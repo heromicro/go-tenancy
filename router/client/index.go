@@ -97,12 +97,11 @@ func InitTenancyRouter(Router *gin.RouterGroup) {
 }
 
 // 菜单
-func InitMenuRouter(Router *gin.RouterGroup) (R *gin.RouterGroup) {
+func InitMenuRouter(Router *gin.RouterGroup) {
 	MenuRouter := Router.Group("/menu")
 	{
 		MenuRouter.GET("/getMenu", client.GetMenu) // 获取菜单树
 	}
-	return MenuRouter
 }
 
 // 运费模板

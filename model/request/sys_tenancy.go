@@ -1,5 +1,7 @@
 package request
 
+import "github.com/gofrs/uuid"
+
 type SetRegionCode struct {
 	Id            float64 `json:"id" form:"id" binding:"required,gt=0"`
 	SysRegionCode int     `json:"sysRegionCode" binding:"required"`
@@ -24,4 +26,9 @@ type SetCopyProductNum struct {
 	CopyNum int `json:"copyNum"`
 	Num     int `json:"num"`
 	Type    int `json:"type" binding:"required"` // 1:+ ,2:-
+}
+
+type LoginDevice struct {
+	UUID       uuid.UUID `json:"uuid" binding:"required"`
+	HospitalNO string    `json:"hospitalNo" binding:"required"`
 }

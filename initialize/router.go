@@ -102,8 +102,12 @@ func Routers(app *gin.Engine) {
 
 		GeneralGroup := V1Group.Group("/user", middleware.IsGeneral())
 		{
-			user.InitAddressRouter(GeneralGroup) //我的地址管理
-			user.InitReceiptRouter(GeneralGroup) //我的发票管理
+			user.InitDeviceRouter(GeneralGroup) //我的发票管理
+		}
+
+		DeviceGroup := V1Group.Group("/device", middleware.IsDevice())
+		{
+			user.InitDeviceRouter(DeviceGroup) //我的发票管理
 		}
 	}
 }

@@ -20,9 +20,9 @@ type UserAddress struct {
 
 	// 可选字段
 	Age          int    `json:"age" form:"age" gorm:"column:age;comment:年龄"`
-	HospitalName string `json:"hospitalName" form:"hospitalName" gorm:"type:varchar(50);column:hospital_name;comment:邮政编码"`
-	LocName      string `json:"locName" form:"locName" gorm:"type:varchar(50);column:loc_name;comment:邮政编码"`
-	BedNum       string `json:"bedNum" form:"bedNum" gorm:"type:varchar(10);column:bed_num;comment:邮政编码"`
+	HospitalName string `json:"hospitalName" form:"hospitalName" gorm:"type:varchar(50);column:hospital_name;comment:医院"`
+	LocName      string `json:"locName" form:"locName" gorm:"type:varchar(50);column:loc_name;comment:科室名称"`
+	BedNum       string `json:"bedNum" form:"bedNum" gorm:"type:varchar(10);column:bed_num;comment:床号"`
 	HospitalNO   string `json:"hospitalNo" form:"hospitalNo" gorm:"type:varchar(20);column:hospital_no;comment:住院号"`
 	Disease      string `json:"disease" form:"disease" gorm:"type:varchar(150);column:disease;comment:病种"`
 

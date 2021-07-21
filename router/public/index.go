@@ -18,14 +18,14 @@ func InitInitRouter(Router *gin.RouterGroup) {
 		ApiRouter.GET("/checkdb", public.CheckDB) // 创建Api
 	}
 }
-func InitPublicRouter(Router *gin.RouterGroup) (R *gin.RouterGroup) {
+func InitPublicRouter(Router *gin.RouterGroup) {
 	BaseRouter := Router.Group("/public", middleware.NeedInit())
 	{
 		BaseRouter.POST("/admin/login", public.AdminLogin)
 		BaseRouter.POST("/merchant/login", public.ClientLogin)
+		BaseRouter.POST("/device/login", public.LoginDevice)
 		BaseRouter.GET("/captcha", public.Captcha)
 		BaseRouter.GET("/region/:p_code", public.Region)
 		BaseRouter.GET("/getRegionList", public.RegionList)
 	}
-	return BaseRouter
 }

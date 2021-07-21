@@ -28,3 +28,10 @@ func InitReceiptRouter(Router *gin.RouterGroup) {
 		ReceiptRouter.DELETE("/deleteReceipt/:id", user.DeleteReceipt)
 	}
 }
+
+// 小程序用户 -> 不同商城（点餐、护工、商城、租赁）-> 医院 -> 病人
+
+// 床旁用户接口
+func InitDeviceRouter(Router *gin.RouterGroup) {
+
+}

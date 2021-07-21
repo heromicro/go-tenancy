@@ -40,7 +40,10 @@ func Login(u *model.SysUser, authorityType int) (response.LoginResponse, error) 
 	case authorityType == multi.TenancyAuthority:
 		return tenancyLogin(u)
 	case authorityType == multi.GeneralAuthority:
-		return generalLogin(u)
+		return response.LoginResponse{
+			User:  nil,
+			Token: "",
+		}, errors.New("错误用户类型")
 	default:
 		return response.LoginResponse{
 			User:  nil,
@@ -73,6 +76,13 @@ func adminLogin(u *model.SysUser) (response.LoginResponse, error) {
 			Token: token,
 		}, err
 	}
+
+	if admin.ID == 0 {
+		return response.LoginResponse{
+			User:  admin,
+			Token: token,
+		}, errors.New("用户名或者密码错误")
+	}
 	claims := &multi.CustomClaims{
 		ID:            strconv.FormatUint(uint64(admin.ID), 10),
 		Username:      admin.Username,
@@ -83,14 +93,6 @@ func adminLogin(u *model.SysUser) (response.LoginResponse, error) {
 		CreationDate:  time.Now().Local().Unix(),
 		ExpiresIn:     multi.RedisSessionTimeoutWeb.Milliseconds(),
 	}
-
-	if admin.ID == 0 {
-		return response.LoginResponse{
-			User:  admin,
-			Token: token,
-		}, errors.New("用户名或者密码错误")
-	}
-
 	token, _, err = multi.AuthDriver.GenerateToken(claims)
 	if err != nil {
 		return response.LoginResponse{
@@ -130,6 +132,14 @@ func tenancyLogin(u *model.SysUser) (response.LoginResponse, error) {
 			Token: token,
 		}, err
 	}
+
+	if tenancy.ID == 0 {
+		return response.LoginResponse{
+			User:  tenancy,
+			Token: token,
+		}, errors.New("用户名或者密码错误")
+	}
+
 	claims := &multi.CustomClaims{
 		ID:            strconv.FormatUint(uint64(tenancy.ID), 10),
 		Username:      tenancy.Username,
@@ -143,13 +153,6 @@ func tenancyLogin(u *model.SysUser) (response.LoginResponse, error) {
 		ExpiresIn:     multi.RedisSessionTimeoutWeb.Milliseconds(),
 	}
 
-	if tenancy.ID == 0 {
-		return response.LoginResponse{
-			User:  tenancy,
-			Token: token,
-		}, errors.New("用户名或者密码错误")
-	}
-
 	token, _, err = multi.AuthDriver.GenerateToken(claims)
 	if err != nil {
 		return response.LoginResponse{
@@ -160,62 +163,6 @@ func tenancyLogin(u *model.SysUser) (response.LoginResponse, error) {
 
 	return response.LoginResponse{
 		User:  tenancy,
-		Token: token,
-	}, nil
-}
-
-// generalLogin
-func generalLogin(u *model.SysUser) (response.LoginResponse, error) {
-	var general response.GeneralUser
-	var token string
-	u.Password = utils.MD5V([]byte(u.Password))
-	err := g.TENANCY_DB.Model(&model.SysUser{}).
-		Where("sys_users.username = ? AND sys_users.password = ?", u.Username, u.Password).
-		Where("sys_authorities.authority_type = ?", multi.GeneralAuthority).
-		Select("sys_users.id,sys_users.username,sys_users.authority_id,sys_users.created_at,sys_users.updated_at, general_infos.email,general_infos.phone,general_infos.nick_name,general_infos.avatar_url,general_infos.sex,general_infos.subscribe,general_infos.open_id,general_infos.union_id,general_infos.country,general_infos.province,general_infos.city,general_infos.id_card,general_infos.is_auth,general_infos.real_name,general_infos.birthday,sys_authorities.authority_name,sys_authorities.authority_type,sys_authorities.default_router,sys_users.authority_id").
-		Joins("left join general_infos on general_infos.sys_user_id = sys_users.id").
-		Joins("left join sys_authorities on sys_authorities.authority_id = sys_users.authority_id").
-		First(&general).Error
-	if errors.Is(err, gorm.ErrRecordNotFound) {
-		return response.LoginResponse{
-			User:  general,
-			Token: token,
-		}, errors.New("用户名或者密码错误")
-	}
-	if err != nil {
-		return response.LoginResponse{
-			User:  general,
-			Token: token,
-		}, err
-	}
-	claims := &multi.CustomClaims{
-		ID:            strconv.FormatUint(uint64(general.ID), 10),
-		Username:      general.Username,
-		AuthorityId:   general.AuthorityId,
-		AuthorityType: general.AuthorityType,
-		LoginType:     multi.LoginTypeWeb,
-		AuthType:      multi.AuthPwd,
-		CreationDate:  time.Now().Local().Unix(),
-		ExpiresIn:     multi.RedisSessionTimeoutWeb.Milliseconds(),
-	}
-
-	if general.ID == 0 {
-		return response.LoginResponse{
-			User:  general,
-			Token: token,
-		}, errors.New("用户名或者密码错误")
-	}
-
-	token, _, err = multi.AuthDriver.GenerateToken(claims)
-	if err != nil {
-		return response.LoginResponse{
-			User:  general,
-			Token: token,
-		}, err
-	}
-
-	return response.LoginResponse{
-		User:  general,
 		Token: token,
 	}, nil
 }

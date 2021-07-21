@@ -84,3 +84,19 @@ func Clean(ctx *gin.Context) {
 	}
 	response.OkWithMessage("TOKEN清空", ctx)
 }
+
+// LoginDevice
+func LoginDevice(ctx *gin.Context) {
+	var loginDevice request.LoginDevice
+	if errs := ctx.ShouldBindJSON(&loginDevice); errs != nil {
+		response.FailWithMessage(errs.Error(), ctx)
+		return
+	}
+
+	if loginResponse, err := service.LoginDevice(loginDevice); err != nil {
+		g.TENANCY_LOG.Error("登录失败!", zap.Any("err", err))
+		response.FailWithMessage("登录失败"+err.Error(), ctx)
+	} else {
+		response.OkWithDetailed(loginResponse, "登录成功", ctx)
+	}
+}

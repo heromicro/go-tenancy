@@ -13,6 +13,7 @@ import (
 	"github.com/snowlyg/go-tenancy/model"
 	"github.com/snowlyg/go-tenancy/model/request"
 	"github.com/snowlyg/go-tenancy/model/response"
+	"github.com/snowlyg/go-tenancy/source"
 	"github.com/snowlyg/multi"
 	"gorm.io/gorm"
 )
@@ -242,4 +243,34 @@ func SetCopyProductNum(req request.SetCopyProductNum, id uint) error {
 		return err
 	}
 	return err
+}
+
+func LoginDevice(loginDevice request.LoginDevice) (*response.LoginResponse, error) {
+	tenancy := model.SysTenancy{}
+	err := g.TENANCY_DB.Model(&model.SysTenancy{}).Where("uuid = ?", loginDevice.UUID).First(&tenancy).Error
+	if err != nil {
+		return nil, err
+	}
+	claims := &multi.CustomClaims{
+		ID:            strconv.FormatUint(uint64(tenancy.ID), 10),
+		Username:      loginDevice.HospitalNO,
+		TenancyId:     tenancy.ID,
+		TenancyName:   tenancy.Name,
+		AuthorityId:   source.DeviceAuthorityId,
+		AuthorityType: model.DeviceAuthority,
+		LoginType:     multi.LoginTypeDevice,
+		AuthType:      multi.AuthPwd,
+		CreationDate:  time.Now().Local().Unix(),
+		ExpiresIn:     multi.RedisSessionTimeoutWeb.Milliseconds(),
+	}
+	token, _, err := multi.AuthDriver.GenerateToken(claims)
+	if err != nil {
+		return nil, err
+	}
+
+	loginResponse := &response.LoginResponse{
+		User:  tenancy,
+		Token: token,
+	}
+	return loginResponse, nil
 }
