@@ -1,6 +1,9 @@
 package request
 
-import "github.com/gofrs/uuid"
+import (
+	"github.com/gofrs/uuid"
+	"github.com/snowlyg/go-tenancy/model"
+)
 
 type SetRegionCode struct {
 	Id            float64 `json:"id" form:"id" binding:"required,gt=0"`
@@ -29,6 +32,6 @@ type SetCopyProductNum struct {
 }
 
 type LoginDevice struct {
-	UUID       uuid.UUID `json:"uuid" binding:"required"`
-	HospitalNO string    `json:"hospitalNo" binding:"required"`
+	UUID uuid.UUID `json:"uuid" binding:"required"`
+	model.Patient
 }

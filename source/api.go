@@ -317,7 +317,6 @@ var baseApis = []model.SysApi{
 	{Path: "/v1/merchant/cuser/setUserLabelMap/:id", Description: "设置用户标签表单", ApiGroup: "cuserClient", Method: "GET"},
 	// 患者管理
 	{Path: "/v1/merchant/patient/getPatientList", Description: "患者列表", ApiGroup: "patient", Method: "POST"},
-	{Path: "/v1/merchant/patient/deletePatient/:id", Description: "删除患者", ApiGroup: "receipt", Method: "DELETE"},
 
 	//物流信息
 	{Path: "/v1/merchant/express/getExpressByCode/:code", Description: "物流信息", ApiGroup: "expressClient", Method: "GET"},

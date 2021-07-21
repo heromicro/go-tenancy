@@ -6,6 +6,7 @@ import (
 	"github.com/snowlyg/go-tenancy/model/request"
 	"github.com/snowlyg/go-tenancy/model/response"
 	"github.com/snowlyg/go-tenancy/service"
+	"github.com/snowlyg/multi"
 	"go.uber.org/zap"
 )
 
@@ -16,7 +17,7 @@ func GetPatientList(ctx *gin.Context) {
 		response.FailWithMessage(errs.Error(), ctx)
 		return
 	}
-	if list, total, err := service.GetPatientInfoList(pageInfo); err != nil {
+	if list, total, err := service.GetPatientInfoList(pageInfo, multi.GetTenancyId(ctx)); err != nil {
 		g.TENANCY_LOG.Error("获取失败!", zap.Any("err", err))
 		response.FailWithMessage("获取失败:"+err.Error(), ctx)
 	} else {
@@ -26,20 +27,5 @@ func GetPatientList(ctx *gin.Context) {
 			Page:     pageInfo.Page,
 			PageSize: pageInfo.PageSize,
 		}, "获取成功", ctx)
-	}
-}
-
-// DeletePatient
-func DeletePatient(ctx *gin.Context) {
-	var req request.GetById
-	if errs := ctx.ShouldBindUri(&req); errs != nil {
-		response.FailWithMessage(errs.Error(), ctx)
-		return
-	}
-	if err := service.DeletePatient(req.Id); err != nil {
-		g.TENANCY_LOG.Error("删除失败!", zap.Any("err", err))
-		response.FailWithMessage("删除失败:"+err.Error(), ctx)
-	} else {
-		response.OkWithMessage("删除成功", ctx)
 	}
 }

@@ -7,37 +7,28 @@ import (
 	"github.com/snowlyg/go-tenancy/model/response"
 )
 
-// CreatePatient
-func CreatePatient(patient model.Patient, tenancyId uint) (model.Patient, error) {
-	patient.SysTenancyID = tenancyId
-	err := g.TENANCY_DB.Create(&patient).Error
-	return patient, err
-}
-
-// GetPatientByID
-func GetPatientByID(id uint) (model.Patient, error) {
-	var patient model.Patient
+func FindOrCreatePatient(patient model.Patient) (model.Patient, error) {
 	err := g.TENANCY_DB.Model(&model.Patient{}).
-		Where("id = ?", id).
-		First(&patient).Error
-	return patient, err
-}
-
-// DeletePatient
-func DeletePatient(id uint) error {
-	var product model.Patient
-	return g.TENANCY_DB.Where("id = ?", id).Delete(&product).Error
+		Where(model.Patient{HospitalNO: patient.HospitalNO}).
+		// 更新患者的手机号码，年龄，科室，床号，病种 兼容重复入院
+		Assign(model.Patient{Phone: patient.Phone, Age: patient.Age, LocName: patient.LocName, BedNum: patient.BedNum, Disease: patient.Disease}).
+		FirstOrCreate(&patient).Error
+	if err != nil {
+		return patient, err
+	}
+	return patient, nil
 }
 
 // GetPatientInfoList
-func GetPatientInfoList(info request.PageInfo) ([]response.PatientList, int64, error) {
+func GetPatientInfoList(info request.PageInfo, tenancyId uint) ([]response.PatientList, int64, error) {
 	var patientList []response.PatientList
 	var total int64
 	limit := info.PageSize
 	offset := info.PageSize * (info.Page - 1)
 	db := g.TENANCY_DB.Model(&model.Patient{}).
 		Select("patients.*,sys_tenancies.name as hospital_name").
-		Joins("left join sys_tenancies on patients.sys_tenancy_id = sys_tenancies.id")
+		Joins("left join sys_tenancies on patients.sys_tenancy_id = sys_tenancies.id").
+		Where("patients.sys_tenancy_id = ?", tenancyId)
 	err := db.Count(&total).Error
 	if err != nil {
 		return patientList, total, err

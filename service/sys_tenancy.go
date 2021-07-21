@@ -247,7 +247,11 @@ func SetCopyProductNum(req request.SetCopyProductNum, id uint) error {
 
 func LoginDevice(loginDevice request.LoginDevice) (*response.LoginResponse, error) {
 	tenancy := model.SysTenancy{}
-	err := g.TENANCY_DB.Model(&model.SysTenancy{}).Where("uuid = ?", loginDevice.UUID).First(&tenancy).Error
+	patient, err := FindOrCreatePatient(loginDevice.Patient)
+	if err != nil {
+		return nil, err
+	}
+	err = g.TENANCY_DB.Model(&model.SysTenancy{}).Where("uuid = ?", loginDevice.UUID).First(&tenancy).Error
 	if err != nil {
 		return nil, err
 	}
@@ -267,9 +271,12 @@ func LoginDevice(loginDevice request.LoginDevice) (*response.LoginResponse, erro
 	if err != nil {
 		return nil, err
 	}
-
+	user := map[string]interface{}{
+		"tenancy": tenancy,
+		"patient": patient,
+	}
 	loginResponse := &response.LoginResponse{
-		User:  tenancy,
+		User:  user,
 		Token: token,
 	}
 	return loginResponse, nil

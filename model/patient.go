@@ -13,8 +13,8 @@ type Patient struct {
 	Age        int    `json:"age" form:"age" gorm:"column:age;comment:年龄" binding:"required"`
 	LocName    string `json:"locName" form:"locName" gorm:"type:varchar(50);column:loc_name;comment:科室名称" binding:"required"`
 	BedNum     string `json:"bedNum" form:"bedNum" gorm:"type:varchar(10);column:bed_num;comment:床号" binding:"required"`
-	HospitalNO string `json:"hospitalNo" form:"hospitalNo" gorm:"type:varchar(20);column:hospital_no;comment:住院号" binding:"required"`
+	HospitalNO string `json:"hospitalNo" form:"hospitalNo" gorm:"uniqueIndex:hospital_no;type:varchar(20);column:hospital_no;comment:住院号" binding:"required"`
 	Disease    string `json:"disease" form:"disease" gorm:"type:varchar(150);column:disease;comment:病种" binding:"required"`
 
-	SysTenancyID uint `json:"sysTenancyId" form:"sysTenancyId" gorm:"column:sys_tenancy_id;comment:关联标记" binding:"required"`
+	SysTenancyID uint `json:"sysTenancyId" form:"sysTenancyId" gorm:"column:sys_tenancy_id;comment:关联标记"`
 }

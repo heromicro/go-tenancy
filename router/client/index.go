@@ -204,6 +204,5 @@ func InitPatientRouter(Router *gin.RouterGroup) {
 	PatientRouter := Router.Group("/patient")
 	{
 		PatientRouter.POST("/getPatientList", client.GetPatientList)
-		PatientRouter.DELETE("/deletePatient/:id", client.DeletePatient)
 	}
 }
