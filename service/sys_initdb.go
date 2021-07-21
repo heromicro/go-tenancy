@@ -134,6 +134,7 @@ func InitDB(conf request.InitDB) error {
 		model.SysConfigValue{},
 		model.SysBrandCategory{},
 		model.SysBrand{},
+		model.Patient{},
 
 		model.TenancyMedia{},
 		model.ProductCategory{},
@@ -220,6 +221,7 @@ func InitDB(conf request.InitDB) error {
 		source.UserMerchant,
 		source.Address,
 		source.Receipt,
+		source.Patient,
 	)
 	if err != nil {
 		_ = WriteConfig(g.TENANCY_VP, BaseMysql)

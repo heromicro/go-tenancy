@@ -42,6 +42,7 @@ func MysqlTables(db *gorm.DB) {
 		model.SysConfigValue{},
 		model.SysBrandCategory{},
 		model.SysBrand{},
+		model.Patient{},
 
 		model.TenancyMedia{},
 		model.ProductCategory{},

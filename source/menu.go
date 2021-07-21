@@ -26,14 +26,12 @@ var menus = []model.SysBaseMenu{
 	{TENANCY_MODEL: g.TENANCY_MODEL{ID: 44}, Pid: 42, Path: "/42/", Icon: "", MenuName: "商户列表", Route: "/admin/merchant/list", Params: "", Sort: 9, Hidden: 2, IsTenancy: 2, IsMenu: 1},
 	{TENANCY_MODEL: g.TENANCY_MODEL{ID: 47}, Pid: 38, Path: "/110/38/", Icon: "", MenuName: "操作日志", Route: "/admin/setting/systemLog", Params: "", Sort: 0, Hidden: 2, IsTenancy: 2, IsMenu: 1},
 	{TENANCY_MODEL: g.TENANCY_MODEL{ID: 48}, Pid: 38, Path: "/110/38/", Icon: "", MenuName: "菜单管理", Route: "/admin/setting/menu", Params: "", Sort: 0, Hidden: 2, IsTenancy: 2, IsMenu: 1},
-
 	{TENANCY_MODEL: g.TENANCY_MODEL{ID: 49}, Pid: 526, Path: "/526/", Icon: "", MenuName: "权限管理", Route: "/merchant/setting", Params: "", Sort: 0, Hidden: 2, IsTenancy: 1, IsMenu: 1},
 	{TENANCY_MODEL: g.TENANCY_MODEL{ID: 50}, Pid: 49, Path: "/526/49/", Icon: "", MenuName: "角色管理", Route: "/merchant/setting/systemRole", Params: "", Sort: 0, Hidden: 2, IsTenancy: 1, IsMenu: 1},
 	{TENANCY_MODEL: g.TENANCY_MODEL{ID: 51}, Pid: 49, Path: "/526/49/", Icon: "", MenuName: "员工管理", Route: "/merchant/setting/systemAdmin", Params: "", Sort: 0, Hidden: 2, IsTenancy: 1, IsMenu: 1},
 	{TENANCY_MODEL: g.TENANCY_MODEL{ID: 52}, Pid: 49, Path: "/526/49/", Icon: "", MenuName: "操作日志", Route: "/merchant/setting/systemLog", Params: "", Sort: 0, Hidden: 2, IsTenancy: 1, IsMenu: 1},
 	{TENANCY_MODEL: g.TENANCY_MODEL{ID: 54}, Pid: 526, Path: "/526/", Icon: "", MenuName: "素材管理", Route: "/merchant/config/picture", Params: "", Sort: 0, Hidden: 2, IsTenancy: 1, IsMenu: 1},
 	{TENANCY_MODEL: g.TENANCY_MODEL{ID: 55}, Pid: 0, Path: "/", Icon: "s-home", MenuName: "首页", Route: "/merchant/dashboard", Params: "", Sort: 100, Hidden: 2, IsTenancy: 1, IsMenu: 1},
-
 	{TENANCY_MODEL: g.TENANCY_MODEL{ID: 57}, Pid: 521, Path: "/520/521/", Icon: "", MenuName: "组合数据", Route: "/admin/group/list", Params: "", Sort: 0, Hidden: 2, IsTenancy: 2, IsMenu: 1},
 	{TENANCY_MODEL: g.TENANCY_MODEL{ID: 58}, Pid: 519, Path: "/519/", Icon: "", MenuName: "公众号", Route: "/admin/app/wechat", Params: "", Sort: 0, Hidden: 2, IsTenancy: 2, IsMenu: 1},
 	{TENANCY_MODEL: g.TENANCY_MODEL{ID: 59}, Pid: 58, Path: "/519/58/", Icon: "", MenuName: "微信菜单", Route: "/admin/app/wechat/menus", Params: "", Sort: 0, Hidden: 2, IsTenancy: 2, IsMenu: 1},
@@ -167,7 +165,8 @@ var menus = []model.SysBaseMenu{
 	{TENANCY_MODEL: g.TENANCY_MODEL{ID: 1028}, Pid: 1027, Path: "1027/", Icon: "", MenuName: "标签管理", Route: "/merchant/user/_label", Params: "[]", Sort: 0, Hidden: 2, IsTenancy: 1, IsMenu: 1},
 	{TENANCY_MODEL: g.TENANCY_MODEL{ID: 1029}, Pid: 1028, Path: "1028/", Icon: "", MenuName: "手动标签", Route: "/merchant/user/label", Params: "[]", Sort: 0, Hidden: 2, IsTenancy: 1, IsMenu: 1},
 	{TENANCY_MODEL: g.TENANCY_MODEL{ID: 1030}, Pid: 1028, Path: "1028/", Icon: "", MenuName: "自动标签", Route: "/merchant/user/maticlabel", Params: "[]", Sort: 0, Hidden: 2, IsTenancy: 1, IsMenu: 1},
-
+	{TENANCY_MODEL: g.TENANCY_MODEL{ID: 1031}, Pid: 0, Path: "/", Icon: "user-solid", MenuName: "患者", Route: "/merchant/patient", Params: "", Sort: 0, Hidden: 2, IsTenancy: 1, IsMenu: 1},
+	{TENANCY_MODEL: g.TENANCY_MODEL{ID: 1032}, Pid: 1031, Path: "/1032/", Icon: "", MenuName: "患者列表", Route: "/merchant/patient/list", Params: "", Sort: 0, Hidden: 2, IsTenancy: 1, IsMenu: 1},
 	// {TENANCY_MODEL: g.TENANCY_MODEL{ID: 1095}, 1051, "/719/1051/", "", "活动商品", "/marketing/assist/goods_list",Params:  "[]", Sort: 0,Hidden: 2, IsTenancy:2,IsMenu: 1},
 	// {TENANCY_MODEL: g.TENANCY_MODEL{ID: 1096}, 1051, "/719/1051/", "", "助力活动", "/marketing/assist/list",Params:  "[]", Sort: 0,Hidden: 2, IsTenancy:2,IsMenu: 1},
 	// {TENANCY_MODEL: g.TENANCY_MODEL{ID: 1099}, Pid: 106, Path: "106/", Icon: "", MenuName: "助力", Route: "/merchant/assist", Params: "[]", Sort: 0, Hidden: 2, IsTenancy: 1, IsMenu: 1},
@@ -177,6 +176,7 @@ var menus = []model.SysBaseMenu{
 	{TENANCY_MODEL: g.TENANCY_MODEL{ID: 1103}, Pid: 1027, Path: "1027/", Icon: "", MenuName: "用户管理", Route: "/merchant/user/list", Params: "[]", Sort: 0, Hidden: 2, IsTenancy: 1, IsMenu: 1},
 	// {TENANCY_MODEL: g.TENANCY_MODEL{ID: 1119}, Pid: 0, Path: "/", Icon: "message", MenuName: "公告列表", Route: "/merchant/station/notice", Params: "[]", Sort: 0, Hidden: 2, IsTenancy: 1, IsMenu: 1},
 	// {TENANCY_MODEL: g.TENANCY_MODEL{ID: 1120}, 110, "/110/", "", "公告管理", "/station/notice",Params:  "[]", Sort: 0,Hidden: 2, IsTenancy:2,IsMenu: 1},
+
 }
 
 //Init sys_base_menus 表数据初始化

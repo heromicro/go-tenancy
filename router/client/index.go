@@ -198,3 +198,12 @@ func InitCUserRouter(Router *gin.RouterGroup) {
 		UserRouter.POST("/getGeneralList", client.GetGeneralList)      // 分页获取c用户列表
 	}
 }
+
+// 患者管理
+func InitPatientRouter(Router *gin.RouterGroup) {
+	PatientRouter := Router.Group("/patient")
+	{
+		PatientRouter.POST("/getPatientList", client.GetPatientList)
+		PatientRouter.DELETE("/deletePatient/:id", client.DeletePatient)
+	}
+}

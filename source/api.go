@@ -15,7 +15,7 @@ type api struct{}
 var baseApis = []model.SysApi{
 
 	{Path: "/v1/auth/logout", Description: "退出", ApiGroup: "user", Method: "GET"},
-	{Path: "/v1/auth/clean", Description: "清空", ApiGroup: "user", Method: "GET"},
+	{Path: "/v1/auth/clean", Description: "清空 token", ApiGroup: "user", Method: "GET"},
 	{Path: "/v1/admin/user/register", Description: "用户注册", ApiGroup: "user", Method: "POST"},
 	{Path: "/v1/admin/user/changePassword", Description: "修改密码", ApiGroup: "user", Method: "POST"},
 	{Path: "/v1/admin/user/changeProfile", Description: "修改个人信息", ApiGroup: "user", Method: "POST"},
@@ -315,6 +315,9 @@ var baseApis = []model.SysApi{
 	{Path: "/v1/merchant/cuser/getOrderList/:id", Description: "消费列表", ApiGroup: "cuserClient", Method: "POST"},
 	{Path: "/v1/merchant/cuser/setUserLabel/:id", Description: "设置用户标签", ApiGroup: "cuserClient", Method: "POST"},
 	{Path: "/v1/merchant/cuser/setUserLabelMap/:id", Description: "设置用户标签表单", ApiGroup: "cuserClient", Method: "GET"},
+	// 患者管理
+	{Path: "/v1/merchant/patient/getPatientList", Description: "患者列表", ApiGroup: "patient", Method: "POST"},
+	{Path: "/v1/merchant/patient/deletePatient/:id", Description: "删除患者", ApiGroup: "receipt", Method: "DELETE"},
 
 	//物流信息
 	{Path: "/v1/merchant/express/getExpressByCode/:code", Description: "物流信息", ApiGroup: "expressClient", Method: "GET"},
