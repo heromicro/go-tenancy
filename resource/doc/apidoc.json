@@ -1,12 +1,12 @@
 {
-  "name": "AcmeCorp Api documentation",
-  "version": "0.3.0",
+  "name": "GO-TENANCY多商户商城平台",
+  "version": "0.0.1",
   "description": "Documentation for the REST api access provided at AcmeCorp",
   "title": "Custom apiDoc browser title",
-  "url" : "https://api.example.com",
+  "url": "http://10.0.0.26:8085",
   "sampleUrl": "https://apidoc.free.beeceptor.com",
   "header": {
-    "title": "Introduction",
+    "title": "文档简介",
     "filename": "header.md"
   },
   "footer": {

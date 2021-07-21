@@ -22,12 +22,12 @@ func LoginTenancy(id uint) (response.LoginTenancy, error) {
 	var loginTenancy response.LoginTenancy
 	var token string
 	err := g.TENANCY_DB.Model(&model.SysUser{}).
-		Where("sys_authorities.authority_type = ?", multi.TenancyAuthority).
-		Where("sys_tenancies.id = ?", id).
-		Select("sys_users.id,sys_users.username,sys_users.authority_id,sys_users.created_at,sys_users.updated_at,sys_tenancies.id  as tenancy_id,sys_tenancies.name as tenancy_name,tenancy_infos.email, tenancy_infos.phone, tenancy_infos.nick_name, tenancy_infos.header_img,sys_authorities.authority_name,sys_authorities.authority_type,sys_authorities.default_router,sys_users.authority_id").
+		Select("sys_users.id,sys_users.username,sys_users.authority_id,sys_users.created_at,sys_users.updated_at,sys_tenancies.id as tenancy_id,sys_tenancies.name as tenancy_name,sys_tenancies.status,tenancy_infos.email, tenancy_infos.phone, tenancy_infos.nick_name, tenancy_infos.header_img,sys_authorities.authority_name,sys_authorities.authority_type,sys_authorities.default_router,sys_users.authority_id").
 		Joins("left join tenancy_infos on tenancy_infos.sys_user_id = sys_users.id").
 		Joins("left join sys_tenancies on tenancy_infos.sys_tenancy_id = sys_tenancies.id").
 		Joins("left join sys_authorities on sys_authorities.authority_id = sys_users.authority_id").
+		Where("sys_authorities.authority_type = ?", multi.TenancyAuthority).
+		Where("sys_tenancies.id = ?", id).
 		First(&loginTenancy.Admin).Error
 	if errors.Is(err, gorm.ErrRecordNotFound) {
 		return loginTenancy, errors.New("用户名或者密码错误")
@@ -50,6 +50,10 @@ func LoginTenancy(id uint) (response.LoginTenancy, error) {
 
 	if loginTenancy.Admin.ID == 0 {
 		return loginTenancy, errors.New("用户名或者密码错误")
+	}
+
+	if loginTenancy.Admin.Status == g.StatusFalse {
+		return loginTenancy, errors.New("商户已被冻结")
 	}
 
 	token, exp, err := multi.AuthDriver.GenerateToken(claims)
@@ -78,6 +82,13 @@ func CreateTenancy(tenancy model.SysTenancy) (model.SysTenancy, error) {
 func GetTenancyByID(id uint) (model.SysTenancy, error) {
 	var tenancy model.SysTenancy
 	err := g.TENANCY_DB.Where("id = ?", id).First(&tenancy).Error
+	return tenancy, err
+}
+
+// GetTenancyByUUID
+func GetTenancyByUUID(uuid string) (model.SysTenancy, error) {
+	var tenancy model.SysTenancy
+	err := g.TENANCY_DB.Where("uuid = ?", uuid).First(&tenancy).Error
 	return tenancy, err
 }
 
@@ -246,17 +257,23 @@ func SetCopyProductNum(req request.SetCopyProductNum, id uint) error {
 }
 
 func LoginDevice(loginDevice request.LoginDevice) (*response.LoginResponse, error) {
-	tenancy := model.SysTenancy{}
+
+	tenancy, err := GetTenancyByUUID(loginDevice.UUID)
+	if err != nil {
+		return nil, fmt.Errorf("find tenancy %w", err)
+	}
+	if tenancy.Status == g.StatusFalse {
+		return nil, fmt.Errorf("商户已被冻结")
+	}
+
+	loginDevice.Patient.SysTenancyID = tenancy.ID
 	patient, err := FindOrCreatePatient(loginDevice.Patient)
 	if err != nil {
 		return nil, err
 	}
-	err = g.TENANCY_DB.Model(&model.SysTenancy{}).Where("uuid = ?", loginDevice.UUID).First(&tenancy).Error
-	if err != nil {
-		return nil, err
-	}
+
 	claims := &multi.CustomClaims{
-		ID:            strconv.FormatUint(uint64(tenancy.ID), 10),
+		ID:            strconv.FormatUint(uint64(patient.ID), 10), // 患者 id
 		Username:      loginDevice.HospitalNO,
 		TenancyId:     tenancy.ID,
 		TenancyName:   tenancy.Name,

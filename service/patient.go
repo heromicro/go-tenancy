@@ -1,6 +1,8 @@
 package service
 
 import (
+	"fmt"
+
 	"github.com/snowlyg/go-tenancy/g"
 	"github.com/snowlyg/go-tenancy/model"
 	"github.com/snowlyg/go-tenancy/model/request"
@@ -14,7 +16,7 @@ func FindOrCreatePatient(patient model.Patient) (model.Patient, error) {
 		Assign(model.Patient{Phone: patient.Phone, Age: patient.Age, LocName: patient.LocName, BedNum: patient.BedNum, Disease: patient.Disease}).
 		FirstOrCreate(&patient).Error
 	if err != nil {
-		return patient, err
+		return patient, fmt.Errorf("find or create patient %w", err)
 	}
 	return patient, nil
 }

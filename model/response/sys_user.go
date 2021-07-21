@@ -21,6 +21,7 @@ type SysAdminUser struct {
 type SysTenancyUser struct {
 	TenancyResponse
 	Username      string `json:"userName"`
+	Status        int    `json:"status"`
 	Email         string `json:"email"`
 	Phone         string `json:"phone"`
 	NickName      string `json:"nickName"`
