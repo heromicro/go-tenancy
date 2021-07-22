@@ -344,14 +344,14 @@ func GetProductInfoList(info request.ProductPageInfo, ctx *gin.Context) ([]respo
 	limit := info.PageSize
 	offset := info.PageSize * (info.Page - 1)
 	db := g.TENANCY_DB.Model(&model.Product{}).
-		Select("products.*,sys_tenancies.name as sys_tenancy_name,sys_brands.brand_name as brand_name,product_categories.cate_name as cate_name").
 		Joins("left join sys_tenancies on products.sys_tenancy_id = sys_tenancies.id").
 		Joins("left join sys_brands on products.sys_brand_id = sys_brands.id").
 		Joins("left join product_categories on products.product_category_id = product_categories.id")
 
 	if IsCuser(ctx) {
-		db = db.Where("products.is_show = ?", g.StatusTrue).Where("products.status = ?", model.SuccessProductStatus)
+		db = db.Select("products.id,products.store_name,products.price,products.image,products.sales").Where("products.is_show = ?", g.StatusTrue).Where("products.status = ?", model.SuccessProductStatus)
 	} else {
+		db = db.Select("products.*,sys_tenancies.name as sys_tenancy_name,sys_brands.brand_name as brand_name,product_categories.cate_name as cate_name")
 		if info.Type != "" {
 			t, err := strconv.Atoi(info.Type)
 			if err != nil {

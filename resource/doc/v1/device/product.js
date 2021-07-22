@@ -59,62 +59,15 @@
  * @apiSuccessExample Response:
  *     HTTP/1.1 200 OK
  *     {
-  "status": 200,
+    "status": 200,
     "data": {
         "list": [
             {
                 "id": 1,
-                "createdAt": "2021-07-22T09:27:57+08:00",
-                "updatedAt": "2021-07-22T09:27:57+08:00",
                 "storeName": "领立裁腰带短袖连衣裙",
-                "storeInfo": "短袖连衣裙",
-                "keyword": "连衣裙",
-                "barCode": "",
-                "isShow": 1,
-                "status": 1,
-                "unitName": "件",
-                "sort": 40,
-                "rank": 0,
                 "sales": 1,
                 "price": 80,
-                "cost": 50,
-                "otPrice": 100,
-                "stock": 399,
-                "isHot": 2,
-                "isBenefit": 2,
-                "isBest": 2,
-                "isNew": 2,
-                "isGood": 1,
-                "productType": 2,
-                "ficti": 100,
-                "browse": 0,
-                "codePath": "",
-                "videoLink": "",
-                "specType": 1,
-                "refusal": "",
-                "rate": 5,
-                "replyCount": 0,
-                "isGiftBag": 2,
-                "careCount": 0,
-                "image": "http://127.0.0.1:8090/uploads/def/20200816/9a6a2e1231fb19517ed1de71206a0657.jpg",
-                "oldId": 0,
-                "tempId": 99,
-                "sysTenancyId": 1,
-                "sysBrandId": 2,
-                "productCategoryId": 162,
-                "sysTenancyName": "宝安中心人民医院",
-                "cateName": "男士上衣",
-                "brandName": "苹果",
-                "productCates": [
-                    {
-                        "id": 174,
-                        "cateName": "时尚女装"
-                    },
-                    {
-                        "id": 173,
-                        "cateName": "品牌服饰"
-                    }
-                ]
+                "image": "http://127.0.0.1:8090/uploads/def/20200816/9a6a2e1231fb19517ed1de71206a0657.jpg"
             }
         ],
         "total": 1,

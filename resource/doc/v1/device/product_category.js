@@ -29,28 +29,14 @@
     "data": [
         {
             "id": 173,
-            "createdAt": "2021-07-22T09:27:57+08:00",
-            "updatedAt": "2021-07-22T09:27:57+08:00",
-            "pid": 0,
             "cateName": "品牌服饰",
-            "path": "/",
-            "sort": 2,
             "pic": "",
-            "status": 1,
-            "level": 0,
             "children": [
                 {
                     "id": 174,
-                    "createdAt": "2021-07-22T09:27:57+08:00",
-                    "updatedAt": "2021-07-22T09:27:57+08:00",
                     "pid": 173,
                     "cateName": "时尚女装",
-                    "path": "/173/",
-                    "sort": 0,
-                    "pic": "",
-                    "status": 1,
-                    "level": 1,
-                    "children": null
+                    "pic": ""
                 }
             ]
         }

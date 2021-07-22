@@ -8,10 +8,10 @@ import (
 type ProductList struct {
 	TenancyResponse
 	model.BaseProduct
-	SysTenancyName string        `json:"sysTenancyName"`        // 商户名称
-	CateName       string        `json:"cateName"`              // 分类名称
-	BrandName      string        `json:"brandName"`             // 商户名称
-	ProductCates   []ProductCate `gorm:"-" json:"productCates"` // 商户分类
+	SysTenancyName string        `json:"sysTenancyName,omitempty"`        // 商户名称
+	CateName       string        `json:"cateName,omitempty"`              // 分类名称
+	BrandName      string        `json:"brandName,omitempty"`             // 商户名称
+	ProductCates   []ProductCate `gorm:"-" json:"productCates,omitempty"` // 商户分类
 
 }
 

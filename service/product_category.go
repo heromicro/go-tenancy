@@ -107,6 +107,7 @@ func getProductCategoryMap(tenancyId uint, isCuser bool) (map[int32][]response.P
 	}
 	if isCuser {
 		db = db.Where("status = ?", g.StatusTrue)
+		db = db.Select("id,pid,cate_name,pic")
 	}
 	err := db.Order("sort").Find(&productCategoryList).Error
 	for _, v := range productCategoryList {

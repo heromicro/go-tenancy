@@ -134,11 +134,64 @@ define({ "api": [
         "type": "bash"
       }
     ],
-    "error": {
+    "success": {
+      "fields": {
+        "Success 200": [
+          {
+            "group": "Success 200",
+            "type": "Number",
+            "optional": false,
+            "field": "id",
+            "description": "<p>分类id</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Number",
+            "optional": false,
+            "field": "pid",
+            "description": "<p>上级id</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "cateName",
+            "description": "<p>分类名称</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Number",
+            "optional": false,
+            "field": "sort",
+            "description": "<p>排序</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "pic",
+            "description": "<p>图片</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Number",
+            "optional": false,
+            "field": "level",
+            "description": "<p>等级</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Object[]",
+            "optional": false,
+            "field": "children",
+            "description": "<p>子分类</p>"
+          }
+        ]
+      },
       "examples": [
         {
           "title": "Response:",
-          "content": "HTTP/1.1 200 OK\n{\n\"status\": 200,\n\"data\": [\n    {\n        \"id\": 173,\n        \"createdAt\": \"2021-07-22T09:27:57+08:00\",\n        \"updatedAt\": \"2021-07-22T09:27:57+08:00\",\n        \"pid\": 0,\n        \"cateName\": \"品牌服饰\",\n        \"path\": \"/\",\n        \"sort\": 2,\n        \"pic\": \"\",\n        \"status\": 1,\n        \"level\": 0,\n        \"children\": [\n            {\n                \"id\": 174,\n                \"createdAt\": \"2021-07-22T09:27:57+08:00\",\n                \"updatedAt\": \"2021-07-22T09:27:57+08:00\",\n                \"pid\": 173,\n                \"cateName\": \"时尚女装\",\n                \"path\": \"/173/\",\n                \"sort\": 0,\n                \"pic\": \"\",\n                \"status\": 1,\n                \"level\": 1,\n                \"children\": null\n            }\n        ]\n    }\n],\n\"message\": \"获取成功\"\n}",
+          "content": "HTTP/1.1 200 OK\n{\n\"status\": 200,\n\"data\": [\n    {\n        \"id\": 173,\n        \"cateName\": \"品牌服饰\",\n        \"pic\": \"\",\n        \"children\": [\n            {\n                \"id\": 174,\n                \"pid\": 173,\n                \"cateName\": \"时尚女装\",\n                \"pic\": \"\"\n            }\n        ]\n    }\n],\n\"message\": \"获取成功\"\n}",
           "type": "json"
         }
       ]
@@ -242,11 +295,246 @@ define({ "api": [
         "type": "bash"
       }
     ],
-    "error": {
+    "success": {
+      "fields": {
+        "Success 200": [
+          {
+            "group": "Success 200",
+            "type": "Number",
+            "optional": false,
+            "field": "id",
+            "description": "<p>商品id</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "storeName",
+            "description": "<p>商品名称</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "storeInfo",
+            "description": "<p>商品简介</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "keyword",
+            "description": "<p>商品关键词</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "barCode",
+            "description": "<p>商品条码</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Number",
+            "optional": false,
+            "field": "isShow",
+            "description": "<p>是否显示 1 是，2否</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Number",
+            "optional": false,
+            "field": "status",
+            "description": "<p>商品状态 1：审核通过,2：审核中 3: 未通过</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "unitName",
+            "description": "<p>商品单位</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Number",
+            "optional": false,
+            "field": "sort",
+            "description": "<p>排序</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Number",
+            "optional": false,
+            "field": "rank",
+            "description": "<p>总后台排序</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Number",
+            "optional": false,
+            "field": "sales",
+            "description": "<p>商品销量</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Number",
+            "optional": false,
+            "field": "price",
+            "description": "<p>最低价格</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Number",
+            "optional": false,
+            "field": "cost",
+            "description": "<p>成本价</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Number",
+            "optional": false,
+            "field": "otPrice",
+            "description": "<p>原价</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Number",
+            "optional": false,
+            "field": "stock",
+            "description": "<p>库存</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Number",
+            "optional": false,
+            "field": "isHot",
+            "description": "<p>是否热卖 1 是，2否</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Number",
+            "optional": false,
+            "field": "isBenefit",
+            "description": "<p>促销单品 1 是，2否</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Number",
+            "optional": false,
+            "field": "isBest",
+            "description": "<p>是否精品 1 是，2否</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Number",
+            "optional": false,
+            "field": "isNew",
+            "description": "<p>是否新品 1 是，2否</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Number",
+            "optional": false,
+            "field": "isGood",
+            "description": "<p>是否优品推荐 1 是，2否</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Number",
+            "optional": false,
+            "field": "productType",
+            "description": "<p>商品分类 1.普通商品 2.秒杀商品,3.预售商品，4.助力商品</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Number",
+            "optional": false,
+            "field": "ficti",
+            "description": "<p>虚拟销量</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Number",
+            "optional": false,
+            "field": "browse",
+            "description": "<p>浏览量</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "codePath",
+            "description": "<p>产品二维码地址</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "videoLink",
+            "description": "<p>主图视频链接</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Number",
+            "optional": false,
+            "field": "specType",
+            "description": "<p>规格 1单 2多</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "refusal",
+            "description": "<p>审核拒绝理由</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Number",
+            "optional": false,
+            "field": "Rate",
+            "description": "<p>评价分数</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Number",
+            "optional": false,
+            "field": "ReplyCount",
+            "description": "<p>评论数</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Number",
+            "optional": false,
+            "field": "isGiftBag",
+            "description": "<p>是否为礼包</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Number",
+            "optional": false,
+            "field": "careCount",
+            "description": "<p>收藏数</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Number",
+            "optional": false,
+            "field": "image",
+            "description": "<p>商品图片</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Object[]",
+            "optional": false,
+            "field": "productCates",
+            "description": "<p>商品分类</p>"
+          }
+        ]
+      },
       "examples": [
         {
           "title": "Response:",
-          "content": "  HTTP/1.1 200 OK\n  {\n\"status\": 200,\n  \"data\": {\n      \"list\": [\n          {\n              \"id\": 1,\n              \"createdAt\": \"2021-07-22T09:27:57+08:00\",\n              \"updatedAt\": \"2021-07-22T09:27:57+08:00\",\n              \"storeName\": \"领立裁腰带短袖连衣裙\",\n              \"storeInfo\": \"短袖连衣裙\",\n              \"keyword\": \"连衣裙\",\n              \"barCode\": \"\",\n              \"isShow\": 1,\n              \"status\": 1,\n              \"unitName\": \"件\",\n              \"sort\": 40,\n              \"rank\": 0,\n              \"sales\": 1,\n              \"price\": 80,\n              \"cost\": 50,\n              \"otPrice\": 100,\n              \"stock\": 399,\n              \"isHot\": 2,\n              \"isBenefit\": 2,\n              \"isBest\": 2,\n              \"isNew\": 2,\n              \"isGood\": 1,\n              \"productType\": 2,\n              \"ficti\": 100,\n              \"browse\": 0,\n              \"codePath\": \"\",\n              \"videoLink\": \"\",\n              \"specType\": 1,\n              \"extensionType\": 2,\n              \"refusal\": \"\",\n              \"rate\": 5,\n              \"replyCount\": 0,\n              \"isGiftBag\": 2,\n              \"careCount\": 0,\n              \"image\": \"http://127.0.0.1:8090/uploads/def/20200816/9a6a2e1231fb19517ed1de71206a0657.jpg\",\n              \"oldId\": 0,\n              \"tempId\": 99,\n              \"sysTenancyId\": 1,\n              \"sysBrandId\": 2,\n              \"productCategoryId\": 162,\n              \"sysTenancyName\": \"宝安中心人民医院\",\n              \"cateName\": \"男士上衣\",\n              \"brandName\": \"苹果\",\n              \"productCates\": [\n                  {\n                      \"id\": 174,\n                      \"cateName\": \"时尚女装\"\n                  },\n                  {\n                      \"id\": 173,\n                      \"cateName\": \"品牌服饰\"\n                  }\n              ]\n          }\n      ],\n      \"total\": 1,\n      \"page\": 1,\n      \"pageSize\": 10\n  },\n  \"message\": \"获取成功\"\n  }",
+          "content": "HTTP/1.1 200 OK\n{\n\"status\": 200,\n\"data\": {\n    \"list\": [\n        {\n            \"id\": 1,\n            \"storeName\": \"领立裁腰带短袖连衣裙\",\n            \"sales\": 1,\n            \"price\": 80,\n            \"image\": \"http://127.0.0.1:8090/uploads/def/20200816/9a6a2e1231fb19517ed1de71206a0657.jpg\"\n        }\n    ],\n    \"total\": 1,\n    \"page\": 1,\n    \"pageSize\": 10\n},\n\"message\": \"获取成功\"\n}",
           "type": "json"
         }
       ]
