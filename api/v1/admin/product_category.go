@@ -74,17 +74,7 @@ func UpdateProductCategory(ctx *gin.Context) {
 
 // GetProductCategoryList
 func GetProductCategoryList(ctx *gin.Context) {
-	if list, err := service.GetProductCategoryInfoList(0); err != nil {
-		g.TENANCY_LOG.Error("获取失败!", zap.Any("err", err))
-		response.FailWithMessage("获取失败:"+err.Error(), ctx)
-	} else {
-		response.OkWithDetailed(list, "获取成功", ctx)
-	}
-}
-
-// GetClientProductCategoryList
-func GetClientProductCategoryList(ctx *gin.Context) {
-	if list, err := service.GetProductCategoryInfoList(multi.GetTenancyId(ctx)); err != nil {
+	if list, err := service.GetProductCategoryInfoList(0, service.IsCuser(ctx)); err != nil {
 		g.TENANCY_LOG.Error("获取失败!", zap.Any("err", err))
 		response.FailWithMessage("获取失败:"+err.Error(), ctx)
 	} else {
@@ -94,7 +84,7 @@ func GetClientProductCategoryList(ctx *gin.Context) {
 
 // GetProductCategorySelect
 func GetProductCategorySelect(ctx *gin.Context) {
-	if opts, err := service.GetProductCategoriesOptions(0); err != nil {
+	if opts, err := service.GetProductCategoriesOptions(0, service.IsCuser(ctx)); err != nil {
 		g.TENANCY_LOG.Error("获取失败!", zap.Any("err", err))
 		response.FailWithMessage("获取失败:"+err.Error(), ctx)
 	} else {

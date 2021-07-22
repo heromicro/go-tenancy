@@ -9,8 +9,8 @@ import (
 	"github.com/snowlyg/go-tenancy/middleware"
 	"github.com/snowlyg/go-tenancy/router/admin"
 	"github.com/snowlyg/go-tenancy/router/client"
+	"github.com/snowlyg/go-tenancy/router/device"
 	"github.com/snowlyg/go-tenancy/router/public"
-	"github.com/snowlyg/go-tenancy/router/user"
 	"github.com/snowlyg/go-tenancy/utils"
 )
 
@@ -43,7 +43,7 @@ func Routers(app *gin.Engine) {
 		public.InitInitRouter(PublicGroup)   // 自动初始化相关
 	}
 
-	V1Group := app.Group("/v1", middleware.Auth(), middleware.CasbinHandler(), middleware.OperationRecord())
+	V1Group := app.Group("/v1", middleware.Auth(), middleware.OperationRecord())
 	{
 		Auth := V1Group.Group("/auth")
 		{
@@ -51,7 +51,7 @@ func Routers(app *gin.Engine) {
 		}
 
 		// 商户和员工
-		AdminGroup := V1Group.Group(g.TENANCY_CONFIG.System.AdminPreix, middleware.IsAdmin())
+		AdminGroup := V1Group.Group(g.TENANCY_CONFIG.System.AdminPreix, middleware.IsAdmin(), middleware.CasbinHandler())
 		{
 			admin.InitApiRouter(AdminGroup)                // 注册功能api路由
 			admin.InitUserRouter(AdminGroup)               // 注册用户路由
@@ -80,7 +80,7 @@ func Routers(app *gin.Engine) {
 		}
 
 		// 商户和员工
-		ClientGroup := V1Group.Group(g.TENANCY_CONFIG.System.ClientPreix, middleware.IsTenancy())
+		ClientGroup := V1Group.Group(g.TENANCY_CONFIG.System.ClientPreix, middleware.IsTenancy(), middleware.CasbinHandler())
 		{
 
 			client.InitTenancyRouter(ClientGroup)            // 注册商户路由
@@ -102,14 +102,14 @@ func Routers(app *gin.Engine) {
 			client.InitSysOperationRecordRouter(ClientGroup) // 操作记录
 		}
 
-		GeneralGroup := V1Group.Group("/user", middleware.IsGeneral())
-		{
-			user.InitDeviceRouter(GeneralGroup) //我的发票管理
-		}
+		// GeneralGroup := V1Group.Group("/user", middleware.IsGeneral())
+		// {
+		// 	user.InitDeviceRouter(GeneralGroup)
+		// }
 
 		DeviceGroup := V1Group.Group("/device", middleware.IsDevice())
 		{
-			user.InitDeviceRouter(DeviceGroup) //我的发票管理
+			device.InitDeviceRouter(DeviceGroup)
 		}
 	}
 }

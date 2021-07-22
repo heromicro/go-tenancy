@@ -71,7 +71,6 @@ func clinetProductList(t *testing.T, params map[string]interface{}, length int) 
 			"codePath",
 			"videoLink",
 			"specType",
-			"extensionType",
 			"refusal",
 			"rate",
 			"replyCount",
@@ -136,13 +135,12 @@ func TestClinetProductProcess(t *testing.T) {
 				"weight":  1,
 			},
 		},
-		"cateId":        183,
-		"content":       "<p>是的发生的发sad</p>",
-		"extensionType": 2,
-		"image":         "http://127.0.0.1:8089/uploads/file/b39024efbc6de61976f585c8421c6bba_20210702150027.png",
-		"isGiftBag":     2,
-		"isGood":        1,
-		"keyword":       "sdfdsfsdfsdf",
+		"cateId":    183,
+		"content":   "<p>是的发生的发sad</p>",
+		"image":     "http://127.0.0.1:8089/uploads/file/b39024efbc6de61976f585c8421c6bba_20210702150027.png",
+		"isGiftBag": 2,
+		"isGood":    1,
+		"keyword":   "sdfdsfsdfsdf",
 		"sliderImages": []string{
 			"http://127.0.0.1:8089/uploads/file/b39024efbc6de61976f585c8421c6bba_20210702150027.png",
 			"http://127.0.0.1:8089/uploads/file/0701aa317da5a004fbf6111545678a6c_20210702150036.png",
@@ -194,7 +192,6 @@ func TestClinetProductProcess(t *testing.T) {
 	product.Value("codePath").String().Equal("")
 	product.Value("videoLink").String().Equal(data["videoLink"].(string))
 	product.Value("specType").Number().Equal(data["specType"].(int))
-	product.Value("extensionType").Number().Equal(data["extensionType"].(int))
 	product.Value("refusal").String().Equal("")
 	product.Value("rate").Number().Equal(5)
 	product.Value("replyCount").Number().Equal(0)
@@ -238,13 +235,12 @@ func TestClinetProductProcess(t *testing.T) {
 					"weight":  1,
 				},
 			},
-			"cateId":        183,
-			"content":       "<p>是的发生的发sadsdfsdfsdf</p>",
-			"extensionType": 1,
-			"image":         "http://127.0.0.1:8089/uploads/file/b39024efbc6de61976f585c8421c6bba_20210702150027.png",
-			"isGiftBag":     1,
-			"isGood":        2,
-			"keyword":       "sdfdsfsdfsdf",
+			"cateId":    183,
+			"content":   "<p>是的发生的发sadsdfsdfsdf</p>",
+			"image":     "http://127.0.0.1:8089/uploads/file/b39024efbc6de61976f585c8421c6bba_20210702150027.png",
+			"isGiftBag": 1,
+			"isGood":    2,
+			"keyword":   "sdfdsfsdfsdf",
 			"sliderImages": []string{
 				"http://127.0.0.1:8089/uploads/file/b39024efbc6de61976f585c8421c6bba_20210702150027.png",
 				"http://127.0.0.1:8089/uploads/file/0701aa317da5a004fbf6111545678a6c_20210702150036.png",
@@ -302,7 +298,6 @@ func TestClinetProductProcess(t *testing.T) {
 		product.Value("codePath").String().Equal("")
 		product.Value("videoLink").String().Equal(data["videoLink"].(string))
 		product.Value("specType").Number().Equal(data["specType"].(int))
-		product.Value("extensionType").Number().Equal(data["extensionType"].(int))
 		product.Value("refusal").String().Equal("")
 		product.Value("rate").Number().Equal(5)
 		product.Value("replyCount").Number().Equal(0)

@@ -12,7 +12,7 @@ import (
 
 // GetProductFilter
 func GetProductFilter(ctx *gin.Context) {
-	if filters, err := service.GetProductFilter(ctx); err != nil {
+	if filters, err := service.GetProductFilter(multi.GetTenancyId(ctx), multi.IsTenancy(ctx)); err != nil {
 		g.TENANCY_LOG.Error("获取失败!", zap.Any("err", err))
 		response.FailWithMessage("获取失败:"+err.Error(), ctx)
 	} else {

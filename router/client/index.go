@@ -49,7 +49,7 @@ func InitCategoryRouter(Router *gin.RouterGroup) {
 		CategoryRouter.GET("/getProductCategorySelect", client.GetProductCategorySelect)
 		CategoryRouter.GET("/getAdminProductCategorySelect", client.GetAdminProductCategorySelect)
 		CategoryRouter.POST("/createProductCategory", client.CreateProductCategory)
-		CategoryRouter.POST("/getProductCategoryList", client.GetProductCategoryList)
+		CategoryRouter.GET("/getProductCategoryList", client.GetProductCategoryList)
 		CategoryRouter.GET("/getProductCategoryById/:id", client.GetProductCategoryById)
 		CategoryRouter.POST("/changeProductCategoryStatus", client.ChangeProductCategoryStatus)
 		CategoryRouter.PUT("/updateProductCategory/:id", client.UpdateProductCategory)

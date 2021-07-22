@@ -67,7 +67,6 @@ func productlist(t *testing.T, params map[string]interface{}, length int) {
 		"codePath",
 		"videoLink",
 		"specType",
-		"extensionType",
 		"productCates",
 		"refusal",
 		"rate",

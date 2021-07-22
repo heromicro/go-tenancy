@@ -1,0 +1,46 @@
+package device
+
+import (
+	"github.com/gin-gonic/gin"
+	device "github.com/snowlyg/go-tenancy/api/v1/device"
+)
+
+// //收货地址
+// func InitAddressRouter(Router *gin.RouterGroup) {
+// 	AddressRouter := Router.Group("/address")
+// 	{
+// 		AddressRouter.POST("/createAddress", device.CreateAddress)
+// 		AddressRouter.POST("/getAddressList", device.GetAddressList)
+// 		AddressRouter.GET("/getAddressById/:id", device.GetAddressById)
+// 		AddressRouter.PUT("/updateAddress/:id", device.UpdateAddress)
+// 		AddressRouter.DELETE("/deleteAddress/:id", device.DeleteAddress)
+// 	}
+// }
+
+// // 发票管理
+// func InitReceiptRouter(Router *gin.RouterGroup) {
+// 	ReceiptRouter := Router.Group("/receipt")
+// 	{
+// 		ReceiptRouter.POST("/createReceipt", device.CreateReceipt)
+// 		ReceiptRouter.POST("/getReceiptList", device.GetReceiptList)
+// 		ReceiptRouter.GET("/getReceiptById/:id", device.GetReceiptById)
+// 		ReceiptRouter.PUT("/updateReceipt/:id", device.UpdateReceipt)
+// 		ReceiptRouter.DELETE("/deleteReceipt/:id", device.DeleteReceipt)
+// 	}
+// }
+
+// 小程序用户 -> 不同商城（点餐、护工、商城、租赁）-> 医院 -> 病人
+// 床旁用户接口
+func InitDeviceRouter(Router *gin.RouterGroup) {
+	// 商品分类
+	CategoryRouter := Router.Group("/productCategory")
+	{
+		CategoryRouter.GET("/getProductCategoryList", device.GetProductCategoryList)
+	}
+	// 商品
+	ProductRouter := Router.Group("/product")
+	{
+		ProductRouter.POST("/getProductList", device.GetProductList)
+	}
+
+}

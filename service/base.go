@@ -194,6 +194,7 @@ func filterDate(db *gorm.DB, date, perfix string) *gorm.DB {
 	return db
 }
 
+// GetIsDelField 获取删除字段
 func GetIsDelField(ctx *gin.Context) string {
 	if multi.IsAdmin(ctx) {
 		return ""
@@ -202,4 +203,12 @@ func GetIsDelField(ctx *gin.Context) string {
 	}
 	// 用户删除
 	return "is_del"
+}
+
+// 是否是 c用户
+func IsCuser(ctx *gin.Context) bool {
+	if multi.IsAdmin(ctx) || multi.IsTenancy(ctx) {
+		return false
+	}
+	return true
 }

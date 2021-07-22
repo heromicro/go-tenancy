@@ -42,8 +42,8 @@ func GetEditProductFictiMap(id uint, ctx *gin.Context) (Form, error) {
 // 审核未通过 7:'status' => 3
 
 // GetProductFilter
-func GetProductFilter(ctx *gin.Context) ([]response.ProductFilter, error) {
-	wheres := getProductConditions(ctx)
+func GetProductFilter(tenancyId uint, isTenancy bool) ([]response.ProductFilter, error) {
+	wheres := getProductConditions(tenancyId, isTenancy)
 	var filters []response.ProductFilter
 	for _, where := range wheres {
 		filter := response.ProductFilter{Name: where.Name, Type: where.Type}
@@ -74,25 +74,25 @@ func GetProductFilter(ctx *gin.Context) ([]response.ProductFilter, error) {
 }
 
 // getProductConditions
-func getProductConditions(ctx *gin.Context) []response.ProductCondition {
+func getProductConditions(tenancyId uint, isTenancy bool) []response.ProductCondition {
 	stock := 0
-	if config, err := GetTenancyConfigValue("mer_store_stock", multi.GetTenancyId(ctx)); err == nil {
+	if config, err := GetTenancyConfigValue("mer_store_stock", tenancyId); err == nil {
 		if value, err := strconv.Atoi(config.Value); err == nil {
 			stock = value
 		}
 	}
 
 	conditions := []response.ProductCondition{
-		{Name: "出售中", Type: 1, Conditions: map[string]interface{}{"is_show": 1, "status": 1}},
-		{Name: "仓库中", Type: 2, Conditions: map[string]interface{}{"is_show": 2, "status": 1}},
+		{Name: "出售中", Type: 1, Conditions: map[string]interface{}{"is_show": g.StatusTrue, "status": model.SuccessProductStatus}},
+		{Name: "仓库中", Type: 2, Conditions: map[string]interface{}{"is_show": g.StatusFalse, "status": model.SuccessProductStatus}},
 
-		{Name: "待审核", Type: 6, Conditions: map[string]interface{}{"status": 2}},
-		{Name: "审核未通过", Type: 7, Conditions: map[string]interface{}{"status": 3}},
+		{Name: "待审核", Type: 6, Conditions: map[string]interface{}{"status": model.AuditProductStatus}},
+		{Name: "审核未通过", Type: 7, Conditions: map[string]interface{}{"status": model.FailProductStatus}},
 	}
 
-	if multi.IsTenancy(ctx) {
-		other := []response.ProductCondition{{Name: "已售罄", Type: 3, Conditions: map[string]interface{}{"is_show": 1, "stock": stock, "status": 1}},
-			{Name: "警戒库存", Type: 4, Conditions: map[string]interface{}{"stock": stock, "status": 1}},
+	if isTenancy {
+		other := []response.ProductCondition{{Name: "已售罄", Type: 3, Conditions: map[string]interface{}{"is_show": g.StatusTrue, "stock": stock, "status": model.SuccessProductStatus}},
+			{Name: "警戒库存", Type: 4, Conditions: map[string]interface{}{"stock": stock, "status": model.SuccessProductStatus}},
 			{Name: "回收站", Type: 5, Conditions: map[string]interface{}{"deleted_at is not null": nil}, IsDeleted: true},
 		}
 		conditions = append(conditions, other...)
@@ -101,8 +101,8 @@ func getProductConditions(ctx *gin.Context) []response.ProductCondition {
 }
 
 // getProductConditionByType
-func getProductConditionByType(ctx *gin.Context, t int) response.ProductCondition {
-	conditions := getProductConditions(ctx)
+func getProductConditionByType(tenancyId uint, isTenancy bool, t int) response.ProductCondition {
+	conditions := getProductConditions(tenancyId, isTenancy)
 	for _, condition := range conditions {
 		if condition.Type == t {
 			return condition
@@ -343,21 +343,30 @@ func GetProductInfoList(info request.ProductPageInfo, ctx *gin.Context) ([]respo
 	var total int64
 	limit := info.PageSize
 	offset := info.PageSize * (info.Page - 1)
-	db := g.TENANCY_DB.Model(&model.Product{})
-	if info.Type != "" {
-		t, err := strconv.Atoi(info.Type)
-		if err != nil {
-			return productList, total, err
-		}
-		cond := getProductConditionByType(ctx, t)
-		if cond.IsDeleted {
-			db = db.Unscoped()
-		}
-		for key, cn := range cond.Conditions {
-			if cn == nil {
-				db = db.Where(fmt.Sprintf("%s%s", "products.", key))
-			} else {
-				db = db.Where(fmt.Sprintf("%s%s = ?", "products.", key), cn)
+	db := g.TENANCY_DB.Model(&model.Product{}).
+		Select("products.*,sys_tenancies.name as sys_tenancy_name,sys_brands.brand_name as brand_name,product_categories.cate_name as cate_name").
+		Joins("left join sys_tenancies on products.sys_tenancy_id = sys_tenancies.id").
+		Joins("left join sys_brands on products.sys_brand_id = sys_brands.id").
+		Joins("left join product_categories on products.product_category_id = product_categories.id")
+
+	if IsCuser(ctx) {
+		db = db.Where("products.is_show = ?", g.StatusTrue).Where("products.status = ?", model.SuccessProductStatus)
+	} else {
+		if info.Type != "" {
+			t, err := strconv.Atoi(info.Type)
+			if err != nil {
+				return productList, total, err
+			}
+			cond := getProductConditionByType(multi.GetTenancyId(ctx), multi.IsTenancy(ctx), t)
+			if cond.IsDeleted {
+				db = db.Unscoped()
+			}
+			for key, cn := range cond.Conditions {
+				if cn == nil {
+					db = db.Where(fmt.Sprintf("%s%s", "products.", key))
+				} else {
+					db = db.Where(fmt.Sprintf("%s%s = ?", "products.", key), cn)
+				}
 			}
 		}
 	}
@@ -365,6 +374,7 @@ func GetProductInfoList(info request.ProductPageInfo, ctx *gin.Context) ([]respo
 	if multi.IsTenancy(ctx) {
 		db = db.Where("products.sys_tenancy_id = ?", tenancyId)
 	}
+
 	if info.Keyword != "" {
 		db = db.Where(g.TENANCY_DB.Where("products.store_name like ?", info.Keyword+"%").Or("products.store_info like ?", info.Keyword+"%").Or("products.keyword like ?", info.Keyword+"%").Or("products.bar_code like ?", info.Keyword+"%"))
 	}
@@ -391,11 +401,7 @@ func GetProductInfoList(info request.ProductPageInfo, ctx *gin.Context) ([]respo
 	if err != nil {
 		return productList, total, err
 	}
-	err = db.Select("products.*,sys_tenancies.name as sys_tenancy_name,sys_brands.brand_name as brand_name,product_categories.cate_name as cate_name").
-		Joins("left join sys_tenancies on products.sys_tenancy_id = sys_tenancies.id").
-		Joins("left join sys_brands on products.sys_brand_id = sys_brands.id").
-		Joins("left join product_categories on products.product_category_id = product_categories.id").
-		Limit(limit).Offset(offset).Find(&productList).Error
+	err = db.Limit(limit).Offset(offset).Find(&productList).Error
 
 	for i := 0; i < len(productList); i++ {
 		productCates, err := getProductCatesByProductId(productList[i].ID, productList[i].SysTenancyID)

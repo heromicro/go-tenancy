@@ -6,6 +6,7 @@ import (
 	"github.com/snowlyg/go-tenancy/model/request"
 	"github.com/snowlyg/go-tenancy/model/response"
 	"github.com/snowlyg/go-tenancy/service"
+	"github.com/snowlyg/multi"
 	"go.uber.org/zap"
 )
 
@@ -25,7 +26,7 @@ func GetEditProductFictiMap(ctx *gin.Context) {
 
 // GetProductFilter
 func GetProductFilter(ctx *gin.Context) {
-	if filters, err := service.GetProductFilter(ctx); err != nil {
+	if filters, err := service.GetProductFilter(multi.GetTenancyId(ctx), multi.IsTenancy(ctx)); err != nil {
 		g.TENANCY_LOG.Error("获取失败!", zap.Any("err", err))
 		response.FailWithMessage("获取失败:"+err.Error(), ctx)
 	} else {

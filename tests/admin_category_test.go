@@ -11,8 +11,7 @@ import (
 func TestCategoryList(t *testing.T) {
 	auth := baseWithLoginTester(t)
 	defer baseLogOut(auth)
-	obj := auth.POST("v1/admin/productCategory/getProductCategoryList").
-		WithJSON(map[string]interface{}{"page": 1, "pageSize": 10}).
+	obj := auth.GET("v1/admin/productCategory/getProductCategoryList").
 		Expect().Status(http.StatusOK).JSON().Object()
 	obj.Keys().ContainsOnly("status", "data", "message")
 	obj.Value("status").Number().Equal(200)

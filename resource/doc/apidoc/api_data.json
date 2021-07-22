@@ -86,11 +86,176 @@
         }
       ]
     },
-    "filename": "v1/public.js",
+    "filename": "v1/device/public.js",
     "groupTitle": "公共方法",
     "sampleRequest": [
       {
         "url": "http://10.0.0.26:8085/v1/public/device/login"
+      }
+    ]
+  },
+  {
+    "type": "get",
+    "url": "/v1/device/productCategory/getProductCategoryList",
+    "title": "商品分类列表",
+    "version": "0.0.1",
+    "name": "商品分类列表",
+    "group": "商品分类",
+    "permission": [
+      {
+        "name": "device"
+      }
+    ],
+    "description": "<p>获取商品分类数据</p>",
+    "header": {
+      "fields": {
+        "Header": [
+          {
+            "group": "Header",
+            "type": "String",
+            "optional": false,
+            "field": "Authorization",
+            "description": "<p>接口需要带上此头信息</p>"
+          }
+        ]
+      },
+      "examples": [
+        {
+          "title": "Header-Example",
+          "content": "\"Authorization: Bearer 5f048fe\"",
+          "type": "Header"
+        }
+      ]
+    },
+    "examples": [
+      {
+        "title": "Curl example",
+        "content": "curl -H \"Authorization: Bearer 5f048fe\" -i http://10.0.0.26:8085/v1/device/productCategory/getProductCategoryList",
+        "type": "bash"
+      }
+    ],
+    "error": {
+      "examples": [
+        {
+          "title": "Response:",
+          "content": "HTTP/1.1 200 OK\n{\n\"status\": 200,\n\"data\": [\n    {\n        \"id\": 173,\n        \"createdAt\": \"2021-07-22T09:27:57+08:00\",\n        \"updatedAt\": \"2021-07-22T09:27:57+08:00\",\n        \"pid\": 0,\n        \"cateName\": \"品牌服饰\",\n        \"path\": \"/\",\n        \"sort\": 2,\n        \"pic\": \"\",\n        \"status\": 1,\n        \"level\": 0,\n        \"children\": [\n            {\n                \"id\": 174,\n                \"createdAt\": \"2021-07-22T09:27:57+08:00\",\n                \"updatedAt\": \"2021-07-22T09:27:57+08:00\",\n                \"pid\": 173,\n                \"cateName\": \"时尚女装\",\n                \"path\": \"/173/\",\n                \"sort\": 0,\n                \"pic\": \"\",\n                \"status\": 1,\n                \"level\": 1,\n                \"children\": null\n            }\n        ]\n    }\n],\n\"message\": \"获取成功\"\n}",
+          "type": "json"
+        }
+      ]
+    },
+    "filename": "v1/device/product_category.js",
+    "groupTitle": "商品分类",
+    "sampleRequest": [
+      {
+        "url": "http://10.0.0.26:8085/v1/device/productCategory/getProductCategoryList"
+      }
+    ]
+  },
+  {
+    "type": "post",
+    "url": "/v1/device/product/getProductList",
+    "title": "商品列表",
+    "version": "0.0.1",
+    "name": "商品列表",
+    "group": "商品",
+    "permission": [
+      {
+        "name": "device"
+      }
+    ],
+    "description": "<p>获取商品数据</p>",
+    "body": [
+      {
+        "group": "Body",
+        "type": "Number",
+        "optional": false,
+        "field": "page",
+        "description": "<p>页码</p>"
+      },
+      {
+        "group": "Body",
+        "type": "Number",
+        "optional": false,
+        "field": "pageSize",
+        "description": "<p>每页数量</p>"
+      },
+      {
+        "group": "Body",
+        "type": "Number",
+        "optional": false,
+        "field": "cateId",
+        "description": "<p>商户分类 id</p>"
+      },
+      {
+        "group": "Body",
+        "type": "Number",
+        "optional": false,
+        "field": "tenancyCategoryId",
+        "description": "<p>商城分类 id</p>"
+      },
+      {
+        "group": "Body",
+        "type": "String",
+        "optional": false,
+        "field": "keyword",
+        "description": "<p>关键字搜索</p>"
+      },
+      {
+        "group": "Body",
+        "type": "String",
+        "optional": false,
+        "field": "type",
+        "description": "<p>商品类型 1.普通商品 2.秒杀商品,3.预售商品，4.助力商品</p>"
+      },
+      {
+        "group": "Body",
+        "type": "String",
+        "optional": true,
+        "field": "isGiftBag",
+        "description": "<p>是否礼包 1 是 ，2 否</p>"
+      }
+    ],
+    "header": {
+      "fields": {
+        "Header": [
+          {
+            "group": "Header",
+            "type": "String",
+            "optional": false,
+            "field": "Authorization",
+            "description": "<p>接口需要带上此头信息</p>"
+          }
+        ]
+      },
+      "examples": [
+        {
+          "title": "Header-Example",
+          "content": "\"Authorization: Bearer 5f048fe\"",
+          "type": "Header"
+        }
+      ]
+    },
+    "examples": [
+      {
+        "title": "Curl example",
+        "content": "curl -H \"Authorization: Bearer 5f048fe\" -i http://10.0.0.26:8085/v1/device/product/getProductList",
+        "type": "bash"
+      }
+    ],
+    "error": {
+      "examples": [
+        {
+          "title": "Response:",
+          "content": "  HTTP/1.1 200 OK\n  {\n\"status\": 200,\n  \"data\": {\n      \"list\": [\n          {\n              \"id\": 1,\n              \"createdAt\": \"2021-07-22T09:27:57+08:00\",\n              \"updatedAt\": \"2021-07-22T09:27:57+08:00\",\n              \"storeName\": \"领立裁腰带短袖连衣裙\",\n              \"storeInfo\": \"短袖连衣裙\",\n              \"keyword\": \"连衣裙\",\n              \"barCode\": \"\",\n              \"isShow\": 1,\n              \"status\": 1,\n              \"unitName\": \"件\",\n              \"sort\": 40,\n              \"rank\": 0,\n              \"sales\": 1,\n              \"price\": 80,\n              \"cost\": 50,\n              \"otPrice\": 100,\n              \"stock\": 399,\n              \"isHot\": 2,\n              \"isBenefit\": 2,\n              \"isBest\": 2,\n              \"isNew\": 2,\n              \"isGood\": 1,\n              \"productType\": 2,\n              \"ficti\": 100,\n              \"browse\": 0,\n              \"codePath\": \"\",\n              \"videoLink\": \"\",\n              \"specType\": 1,\n              \"extensionType\": 2,\n              \"refusal\": \"\",\n              \"rate\": 5,\n              \"replyCount\": 0,\n              \"isGiftBag\": 2,\n              \"careCount\": 0,\n              \"image\": \"http://127.0.0.1:8090/uploads/def/20200816/9a6a2e1231fb19517ed1de71206a0657.jpg\",\n              \"oldId\": 0,\n              \"tempId\": 99,\n              \"sysTenancyId\": 1,\n              \"sysBrandId\": 2,\n              \"productCategoryId\": 162,\n              \"sysTenancyName\": \"宝安中心人民医院\",\n              \"cateName\": \"男士上衣\",\n              \"brandName\": \"苹果\",\n              \"productCates\": [\n                  {\n                      \"id\": 174,\n                      \"cateName\": \"时尚女装\"\n                  },\n                  {\n                      \"id\": 173,\n                      \"cateName\": \"品牌服饰\"\n                  }\n              ]\n          }\n      ],\n      \"total\": 1,\n      \"page\": 1,\n      \"pageSize\": 10\n  },\n  \"message\": \"获取成功\"\n  }",
+          "type": "json"
+        }
+      ]
+    },
+    "filename": "v1/device/product.js",
+    "groupTitle": "商品",
+    "sampleRequest": [
+      {
+        "url": "http://10.0.0.26:8085/v1/device/product/getProductList"
       }
     ]
   }

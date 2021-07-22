@@ -29,12 +29,12 @@
 // Current Permissions.
 // ------------------------------------------------------------------------------------------
 /**
- * @apiDefine admin Admin access rights needed.
- * Optionally you can write here further Informations about the permission.
+ * @apiDefine device 床旁设备授权
+ * 床旁设备授权，区分设备所在医院
  *
  * An "apiDefinePermission"-block can have an "apiVersion", so you can attach the block to a specific version.
  *
- * @apiVersion 0.3.0
+ * @apiVersion 0.0.1
  */
 
 

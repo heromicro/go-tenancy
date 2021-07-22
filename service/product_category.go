@@ -38,7 +38,7 @@ func GetProductCategoryMap(id uint, ctx *gin.Context) (Form, error) {
 	} else {
 		form.SetAction("/productCategory/createProductCategory", ctx)
 	}
-	opts, err := GetProductCategoriesOptions(multi.GetTenancyId(ctx))
+	opts, err := GetProductCategoriesOptions(multi.GetTenancyId(ctx), IsCuser(ctx))
 	if err != nil {
 		return form, err
 	}
@@ -87,9 +87,9 @@ func DeleteProductCategory(id uint) error {
 }
 
 // GetCategoryInfoList
-func GetProductCategoryInfoList(tenancyId uint) ([]response.ProductCategory, error) {
+func GetProductCategoryInfoList(tenancyId uint, isCuser bool) ([]response.ProductCategory, error) {
 	var productCategoryList []response.ProductCategory
-	treeMap, err := getProductCategoryMap(tenancyId)
+	treeMap, err := getProductCategoryMap(tenancyId, isCuser)
 	productCategoryList = treeMap[0]
 	for i := 0; i < len(productCategoryList); i++ {
 		err = getProductCategoryBaseChildrenList(&productCategoryList[i], treeMap)
@@ -98,12 +98,15 @@ func GetProductCategoryInfoList(tenancyId uint) ([]response.ProductCategory, err
 }
 
 // getCategoryMap
-func getProductCategoryMap(tenancyId uint) (map[int32][]response.ProductCategory, error) {
+func getProductCategoryMap(tenancyId uint, isCuser bool) (map[int32][]response.ProductCategory, error) {
 	var productCategoryList []response.ProductCategory
 	treeMap := make(map[int32][]response.ProductCategory)
 	db := g.TENANCY_DB.Model(&model.ProductCategory{})
 	if int(tenancyId) >= 0 {
 		db = db.Where("sys_tenancy_id = ?", tenancyId)
+	}
+	if isCuser {
+		db = db.Where("status = ?", g.StatusTrue)
 	}
 	err := db.Order("sort").Find(&productCategoryList).Error
 	for _, v := range productCategoryList {
@@ -122,10 +125,10 @@ func getProductCategoryBaseChildrenList(cate *response.ProductCategory, treeMap 
 }
 
 // GetProductCategoriesOptions
-func GetProductCategoriesOptions(tenancyId uint) ([]Option, error) {
+func GetProductCategoriesOptions(tenancyId uint, isCuser bool) ([]Option, error) {
 	var options []Option
 	options = append(options, Option{Label: "请选择", Value: 0})
-	treeMap, err := getProductCategoryMap(tenancyId)
+	treeMap, err := getProductCategoryMap(tenancyId, isCuser)
 
 	for _, opt := range treeMap[0] {
 		options = append(options, Option{Label: opt.CateName, Value: opt.ID})
