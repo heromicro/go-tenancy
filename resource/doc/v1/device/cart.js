@@ -19,27 +19,30 @@
  *     "Authorization: Bearer 5f048fe"
  *
  * @apiExample {bash} Curl example
- * curl -H "Authorization: Bearer 5f048fe" -i http://10.0.0.26:8085/v1/device/product/getProductList
+ * curl -H "Authorization: Bearer 5f048fe" -i http://10.0.0.26:8085/v1/cart/product/createCart
  *
  *
  * @apiSuccessExample Response:
  *     HTTP/1.1 200 OK
  *     {
-    "status": 200,
+ "status": 200,
     "data": {
-        "list": [
-            {
-                "id": 1,
-                "storeName": "领立裁腰带短袖连衣裙",
-                "sales": 1,
-                "price": 80,
-                "image": "http://127.0.0.1:8090/uploads/def/20200816/9a6a2e1231fb19517ed1de71206a0657.jpg"
-            }
-        ],
-        "total": 1,
-        "page": 1,
-        "pageSize": 10
+        "id": 5,
+        "createdAt": "2021-07-22T16:23:44.537+08:00",
+        "updatedAt": "2021-07-22T16:23:44.537+08:00",
+        "productType": 1,
+        "productAttrUnique": "e2fe28308fd2",
+        "cartNum": 2,
+        "source": 0,
+        "sourceId": 0,
+        "isPay": 2,
+        "isDel": 2,
+        "isNew": 2,
+        "isFail": 2,
+        "productId": 1,
+        "sysUserId": 1,
+        "sysTenancyId": 1
     },
-    "message": "获取成功"
+    "message": "创建成功"
  *     }
  */

@@ -171,7 +171,7 @@ func CreateProduct(req request.CreateProduct, tenancyId uint) (model.Product, er
 			if err != nil {
 				return fmt.Errorf("get product attr value unique %w", err)
 			}
-			unique = unique[12:23]
+			unique = fmt.Sprintf("%s%d", unique[12:23], product.ProductType)
 			attrValue.BaseProductAttrValue.Sku = attrValue.Value0
 			attrValue.BaseProductAttrValue.Unique = unique
 			productAttrValue := model.ProductAttrValue{ProductID: product.ID, BaseProductAttrValue: attrValue.BaseProductAttrValue, Detail: string(detail), Type: product.ProductType}

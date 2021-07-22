@@ -216,7 +216,7 @@
         "name": "device"
       }
     ],
-    "description": "<p>获取商品数据</p>",
+    "description": "<p>获取商品列表数据</p>",
     "body": [
       {
         "group": "Body",
@@ -657,6 +657,100 @@
     "sampleRequest": [
       {
         "url": "http://10.0.0.26:8085/v1/device/product/getProductById/1"
+      }
+    ]
+  },
+  {
+    "type": "post",
+    "url": "/v1/device/cart/createCart",
+    "title": "添加购物车",
+    "version": "0.0.1",
+    "name": "添加购物车",
+    "group": "购物车管理",
+    "permission": [
+      {
+        "name": "device"
+      }
+    ],
+    "description": "<p>添加商品到购物车</p>",
+    "body": [
+      {
+        "group": "Body",
+        "type": "Number",
+        "optional": false,
+        "field": "cartNum",
+        "description": "<p>商品数量</p>"
+      },
+      {
+        "group": "Body",
+        "type": "Number",
+        "optional": false,
+        "field": "isNew",
+        "description": "<p>是否为立即购买 1 是，2否</p>"
+      },
+      {
+        "group": "Body",
+        "type": "Number",
+        "optional": false,
+        "field": "productType",
+        "description": "<p>商品类型 1.普通商品 2.秒杀商品,3.预售商品，4.助力商品</p>"
+      },
+      {
+        "group": "Body",
+        "type": "Number",
+        "optional": false,
+        "field": "productId",
+        "description": "<p>商品 id</p>"
+      },
+      {
+        "group": "Body",
+        "type": "String",
+        "optional": false,
+        "field": "productAttrUnique",
+        "description": "<p>商品规格唯一值</p>"
+      }
+    ],
+    "header": {
+      "fields": {
+        "Header": [
+          {
+            "group": "Header",
+            "type": "String",
+            "optional": false,
+            "field": "Authorization",
+            "description": "<p>接口需要带上此头信息</p>"
+          }
+        ]
+      },
+      "examples": [
+        {
+          "title": "Header-Example",
+          "content": "\"Authorization: Bearer 5f048fe\"",
+          "type": "Header"
+        }
+      ]
+    },
+    "examples": [
+      {
+        "title": "Curl example",
+        "content": "curl -H \"Authorization: Bearer 5f048fe\" -i http://10.0.0.26:8085/v1/cart/product/createCart",
+        "type": "bash"
+      }
+    ],
+    "success": {
+      "examples": [
+        {
+          "title": "Response:",
+          "content": "   HTTP/1.1 200 OK\n   {\n\"status\": 200,\n   \"data\": {\n       \"id\": 5,\n       \"createdAt\": \"2021-07-22T16:23:44.537+08:00\",\n       \"updatedAt\": \"2021-07-22T16:23:44.537+08:00\",\n       \"productType\": 1,\n       \"productAttrUnique\": \"e2fe28308fd2\",\n       \"cartNum\": 2,\n       \"source\": 0,\n       \"sourceId\": 0,\n       \"isPay\": 2,\n       \"isDel\": 2,\n       \"isNew\": 2,\n       \"isFail\": 2,\n       \"productId\": 1,\n       \"sysUserId\": 1,\n       \"sysTenancyId\": 1\n   },\n   \"message\": \"创建成功\"\n   }",
+          "type": "json"
+        }
+      ]
+    },
+    "filename": "v1/device/cart.js",
+    "groupTitle": "购物车管理",
+    "sampleRequest": [
+      {
+        "url": "http://10.0.0.26:8085/v1/device/cart/createCart"
       }
     ]
   }
