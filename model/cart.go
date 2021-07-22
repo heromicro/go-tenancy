@@ -17,8 +17,7 @@ type BaseCart struct {
 	CartNum           uint16 `gorm:"column:cart_num;type:smallint unsigned;not null;default:0" json:"cartNum" binding:"required"`                 // 商品数量
 	Source            uint8  `gorm:"column:source;type:tinyint unsigned;not null;default:0" json:"source"`                                        // 来源 1.直播间,2.预售商品,3.助力商品
 	SourceID          uint   `gorm:"column:source_id;type:int unsigned;not null;default:0" json:"sourceId"`                                       // 来源关联 id
-	IsPay             int    `gorm:"column:is_pay;type:tinyint(1);not null;default:2" json:"isPay"`                                               // 2 = 未购买 1 = 已购买
-	IsDel             int    `gorm:"column:is_del;type:tinyint(1);not null;default:2" json:"isDel"`                                               // 是否删除
+	IsPay             int    `gorm:"column:is_pay;type:tinyint(1);not null;default:2" json:"isPay"`                                               // 2 = 未购买 1 = 已购买                                              // 是否删除
 	IsNew             int    `gorm:"column:is_new;type:tinyint(1);not null;default:2" json:"isNew" binding:"required"`                            // 是否为立即购买
 	IsFail            int    `gorm:"column:is_fail;type:tinyint unsigned;not null;default:2" json:"isFail"`                                       // 是否失效
 }

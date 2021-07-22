@@ -25,3 +25,15 @@ func CreateCart(ctx *gin.Context) {
 		response.OkWithDetailed(returnCart, "创建成功", ctx)
 	}
 }
+
+func GetCartList(ctx *gin.Context) {
+	if list, total, err := service.GetCartList(ctx); err != nil {
+		g.TENANCY_LOG.Error("获取失败!", zap.Any("err", err))
+		response.FailWithMessage("获取失败:"+err.Error(), ctx)
+	} else {
+		response.OkWithDetailed(response.PageResult{
+			List:  list,
+			Total: total,
+		}, "获取成功", ctx)
+	}
+}
