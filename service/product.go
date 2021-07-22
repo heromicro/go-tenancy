@@ -6,6 +6,7 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/chindeo/pkg/file"
 	"github.com/gin-gonic/gin"
 	"github.com/snowlyg/go-tenancy/g"
 	"github.com/snowlyg/go-tenancy/model"
@@ -113,7 +114,6 @@ func getProductConditionByType(tenancyId uint, isTenancy bool, t int) response.P
 
 // CreateProduct
 func CreateProduct(req request.CreateProduct, tenancyId uint) (model.Product, error) {
-
 	var product model.Product
 	product.BaseProduct = req.BaseProduct
 	product.SysTenancyID = tenancyId
@@ -125,63 +125,82 @@ func CreateProduct(req request.CreateProduct, tenancyId uint) (model.Product, er
 	product.IsNew = g.StatusFalse
 	product.ProductType = model.GeneralSale
 	product.Status = model.AuditProductStatus
-	err := g.TENANCY_DB.Create(&product).Error
-	if err != nil {
-		return model.Product{}, fmt.Errorf("create product %w", err)
-	}
+	err := g.TENANCY_DB.Transaction(func(tx *gorm.DB) error {
 
-	var productCates []model.ProductProductCate
-	for _, categoryId := range req.CategoryIds {
-		productCate := model.ProductProductCate{ProductID: product.ID, ProductCategoryID: categoryId, SysTenancyID: product.SysTenancyID}
-		productCates = append(productCates, productCate)
-	}
-
-	err = g.TENANCY_DB.Model(&model.ProductProductCate{}).Create(&productCates).Error
-	if err != nil {
-		return model.Product{}, fmt.Errorf("create product product cate %w", err)
-	}
-
-	err = g.TENANCY_DB.Model(&model.ProductContent{}).Create(map[string]interface{}{
-		"Content": req.Content, "Type": product.ProductType, "ProductID": product.ID,
-	}).Error
-	if err != nil {
-		return model.Product{}, fmt.Errorf("create product content %w", err)
-	}
-
-	var productAttrs []model.ProductAttr
-	for _, attr := range req.Attr {
-		productAttr := model.ProductAttr{ProductID: product.ID, AttrName: attr.Value, AttrValues: strings.Join(attr.Detail, ","), Type: product.ProductType}
-		productAttrs = append(productAttrs, productAttr)
-	}
-	err = g.TENANCY_DB.Model(&model.ProductAttr{}).Create(&productAttrs).Error
-	if err != nil {
-		return model.Product{}, fmt.Errorf("create product attr %w", err)
-	}
-
-	var productAttrValues []model.ProductAttrValue
-	for _, attrValue := range req.AttrValue {
-		detail, err := json.Marshal(attrValue.Detail)
+		err := tx.Model(&model.Product{}).Create(&product).Error
 		if err != nil {
-			return model.Product{}, fmt.Errorf("json product attr value detail marshal %w", err)
+			return fmt.Errorf("create product %w", err)
 		}
-		attrValue.BaseProductAttrValue.Sku = attrValue.Value0
-		productAttrValue := model.ProductAttrValue{ProductID: product.ID, BaseProductAttrValue: attrValue.BaseProductAttrValue, Detail: string(detail), Type: product.ProductType}
-		productAttrValues = append(productAttrValues, productAttrValue)
-	}
-	err = g.TENANCY_DB.Model(&model.ProductAttrValue{}).Create(&productAttrValues).Error
-	if err != nil {
-		return model.Product{}, fmt.Errorf("create product attr value %w", err)
-	}
 
+		var productCates []model.ProductProductCate
+		for _, categoryId := range req.CategoryIds {
+			productCate := model.ProductProductCate{ProductID: product.ID, ProductCategoryID: categoryId, SysTenancyID: product.SysTenancyID}
+			productCates = append(productCates, productCate)
+		}
+
+		err = tx.Model(&model.Product{}).Model(&model.ProductProductCate{}).Create(&productCates).Error
+		if err != nil {
+			return fmt.Errorf("create product product cate %w", err)
+		}
+
+		err = tx.Model(&model.ProductContent{}).Create(map[string]interface{}{
+			"Content": req.Content, "Type": product.ProductType, "ProductID": product.ID,
+		}).Error
+		if err != nil {
+			return fmt.Errorf("create product content %w", err)
+		}
+
+		var productAttrs []model.ProductAttr
+		for _, attr := range req.Attr {
+			productAttr := model.ProductAttr{ProductID: product.ID, AttrName: attr.Value, AttrValues: strings.Join(attr.Detail, ","), Type: product.ProductType}
+			productAttrs = append(productAttrs, productAttr)
+		}
+		err = tx.Model(&model.ProductAttr{}).Create(&productAttrs).Error
+		if err != nil {
+			return fmt.Errorf("create product attr %w", err)
+		}
+
+		var productAttrValues []model.ProductAttrValue
+		for _, attrValue := range req.AttrValue {
+			detail, err := json.Marshal(attrValue.Detail)
+			if err != nil {
+				return fmt.Errorf("json product attr value detail marshal %w", err)
+			}
+
+			unique, err := file.Md5Byte([]byte(fmt.Sprintf("%s%d", string(detail), product.ID)))
+			if err != nil {
+				return fmt.Errorf("get product attr value unique %w", err)
+			}
+			unique = unique[12:23]
+			attrValue.BaseProductAttrValue.Sku = attrValue.Value0
+			attrValue.BaseProductAttrValue.Unique = unique
+			productAttrValue := model.ProductAttrValue{ProductID: product.ID, BaseProductAttrValue: attrValue.BaseProductAttrValue, Detail: string(detail), Type: product.ProductType}
+			productAttrValues = append(productAttrValues, productAttrValue)
+		}
+		err = tx.Model(&model.ProductAttrValue{}).Create(&productAttrValues).Error
+		if err != nil {
+			return fmt.Errorf("create product attr value %w", err)
+		}
+		return nil
+	})
+	if err != nil {
+		return product, err
+	}
 	return product, nil
 }
 
 // GetProductByID
-func GetProductByID(id uint) (response.ProductDetail, error) {
+func GetProductByID(id uint, isCuser bool) (response.ProductDetail, error) {
 	var product response.ProductDetail
-	err := g.TENANCY_DB.Model(&model.Product{}).
-		Select("products.*,sys_tenancies.name as sys_tenancy_name,sys_brands.brand_name as brand_name,product_categories.cate_name as cate_name,product_contents.content as content,shipping_templates.name as temp_name").
-		Joins("left join sys_tenancies on products.sys_tenancy_id = sys_tenancies.id").
+	db := g.TENANCY_DB.Model(&model.Product{})
+	if isCuser {
+		// 用户端成本价
+		db = db.Where("products.is_show = ?", g.StatusTrue).Where("products.status = ?", model.SuccessProductStatus).Select("products.id,products.store_name,products.store_info,products.keyword,products.ficti,products.unit_name,products.sort,products.sales,products.price,products.ot_price,products.stock,products.is_hot,products.is_benefit,products.is_best,products.is_new,products.is_good,products.product_type,products.spec_type,products.rate,products.is_gift_bag,products.image,products.temp_id,products.sys_tenancy_id,products.sys_brand_id,products.product_category_id,products.slider_image,sys_tenancies.name as sys_tenancy_name,sys_brands.brand_name as brand_name,product_categories.cate_name as cate_name,product_contents.content as content,shipping_templates.name as temp_name")
+	} else {
+		db = db.Select("products.*,sys_tenancies.name as sys_tenancy_name,sys_brands.brand_name as brand_name,product_categories.cate_name as cate_name,product_contents.content as content,shipping_templates.name as temp_name")
+	}
+
+	err := db.Joins("left join sys_tenancies on products.sys_tenancy_id = sys_tenancies.id").
 		Joins("left join sys_brands on products.sys_brand_id = sys_brands.id").
 		Joins("left join product_categories on products.product_category_id = product_categories.id").
 		Joins("left join product_contents on product_contents.product_id = products.id").
@@ -189,7 +208,7 @@ func GetProductByID(id uint) (response.ProductDetail, error) {
 		Where("products.id = ?", id).
 		First(&product).Error
 	if err != nil {
-		return response.ProductDetail{}, err
+		return product, err
 	}
 	product.SliderImages = strings.Split(product.SliderImage, ",")
 
@@ -197,38 +216,47 @@ func GetProductByID(id uint) (response.ProductDetail, error) {
 	err = g.TENANCY_DB.Model(&model.ProductAttr{}).Where("product_id = ?", id).
 		Find(&attrs).Error
 	if err != nil {
-		return response.ProductDetail{}, err
+		return product, err
 	}
+
 	values := []request.Value{}
-	for _, attr := range attrs {
-		value := request.Value{Value: attr.AttrName, Detail: strings.Split(attr.AttrValues, ",")}
-		values = append(values, value)
+	if len(attrs) > 0 {
+		for _, attr := range attrs {
+			value := request.Value{Value: attr.AttrName, Detail: strings.Split(attr.AttrValues, ",")}
+			values = append(values, value)
+		}
 	}
+
 	product.Attr = values
 
 	var attrValues []model.ProductAttrValue
 	err = g.TENANCY_DB.Model(&model.ProductAttrValue{}).Where("product_id = ?", id).
 		Find(&attrValues).Error
 	if err != nil {
-		return response.ProductDetail{}, err
+		return product, err
 	}
-	var productAttrValues []request.ProductAttrValue
-	for _, attrValue := range attrValues {
-		productAttrValue := request.ProductAttrValue{BaseProductAttrValue: attrValue.BaseProductAttrValue, Value0: attrValue.BaseProductAttrValue.Sku}
-		err := json.Unmarshal([]byte(attrValue.Detail), &productAttrValue.Detail)
-		if err != nil {
-			return response.ProductDetail{}, fmt.Errorf("json product attr value detail marshal %w", err)
+	productAttrValues := []request.ProductAttrValue{}
+	if len(attrValues) > 0 {
+		for _, attrValue := range attrValues {
+			productAttrValue := request.ProductAttrValue{BaseProductAttrValue: attrValue.BaseProductAttrValue, Value0: attrValue.BaseProductAttrValue.Sku}
+			if attrValue.Detail != "" {
+				err := json.Unmarshal([]byte(attrValue.Detail), &productAttrValue.Detail)
+				if err != nil {
+					return product, fmt.Errorf("json product attr value detail marshal %w", err)
+				}
+			}
+			productAttrValue.Value0 = attrValue.BaseProductAttrValue.Sku
+			productAttrValues = append(productAttrValues, productAttrValue)
 		}
-		productAttrValue.Value0 = attrValue.BaseProductAttrValue.Sku
-		productAttrValues = append(productAttrValues, productAttrValue)
 	}
+
 	product.AttrValue = productAttrValues
 	product.CateId = product.ProductCategoryID
 	product.SliderImages = strings.Split(product.SliderImage, ",")
 
 	productCates, err := getProductCatesByProductId(product.ID, product.SysTenancyID)
 	if err != nil {
-		return response.ProductDetail{}, err
+		return product, err
 	}
 	product.ProductCates = productCates
 
@@ -349,7 +377,8 @@ func GetProductInfoList(info request.ProductPageInfo, ctx *gin.Context) ([]respo
 		Joins("left join product_categories on products.product_category_id = product_categories.id")
 
 	if IsCuser(ctx) {
-		db = db.Select("products.id,products.store_name,products.price,products.image,products.sales").Where("products.is_show = ?", g.StatusTrue).Where("products.status = ?", model.SuccessProductStatus)
+		db = db.Select("products.id,products.store_name,products.price,products.image,products.sales").
+			Where("products.is_show = ?", g.StatusTrue).Where("products.status = ?", model.SuccessProductStatus)
 	} else {
 		db = db.Select("products.*,sys_tenancies.name as sys_tenancy_name,sys_brands.brand_name as brand_name,product_categories.cate_name as cate_name")
 		if info.Type != "" {

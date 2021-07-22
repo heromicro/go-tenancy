@@ -11,6 +11,7 @@ require (
 	github.com/bwmarrin/snowflake v0.3.0
 	github.com/casbin/casbin/v2 v2.28.4
 	github.com/casbin/gorm-adapter/v3 v3.2.9
+	github.com/chindeo/pkg v0.0.2-0.20210722085716-355174e9a03e
 	github.com/denisenkom/go-mssqldb v0.10.0 // indirect
 	github.com/fasthttp-contrib/websocket v0.0.0-20160511215533-1f3b11f56072 // indirect
 	github.com/fatih/structs v1.1.0 // indirect
@@ -59,7 +60,6 @@ require (
 	golang.org/x/sys v0.0.0-20210521203332-0cec03c779c1 // indirect
 	golang.org/x/time v0.0.0-20201208040808-7e3f01d25324 // indirect
 	gopkg.in/ini.v1 v1.62.0 // indirect
-	gopkg.in/yaml.v2 v2.4.0 // indirect
 	gorm.io/datatypes v1.0.1
 	gorm.io/driver/mysql v1.1.0
 	gorm.io/gorm v1.21.10

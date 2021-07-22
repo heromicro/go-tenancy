@@ -21,6 +21,7 @@ func CreateAutoLabel(labelRule request.LabelRule) (request.LabelRule, error) {
 	if !errors.Is(err, gorm.ErrRecordNotFound) {
 		return labelRule, errors.New("名称已被注冊")
 	}
+
 	err = g.TENANCY_DB.Transaction(func(tx *gorm.DB) error {
 		label := model.UserLabel{LabelName: labelRule.LabelName, Type: model.UserLabelTypeZD, SysTenancyID: labelRule.SysTenancyID}
 		if err := tx.Model(&model.UserLabel{}).Create(&label).Error; err != nil {
@@ -33,6 +34,7 @@ func CreateAutoLabel(labelRule request.LabelRule) (request.LabelRule, error) {
 		labelRule.LabelRule = ru
 		return nil
 	})
+
 	if err != nil {
 		return labelRule, err
 	}

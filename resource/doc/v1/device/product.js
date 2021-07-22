@@ -2,10 +2,10 @@
  * @api {post} /v1/device/product/getProductList 商品列表
  * @apiVersion 0.0.1
  * @apiName 商品列表
- * @apiGroup 商品
+ * @apiGroup 商品管理
  * @apiPermission device
  *
- * @apiDescription 获取商品数据
+ * @apiDescription 获取商品列表数据
  *     
  * @apiBody {Number} page 页码
  * @apiBody {Number} pageSize 每页数量
@@ -21,6 +21,49 @@
  *
  * @apiExample {bash} Curl example
  * curl -H "Authorization: Bearer 5f048fe" -i http://10.0.0.26:8085/v1/device/product/getProductList
+ *
+ *
+ * @apiSuccessExample Response:
+ *     HTTP/1.1 200 OK
+ *     {
+    "status": 200,
+    "data": {
+        "list": [
+            {
+                "id": 1,
+                "storeName": "领立裁腰带短袖连衣裙",
+                "sales": 1,
+                "price": 80,
+                "image": "http://127.0.0.1:8090/uploads/def/20200816/9a6a2e1231fb19517ed1de71206a0657.jpg"
+            }
+        ],
+        "total": 1,
+        "page": 1,
+        "pageSize": 10
+    },
+    "message": "获取成功"
+ *     }
+ */
+
+
+
+
+/**
+ * @api {get} /v1/device/product/getProductById/1 商品详情
+ * @apiVersion 0.0.1
+ * @apiName 商品详情
+ * @apiGroup 商品管理
+ * @apiPermission device
+ *
+ * @apiDescription 获取商品详情数据
+ *     
+ *
+ * @apiHeader {String} Authorization 接口需要带上此头信息
+ * @apiHeaderExample {Header} Header-Example
+ *     "Authorization: Bearer 5f048fe"
+ *
+ * @apiExample {bash} Curl example
+ * curl -H "Authorization: Bearer 5f048fe" -i http://10.0.0.26:8085/v1/device/product/getProductById/1
  *
  * @apiSuccess {Number}   id            商品id
  * @apiSuccess {String}   storeName     商品名称
@@ -53,27 +96,177 @@
  * @apiSuccess {Number}   ReplyCount       评论数
  * @apiSuccess {Number}   isGiftBag       是否为礼包
  * @apiSuccess {Number}   careCount       收藏数
- * @apiSuccess {Number}   image       商品图片
+ * @apiSuccess {String}   image       商品图片
+ * @apiSuccess {String}   sysTenancyName       医院名称
+ * @apiSuccess {String}   cateName       后台分类名称
+ * @apiSuccess {String}   brandName       品牌名称
+ * @apiSuccess {String}   tempName       模板名称
+ * @apiSuccess {String}   content       详情内容
+ * @apiSuccess {String[]}   sliderImages      展示图片
+ * @apiSuccess {String[]}   attr      规格
+ * @apiSuccess {Object[]}   attrValue      规格详情
  * @apiSuccess {Object[]}   productCates  商品分类
  *
  * @apiSuccessExample Response:
  *     HTTP/1.1 200 OK
  *     {
-    "status": 200,
+  "status": 200,
     "data": {
-        "list": [
+        "id": 1,
+        "storeName": "领立裁腰带短袖连衣裙",
+        "storeInfo": "短袖连衣裙",
+        "keyword": "连衣裙",
+        "unitName": "件",
+        "sort": 40,
+        "sales": 1,
+        "price": 80,
+        "otPrice": 100,
+        "stock": 399,
+        "isHot": 2,
+        "isBenefit": 2,
+        "isBest": 2,
+        "isNew": 2,
+        "isGood": 1,
+        "productType": 2,
+        "ficti": 100,
+        "specType": 1,
+        "rate": 5,
+        "isGiftBag": 2,
+        "image": "http://127.0.0.1:8090/uploads/def/20200816/9a6a2e1231fb19517ed1de71206a0657.jpg",
+        "tempId": 99,
+        "sysTenancyId": 1,
+        "sysBrandId": 2,
+        "productCategoryId": 162,
+        "sysTenancyName": "宝安中心人民医院",
+        "cateName": "男士上衣",
+        "brandName": "苹果",
+        "tempName": "",
+        "content": "<p>好手机</p>",
+        "sliderImage": "http://127.0.0.1:8090/uploads/def/20200816/9a6a2e1231fb19517ed1de71206a0657.jpg,http://127.0.0.1:8090/uploads/def/20200816/9a6a2e1231fb19517ed1de71206a0657.jpg",
+        "sliderImages": [
+            "http://127.0.0.1:8090/uploads/def/20200816/9a6a2e1231fb19517ed1de71206a0657.jpg",
+            "http://127.0.0.1:8090/uploads/def/20200816/9a6a2e1231fb19517ed1de71206a0657.jpg"
+        ],
+        "attr": [
             {
-                "id": 1,
-                "storeName": "领立裁腰带短袖连衣裙",
-                "sales": 1,
-                "price": 80,
-                "image": "http://127.0.0.1:8090/uploads/def/20200816/9a6a2e1231fb19517ed1de71206a0657.jpg"
+                "detail": [
+                    "35"
+                ],
+                "value": "S"
+            },
+            {
+                "detail": [
+                    "36"
+                ],
+                "value": "L"
+            },
+            {
+                "detail": [
+                    "37"
+                ],
+                "value": "XL"
+            },
+            {
+                "detail": [
+                    "38"
+                ],
+                "value": "XXL"
             }
         ],
-        "total": 1,
-        "page": 1,
-        "pageSize": 10
+        "attrValue": [
+            {
+                "sku": "S",
+                "stock": 99,
+                "sales": 1,
+                "image": "\thttp://127.0.0.1:8090/uploads/def/20200816/9a6a2e1231fb19517ed1de71206a0657.jpg",
+                "barCode": "123456",
+                "cost": 50,
+                "otPrice": 180,
+                "price": 160,
+                "volume": 1,
+                "weight": 1,
+                "extensionOne": 0,
+                "extensionTwo": 0,
+                "unique": "e2fe28308fd0",
+                "detail": {
+                    "尺寸": "S"
+                },
+                "value0": "S"
+            },
+            {
+                "sku": "L",
+                "stock": 100,
+                "sales": 0,
+                "image": "\thttp://127.0.0.1:8090/uploads/def/20200816/9a6a2e1231fb19517ed1de71206a0657.jpg",
+                "barCode": "123456",
+                "cost": 50,
+                "otPrice": 180,
+                "price": 160,
+                "volume": 1,
+                "weight": 1,
+                "extensionOne": 0,
+                "extensionTwo": 0,
+                "unique": "e2fe28308fd0",
+                "detail": {
+                    "尺寸": "L"
+                },
+                "value0": "L"
+            },
+            {
+                "sku": "XL",
+                "stock": 100,
+                "sales": 0,
+                "image": "\thttp://127.0.0.1:8090/uploads/def/20200816/9a6a2e1231fb19517ed1de71206a0657.jpg",
+                "barCode": "123456",
+                "cost": 50,
+                "otPrice": 180,
+                "price": 160,
+                "volume": 1,
+                "weight": 1,
+                "extensionOne": 0,
+                "extensionTwo": 0,
+                "unique": "e2fe28308fd0",
+                "detail": {
+                    "尺寸": "XL"
+                },
+                "value0": "XL"
+            },
+            {
+                "sku": "XXL",
+                "stock": 100,
+                "sales": 0,
+                "image": "\thttp://127.0.0.1:8090/uploads/def/20200816/9a6a2e1231fb19517ed1de71206a0657.jpg",
+                "barCode": "123456",
+                "cost": 50,
+                "otPrice": 180,
+                "price": 160,
+                "volume": 1,
+                "weight": 1,
+                "extensionOne": 0,
+                "extensionTwo": 0,
+                "unique": "e2fe28308fd0",
+                "detail": {
+                    "尺寸": "XXL"
+                },
+                "value0": "XXL"
+            }
+        ],
+        "cateId": 162,
+        "tenancyCategoryId": [
+            174,
+            173
+        ],
+        "productCates": [
+            {
+                "id": 174,
+                "cateName": "时尚女装"
+            },
+            {
+                "id": 173,
+                "cateName": "品牌服饰"
+            }
+        ]
     },
-    "message": "获取成功"
+    "message": "操作成功"
  *     }
  */

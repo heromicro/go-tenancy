@@ -100,7 +100,7 @@ func GetProductById(ctx *gin.Context) {
 		response.FailWithMessage(errs.Error(), ctx)
 		return
 	}
-	product, err := service.GetProductByID(req.Id)
+	product, err := service.GetProductByID(req.Id, service.IsCuser(ctx))
 	if err != nil {
 		g.TENANCY_LOG.Error("获取失败!", zap.Any("err", err))
 		response.FailWithMessage("获取失败:"+err.Error(), ctx)

@@ -1,4 +1,4 @@
-package user
+package device
 
 import (
 	"github.com/gin-gonic/gin"
@@ -19,14 +19,7 @@ func CreateReceipt(ctx *gin.Context) {
 		return
 	}
 
-	user_id := multi.GetUserId(ctx)
-	if user_id == 0 {
-		g.TENANCY_LOG.Error("更新失败! general_user is 0")
-		response.FailWithMessage("请求失败", ctx)
-		return
-	}
-
-	if returnReceipt, err := service.CreateReceipt(receipt, user_id); err != nil {
+	if returnReceipt, err := service.CreateReceipt(receipt, multi.GetUserId(ctx)); err != nil {
 		g.TENANCY_LOG.Error("创建失败!", zap.Any("err", err))
 		response.FailWithMessage("添加失败:"+err.Error(), ctx)
 	} else {
