@@ -17,6 +17,7 @@ require (
 	github.com/fsnotify/fsnotify v1.4.9
 	github.com/fvbock/endless v0.0.0-20170109170031-447134032cb6
 	github.com/gavv/httpexpect v2.0.0+incompatible
+	github.com/gin-contrib/static v0.0.1
 	github.com/gin-gonic/gin v1.7.2
 	github.com/go-ole/go-ole v1.2.5 // indirect
 	github.com/go-playground/validator/v10 v10.6.1
@@ -38,7 +39,7 @@ require (
 	github.com/satori/go.uuid v1.2.0
 	github.com/sergi/go-diff v1.2.0 // indirect
 	github.com/shirou/gopsutil v3.21.3+incompatible
-	github.com/shopspring/decimal v1.2.0 // indirect
+	github.com/shopspring/decimal v1.2.0
 	github.com/snowlyg/multi v0.0.0-20210617034456-78c1e847cda0
 	github.com/spf13/cast v1.3.1 // indirect
 	github.com/spf13/pflag v1.0.5 // indirect

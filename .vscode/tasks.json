@@ -14,43 +14,19 @@
       "command": "go test -timeout 60s -run [^TestInitDB$] github.com/snowlyg/go-tenancy/tests"
     },
     {
-      "label": "set goos to linux",
-      "type": "shell",
-      "command": "go env -w GOOS=linux"
-    },
-    {
-      "label": "building",
-      "type": "shell",
-      "dependsOn": [
-        "set goos to linux",
-      ],
-      "command": "go build -ldflags '-w -s' -o ./main main.go"
-    },
-    {
-      "label": "upx",
-      "type": "shell",
-      "command": "./upx -9 ./main",
-      "group": {
-        "kind": "build",
-        "isDefault": true
-      },
-      "dependsOn": [
-        "building",
-      ],
-      "problemMatcher": []
-    },
-    {
       "label": "build linux",
       "type": "shell",
-      "dependsOn": [
-        "upx",
-      ],
-      "command": "go env -w GOOS=windows"
+      "command": "go env -w GOOS=linux | go build -ldflags '-w -s' -o ./main main.go | ./upx -9 ./main | go env -w GOOS=windows"
     },
     {
       "label": "git push gitee",
       "type": "shell",
       "command": "git push gitee master"
+    },
+    {
+      "label": "apidoc",
+      "type": "shell",
+      "command": " cd resource/doc/ | apidoc -i v1/ -o apidoc/ -t template/"
     }
   ]
 }

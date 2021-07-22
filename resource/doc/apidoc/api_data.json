@@ -11,79 +11,70 @@
         "name": "none"
       }
     ],
-    "description": "<p>用于医院床旁设备登录使用. 医院床旁设备必须授权登录后才可以调用平台其他接口，用于确定用户在哪个医院，患者信息用于用户注册患者和更新患者信息.</p>",
-    "query": [
+    "description": "<p>用于医院床旁设备登录使用。 医院床旁设备必须授权登录后才可以调用平台其他接口，用于确定用户在哪个医院，患者信息用于用户注册患者和更新患者信息。</p>",
+    "body": [
       {
-        "group": "Query",
+        "group": "Body",
         "type": "String",
         "optional": false,
         "field": "uuid",
-        "description": "<p>医院唯一标识，由后台定义.</p>"
+        "description": "<p>c976999e-b004-403c-96b7-e2390f64fbb7</p>"
       },
       {
-        "group": "Query",
+        "group": "Body",
         "type": "String",
         "optional": false,
         "field": "name",
-        "description": "<p>患者名称.</p>"
+        "description": "<p>八两金</p>"
       },
       {
-        "group": "Query",
+        "group": "Body",
         "type": "String",
         "optional": false,
         "field": "phone",
-        "description": "<p>手机号.</p>"
+        "description": "<p>13845687419</p>"
       },
       {
-        "group": "Query",
+        "group": "Body",
         "type": "String",
         "optional": false,
         "field": "sex",
-        "description": "<p>性别 0 女，1男，2未知.</p>"
+        "description": "<p>性别 0 女，1男，2未知</p>"
       },
       {
-        "group": "Query",
+        "group": "Body",
         "type": "String",
         "optional": false,
         "field": "age",
         "description": "<p>年龄.</p>"
       },
       {
-        "group": "Query",
+        "group": "Body",
         "type": "String",
         "optional": false,
         "field": "locName",
-        "description": "<p>科室名.</p>"
+        "description": "<p>泌尿科一区</p>"
       },
-      {
-        "group": "Query",
-        "type": "String",
-        "optional": false,
-        "field": "bedNum",
-        "description": "<p>床号.</p>"
-      },
-      {
-        "group": "Query",
-        "type": "String",
-        "optional": false,
-        "field": "hospitalNo",
-        "description": "<p>住院号.</p>"
-      },
-      {
-        "group": "Query",
-        "type": "String",
-        "optional": false,
-        "field": "disease",
-        "description": "<p>病种.</p>"
-      }
-    ],
-    "body": [
       {
         "group": "Body",
         "type": "String",
         "optional": false,
-        "field": "age",
-        "description": "<p>Age of the User</p>"
+        "field": "bedNum",
+        "description": "<p>15</p>"
+      },
+      {
+        "group": "Body",
+        "type": "String",
+        "optional": false,
+        "field": "hospitalNo",
+        "description": "<p>88956655</p>"
+      },
+      {
+        "group": "Body",
+        "type": "String",
+        "optional": false,
+        "field": "disease",
+        "description": "<p>不孕不育</p>"
       }
     ],
     "success": {
@@ -99,7 +90,7 @@
     "groupTitle": "公共方法",
     "sampleRequest": [
       {
-        "url": "https://apidoc.free.beeceptor.com/v1/public/device/login"
+        "url": "http://10.0.0.26:8085/v1/public/device/login"
       }
     ]
   }

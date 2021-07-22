@@ -5,20 +5,19 @@
  * @apiGroup 公共方法
  * @apiPermission none
  *
- * @apiDescription 用于医院床旁设备登录使用.
- * 医院床旁设备必须授权登录后才可以调用平台其他接口，用于确定用户在哪个医院，患者信息用于用户注册患者和更新患者信息.
+ * @apiDescription 用于医院床旁设备登录使用。
+ * 医院床旁设备必须授权登录后才可以调用平台其他接口，用于确定用户在哪个医院，患者信息用于用户注册患者和更新患者信息。
  *
- * @apiQuery {String} uuid 医院唯一标识，由后台定义.
- * @apiQuery {String} name 患者名称.
- * @apiQuery {String} phone 手机号.
- * @apiQuery {String} sex 性别 0 女，1男，2未知.
- * @apiQuery {String} age 年龄.
- * @apiQuery {String} locName 科室名.
- * @apiQuery {String} bedNum 床号.
- * @apiQuery {String} hospitalNo 住院号.
- * @apiQuery {String} disease 病种.
  *
- * @apiBody {String} age Age of the User
+ * @apiBody {String} uuid c976999e-b004-403c-96b7-e2390f64fbb7
+ * @apiBody {String} name 八两金
+ * @apiBody {String} phone 13845687419
+ * @apiBody {String} sex 性别 0 女，1男，2未知
+ * @apiBody {String} age 年龄.
+ * @apiBody {String} locName 泌尿科一区
+ * @apiBody {String} bedNum 15
+ * @apiBody {String} hospitalNo 88956655
+ * @apiBody {String} disease 不孕不育
  *
  * @apiSuccessExample {json} Success-Response:
  *     HTTP/1.1 200 OK

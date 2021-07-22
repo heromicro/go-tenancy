@@ -3,6 +3,7 @@ package initialize
 import (
 	"net/http"
 
+	"github.com/gin-contrib/static"
 	"github.com/gin-gonic/gin"
 	"github.com/snowlyg/go-tenancy/g"
 	"github.com/snowlyg/go-tenancy/middleware"
@@ -18,7 +19,7 @@ import (
 func App() *gin.Engine {
 	gin.SetMode(g.TENANCY_CONFIG.System.Level)
 	App := gin.Default()
-
+	App.Use(static.Serve("/", static.LocalFile("resource/doc/apidoc", true)))
 	// 注册已定义验证方法
 	utils.RegisterValidation()
 	// 注册路由
