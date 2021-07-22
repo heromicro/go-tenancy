@@ -7,7 +7,12 @@
  *
  * @apiDescription 添加商品到购物车
  *     
- *     
+ * @apiParam {Number} cartNum 商品数量
+ * @apiParam {Number} isNew 是否为立即购买 1 是，2否
+ * @apiParam {Number} productType 商品类型 1.普通商品 2.秒杀商品,3.预售商品，4.助力商品
+ * @apiParam {Number} productId 商品 id 
+ * @apiParam {String} productAttrUnique 商品规格唯一值 
+ * 
  * @apiBody {Number} cartNum 商品数量
  * @apiBody {Number} isNew 是否为立即购买 1 是，2否
  * @apiBody {Number} productType 商品类型 1.普通商品 2.秒杀商品,3.预售商品，4.助力商品

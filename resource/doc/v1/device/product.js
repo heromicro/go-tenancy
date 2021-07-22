@@ -7,6 +7,14 @@
  *
  * @apiDescription 获取商品列表数据
  *     
+ * @apiParam {Number} page 页码
+ * @apiParam {Number} pageSize 每页数量
+ * @apiParam {Number} cateId 商户分类 id
+ * @apiParam {Number} tenancyCategoryId 商城分类 id 
+ * @apiParam {String} keyword 关键字搜索 
+ * @apiParam {String} type 商品类型 1.普通商品 2.秒杀商品,3.预售商品，4.助力商品
+ * @apiParam {String} [isGiftBag] 是否礼包 1 是 ，2 否
+ * 
  * @apiBody {Number} page 页码
  * @apiBody {Number} pageSize 每页数量
  * @apiBody {Number} cateId 商户分类 id

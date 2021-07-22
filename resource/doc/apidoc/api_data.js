@@ -12,6 +12,75 @@ define({ "api": [
       }
     ],
     "description": "<p>用于医院床旁设备登录使用。 医院床旁设备必须授权登录后才可以调用平台其他接口，用于确定用户在哪个医院，患者信息用于用户注册患者和更新患者信息。</p>",
+    "parameter": {
+      "fields": {
+        "Parameter": [
+          {
+            "group": "Parameter",
+            "type": "String",
+            "optional": false,
+            "field": "uuid",
+            "description": "<p>c976999e-b004-403c-96b7-e2390f64fbb7</p>"
+          },
+          {
+            "group": "Parameter",
+            "type": "String",
+            "optional": false,
+            "field": "name",
+            "description": "<p>八两金</p>"
+          },
+          {
+            "group": "Parameter",
+            "type": "String",
+            "optional": false,
+            "field": "phone",
+            "description": "<p>13845687419</p>"
+          },
+          {
+            "group": "Parameter",
+            "type": "String",
+            "optional": false,
+            "field": "sex",
+            "description": "<p>性别 0 女，1男，2未知</p>"
+          },
+          {
+            "group": "Parameter",
+            "type": "String",
+            "optional": false,
+            "field": "age",
+            "description": "<p>年龄.</p>"
+          },
+          {
+            "group": "Parameter",
+            "type": "String",
+            "optional": false,
+            "field": "locName",
+            "description": "<p>泌尿科一区</p>"
+          },
+          {
+            "group": "Parameter",
+            "type": "String",
+            "optional": false,
+            "field": "bedNum",
+            "description": "<p>15</p>"
+          },
+          {
+            "group": "Parameter",
+            "type": "String",
+            "optional": false,
+            "field": "hospitalNo",
+            "description": "<p>88956655</p>"
+          },
+          {
+            "group": "Parameter",
+            "type": "String",
+            "optional": false,
+            "field": "disease",
+            "description": "<p>不孕不育</p>"
+          }
+        ]
+      }
+    },
     "body": [
       {
         "group": "Body",
@@ -217,6 +286,61 @@ define({ "api": [
       }
     ],
     "description": "<p>获取商品列表数据</p>",
+    "parameter": {
+      "fields": {
+        "Parameter": [
+          {
+            "group": "Parameter",
+            "type": "Number",
+            "optional": false,
+            "field": "page",
+            "description": "<p>页码</p>"
+          },
+          {
+            "group": "Parameter",
+            "type": "Number",
+            "optional": false,
+            "field": "pageSize",
+            "description": "<p>每页数量</p>"
+          },
+          {
+            "group": "Parameter",
+            "type": "Number",
+            "optional": false,
+            "field": "cateId",
+            "description": "<p>商户分类 id</p>"
+          },
+          {
+            "group": "Parameter",
+            "type": "Number",
+            "optional": false,
+            "field": "tenancyCategoryId",
+            "description": "<p>商城分类 id</p>"
+          },
+          {
+            "group": "Parameter",
+            "type": "String",
+            "optional": false,
+            "field": "keyword",
+            "description": "<p>关键字搜索</p>"
+          },
+          {
+            "group": "Parameter",
+            "type": "String",
+            "optional": false,
+            "field": "type",
+            "description": "<p>商品类型 1.普通商品 2.秒杀商品,3.预售商品，4.助力商品</p>"
+          },
+          {
+            "group": "Parameter",
+            "type": "String",
+            "optional": true,
+            "field": "isGiftBag",
+            "description": "<p>是否礼包 1 是 ，2 否</p>"
+          }
+        ]
+      }
+    },
     "body": [
       {
         "group": "Body",
@@ -673,6 +797,47 @@ define({ "api": [
       }
     ],
     "description": "<p>添加商品到购物车</p>",
+    "parameter": {
+      "fields": {
+        "Parameter": [
+          {
+            "group": "Parameter",
+            "type": "Number",
+            "optional": false,
+            "field": "cartNum",
+            "description": "<p>商品数量</p>"
+          },
+          {
+            "group": "Parameter",
+            "type": "Number",
+            "optional": false,
+            "field": "isNew",
+            "description": "<p>是否为立即购买 1 是，2否</p>"
+          },
+          {
+            "group": "Parameter",
+            "type": "Number",
+            "optional": false,
+            "field": "productType",
+            "description": "<p>商品类型 1.普通商品 2.秒杀商品,3.预售商品，4.助力商品</p>"
+          },
+          {
+            "group": "Parameter",
+            "type": "Number",
+            "optional": false,
+            "field": "productId",
+            "description": "<p>商品 id</p>"
+          },
+          {
+            "group": "Parameter",
+            "type": "String",
+            "optional": false,
+            "field": "productAttrUnique",
+            "description": "<p>商品规格唯一值</p>"
+          }
+        ]
+      }
+    },
     "body": [
       {
         "group": "Body",

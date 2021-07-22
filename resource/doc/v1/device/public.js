@@ -9,6 +9,17 @@
  * 医院床旁设备必须授权登录后才可以调用平台其他接口，用于确定用户在哪个医院，患者信息用于用户注册患者和更新患者信息。
  *
  *
+ * @apiParam {String} uuid c976999e-b004-403c-96b7-e2390f64fbb7
+ * @apiParam {String} name 八两金
+ * @apiParam {String} phone 13845687419
+ * @apiParam {String} sex 性别 0 女，1男，2未知
+ * @apiParam {String} age 年龄.
+ * @apiParam {String} locName 泌尿科一区
+ * @apiParam {String} bedNum 15
+ * @apiParam {String} hospitalNo 88956655
+ * @apiParam {String} disease 不孕不育
+ * 
+ * 
  * @apiBody {String} uuid c976999e-b004-403c-96b7-e2390f64fbb7
  * @apiBody {String} name 八两金
  * @apiBody {String} phone 13845687419
