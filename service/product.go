@@ -114,10 +114,11 @@ func getProductConditionByType(tenancyId uint, isTenancy bool, t int) response.P
 
 // CreateProduct
 func CreateProduct(req request.CreateProduct, tenancyId uint) (model.Product, error) {
-	var product model.Product
-	product.BaseProduct = req.BaseProduct
+	product := model.Product{
+		BaseProduct: req.BaseProduct,
+		SliderImage: strings.Join(req.SliderImages, ","),
+	}
 	product.SysTenancyID = tenancyId
-	product.SliderImage = strings.Join(req.SliderImages, ",")
 	product.ProductCategoryID = req.CateId
 	product.IsHot = g.StatusFalse
 	product.IsBenefit = g.StatusFalse
@@ -125,6 +126,7 @@ func CreateProduct(req request.CreateProduct, tenancyId uint) (model.Product, er
 	product.IsNew = g.StatusFalse
 	product.ProductType = model.GeneralSale
 	product.Status = model.AuditProductStatus
+
 	err := g.TENANCY_DB.Transaction(func(tx *gorm.DB) error {
 		err := tx.Model(&model.Product{}).Create(&product).Error
 		if err != nil {
@@ -157,33 +159,44 @@ func CreateProduct(req request.CreateProduct, tenancyId uint) (model.Product, er
 }
 
 // UpdateProduct
-func UpdateProduct(req request.UpdateProduct, id, tenancyId uint) error {
-	product := model.Product{
-		BaseProduct: model.BaseProduct{
-			StoreName: req.StoreName, Ficti: req.Ficti, IsBenefit: req.IsBenefit, IsBest: req.IsBest,
-			IsHot: req.IsHot, IsNew: req.IsNew, Status: model.AuditProductStatus,
-		},
-	}
+func UpdateProduct(req request.UpdateProduct, id uint, ctx *gin.Context) error {
+	// 更新商品重新审核，并下架
+	tenancyId := multi.GetTenancyId(ctx)
 	err := g.TENANCY_DB.Transaction(func(tx *gorm.DB) error {
-		if err := tx.Where("id = ?", id).Updates(&product).Error; err != nil {
-			return err
-		}
-
-		if len(req.CategoryIds) > 0 {
-			err := SetProductCategory(tx, product.ID, tenancyId, req.CategoryIds)
+		if multi.IsAdmin(ctx) {
+			if err := tx.Where("id = ?", id).Updates(map[string]interface{}{"store_name": req.StoreName, "is_benefit": req.IsBenefit, "is_best": req.IsBest, "is_hot": req.IsHot, "is_new": req.IsNew, "sort": req.Sort}).Error; err != nil {
+				return err
+			}
+		} else if multi.IsTenancy(ctx) {
+			product := model.Product{
+				BaseProduct: req.BaseProduct,
+			}
+			product.Status = model.AuditProductStatus
+			product.IsShow = g.StatusFalse
+			product.ProductCategoryID = req.CateId
+			product.SliderImage = strings.Join(req.SliderImages, ",")
+			if err := tx.Where("id = ?", id).Updates(&product).Error; err != nil {
+				return err
+			}
+			err := SetProductAttrValue(tx, true, id, req.ProductType, req.AttrValue)
 			if err != nil {
-				return fmt.Errorf("set product product_cate %w", err)
+				return fmt.Errorf("set product attr %w", err)
+			}
+			err = tx.Model(&model.Cart{}).Where("product_id = ?", id).Update("is_fail", g.StatusTrue).Error
+			if err != nil {
+				return err
+			}
+			if len(req.CategoryIds) > 0 {
+				err := SetProductCategory(tx, product.ID, tenancyId, req.CategoryIds)
+				if err != nil {
+					return fmt.Errorf("set product product_cate %w", err)
+				}
 			}
 		}
 
 		err := SetProductContent(tx, id, tenancyId, req.ProductType, req.Content)
 		if err != nil {
 			return fmt.Errorf("set product content  %w", err)
-		}
-
-		err = SetProductAttrValue(tx, true, id, req.ProductType, req.AttrValue)
-		if err != nil {
-			return fmt.Errorf("set product attr %w", err)
 		}
 
 		return nil
