@@ -142,7 +142,6 @@ func InitDB(conf request.InitDB) error {
 		model.Product{},
 		model.ProductProductCate{},
 		model.ProductContent{},
-		model.ProductAttr{},
 		model.ProductAttrValue{},
 		model.ProductReply{},
 		model.ShippingTemplate{},

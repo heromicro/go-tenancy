@@ -50,7 +50,6 @@ func MysqlTables(db *gorm.DB) {
 		model.Product{},
 		model.ProductProductCate{},
 		model.ProductContent{},
-		model.ProductAttr{},
 		model.ProductAttrValue{},
 		model.ProductReply{},
 		model.ShippingTemplate{},

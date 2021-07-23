@@ -11,17 +11,19 @@ import (
 )
 
 func GetCartList(ctx *gin.Context) {
-	if list, total, err := service.GetCartList(ctx); err != nil {
+	if list, fails, total, err := service.GetCartList(ctx); err != nil {
 		g.TENANCY_LOG.Error("获取失败!", zap.Any("err", err))
 		response.FailWithMessage("获取失败:"+err.Error(), ctx)
 	} else {
 		if total > 99 {
 			response.OkWithDetailed(gin.H{
+				"fails": fails,
 				"list":  list,
 				"total": "99+",
 			}, "获取成功", ctx)
 		} else {
 			response.OkWithDetailed(gin.H{
+				"fails": fails,
 				"list":  list,
 				"total": total,
 			}, "获取成功", ctx)

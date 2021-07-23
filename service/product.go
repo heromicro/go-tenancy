@@ -126,61 +126,28 @@ func CreateProduct(req request.CreateProduct, tenancyId uint) (model.Product, er
 	product.ProductType = model.GeneralSale
 	product.Status = model.AuditProductStatus
 	err := g.TENANCY_DB.Transaction(func(tx *gorm.DB) error {
-
 		err := tx.Model(&model.Product{}).Create(&product).Error
 		if err != nil {
 			return fmt.Errorf("create product %w", err)
 		}
 
-		var productCates []model.ProductProductCate
-		for _, categoryId := range req.CategoryIds {
-			productCate := model.ProductProductCate{ProductID: product.ID, ProductCategoryID: categoryId, SysTenancyID: product.SysTenancyID}
-			productCates = append(productCates, productCate)
-		}
-
-		err = tx.Model(&model.Product{}).Model(&model.ProductProductCate{}).Create(&productCates).Error
-		if err != nil {
-			return fmt.Errorf("create product product cate %w", err)
-		}
-
-		err = tx.Model(&model.ProductContent{}).Create(map[string]interface{}{
-			"Content": req.Content, "Type": product.ProductType, "ProductID": product.ID,
-		}).Error
-		if err != nil {
-			return fmt.Errorf("create product content %w", err)
-		}
-
-		var productAttrs []model.ProductAttr
-		for _, attr := range req.Attr {
-			productAttr := model.ProductAttr{ProductID: product.ID, AttrName: attr.Value, AttrValues: strings.Join(attr.Detail, ","), Type: product.ProductType}
-			productAttrs = append(productAttrs, productAttr)
-		}
-		err = tx.Model(&model.ProductAttr{}).Create(&productAttrs).Error
-		if err != nil {
-			return fmt.Errorf("create product attr %w", err)
-		}
-
-		var productAttrValues []model.ProductAttrValue
-		for _, attrValue := range req.AttrValue {
-			detail, err := json.Marshal(attrValue.Detail)
+		if len(req.CategoryIds) > 0 {
+			err = SetProductCategory(tx, product.ID, tenancyId, req.CategoryIds)
 			if err != nil {
-				return fmt.Errorf("json product attr value detail marshal %w", err)
+				return fmt.Errorf("create product product cate %w", err)
 			}
+		}
 
-			unique, err := file.Md5Byte([]byte(fmt.Sprintf("%s%d", string(detail), product.ID)))
-			if err != nil {
-				return fmt.Errorf("get product attr value unique %w", err)
-			}
-			unique = fmt.Sprintf("%s%d", unique[12:23], product.ProductType)
-			attrValue.BaseProductAttrValue.Sku = attrValue.Value0
-			attrValue.BaseProductAttrValue.Unique = unique
-			productAttrValue := model.ProductAttrValue{ProductID: product.ID, BaseProductAttrValue: attrValue.BaseProductAttrValue, Detail: string(detail), Type: product.ProductType}
-			productAttrValues = append(productAttrValues, productAttrValue)
-		}
-		err = tx.Model(&model.ProductAttrValue{}).Create(&productAttrValues).Error
+		err = SetProductContent(tx, product.ID, tenancyId, product.ProductType, req.Content)
 		if err != nil {
-			return fmt.Errorf("create product attr value %w", err)
+			return fmt.Errorf("set product content  %w", err)
 		}
+
+		err = SetProductAttrValue(tx, true, product.ID, req.ProductType, req.AttrValue)
+		if err != nil {
+			return fmt.Errorf("set product attr %w", err)
+		}
+
 		return nil
 	})
 	if err != nil {
@@ -189,31 +156,187 @@ func CreateProduct(req request.CreateProduct, tenancyId uint) (model.Product, er
 	return product, nil
 }
 
+// UpdateProduct
+func UpdateProduct(req request.UpdateProduct, id, tenancyId uint) error {
+	product := model.Product{
+		BaseProduct: model.BaseProduct{
+			StoreName: req.StoreName, Ficti: req.Ficti, IsBenefit: req.IsBenefit, IsBest: req.IsBest,
+			IsHot: req.IsHot, IsNew: req.IsNew, Status: model.AuditProductStatus,
+		},
+	}
+	err := g.TENANCY_DB.Transaction(func(tx *gorm.DB) error {
+		if err := tx.Where("id = ?", id).Updates(&product).Error; err != nil {
+			return err
+		}
+
+		if len(req.CategoryIds) > 0 {
+			err := SetProductCategory(tx, product.ID, tenancyId, req.CategoryIds)
+			if err != nil {
+				return fmt.Errorf("set product product_cate %w", err)
+			}
+		}
+
+		err := SetProductContent(tx, id, tenancyId, req.ProductType, req.Content)
+		if err != nil {
+			return fmt.Errorf("set product content  %w", err)
+		}
+
+		err = SetProductAttrValue(tx, true, id, req.ProductType, req.AttrValue)
+		if err != nil {
+			return fmt.Errorf("set product attr %w", err)
+		}
+
+		return nil
+	})
+	return err
+}
+
+func SetProductAttrValue(tx *gorm.DB, isUpdate bool, productId uint, productType int32, reqAttrValue []request.ProductAttrValue) error {
+	if isUpdate {
+		err := tx.Where("product_id = ?", productId).Delete(&model.ProductAttrValue{}).Error
+		if err != nil {
+			return fmt.Errorf("create product attr %w", err)
+		}
+	}
+	var productAttrValues []model.ProductAttrValue
+	for _, attrValue := range reqAttrValue {
+		detail, err := json.Marshal(attrValue.Detail)
+		if err != nil {
+			return fmt.Errorf("json product attr value detail marshal %w", err)
+		}
+		unique, err := file.Md5Byte([]byte(fmt.Sprintf("%s%d", string(detail), productId)))
+		if err != nil {
+			return fmt.Errorf("get product attr value unique %w", err)
+		}
+		unique = fmt.Sprintf("%s%d", unique[12:23], productType)
+		attrValue.BaseProductAttrValue.Sku = attrValue.Value0
+		attrValue.BaseProductAttrValue.Unique = unique
+		productAttrValue := model.ProductAttrValue{ProductID: productId, BaseProductAttrValue: attrValue.BaseProductAttrValue, Detail: string(detail), Type: productType}
+		productAttrValues = append(productAttrValues, productAttrValue)
+	}
+
+	err := tx.Model(&model.ProductAttrValue{}).Create(&productAttrValues).Error
+	if err != nil {
+		return fmt.Errorf("create product attr value %w", err)
+	}
+
+	return nil
+}
+
+func GetProductCategoryIdsById(id uint) ([]uint, error) {
+	ids := []uint{}
+	err := g.TENANCY_DB.Model(&model.ProductProductCate{}).Select("product_category_id").Where("product_id = ?", id).Find(&ids).Error
+	if err != nil {
+		return ids, err
+	}
+	return ids, nil
+}
+
+func SetProductContent(tx *gorm.DB, productId, tenancyId uint, productType int32, content string) error {
+	var conModel model.ProductContent
+	if err := g.TENANCY_DB.Model(&model.ProductContent{}).Where("product_id = ?", productId).Where("sys_tenancy_id = ?", tenancyId).First(&conModel).Error; err != nil {
+		return err
+	}
+
+	if conModel.ProductID > 0 {
+		if err := tx.Model(&model.ProductContent{}).Where("product_id = ?", productId).Updates(map[string]interface{}{"content": content}).Error; err != nil {
+			return err
+		}
+	} else {
+		con := model.ProductContent{Content: content, ProductID: productId, Type: productType}
+		if err := tx.Model(&model.ProductContent{}).Create(&con).Error; err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+// SetProductCategory
+func SetProductCategory(tx *gorm.DB, id, tenancyId uint, reqIds []uint) error {
+	cateIds, err := GetProductCategoryIdsById(id)
+	if err != nil {
+		return err
+	}
+
+	// 删除
+	var delIds []uint
+	for _, cateId := range cateIds {
+		isDel := true
+		for _, reqlId := range reqIds {
+			if cateId == reqlId {
+				isDel = false
+				break
+			}
+		}
+		if isDel {
+			delIds = append(delIds, cateId)
+		}
+	}
+
+	if len(delIds) > 0 {
+		if err = tx.Where("product_id = ?", id).Where("sys_tenancy_id = ?", tenancyId).Where("product_category_id in ?", delIds).Delete(&model.ProductProductCate{}).Error; err != nil {
+			return fmt.Errorf("delete product_product_categorys %w", err)
+		}
+	}
+
+	// 增加
+	var addIds []uint
+	for _, reqId := range reqIds {
+		isAdd := true
+		for _, cateId := range cateIds {
+			if reqId == cateId {
+				isAdd = false
+				break
+			}
+		}
+		if isAdd {
+			addIds = append(addIds, reqId)
+		}
+	}
+
+	if len(addIds) > 0 {
+		var cates []model.ProductProductCate
+		for _, addId := range addIds {
+			cates = append(cates, model.ProductProductCate{ProductID: id, ProductCategoryID: addId, SysTenancyID: tenancyId})
+		}
+		if err = tx.Model(&model.ProductProductCate{}).Create(&cates).Error; err != nil {
+			return fmt.Errorf("create product_product_categorys %w", err)
+		}
+	}
+
+	return nil
+}
+
 // GetCartProducts
 func GetCartProducts(sysTenancyID, sysUserID uint) ([]response.CartProduct, error) {
 	var cartProducts []response.CartProduct
-	err := g.TENANCY_DB.Model(&model.Product{}).Where("products.is_show = ?", g.StatusTrue).Where("products.status = ?", model.SuccessProductStatus).Select("products.id as product_id,products.store_name,products.image,products.price,carts.id,carts.cart_num,carts.sys_tenancy_id as sys_tenancy_id,carts.product_attr_unique").
+	err := g.TENANCY_DB.Model(&model.Product{}).Where("products.is_show = ?", g.StatusTrue).Where("products.status = ?", model.SuccessProductStatus).Select("products.id as product_id,products.store_name,products.image,products.spec_type,products.price,carts.id,carts.cart_num,carts.sys_tenancy_id as sys_tenancy_id,carts.product_attr_unique,carts.is_fail").
 		Joins("left join carts on products.id = carts.product_id").
 		Where("carts.sys_tenancy_id = ?", sysTenancyID).
 		Where("carts.sys_user_id = ?", sysUserID).
 		Where("carts.is_pay", g.StatusFalse).
-		Where("carts.is_fail", g.StatusFalse).
 		Where("carts.deleted_at is null").
 		Find(&cartProducts).Error
 	if err != nil {
 		return cartProducts, err
 	}
 
-	productIds := []uint{}
+	singeProductIds := []uint{}
+	doubleProductIds := []uint{}
 	uniques := []string{}
 	for _, cartProduct := range cartProducts {
-		productIds = append(productIds, cartProduct.ProductID)
+		if cartProduct.SpecType == model.SingleSpec {
+			singeProductIds = append(singeProductIds, cartProduct.ProductID)
+		} else if cartProduct.SpecType == model.DoubleSpec {
+			doubleProductIds = append(doubleProductIds, cartProduct.ProductID)
+		}
+
 		uniques = append(uniques, cartProduct.ProductAttrUnique)
 	}
 
 	var attrValues []model.ProductAttrValue
 	err = g.TENANCY_DB.Model(&model.ProductAttrValue{}).
-		Where("product_id in ?", productIds).
+		Where("product_id in ?", doubleProductIds).
 		Where("'unique' in ?", uniques).
 		Find(&attrValues).Error
 	if err != nil {
@@ -223,7 +346,7 @@ func GetCartProducts(sysTenancyID, sysUserID uint) ([]response.CartProduct, erro
 	if len(attrValues) > 0 {
 		for _, attrValue := range attrValues {
 			for i := 0; i < len(cartProducts); i++ {
-				if cartProducts[i].ProductID == attrValue.ProductID && cartProducts[i].ProductAttrUnique == attrValue.Unique {
+				if cartProducts[i].ProductID == attrValue.ProductID && cartProducts[i].ProductAttrUnique == attrValue.Unique && cartProducts[i].SpecType == model.DoubleSpec {
 					productAttrValue := request.ProductAttrValue{BaseProductAttrValue: attrValue.BaseProductAttrValue, Value0: attrValue.BaseProductAttrValue.Sku}
 					if attrValue.Detail != "" {
 						err := json.Unmarshal([]byte(attrValue.Detail), &productAttrValue.Detail)
@@ -235,7 +358,6 @@ func GetCartProducts(sysTenancyID, sysUserID uint) ([]response.CartProduct, erro
 					cartProducts[i].AttrValue = productAttrValue
 				}
 			}
-
 		}
 	}
 
@@ -265,23 +387,6 @@ func GetProductByID(id uint, isCuser bool) (response.ProductDetail, error) {
 	}
 	product.SliderImages = strings.Split(product.SliderImage, ",")
 
-	var attrs []model.ProductAttr
-	err = g.TENANCY_DB.Model(&model.ProductAttr{}).Where("product_id = ?", id).
-		Find(&attrs).Error
-	if err != nil {
-		return product, err
-	}
-
-	values := []request.Value{}
-	if len(attrs) > 0 {
-		for _, attr := range attrs {
-			value := request.Value{Value: attr.AttrName, Detail: strings.Split(attr.AttrValues, ",")}
-			values = append(values, value)
-		}
-	}
-
-	product.Attr = values
-
 	var attrValues []model.ProductAttrValue
 	err = g.TENANCY_DB.Model(&model.ProductAttrValue{}).Where("product_id = ?", id).
 		Find(&attrValues).Error
@@ -302,8 +407,8 @@ func GetProductByID(id uint, isCuser bool) (response.ProductDetail, error) {
 			productAttrValues = append(productAttrValues, productAttrValue)
 		}
 	}
-
 	product.AttrValue = productAttrValues
+
 	product.CateId = product.ProductCategoryID
 	product.SliderImages = strings.Split(product.SliderImage, ",")
 
@@ -332,37 +437,6 @@ func GetProductFictiByID(id uint) (int32, error) {
 	return product.Ficti, err
 }
 
-// UpdateProduct
-func UpdateProduct(req request.UpdateProduct, id uint) error {
-
-	product := model.Product{
-		BaseProduct: model.BaseProduct{StoreName: req.StoreName, Ficti: req.Ficti, IsBenefit: req.IsBenefit, IsBest: req.IsBest, IsHot: req.IsHot, IsNew: req.IsNew, Status: model.AuditProductStatus}}
-
-	var content model.ProductContent
-	if err := g.TENANCY_DB.Model(&model.ProductContent{}).Where("product_id = ?", id).First(&content).Error; err != nil {
-		return err
-	}
-
-	err := g.TENANCY_DB.Transaction(func(tx *gorm.DB) error {
-		if err := tx.Where("id = ?", id).Updates(&product).Error; err != nil {
-			return err
-		}
-		if content.ProductID > 0 {
-			if err := tx.Model(&model.ProductContent{}).Where("product_id = ?", content.ProductID).Updates(map[string]interface{}{"content": req.Content}).Error; err != nil {
-				return err
-			}
-		} else {
-			content = model.ProductContent{Content: req.Content, ProductID: id, Type: req.ProductType}
-			if err := tx.Model(&model.ProductContent{}).Create(&content).Error; err != nil {
-				return err
-			}
-		}
-
-		return nil
-	})
-	return err
-}
-
 // ChangeProductStatus
 func ChangeProductStatus(changeStatus request.ChangeProductStatus) error {
 	return g.TENANCY_DB.Model(&model.Product{}).Where("id = ?", changeStatus.Id).Updates(map[string]interface{}{"status": changeStatus.Status, "refusal": changeStatus.Refusal}).Error
@@ -375,7 +449,19 @@ func ChangeMutilProductStatus(changeStatus request.ChangeMutilProductStatus) err
 
 // ChangeProductIsShow
 func ChangeProductIsShow(changeStatus request.ChangeProductIsShow) error {
-	return g.TENANCY_DB.Model(&model.Product{}).Where("id = ?", changeStatus.Id).Updates(map[string]interface{}{"is_show": changeStatus.IsShow}).Error
+	err := g.TENANCY_DB.Transaction(func(tx *gorm.DB) error {
+		err := tx.Model(&model.Product{}).Where("id = ?", changeStatus.Id).Updates(map[string]interface{}{"is_show": changeStatus.IsShow}).Error
+		if err != nil {
+			return err
+		}
+		err = tx.Model(&model.Cart{}).Where("product_id = ?", changeStatus.Id).Update("is_fail", g.StatusTrue).Error
+		if err != nil {
+			return err
+		}
+		return nil
+	})
+
+	return err
 }
 
 // SetProductFicti
@@ -402,8 +488,19 @@ func SetProductFicti(req request.SetProductFicti, id uint) error {
 
 // DeleteProduct
 func DeleteProduct(id uint) error {
-	var product model.Product
-	return g.TENANCY_DB.Where("id = ?", id).Delete(&product).Error
+	err := g.TENANCY_DB.Transaction(func(tx *gorm.DB) error {
+		err := tx.Delete(&model.Product{}, 1).Error
+		if err != nil {
+			return err
+		}
+		err = tx.Model(&model.Cart{}).Where("product_id = ?", id).Update("is_fail", g.StatusTrue).Error
+		if err != nil {
+			return err
+		}
+		return nil
+	})
+
+	return err
 }
 
 // RestoreProduct
@@ -413,8 +510,7 @@ func RestoreProduct(id uint) error {
 
 // ForceDeleteProduct
 func ForceDeleteProduct(id uint) error {
-	var product model.Product
-	return g.TENANCY_DB.Unscoped().Where("id = ?", id).Delete(&product).Error
+	return g.TENANCY_DB.Unscoped().Delete(&model.Product{}, 1).Error
 }
 
 // GetProductInfoList

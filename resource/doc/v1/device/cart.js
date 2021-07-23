@@ -90,6 +90,7 @@
  *     {
           "status": 200,
           "data": {
+              fails": [], // 失效商品
               "list": [
                   {
                       "sysTenancyId": 1,

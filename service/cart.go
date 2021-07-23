@@ -72,17 +72,22 @@ func GetProductCount(sysUserID, sysTenancyID uint) (int64, error) {
 }
 
 // GetCartList
-func GetCartList(ctx *gin.Context) ([]response.CartList, int64, error) {
+func GetCartList(ctx *gin.Context) ([]response.CartList, []response.CartProduct, int64, error) {
 	cartList := []response.CartList{}
+	fails := []response.CartProduct{}
 	var count int64
 	cartProducts, err := GetCartProducts(multi.GetTenancyId(ctx), multi.GetUserId(ctx))
 	if err != nil {
-		return cartList, count, fmt.Errorf("get cart %w", err)
+		return cartList, fails, count, fmt.Errorf("get cart %w", err)
 	}
 	tenancyIds := []uint{}
 	if len(cartProducts) > 0 {
 		for _, cartProduct := range cartProducts {
-			tenancyIds = append(tenancyIds, cartProduct.SysTenancyID)
+			if cartProduct.IsFail == g.StatusFalse {
+				tenancyIds = append(tenancyIds, cartProduct.SysTenancyID)
+			} else {
+				fails = append(fails, cartProduct)
+			}
 		}
 		err := g.TENANCY_DB.Model(&model.SysTenancy{}).
 			Select("avatar,name,id as sys_tenancy_id").
@@ -91,13 +96,13 @@ func GetCartList(ctx *gin.Context) ([]response.CartList, int64, error) {
 			Where("id in ?", tenancyIds).
 			Find(&cartList).Error
 		if err != nil {
-			return cartList, count, fmt.Errorf("get cart %w", err)
+			return cartList, fails, count, fmt.Errorf("get cart %w", err)
 		}
 	}
 	if len(cartList) > 0 {
 		for i := 0; i < len(cartList); i++ {
 			for _, cartProduct := range cartProducts {
-				if cartProduct.SysTenancyID == cartList[i].SysTenancyID {
+				if cartProduct.SysTenancyID == cartList[i].SysTenancyID && cartProduct.IsFail == g.StatusFalse {
 					cartList[i].Products = append(cartList[i].Products, cartProduct)
 				}
 			}
@@ -105,5 +110,5 @@ func GetCartList(ctx *gin.Context) ([]response.CartList, int64, error) {
 	}
 	count = int64(len(cartProducts))
 
-	return cartList, count, err
+	return cartList, fails, count, err
 }

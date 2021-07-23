@@ -14,8 +14,7 @@ type ProductPageInfo struct {
 
 type UpdateProduct struct {
 	Id uint `json:"id"`
-	model.BaseProduct
-	Content string `json:"content"`
+	CreateProduct
 }
 type SetProductFicti struct {
 	Ficti  int32  `json:"ficti"`
@@ -44,7 +43,6 @@ type CreateProduct struct {
 	CateId       uint               `json:"cateId"`            // 平台分类id
 	CategoryIds  []uint             `json:"tenancyCategoryId"` // 平台分类id
 	Content      string             `json:"content"`           // 商品内容
-	Attr         []Value            `json:"attr"`              //规格参数
 	AttrValue    []ProductAttrValue `json:"attrValue"`         // 商品内容
 }
 

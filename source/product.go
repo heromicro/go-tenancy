@@ -57,13 +57,6 @@ var productAttrValues = []model.ProductAttrValue{
 	{ProductID: 7, Detail: "", BaseProductAttrValue: model.BaseProductAttrValue{Sku: "", Stock: 98, Sales: 2, Image: "http://127.0.0.1:8090/uploads/def/20200816/9a6a2e1231fb19517ed1de71206a0657.jpg", BarCode: "10024242", Cost: 50.00, OtPrice: 180.00, Price: 160.00, Volume: 1.00, Weight: 1.00, ExtensionOne: 0.00, ExtensionTwo: 0.00, Unique: "e2fe28308fd7"}, Type: 1},
 }
 
-var productAttrs = []model.ProductAttr{
-	{AttrName: "S", AttrValues: "35", Type: 1, ProductID: 1},
-	{AttrName: "L", AttrValues: "36", Type: 1, ProductID: 1},
-	{AttrName: "XL", AttrValues: "37", Type: 1, ProductID: 1},
-	{AttrName: "XXL", AttrValues: "38", Type: 1, ProductID: 1},
-}
-
 func (m *product) Init() error {
 	return g.TENANCY_DB.Transaction(func(tx *gorm.DB) error {
 		if tx.Where("id IN ?", []int{1}).Find(&[]model.Product{}).RowsAffected == 1 {
@@ -74,9 +67,6 @@ func (m *product) Init() error {
 			return err
 		}
 		if err := tx.Model(&model.ProductContent{}).Create(&productContents).Error; err != nil { // 遇到错误时回滚事务
-			return err
-		}
-		if err := tx.Model(&model.ProductAttr{}).Create(&productAttrs).Error; err != nil { // 遇到错误时回滚事务
 			return err
 		}
 		if err := tx.Model(&model.ProductAttrValue{}).Create(&productAttrValues).Error; err != nil { // 遇到错误时回滚事务

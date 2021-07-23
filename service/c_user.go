@@ -231,7 +231,7 @@ func SetUserLabel(id, tenancyId uint, reqlabelIds []uint) error {
 
 	if len(delIds) > 0 {
 		if err = g.TENANCY_DB.Where("sys_user_id = ?", id).Where("sys_tenancy_id = ?", tenancyId).Where("user_label_id in ?", delIds).Delete(&model.UserUserLabel{}).Error; err != nil {
-			return fmt.Errorf("delete user_user_label %w", err)
+			return fmt.Errorf("delete user_user_labels %w", err)
 		}
 	}
 
@@ -255,7 +255,7 @@ func SetUserLabel(id, tenancyId uint, reqlabelIds []uint) error {
 		for _, addId := range addIds {
 			labels = append(labels, model.UserUserLabel{UserLabelID: addId, SysUserID: id, SysTenancyID: tenancyId})
 		}
-		if err = g.TENANCY_DB.Model(&model.UserUserLabel{}).Where("sys_tenancy_id = ?", tenancyId).Where("sys_user_id = ?", id).Where("user_label_id in ?", addIds).Create(&labels).Error; err != nil {
+		if err = g.TENANCY_DB.Model(&model.UserUserLabel{}).Create(&labels).Error; err != nil {
 			return fmt.Errorf("create user_user_labels %w", err)
 		}
 	}
