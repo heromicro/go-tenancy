@@ -26,7 +26,7 @@
     {
       "label": "apidoc",
       "type": "shell",
-      "command": " cd resource/doc/ | apidoc -i v1/ -o apidoc/ -t template/"
+      "command": "cd resource/doc/ | apidoc -i v1/ -o apidoc/ -t template/"
     }
   ]
 }

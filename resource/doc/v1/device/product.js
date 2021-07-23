@@ -30,6 +30,7 @@
  * @apiExample {bash} Curl example
  * curl -H "Authorization: Bearer 5f048fe" -i http://10.0.0.26:8085/v1/device/product/getProductList
  *
+ * @apiUse TokenError
  *
  * @apiSuccessExample Response:
  *     HTTP/1.1 200 OK
@@ -115,6 +116,8 @@
  * @apiSuccess {Object[]}   attrValue      规格详情
  * @apiSuccess {Object[]}   productCates  商品分类
  *
+ * @apiUse TokenError
+ * 
  * @apiSuccessExample Response:
  *     HTTP/1.1 200 OK
  *     {

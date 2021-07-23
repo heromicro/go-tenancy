@@ -6,7 +6,7 @@ import (
 )
 
 func TestReceiptList(t *testing.T) {
-	auth := userWithLoginTester(t)
+	auth := deviceWithLoginTester(t)
 	defer baseLogOut(auth)
 	obj := auth.POST("v1/user/receipt/getReceiptList").
 		WithJSON(map[string]interface{}{"page": 1, "pageSize": 10}).
@@ -41,7 +41,7 @@ func TestReceiptProcess(t *testing.T) {
 		"tel":              "13845687419",
 		"isDefault":        true,
 	}
-	auth := userWithLoginTester(t)
+	auth := deviceWithLoginTester(t)
 	defer baseLogOut(auth)
 	obj := auth.POST("v1/user/receipt/createReceipt").
 		WithJSON(data).
@@ -141,7 +141,7 @@ func TestReceiptRegisterReceiptTitleError(t *testing.T) {
 		"tel":              "13845687419",
 		"isDefault":        true,
 	}
-	auth := userWithLoginTester(t)
+	auth := deviceWithLoginTester(t)
 	defer baseLogOut(auth)
 	obj := auth.POST("v1/user/receipt/createReceipt").
 		WithJSON(data).
@@ -163,7 +163,7 @@ func TestReceiptRegisterReceiptTypeError(t *testing.T) {
 		"tel":              "13845687419",
 		"isDefault":        true,
 	}
-	auth := userWithLoginTester(t)
+	auth := deviceWithLoginTester(t)
 	defer baseLogOut(auth)
 	obj := auth.POST("v1/user/receipt/createReceipt").
 		WithJSON(data).
@@ -186,7 +186,7 @@ func TestReceiptRegisterEmaileError(t *testing.T) {
 		"tel":              "13845687419",
 		"isDefault":        true,
 	}
-	auth := userWithLoginTester(t)
+	auth := deviceWithLoginTester(t)
 	defer baseLogOut(auth)
 	obj := auth.POST("v1/user/receipt/createReceipt").
 		WithJSON(data).

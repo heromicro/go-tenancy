@@ -93,3 +93,31 @@
  *     }
  *
  */
+
+
+    /**
+ * @api {get} /v1/auth/logout 退出登录
+ * @apiVersion 0.0.1
+ * @apiName 退出登录
+ * @apiGroup 公共方法
+ * @apiPermission device
+ *
+ * @apiDescription 退出当前登录用户
+ *
+ * @apiHeader {String} Authorization 接口需要带上此头信息
+ * @apiHeaderExample {Header} Header-Example
+ *     "Authorization: Bearer 5f048fe"
+ *
+ * @apiExample {bash} Curl example
+ * curl -H "Authorization: Bearer 5f048fe" -i http://10.0.0.26:8085/v1/auth/logout
+ *
+ * @apiUse TokenError
+ *
+ * @apiSuccessExample Response:
+ *     HTTP/1.1 200 OK
+ *     {
+         "status": 200,
+         "data": {},
+         "message": "退出登录"
+ *     }
+ */

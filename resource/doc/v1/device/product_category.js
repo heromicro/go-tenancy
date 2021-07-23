@@ -22,6 +22,8 @@
  * @apiSuccess {Number}   level      等级
  * @apiSuccess {Object[]}   children      子分类
  *
+ * @apiUse TokenError
+ * 
  * @apiSuccessExample Response:
  *     HTTP/1.1 200 OK
  *     {

@@ -6,7 +6,7 @@ import (
 )
 
 func TestAddressList(t *testing.T) {
-	auth := userWithLoginTester(t)
+	auth := deviceWithLoginTester(t)
 	defer baseLogOut(auth)
 	obj := auth.POST("v1/user/address/getAddressList").
 		WithJSON(map[string]interface{}{"page": 1, "pageSize": 10}).
@@ -48,7 +48,7 @@ func TestAddressProcess(t *testing.T) {
 		"hospitalNo":   "88956655",
 		"disease":      "不孕不育",
 	}
-	auth := userWithLoginTester(t)
+	auth := deviceWithLoginTester(t)
 	defer baseLogOut(auth)
 	obj := auth.POST("v1/user/address/createAddress").
 		WithJSON(data).
@@ -180,7 +180,7 @@ func TestAddressRegisterError(t *testing.T) {
 		"hospitalNo":   "88956655",
 		"disease":      "不孕不育",
 	}
-	auth := userWithLoginTester(t)
+	auth := deviceWithLoginTester(t)
 	defer baseLogOut(auth)
 	obj := auth.POST("v1/user/address/createAddress").
 		WithJSON(data).

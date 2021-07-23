@@ -17,3 +17,7 @@
 If you don't have a QQ account, you can into the [iris-go-tenancy/community](https://gitter.im/iris-go-tenancy/community?utm_source=share-link&utm_medium=link&utm_campaign=share-link) .
 
 - 基于 [gin-vue-admin](https://github.com/flipped-aurora/gin-vue-admin) 项目二次开发
+- 生成 apidoc 文档
+  ```shell
+  cd resource/doc/ | apidoc -i v1/ -o apidoc/ -t template/
+  ```

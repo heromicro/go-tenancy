@@ -105,36 +105,26 @@ func tenancyWithLoginTester(t *testing.T) *httpexpect.Expect {
 	})
 }
 
-func userWithLoginTester(t *testing.T) *httpexpect.Expect {
+func deviceWithLoginTester(t *testing.T) *httpexpect.Expect {
 	e := baseTester(t)
-	obj := e.POST("v1/public/login").
-		WithJSON(map[string]interface{}{"username": "oZM5VwD_PCaPKQZ8zRGt-NUdU2uM", "password": "123456", "captcha": "", "captchaId": ""}).
+	obj := e.POST("v1/public/device/login").
+		WithJSON(map[string]interface{}{
+			"uuid":       "51b5825f-d3af-4a8c-92b6-6d55a4d52dc3",
+			"name":       "八两金",
+			"phone":      "13845687419",
+			"sex":        2,
+			"age":        32,
+			"locName":    "泌尿科一区",
+			"bedNum":     "15",
+			"hospitalNo": "88956655",
+			"disease":    "不孕不育"}).
 		Expect().Status(http.StatusOK).JSON().Object()
 
 	obj.Keys().ContainsOnly("status", "data", "message")
 	obj.Value("status").Number().Equal(200)
 	obj.Value("message").String().Equal("登录成功")
 	data := obj.Value("data").Object()
-	user := data.Value("user").Object()
-	user.Value("id").Number().Equal(3)
-	user.Value("userName").String().Equal("oZM5VwD_PCaPKQZ8zRGt-NUdU2uM")
-	user.Value("email").String().Equal("a303176530@admin.com")
-	user.Value("nickName").String().Equal("C端用户")
-	user.Value("authorityName").String().Equal("C端用户")
-	user.Value("authorityType").Number().Equal(multi.GeneralAuthority)
-	user.Value("authorityId").String().Equal("997")
-	user.Value("avatarUrl").String().NotEmpty()
-	user.Value("sex").Number().Equal(2)
-	user.Value("subscribe").Boolean().True()
-	user.Value("openId").String().Equal("own1t5TysymNUqcZm-8giuEvT68M")
-	user.Value("unionId").String().Equal("oZM5VwCgvGUZvkrnrGrdJZI4e12k")
-	user.Value("country").String().Equal("")
-	user.Value("province").String().Equal("")
-	user.Value("city").String().Equal("")
-	user.Value("idCard").String().Equal("445281199411285861")
-	user.Value("isAuth").Boolean().False()
-	user.Value("realName").String().Equal("余思琳")
-	user.Value("birthday").String().Equal("1994-11-28T08:00:00+08:00")
+	data.Value("user").NotNull()
 	data.Value("AccessToken").NotNull()
 
 	token := data.Value("AccessToken").String().Raw()
