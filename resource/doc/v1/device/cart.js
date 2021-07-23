@@ -97,6 +97,7 @@
                       "Avatar": "",
                       "products": [
                           {
+                              "id": 1, // 购物车id
                               "sysTenancyId": 1,
                               "productId": 3,
                               "storeName": "精梳棉修身短袖T恤（圆/V领）",
@@ -142,7 +143,7 @@
  *
  * @apiDescription 修改购物车内商品数量
  *   
- * @apiParam id 路径上使用商品id   
+ * @apiParam id 路径上使用购物车id   
  *
  * @apiBody {Number} cartNum 商品数量
  * 
@@ -206,7 +207,7 @@
  *
  * @apiDescription 批量删除购物车商品  
  * 
- * @apiBody {Number[]} ids 商品id数组
+ * @apiBody {Number[]} ids 购物车id数组
  * 
  * @apiHeader {String} Authorization 接口需要带上此头信息
  * @apiHeaderExample {Header} Header-Example

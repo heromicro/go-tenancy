@@ -10,6 +10,7 @@ type CartList struct {
 }
 
 type CartProduct struct {
+	Id                uint                     `json:"id"`
 	SysTenancyID      uint                     `json:"sysTenancyId"`
 	ProductID         uint                     `json:"productId"`
 	StoreName         string                   `json:"storeName"`

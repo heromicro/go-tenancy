@@ -16,7 +16,12 @@ import (
 // CreateCart
 func CreateCart(req request.CreateCart) (model.Cart, error) {
 	cart := model.Cart{BaseCart: req.BaseCart, SysUserID: req.SysUserID, SysTenancyID: req.SysTenancyID, ProductID: req.ProductID}
-	err := g.TENANCY_DB.Model(&model.Cart{}).Where("sys_user_id = ?", req.SysUserID).Where("sys_tenancy_id = ?", req.SysTenancyID).Where("product_id = ?", req.ProductID).First(&cart).Error
+	err := g.TENANCY_DB.Model(&model.Cart{}).
+		Where("sys_user_id = ?", req.SysUserID).
+		Where("sys_tenancy_id = ?", req.SysTenancyID).
+		Where("product_id = ?", req.ProductID).
+		Where("product_attr_unique = ?", req.ProductAttrUnique).
+		First(&cart).Error
 	if errors.Is(err, gorm.ErrRecordNotFound) { // 没有商品直接新建
 		err = g.TENANCY_DB.Model(&model.Cart{}).Create(&cart).Error
 		if err != nil {
@@ -40,7 +45,7 @@ func ChangeCartNum(cartNum uint16, id, sysUserID, sysTenancyID uint) error {
 	return g.TENANCY_DB.Model(&model.Cart{}).
 		Where("sys_user_id = ?", sysUserID).
 		Where("sys_tenancy_id = ?", sysTenancyID).
-		Where("product_id = ?", id).
+		Where("id = ?", id).
 		Update("cart_num", cartNum).Error
 }
 
@@ -49,7 +54,7 @@ func DeleteCart(ids []int, sysUserID, sysTenancyID uint) error {
 	return g.TENANCY_DB.Model(&model.Cart{}).
 		Where("sys_user_id = ?", sysUserID).
 		Where("sys_tenancy_id = ?", sysTenancyID).
-		Where("product_id in ?", ids).
+		Where("id in ?", ids).
 		Delete(&model.Cart{}).Error
 }
 

@@ -192,7 +192,7 @@ func CreateProduct(req request.CreateProduct, tenancyId uint) (model.Product, er
 // GetCartProducts
 func GetCartProducts(sysTenancyID, sysUserID uint) ([]response.CartProduct, error) {
 	var cartProducts []response.CartProduct
-	err := g.TENANCY_DB.Model(&model.Product{}).Where("products.is_show = ?", g.StatusTrue).Where("products.status = ?", model.SuccessProductStatus).Select("products.id as product_id,products.store_name,products.image,products.price,carts.cart_num,carts.sys_tenancy_id as sys_tenancy_id,carts.product_attr_unique").
+	err := g.TENANCY_DB.Model(&model.Product{}).Where("products.is_show = ?", g.StatusTrue).Where("products.status = ?", model.SuccessProductStatus).Select("products.id as product_id,products.store_name,products.image,products.price,carts.id,carts.cart_num,carts.sys_tenancy_id as sys_tenancy_id,carts.product_attr_unique").
 		Joins("left join carts on products.id = carts.product_id").
 		Where("carts.sys_tenancy_id = ?", sysTenancyID).
 		Where("carts.sys_user_id = ?", sysUserID).
