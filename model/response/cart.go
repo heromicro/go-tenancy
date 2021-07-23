@@ -1,5 +1,7 @@
 package response
 
+import "github.com/snowlyg/go-tenancy/model/request"
+
 type CartList struct {
 	SysTenancyID uint          `json:"sysTenancyId"`
 	Name         string        `json:"name" form:"name"`
@@ -8,10 +10,12 @@ type CartList struct {
 }
 
 type CartProduct struct {
-	SysTenancyID uint   `json:"sysTenancyId"`
-	ProductID    uint   `json:"productId"`
-	StoreName    string `json:"storeName"`
-	Image        string `json:"image"`
-	Price        string `json:"price"`
-	CartNum      uint16 `json:"cartNum"`
+	SysTenancyID      uint                     `json:"sysTenancyId"`
+	ProductID         uint                     `json:"productId"`
+	StoreName         string                   `json:"storeName"`
+	Image             string                   `json:"image"`
+	Price             string                   `json:"price"`
+	CartNum           uint16                   `json:"cartNum"`
+	ProductAttrUnique string                   `json:"productAttrUnique"` // 商品属性
+	AttrValue         request.ProductAttrValue `gorm:"-" json:"attrValue"`
 }

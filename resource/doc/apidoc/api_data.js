@@ -1055,6 +1055,99 @@ define({ "api": [
     }
   },
   {
+    "type": "delete",
+    "url": "/v1/device/cart/deleteCart",
+    "title": "删除购物车商品",
+    "version": "0.0.1",
+    "name": "删除购物车商品",
+    "group": "购物车管理",
+    "permission": [
+      {
+        "name": "device",
+        "title": "床旁设备授权",
+        "description": "<p>床旁设备授权，区分设备所在医院</p> <p>床旁设备请求平台接口之前都需要获取授权，并将授权凭证放置在头部信息中。</p>"
+      }
+    ],
+    "description": "<p>批量删除购物车商品</p>",
+    "body": [
+      {
+        "group": "Body",
+        "type": "Number[]",
+        "optional": false,
+        "field": "ids",
+        "description": "<p>商品id数组</p>"
+      }
+    ],
+    "header": {
+      "fields": {
+        "Header": [
+          {
+            "group": "Header",
+            "type": "String",
+            "optional": false,
+            "field": "Authorization",
+            "description": "<p>接口需要带上此头信息</p>"
+          }
+        ]
+      },
+      "examples": [
+        {
+          "title": "Header-Example",
+          "content": "\"Authorization: Bearer 5f048fe\"",
+          "type": "Header"
+        }
+      ]
+    },
+    "examples": [
+      {
+        "title": "Curl example",
+        "content": "curl -H \"Authorization: Bearer 5f048fe\" -i http://10.0.0.26:8085/v1/device/cart/getProductCount",
+        "type": "bash"
+      }
+    ],
+    "success": {
+      "examples": [
+        {
+          "title": "Response:",
+          "content": "HTTP/1.1 200 OK\n{\n    \"status\": 200,\n    \"data\": {\n        \"total\": 1\n    },\n    \"message\": \"获取成功\"\n}",
+          "type": "json"
+        }
+      ]
+    },
+    "filename": "v1/device/cart.js",
+    "groupTitle": "购物车管理",
+    "sampleRequest": [
+      {
+        "url": "http://10.0.0.26:8085/v1/device/cart/deleteCart"
+      }
+    ],
+    "error": {
+      "fields": {
+        "Error 4xx": [
+          {
+            "group": "Error 4xx",
+            "optional": false,
+            "field": "status",
+            "description": "<p>4001 授权错误时返回的状态码，得到次状态码需要重新授权。</p>"
+          },
+          {
+            "group": "Error 4xx",
+            "optional": false,
+            "field": "message",
+            "description": "<p>授权失败的具体描述信息</p>"
+          }
+        ]
+      },
+      "examples": [
+        {
+          "title": "Response (example):",
+          "content": "HTTP/1.1 200 OK\n{\n      \"status\": 4001,\n      \"data\": {},\n      \"message\": \"mutil: invalid token\"\n}",
+          "type": "json"
+        }
+      ]
+    }
+  },
+  {
     "type": "post",
     "url": "/v1/device/cart/createCart",
     "title": "添加购物车",
@@ -1442,7 +1535,7 @@ define({ "api": [
       "examples": [
         {
           "title": "Response:",
-          "content": "HTTP/1.1 200 OK\n{\n    \"status\": 200,\n        \"data\": {\n            \"list\": [\n                {\n                    \"sysTenancyId\": 1,\n                    \"name\": \"宝安中心人民医院\",\n                    \"Avatar\": \"\",\n                    \"productId\": 1,\n                    \"products\": [\n                        {\n                            \"id\": 1,\n                            \"storeName\": \"领立裁腰带短袖连衣裙\",\n                            \"storeInfo\": \"短袖连衣裙\",\n                            \"keyword\": \"连衣裙\",\n                            \"unitName\": \"件\",\n                            \"sort\": 40,\n                            \"sales\": 1,\n                            \"price\": 80,\n                            \"otPrice\": 100,\n                            \"stock\": 399,\n                            \"isHot\": 2,\n                            \"isBenefit\": 2,\n                            \"isBest\": 2,\n                            \"isNew\": 2,\n                            \"isGood\": 1,\n                            \"productType\": 2,\n                            \"ficti\": 100,\n                            \"specType\": 1,\n                            \"rate\": 5,\n                            \"isGiftBag\": 2,\n                            \"image\": \"http://127.0.0.1:8090/uploads/def/20200816/9a6a2e1231fb19517ed1de71206a0657.jpg\",\n                            \"tempId\": 99,\n                            \"sysTenancyId\": 1,\n                            \"sysBrandId\": 2,\n                            \"productCategoryId\": 162,\n                            \"sysTenancyName\": \"宝安中心人民医院\",\n                            \"cateName\": \"男士上衣\",\n                            \"brandName\": \"苹果\",\n                            \"tempName\": \"\",\n                            \"content\": \"<p>好手机</p>\",\n                            \"sliderImage\": \"http://127.0.0.1:8090/uploads/def/20200816/9a6a2e1231fb19517ed1de71206a0657.jpg,http://127.0.0.1:8090/uploads/def/20200816/9a6a2e1231fb19517ed1de71206a0657.jpg\",\n                            \"sliderImages\": null,\n                            \"attr\": null,\n                            \"attrValue\": null,\n                            \"cateId\": 0,\n                            \"tenancyCategoryId\": null,\n                            \"productCates\": null\n                        }\n                    ]\n                }\n            ],\n            \"total\": 1,\n            \"page\": 0,\n            \"pageSize\": 0\n        },\n        \"message\": \"获取成功\"\n}",
+          "content": "HTTP/1.1 200 OK\n{\n    \"status\": 200,\n        \"data\": {\n            \"list\": [\n                {\n                    \"sysTenancyId\": 1,\n                    \"name\": \"宝安中心人民医院\",\n                    \"Avatar\": \"\",\n                    \"products\": [\n                        {\n                            \"sysTenancyId\": 1,\n                            \"productId\": 1,\n                            \"storeName\": \"领立裁腰带短袖连衣裙\",\n                            \"image\": \"http://127.0.0.1:8090/uploads/def/20200816/9a6a2e1231fb19517ed1de71206a0657.jpg\",\n                            \"price\": \"80.00\",\n                            \"cartNum\": 213\n                        },\n                        {\n                            \"sysTenancyId\": 1,\n                            \"productId\": 3,\n                            \"storeName\": \"精梳棉修身短袖T恤（圆/V领）\",\n                            \"image\": \"http://127.0.0.1:8090/uploads/def/20200816/9a6a2e1231fb19517ed1de71206a0657.jpg\",\n                            \"price\": \"40.00\",\n                            \"cartNum\": 6\n                        }\n                    ]\n                }\n            ],\n            \"total\": 2\n        },\n        \"message\": \"获取成功\"\n}",
           "type": "json"
         }
       ]

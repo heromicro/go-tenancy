@@ -192,7 +192,7 @@ func CreateProduct(req request.CreateProduct, tenancyId uint) (model.Product, er
 // GetCartProducts
 func GetCartProducts(sysTenancyID, sysUserID uint) ([]response.CartProduct, error) {
 	var cartProducts []response.CartProduct
-	err := g.TENANCY_DB.Model(&model.Product{}).Where("products.is_show = ?", g.StatusTrue).Where("products.status = ?", model.SuccessProductStatus).Select("products.id as product_id,products.store_name,products.image,products.price,carts.cart_num,carts.sys_tenancy_id as sys_tenancy_id").
+	err := g.TENANCY_DB.Model(&model.Product{}).Where("products.is_show = ?", g.StatusTrue).Where("products.status = ?", model.SuccessProductStatus).Select("products.id as product_id,products.store_name,products.image,products.price,carts.cart_num,carts.sys_tenancy_id as sys_tenancy_id,carts.product_attr_unique").
 		Joins("left join carts on products.id = carts.product_id").
 		Where("carts.sys_tenancy_id = ?", sysTenancyID).
 		Where("carts.sys_user_id = ?", sysUserID).
@@ -202,6 +202,41 @@ func GetCartProducts(sysTenancyID, sysUserID uint) ([]response.CartProduct, erro
 		Find(&cartProducts).Error
 	if err != nil {
 		return cartProducts, err
+	}
+
+	productIds := []uint{}
+	uniques := []string{}
+	for _, cartProduct := range cartProducts {
+		productIds = append(productIds, cartProduct.ProductID)
+		uniques = append(uniques, cartProduct.ProductAttrUnique)
+	}
+
+	var attrValues []model.ProductAttrValue
+	err = g.TENANCY_DB.Model(&model.ProductAttrValue{}).
+		Where("product_id in ?", productIds).
+		Where("'unique' in ?", uniques).
+		Find(&attrValues).Error
+	if err != nil {
+		return cartProducts, fmt.Errorf("get product attr value %w", err)
+	}
+
+	if len(attrValues) > 0 {
+		for _, attrValue := range attrValues {
+			for i := 0; i < len(cartProducts); i++ {
+				if cartProducts[i].ProductID == attrValue.ProductID && cartProducts[i].ProductAttrUnique == attrValue.Unique {
+					productAttrValue := request.ProductAttrValue{BaseProductAttrValue: attrValue.BaseProductAttrValue, Value0: attrValue.BaseProductAttrValue.Sku}
+					if attrValue.Detail != "" {
+						err := json.Unmarshal([]byte(attrValue.Detail), &productAttrValue.Detail)
+						if err != nil {
+							return cartProducts, fmt.Errorf("json product attr value detail marshal %w", err)
+						}
+					}
+					productAttrValue.Value0 = attrValue.BaseProductAttrValue.Sku
+					cartProducts[i].AttrValue = productAttrValue
+				}
+			}
+
+		}
 	}
 
 	return cartProducts, err

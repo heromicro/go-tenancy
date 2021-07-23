@@ -49,6 +49,7 @@ type CreateProduct struct {
 }
 
 type ProductAttrValue struct {
+	ProductID uint `json:"productId"` // 商品id
 	model.BaseProductAttrValue
 	Detail map[string]interface{} `json:"detail"`
 	Value0 string                 `json:"value0"`

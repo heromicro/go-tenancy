@@ -88,36 +88,47 @@
  * @apiSuccessExample Response:
  *     HTTP/1.1 200 OK
  *     {
-        "status": 200,
-            "data": {
-                "list": [
-                    {
-                        "sysTenancyId": 1,
-                        "name": "宝安中心人民医院",
-                        "Avatar": "",
-                        "products": [
-                            {
-                                "sysTenancyId": 1,
-                                "productId": 1,
-                                "storeName": "领立裁腰带短袖连衣裙",
-                                "image": "http://127.0.0.1:8090/uploads/def/20200816/9a6a2e1231fb19517ed1de71206a0657.jpg",
-                                "price": "80.00",
-                                "cartNum": 213
-                            },
-                            {
-                                "sysTenancyId": 1,
-                                "productId": 3,
-                                "storeName": "精梳棉修身短袖T恤（圆/V领）",
-                                "image": "http://127.0.0.1:8090/uploads/def/20200816/9a6a2e1231fb19517ed1de71206a0657.jpg",
-                                "price": "40.00",
-                                "cartNum": 6
-                            }
-                        ]
-                    }
-                ],
-                "total": 2
-            },
-            "message": "获取成功"
+          "status": 200,
+          "data": {
+              "list": [
+                  {
+                      "sysTenancyId": 1,
+                      "name": "宝安中心人民医院",
+                      "Avatar": "",
+                      "products": [
+                          {
+                              "sysTenancyId": 1,
+                              "productId": 3,
+                              "storeName": "精梳棉修身短袖T恤（圆/V领）",
+                              "image": "http://127.0.0.1:8090/uploads/def/20200816/9a6a2e1231fb19517ed1de71206a0657.jpg",
+                              "price": "40.00",
+                              "cartNum": 10,
+                              "productAttrUnique": "e2fe28308fd2",
+                              "attrValue": {
+                                  "productId": 0,
+                                  "sku": "",
+                                  "stock": 0,
+                                  "sales": 0,
+                                  "image": "",
+                                  "barCode": "",
+                                  "cost": 0,
+                                  "otPrice": 0,
+                                  "price": 0,
+                                  "volume": 0,
+                                  "weight": 0,
+                                  "extensionOne": 0,
+                                  "extensionTwo": 0,
+                                  "unique": "",
+                                  "detail": null,
+                                  "value0": ""
+                              }
+                          }
+                      ]
+                  }
+              ],
+              "total": 1
+          },
+          "message": "获取成功"
  *     }
  */
 
