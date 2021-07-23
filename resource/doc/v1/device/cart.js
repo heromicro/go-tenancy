@@ -68,15 +68,14 @@
  * @apiGroup 购物车管理
  * @apiPermission device
  *
- * @apiDescription 获取购物车内商品列表信息
- *     
+ * @apiDescription 获取购物车内商品列表信息    
  *
  * @apiHeader {String} Authorization 接口需要带上此头信息
  * @apiHeaderExample {Header} Header-Example
  *     "Authorization: Bearer 5f048fe"
  *
  * @apiExample {bash} Curl example
- * curl -H "Authorization: Bearer 5f048fe" -i http://10.0.0.26:8085/v1/cart/getCartList
+ * curl -H "Authorization: Bearer 5f048fe" -i http://10.0.0.26:8085/v1/device/cart/getCartList
  *
  * @apiUse TokenError
  * 
@@ -96,54 +95,125 @@
                         "sysTenancyId": 1,
                         "name": "宝安中心人民医院",
                         "Avatar": "",
-                        "productId": 1,
                         "products": [
                             {
-                                "id": 1,
-                                "storeName": "领立裁腰带短袖连衣裙",
-                                "storeInfo": "短袖连衣裙",
-                                "keyword": "连衣裙",
-                                "unitName": "件",
-                                "sort": 40,
-                                "sales": 1,
-                                "price": 80,
-                                "otPrice": 100,
-                                "stock": 399,
-                                "isHot": 2,
-                                "isBenefit": 2,
-                                "isBest": 2,
-                                "isNew": 2,
-                                "isGood": 1,
-                                "productType": 2,
-                                "ficti": 100,
-                                "specType": 1,
-                                "rate": 5,
-                                "isGiftBag": 2,
-                                "image": "http://127.0.0.1:8090/uploads/def/20200816/9a6a2e1231fb19517ed1de71206a0657.jpg",
-                                "tempId": 99,
                                 "sysTenancyId": 1,
-                                "sysBrandId": 2,
-                                "productCategoryId": 162,
-                                "sysTenancyName": "宝安中心人民医院",
-                                "cateName": "男士上衣",
-                                "brandName": "苹果",
-                                "tempName": "",
-                                "content": "<p>好手机</p>",
-                                "sliderImage": "http://127.0.0.1:8090/uploads/def/20200816/9a6a2e1231fb19517ed1de71206a0657.jpg,http://127.0.0.1:8090/uploads/def/20200816/9a6a2e1231fb19517ed1de71206a0657.jpg",
-                                "sliderImages": null,
-                                "attr": null,
-                                "attrValue": null,
-                                "cateId": 0,
-                                "tenancyCategoryId": null,
-                                "productCates": null
+                                "productId": 1,
+                                "storeName": "领立裁腰带短袖连衣裙",
+                                "image": "http://127.0.0.1:8090/uploads/def/20200816/9a6a2e1231fb19517ed1de71206a0657.jpg",
+                                "price": "80.00",
+                                "cartNum": 213
+                            },
+                            {
+                                "sysTenancyId": 1,
+                                "productId": 3,
+                                "storeName": "精梳棉修身短袖T恤（圆/V领）",
+                                "image": "http://127.0.0.1:8090/uploads/def/20200816/9a6a2e1231fb19517ed1de71206a0657.jpg",
+                                "price": "40.00",
+                                "cartNum": 6
                             }
                         ]
                     }
                 ],
-                "total": 1,
-                "page": 0,
-                "pageSize": 0
+                "total": 2
             },
             "message": "获取成功"
+ *     }
+ */
+
+            
+/**
+ * @api {post} /v1/device/cart/changeCartNum/1 修改购物车商品数量
+ * @apiVersion 0.0.1
+ * @apiName 修改购物车商品数量
+ * @apiGroup 购物车管理
+ * @apiPermission device
+ *
+ * @apiDescription 修改购物车内商品数量
+ *   
+ * @apiParam id 路径上使用商品id   
+ *
+ * @apiBody {Number} cartNum 商品数量
+ * 
+ * @apiHeader {String} Authorization 接口需要带上此头信息
+ * @apiHeaderExample {Header} Header-Example
+ *     "Authorization: Bearer 5f048fe"
+ *
+ * @apiExample {bash} Curl example
+ * curl -H "Authorization: Bearer 5f048fe" -i http://10.0.0.26:8085/v1/device/cart/changeCartNum/1
+ *
+ * @apiUse TokenError
+ * 
+ *
+ * @apiSuccessExample Response:
+ *     HTTP/1.1 200 OK
+ *     {
+        "status": 200,
+        "data": {},
+        "message": "操作成功"
+ *     }
+ */
+
+
+ /**
+ * @api {get} /v1/device/cart/getProductCount 获取购物车商品数
+ * @apiVersion 0.0.1
+ * @apiName 获取购物车商品数
+ * @apiGroup 购物车管理
+ * @apiPermission device
+ *
+ * @apiDescription 获取购物车商品数    
+ *
+ * @apiHeader {String} Authorization 接口需要带上此头信息
+ * @apiHeaderExample {Header} Header-Example
+ *     "Authorization: Bearer 5f048fe"
+ *
+ * @apiExample {bash} Curl example
+ * curl -H "Authorization: Bearer 5f048fe" -i http://10.0.0.26:8085/v1/device/cart/getProductCount
+ *
+ * @apiUse TokenError
+ * 
+ * @apiSuccess {Number}   total   商品总数
+ *
+ * @apiSuccessExample Response:
+ *     HTTP/1.1 200 OK
+ *     {
+        "status": 200,
+        "data": {
+            "total": 1
+        },
+        "message": "获取成功"
+ *     }
+ */
+
+ /**
+ * @api {delete} /v1/device/cart/deleteCart 删除购物车商品
+ * @apiVersion 0.0.1
+ * @apiName 删除购物车商品
+ * @apiGroup 购物车管理
+ * @apiPermission device
+ *
+ * @apiDescription 批量删除购物车商品  
+ * 
+ * @apiBody {Number[]} ids 商品id数组
+ * 
+ * @apiHeader {String} Authorization 接口需要带上此头信息
+ * @apiHeaderExample {Header} Header-Example
+ *     "Authorization: Bearer 5f048fe"
+ *
+ * @apiExample {bash} Curl example
+ * curl -H "Authorization: Bearer 5f048fe" -i http://10.0.0.26:8085/v1/device/cart/getProductCount
+ *
+ * @apiUse TokenError
+ * 
+ *
+ * @apiSuccessExample Response:
+ *     HTTP/1.1 200 OK
+ *     {
+        "status": 200,
+        "data": {
+            "total": 1
+        },
+        "message": "获取成功"
  *     }
  */

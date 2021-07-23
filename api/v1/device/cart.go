@@ -10,6 +10,43 @@ import (
 	"go.uber.org/zap"
 )
 
+func GetCartList(ctx *gin.Context) {
+	if list, total, err := service.GetCartList(ctx); err != nil {
+		g.TENANCY_LOG.Error("获取失败!", zap.Any("err", err))
+		response.FailWithMessage("获取失败:"+err.Error(), ctx)
+	} else {
+		if total > 99 {
+			response.OkWithDetailed(gin.H{
+				"list":  list,
+				"total": "99+",
+			}, "获取成功", ctx)
+		} else {
+			response.OkWithDetailed(gin.H{
+				"list":  list,
+				"total": total,
+			}, "获取成功", ctx)
+		}
+
+	}
+}
+
+func GetProductCount(ctx *gin.Context) {
+	if total, err := service.GetProductCount(multi.GetUserId(ctx), multi.GetTenancyId(ctx)); err != nil {
+		g.TENANCY_LOG.Error("获取失败!", zap.Any("err", err))
+		response.FailWithMessage("获取失败:"+err.Error(), ctx)
+	} else {
+		if total > 99 {
+			response.OkWithDetailed(gin.H{
+				"total": "99+",
+			}, "获取成功", ctx)
+		} else {
+			response.OkWithDetailed(gin.H{
+				"total": total,
+			}, "获取成功", ctx)
+		}
+	}
+}
+
 func CreateCart(ctx *gin.Context) {
 	var cart request.CreateCart
 	cart.SysTenancyID = multi.GetTenancyId(ctx)
@@ -26,14 +63,34 @@ func CreateCart(ctx *gin.Context) {
 	}
 }
 
-func GetCartList(ctx *gin.Context) {
-	if list, total, err := service.GetCartList(ctx); err != nil {
-		g.TENANCY_LOG.Error("获取失败!", zap.Any("err", err))
-		response.FailWithMessage("获取失败:"+err.Error(), ctx)
+func ChangeCartNum(ctx *gin.Context) {
+	var req request.GetById
+	if errs := ctx.ShouldBindUri(&req); errs != nil {
+		response.FailWithMessage(errs.Error(), ctx)
+		return
+	}
+	var cartNum request.ChangeCartNum
+	if errs := ctx.ShouldBindJSON(&cartNum); errs != nil {
+		response.FailWithMessage(errs.Error(), ctx)
+		return
+	}
+	if err := service.ChangeCartNum(cartNum.CartNum, req.Id, multi.GetUserId(ctx), multi.GetTenancyId(ctx)); err != nil {
+		g.TENANCY_LOG.Error("操作失败!", zap.Any("err", err))
+		response.FailWithMessage("操作失败:"+err.Error(), ctx)
 	} else {
-		response.OkWithDetailed(gin.H{
-			"list":  list,
-			"total": total,
-		}, "获取成功", ctx)
+		response.OkWithMessage("操作成功", ctx)
+	}
+}
+func DeleteCart(ctx *gin.Context) {
+	var delCart request.IdsReq
+	if errs := ctx.ShouldBindJSON(&delCart); errs != nil {
+		response.FailWithMessage(errs.Error(), ctx)
+		return
+	}
+	if err := service.DeleteCart(delCart.Ids, multi.GetUserId(ctx), multi.GetTenancyId(ctx)); err != nil {
+		g.TENANCY_LOG.Error("操作失败!", zap.Any("err", err))
+		response.FailWithMessage("操作失败:"+err.Error(), ctx)
+	} else {
+		response.OkWithMessage("操作成功", ctx)
 	}
 }

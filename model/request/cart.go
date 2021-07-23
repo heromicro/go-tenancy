@@ -8,3 +8,7 @@ type CreateCart struct {
 	SysUserID    uint `json:"sysUserId"`
 	SysTenancyID uint `json:"sysTenancyId"` // 商户 id
 }
+
+type ChangeCartNum struct {
+	CartNum uint16 `json:"cartNum" binding:"required"`
+}

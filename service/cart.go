@@ -18,7 +18,7 @@ func CreateCart(req request.CreateCart) (model.Cart, error) {
 	cart := model.Cart{BaseCart: req.BaseCart, SysUserID: req.SysUserID, SysTenancyID: req.SysTenancyID, ProductID: req.ProductID}
 	err := g.TENANCY_DB.Model(&model.Cart{}).Where("sys_user_id = ?", req.SysUserID).Where("sys_tenancy_id = ?", req.SysTenancyID).Where("product_id = ?", req.ProductID).First(&cart).Error
 	if errors.Is(err, gorm.ErrRecordNotFound) { // 没有商品直接新建
-		err = g.TENANCY_DB.Model(&model.Cart{}).FirstOrCreate(&cart).Error
+		err = g.TENANCY_DB.Model(&model.Cart{}).Create(&cart).Error
 		if err != nil {
 			return cart, err
 		}
@@ -35,41 +35,70 @@ func CreateCart(req request.CreateCart) (model.Cart, error) {
 	return cart, nil
 }
 
+// ChangeCartNum
+func ChangeCartNum(cartNum uint16, id, sysUserID, sysTenancyID uint) error {
+	return g.TENANCY_DB.Model(&model.Cart{}).
+		Where("sys_user_id = ?", sysUserID).
+		Where("sys_tenancy_id = ?", sysTenancyID).
+		Where("product_id = ?", id).
+		Update("cart_num", cartNum).Error
+}
+
+// DeleteCart
+func DeleteCart(ids []int, sysUserID, sysTenancyID uint) error {
+	return g.TENANCY_DB.Model(&model.Cart{}).
+		Where("sys_user_id = ?", sysUserID).
+		Where("sys_tenancy_id = ?", sysTenancyID).
+		Where("product_id in ?", ids).
+		Delete(&model.Cart{}).Error
+}
+
+// GetProductCount
+func GetProductCount(sysUserID, sysTenancyID uint) (int64, error) {
+	var count int64
+	err := g.TENANCY_DB.Model(&model.Cart{}).
+		Where("sys_user_id = ?", sysUserID).
+		Where("sys_tenancy_id = ?", sysTenancyID).
+		Count(&count).Error
+	if err != nil {
+		return count, err
+	}
+	return count, nil
+}
+
 // GetCartList
 func GetCartList(ctx *gin.Context) ([]response.CartList, int64, error) {
 	cartList := []response.CartList{}
 	var count int64
-	err := g.TENANCY_DB.Model(&model.Cart{}).
-		Select("carts.product_id,sys_tenancies.avatar,sys_tenancies.name,sys_tenancies.id as sys_tenancy_id").
-		Joins("left join sys_tenancies on sys_tenancies.id = carts.sys_tenancy_id").
-		Where("carts.sys_user_id", multi.GetUserId(ctx)).
-		Where("carts.is_pay", g.StatusFalse).
-		Where("carts.is_fail", g.StatusFalse).
-		Where("carts.sys_tenancy_id", multi.GetTenancyId(ctx)).
-		Find(&cartList).Error
+	cartProducts, err := GetCartProducts(multi.GetTenancyId(ctx), multi.GetUserId(ctx))
 	if err != nil {
 		return cartList, count, fmt.Errorf("get cart %w", err)
 	}
-	var productIds []uint
-	for _, cart := range cartList {
-		productIds = append(productIds, cart.ProductID)
-	}
-	if len(productIds) > 0 {
-		products, err := GetProductByIDs(productIds, IsCuser(ctx))
+	tenancyIds := []uint{}
+	if len(cartProducts) > 0 {
+		for _, cartProduct := range cartProducts {
+			tenancyIds = append(tenancyIds, cartProduct.SysTenancyID)
+		}
+		err := g.TENANCY_DB.Model(&model.SysTenancy{}).
+			Select("avatar,name,id as sys_tenancy_id").
+			Where("status = ?", g.StatusTrue).
+			Where("state = ?", g.StatusTrue).
+			Where("id in ?", tenancyIds).
+			Find(&cartList).Error
 		if err != nil {
 			return cartList, count, fmt.Errorf("get cart %w", err)
 		}
-		if len(products) > 0 {
-			for i := 0; i < len(cartList); i++ {
-				for _, product := range products {
-					if cartList[i].ProductID == product.ID {
-						cartList[i].Products = append(cartList[i].Products, product)
-					}
+	}
+	if len(cartList) > 0 {
+		for i := 0; i < len(cartList); i++ {
+			for _, cartProduct := range cartProducts {
+				if cartProduct.SysTenancyID == cartList[i].SysTenancyID {
+					cartList[i].Products = append(cartList[i].Products, cartProduct)
 				}
 			}
 		}
-		count = int64(len(products))
 	}
+	count = int64(len(cartProducts))
 
 	return cartList, count, err
 }

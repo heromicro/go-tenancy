@@ -34,3 +34,35 @@ func TestDeviceCreateCart(t *testing.T) {
 	obj.Value("status").Number().Equal(200)
 	obj.Value("message").String().Equal("创建成功")
 }
+
+func TestDeviceGetProductCount(t *testing.T) {
+	auth := deviceWithLoginTester(t)
+	defer baseLogOut(auth)
+	obj := auth.GET("v1/device/cart/getProductCount").
+		Expect().Status(http.StatusOK).JSON().Object()
+	obj.Keys().ContainsOnly("status", "data", "message")
+	obj.Value("status").Number().Equal(200)
+	obj.Value("message").String().Equal("获取成功")
+}
+
+func TestDeviceChangeCartNum(t *testing.T) {
+	auth := deviceWithLoginTester(t)
+	defer baseLogOut(auth)
+	obj := auth.POST("v1/device/cart/changeCartNum/1").
+		WithJSON(map[string]interface{}{"cartNum": 2}).
+		Expect().Status(http.StatusOK).JSON().Object()
+	obj.Keys().ContainsOnly("status", "data", "message")
+	obj.Value("status").Number().Equal(200)
+	obj.Value("message").String().Equal("操作成功")
+}
+
+func TestDeviceDeleteCart(t *testing.T) {
+	auth := deviceWithLoginTester(t)
+	defer baseLogOut(auth)
+	obj := auth.DELETE("v1/device/cart/deleteCart").
+		WithJSON(map[string]interface{}{"ids": []uint{1}}).
+		Expect().Status(http.StatusOK).JSON().Object()
+	obj.Keys().ContainsOnly("status", "data", "message")
+	obj.Value("status").Number().Equal(200)
+	obj.Value("message").String().Equal("操作成功")
+}

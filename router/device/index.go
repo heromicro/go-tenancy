@@ -46,7 +46,10 @@ func InitDeviceRouter(Router *gin.RouterGroup) {
 	// 购物车
 	CartRouter := Router.Group("/cart")
 	{
-		CartRouter.POST("/createCart", device.CreateCart)
 		CartRouter.GET("/getCartList", device.GetCartList)
+		CartRouter.GET("/getProductCount", device.GetProductCount)
+		CartRouter.POST("/createCart", device.CreateCart)
+		CartRouter.POST("/changeCartNum/:id", device.ChangeCartNum)
+		CartRouter.DELETE("/deleteCart", device.DeleteCart)
 	}
 }
