@@ -83,7 +83,7 @@
  * @apiSuccess {Number}   sysTenancyId       商户id
  * @apiSuccess {String}   name     商户名称
  * @apiSuccess {String}   Avatar    商户图片
- * @apiSuccess {Object []}   products   商品集合
+ * @apiSuccess {Object[]}   products   商品集合
  * @apiSuccess {Number}   total   商品总数
  *
  * @apiSuccessExample Response:

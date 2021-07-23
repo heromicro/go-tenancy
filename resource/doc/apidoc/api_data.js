@@ -357,7 +357,32 @@ define({ "api": [
       {
         "url": "http://10.0.0.26:8085/v1/device/productCategory/getProductCategoryList"
       }
-    ]
+    ],
+    "error": {
+      "fields": {
+        "Error 4xx": [
+          {
+            "group": "Error 4xx",
+            "optional": false,
+            "field": "status",
+            "description": "<p>4001 授权错误时返回的状态码，得到次状态码需要重新授权。</p>"
+          },
+          {
+            "group": "Error 4xx",
+            "optional": false,
+            "field": "message",
+            "description": "<p>授权失败的具体描述信息</p>"
+          }
+        ]
+      },
+      "examples": [
+        {
+          "title": "Response (example):",
+          "content": "HTTP/1.1 200 OK\n{\n      \"status\": 4001,\n      \"data\": {},\n      \"message\": \"mutil: invalid token\"\n}",
+          "type": "json"
+        }
+      ]
+    }
   },
   {
     "type": "post",
@@ -522,7 +547,32 @@ define({ "api": [
       {
         "url": "http://10.0.0.26:8085/v1/device/product/getProductList"
       }
-    ]
+    ],
+    "error": {
+      "fields": {
+        "Error 4xx": [
+          {
+            "group": "Error 4xx",
+            "optional": false,
+            "field": "status",
+            "description": "<p>4001 授权错误时返回的状态码，得到次状态码需要重新授权。</p>"
+          },
+          {
+            "group": "Error 4xx",
+            "optional": false,
+            "field": "message",
+            "description": "<p>授权失败的具体描述信息</p>"
+          }
+        ]
+      },
+      "examples": [
+        {
+          "title": "Response (example):",
+          "content": "HTTP/1.1 200 OK\n{\n      \"status\": 4001,\n      \"data\": {},\n      \"message\": \"mutil: invalid token\"\n}",
+          "type": "json"
+        }
+      ]
+    }
   },
   {
     "type": "get",
@@ -872,7 +922,32 @@ define({ "api": [
       {
         "url": "http://10.0.0.26:8085/v1/device/product/getProductById/1"
       }
-    ]
+    ],
+    "error": {
+      "fields": {
+        "Error 4xx": [
+          {
+            "group": "Error 4xx",
+            "optional": false,
+            "field": "status",
+            "description": "<p>4001 授权错误时返回的状态码，得到次状态码需要重新授权。</p>"
+          },
+          {
+            "group": "Error 4xx",
+            "optional": false,
+            "field": "message",
+            "description": "<p>授权失败的具体描述信息</p>"
+          }
+        ]
+      },
+      "examples": [
+        {
+          "title": "Response (example):",
+          "content": "HTTP/1.1 200 OK\n{\n      \"status\": 4001,\n      \"data\": {},\n      \"message\": \"mutil: invalid token\"\n}",
+          "type": "json"
+        }
+      ]
+    }
   },
   {
     "type": "post",
@@ -987,18 +1062,187 @@ define({ "api": [
         }
       ]
     },
+    "success": {
+      "fields": {
+        "Success 200": [
+          {
+            "group": "Success 200",
+            "type": "Number",
+            "optional": false,
+            "field": "id",
+            "description": "<p>购物车id</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Number",
+            "optional": false,
+            "field": "cartNum",
+            "description": "<p>购物车商品数量</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Number",
+            "optional": false,
+            "field": "isPay",
+            "description": "<p>是否支付 1 是，2否</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Number",
+            "optional": false,
+            "field": "isDel",
+            "description": "<p>是否删除 1 是，2否</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Number",
+            "optional": false,
+            "field": "isNew",
+            "description": "<p>是否为立即购买 1 是，2否</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Number",
+            "optional": false,
+            "field": "isFail",
+            "description": "<p>是否过期 1 是，2否</p>"
+          }
+        ]
+      },
+      "examples": [
+        {
+          "title": "Response:",
+          "content": "HTTP/1.1 200 OK\n{\n      \"status\": 200,\n          \"data\": {\n              \"id\": 5,\n              \"createdAt\": \"2021-07-22T16:23:44.537+08:00\",\n              \"updatedAt\": \"2021-07-22T16:23:44.537+08:00\",\n              \"productType\": 1,\n              \"productAttrUnique\": \"e2fe28308fd2\",\n              \"cartNum\": 2,\n              \"source\": 0,\n              \"sourceId\": 0,\n              \"isPay\": 2,\n              \"isDel\": 2,\n              \"isNew\": 2,\n              \"isFail\": 2,\n              \"productId\": 1,\n              \"sysUserId\": 1,\n              \"sysTenancyId\": 1\n          },\n          \"message\": \"创建成功\"\n}",
+          "type": "json"
+        }
+      ]
+    },
     "examples": [
       {
         "title": "Curl example",
-        "content": "curl -H \"Authorization: Bearer 5f048fe\" -i http://10.0.0.26:8085/v1/cart/product/createCart",
+        "content": "curl -H \"Authorization: Bearer 5f048fe\" -i http://10.0.0.26:8085/v1/cart/createCart",
+        "type": "bash"
+      }
+    ],
+    "filename": "v1/device/cart.js",
+    "groupTitle": "购物车管理",
+    "sampleRequest": [
+      {
+        "url": "http://10.0.0.26:8085/v1/device/cart/createCart"
+      }
+    ],
+    "error": {
+      "fields": {
+        "Error 4xx": [
+          {
+            "group": "Error 4xx",
+            "optional": false,
+            "field": "status",
+            "description": "<p>4001 授权错误时返回的状态码，得到次状态码需要重新授权。</p>"
+          },
+          {
+            "group": "Error 4xx",
+            "optional": false,
+            "field": "message",
+            "description": "<p>授权失败的具体描述信息</p>"
+          }
+        ]
+      },
+      "examples": [
+        {
+          "title": "Response (example):",
+          "content": "HTTP/1.1 200 OK\n{\n      \"status\": 4001,\n      \"data\": {},\n      \"message\": \"mutil: invalid token\"\n}",
+          "type": "json"
+        }
+      ]
+    }
+  },
+  {
+    "type": "get",
+    "url": "/v1/device/cart/getCartList",
+    "title": "购物车商品列表",
+    "version": "0.0.1",
+    "name": "购物车商品列表",
+    "group": "购物车管理",
+    "permission": [
+      {
+        "name": "device",
+        "title": "床旁设备授权",
+        "description": "<p>床旁设备授权，区分设备所在医院</p> <p>床旁设备请求平台接口之前都需要获取授权，并将授权凭证放置在头部信息中。</p>"
+      }
+    ],
+    "description": "<p>获取购物车内商品列表信息</p>",
+    "header": {
+      "fields": {
+        "Header": [
+          {
+            "group": "Header",
+            "type": "String",
+            "optional": false,
+            "field": "Authorization",
+            "description": "<p>接口需要带上此头信息</p>"
+          }
+        ]
+      },
+      "examples": [
+        {
+          "title": "Header-Example",
+          "content": "\"Authorization: Bearer 5f048fe\"",
+          "type": "Header"
+        }
+      ]
+    },
+    "examples": [
+      {
+        "title": "Curl example",
+        "content": "curl -H \"Authorization: Bearer 5f048fe\" -i http://10.0.0.26:8085/v1/cart/getCartList",
         "type": "bash"
       }
     ],
     "success": {
+      "fields": {
+        "Success 200": [
+          {
+            "group": "Success 200",
+            "type": "Number",
+            "optional": false,
+            "field": "sysTenancyId",
+            "description": "<p>商户id</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "name",
+            "description": "<p>商户名称</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "Avatar",
+            "description": "<p>商户图片</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Object[]",
+            "optional": false,
+            "field": "products",
+            "description": "<p>商品集合</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Number",
+            "optional": false,
+            "field": "total",
+            "description": "<p>商品总数</p>"
+          }
+        ]
+      },
       "examples": [
         {
           "title": "Response:",
-          "content": "   HTTP/1.1 200 OK\n   {\n\"status\": 200,\n   \"data\": {\n       \"id\": 5,\n       \"createdAt\": \"2021-07-22T16:23:44.537+08:00\",\n       \"updatedAt\": \"2021-07-22T16:23:44.537+08:00\",\n       \"productType\": 1,\n       \"productAttrUnique\": \"e2fe28308fd2\",\n       \"cartNum\": 2,\n       \"source\": 0,\n       \"sourceId\": 0,\n       \"isPay\": 2,\n       \"isDel\": 2,\n       \"isNew\": 2,\n       \"isFail\": 2,\n       \"productId\": 1,\n       \"sysUserId\": 1,\n       \"sysTenancyId\": 1\n   },\n   \"message\": \"创建成功\"\n   }",
+          "content": "HTTP/1.1 200 OK\n{\n    \"status\": 200,\n        \"data\": {\n            \"list\": [\n                {\n                    \"sysTenancyId\": 1,\n                    \"name\": \"宝安中心人民医院\",\n                    \"Avatar\": \"\",\n                    \"productId\": 1,\n                    \"products\": [\n                        {\n                            \"id\": 1,\n                            \"storeName\": \"领立裁腰带短袖连衣裙\",\n                            \"storeInfo\": \"短袖连衣裙\",\n                            \"keyword\": \"连衣裙\",\n                            \"unitName\": \"件\",\n                            \"sort\": 40,\n                            \"sales\": 1,\n                            \"price\": 80,\n                            \"otPrice\": 100,\n                            \"stock\": 399,\n                            \"isHot\": 2,\n                            \"isBenefit\": 2,\n                            \"isBest\": 2,\n                            \"isNew\": 2,\n                            \"isGood\": 1,\n                            \"productType\": 2,\n                            \"ficti\": 100,\n                            \"specType\": 1,\n                            \"rate\": 5,\n                            \"isGiftBag\": 2,\n                            \"image\": \"http://127.0.0.1:8090/uploads/def/20200816/9a6a2e1231fb19517ed1de71206a0657.jpg\",\n                            \"tempId\": 99,\n                            \"sysTenancyId\": 1,\n                            \"sysBrandId\": 2,\n                            \"productCategoryId\": 162,\n                            \"sysTenancyName\": \"宝安中心人民医院\",\n                            \"cateName\": \"男士上衣\",\n                            \"brandName\": \"苹果\",\n                            \"tempName\": \"\",\n                            \"content\": \"<p>好手机</p>\",\n                            \"sliderImage\": \"http://127.0.0.1:8090/uploads/def/20200816/9a6a2e1231fb19517ed1de71206a0657.jpg,http://127.0.0.1:8090/uploads/def/20200816/9a6a2e1231fb19517ed1de71206a0657.jpg\",\n                            \"sliderImages\": null,\n                            \"attr\": null,\n                            \"attrValue\": null,\n                            \"cateId\": 0,\n                            \"tenancyCategoryId\": null,\n                            \"productCates\": null\n                        }\n                    ]\n                }\n            ],\n            \"total\": 1,\n            \"page\": 0,\n            \"pageSize\": 0\n        },\n        \"message\": \"获取成功\"\n}",
           "type": "json"
         }
       ]
@@ -1007,8 +1251,33 @@ define({ "api": [
     "groupTitle": "购物车管理",
     "sampleRequest": [
       {
-        "url": "http://10.0.0.26:8085/v1/device/cart/createCart"
+        "url": "http://10.0.0.26:8085/v1/device/cart/getCartList"
       }
-    ]
+    ],
+    "error": {
+      "fields": {
+        "Error 4xx": [
+          {
+            "group": "Error 4xx",
+            "optional": false,
+            "field": "status",
+            "description": "<p>4001 授权错误时返回的状态码，得到次状态码需要重新授权。</p>"
+          },
+          {
+            "group": "Error 4xx",
+            "optional": false,
+            "field": "message",
+            "description": "<p>授权失败的具体描述信息</p>"
+          }
+        ]
+      },
+      "examples": [
+        {
+          "title": "Response (example):",
+          "content": "HTTP/1.1 200 OK\n{\n      \"status\": 4001,\n      \"data\": {},\n      \"message\": \"mutil: invalid token\"\n}",
+          "type": "json"
+        }
+      ]
+    }
   }
 ] });
