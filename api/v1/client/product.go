@@ -49,7 +49,7 @@ func UpdateProduct(ctx *gin.Context) {
 		return
 	}
 
-	if err := service.UpdateProduct(product, req.Id, multi.GetTenancyId(ctx)); err != nil {
+	if err := service.UpdateProduct(product, req.Id, ctx); err != nil {
 		g.TENANCY_LOG.Error("更新失败!", zap.Any("err", err))
 		response.FailWithMessage("更新失败:"+err.Error(), ctx)
 	} else {

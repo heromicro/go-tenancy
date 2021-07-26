@@ -112,7 +112,6 @@
  * @apiSuccess {String}   tempName       模板名称
  * @apiSuccess {String}   content       详情内容
  * @apiSuccess {String[]}   sliderImages      展示图片
- * @apiSuccess {String[]}   attr      规格
  * @apiSuccess {Object[]}   attrValue      规格详情
  * @apiSuccess {Object[]}   productCates  商品分类
  *
@@ -157,32 +156,6 @@
         "sliderImages": [
             "http://127.0.0.1:8090/uploads/def/20200816/9a6a2e1231fb19517ed1de71206a0657.jpg",
             "http://127.0.0.1:8090/uploads/def/20200816/9a6a2e1231fb19517ed1de71206a0657.jpg"
-        ],
-        "attr": [
-            {
-                "detail": [
-                    "35"
-                ],
-                "value": "S"
-            },
-            {
-                "detail": [
-                    "36"
-                ],
-                "value": "L"
-            },
-            {
-                "detail": [
-                    "37"
-                ],
-                "value": "XL"
-            },
-            {
-                "detail": [
-                    "38"
-                ],
-                "value": "XXL"
-            }
         ],
         "attrValue": [
             {
