@@ -322,27 +322,31 @@ func SetProductCategory(tx *gorm.DB, id, tenancyId uint, reqIds []uint) error {
 }
 
 // GetCartProducts
-func GetCartProducts(sysTenancyID, sysUserID uint) ([]response.CartProduct, error) {
+func GetCartProducts(sysTenancyID, sysUserID uint, cartIds []uint) ([]response.CartProduct, error) {
 	var cartProducts []response.CartProduct
-	err := g.TENANCY_DB.Model(&model.Product{}).Where("products.is_show = ?", g.StatusTrue).Where("products.status = ?", model.SuccessProductStatus).Select("products.id as product_id,products.store_name,products.image,products.spec_type,products.price,carts.id,carts.cart_num,carts.sys_tenancy_id as sys_tenancy_id,carts.product_attr_unique,carts.is_fail").
+	db := g.TENANCY_DB.Model(&model.Product{}).Where("products.is_show = ?", g.StatusTrue).Where("products.status = ?", model.SuccessProductStatus).Select("products.id as product_id,products.store_name,products.image,products.spec_type,products.price,carts.id,carts.cart_num,carts.sys_tenancy_id as sys_tenancy_id,carts.product_attr_unique,carts.is_fail").
 		Joins("left join carts on products.id = carts.product_id").
 		Where("carts.sys_tenancy_id = ?", sysTenancyID).
 		Where("carts.sys_user_id = ?", sysUserID).
-		Where("carts.is_pay", g.StatusFalse).
-		Where("carts.deleted_at is null").
-		Find(&cartProducts).Error
+		Where("carts.is_pay = ?", g.StatusFalse).
+		Where("carts.deleted_at is null")
+
+	if len(cartIds) > 0 {
+		db = db.Where("carts.id in ?", cartIds)
+	}
+
+	err := db.Find(&cartProducts).Error
 	if err != nil {
 		return cartProducts, err
 	}
 
-	singeProductIds := []uint{}
-	doubleProductIds := []uint{}
+	productIds := []uint{}
 	uniques := []string{}
 	for _, cartProduct := range cartProducts {
 		if cartProduct.SpecType == model.SingleSpec {
-			singeProductIds = append(singeProductIds, cartProduct.ProductID)
+			productIds = append(productIds, cartProduct.ProductID)
 		} else if cartProduct.SpecType == model.DoubleSpec {
-			doubleProductIds = append(doubleProductIds, cartProduct.ProductID)
+			productIds = append(productIds, cartProduct.ProductID)
 		}
 
 		uniques = append(uniques, cartProduct.ProductAttrUnique)
@@ -350,8 +354,8 @@ func GetCartProducts(sysTenancyID, sysUserID uint) ([]response.CartProduct, erro
 
 	var attrValues []model.ProductAttrValue
 	err = g.TENANCY_DB.Model(&model.ProductAttrValue{}).
-		Where("product_id in ?", doubleProductIds).
-		Where("'unique' in ?", uniques).
+		Where("product_id in ?", productIds).
+		Where("`unique` in ?", uniques).
 		Find(&attrValues).Error
 	if err != nil {
 		return cartProducts, fmt.Errorf("get product attr value %w", err)
@@ -360,7 +364,7 @@ func GetCartProducts(sysTenancyID, sysUserID uint) ([]response.CartProduct, erro
 	if len(attrValues) > 0 {
 		for _, attrValue := range attrValues {
 			for i := 0; i < len(cartProducts); i++ {
-				if cartProducts[i].ProductID == attrValue.ProductID && cartProducts[i].ProductAttrUnique == attrValue.Unique && cartProducts[i].SpecType == model.DoubleSpec {
+				if cartProducts[i].ProductID == attrValue.ProductID && cartProducts[i].ProductAttrUnique == attrValue.Unique {
 					productAttrValue := request.ProductAttrValue{BaseProductAttrValue: attrValue.BaseProductAttrValue, Value0: attrValue.BaseProductAttrValue.Sku}
 					if attrValue.Detail != "" {
 						err := json.Unmarshal([]byte(attrValue.Detail), &productAttrValue.Detail)

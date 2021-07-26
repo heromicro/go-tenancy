@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"github.com/gin-gonic/gin"
+	"github.com/shopspring/decimal"
 	"github.com/snowlyg/go-tenancy/g"
 	"github.com/snowlyg/go-tenancy/model"
 	"github.com/snowlyg/go-tenancy/model/request"
@@ -516,4 +517,44 @@ func UpdateOrder(id uint, order request.OrderRemarkAndUpdate, ctx *gin.Context) 
 // DeleteOrder
 func DeleteOrder(id uint) error {
 	return g.TENANCY_DB.Model(&model.Order{}).Where("id = ?", id).Update("is_system_del", g.StatusTrue).Error
+}
+
+func CheckOrder(req request.CheckOrder, ctx *gin.Context) (response.CheckOrder, error) {
+	var res response.CheckOrder
+	list, fails, _, err := GetCartList(ctx, req.CartIds)
+	if err != nil {
+		return res, fmt.Errorf("获取购物车信息 %w", err)
+	}
+
+	if len(fails) > 0 {
+		return res, fmt.Errorf("购物车商品已失效")
+	}
+
+	if len(list) > 1 || len(list) == 0 {
+		return res, fmt.Errorf("购物车数据异常")
+	}
+
+	res.OrderType = model.OrderTypeSelf // TODO:所有订单默认自提
+	res.PostagePrice = decimal.NewFromInt(0)
+	res.DownPrice = decimal.NewFromInt(0)
+	res.CartList = list[0]
+	res.ProductPrices = map[uint]map[string]decimal.Decimal{}
+	if len(res.CartList.Products) > 0 {
+		for _, product := range res.CartList.Products {
+			productPrice := decimal.NewFromFloat(product.AttrValue.Price).Mul(decimal.NewFromInt(product.CartNum))
+			productOtPrice := decimal.NewFromFloat(product.AttrValue.OtPrice).Mul(decimal.NewFromInt(product.CartNum))
+			res.ProductPrices[product.ProductID] = map[string]decimal.Decimal{
+				"price":   productPrice,
+				"otPrice": productOtPrice,
+			}
+			res.TotalPrice = res.TotalPrice.Add(productPrice)
+			res.TotalOtPrice = res.TotalOtPrice.Add(productOtPrice)
+			res.TotalNum += product.CartNum
+		}
+	}
+
+	res.FinalOtPrice = res.TotalOtPrice.Sub(res.PostagePrice).Sub(res.DownPrice)
+	res.FinalPrice = res.TotalPrice.Sub(res.PostagePrice).Sub(res.DownPrice)
+
+	return res, nil
 }

@@ -16,8 +16,7 @@ type CartProduct struct {
 	ProductID         uint                     `json:"productId"`
 	StoreName         string                   `json:"storeName"`
 	Image             string                   `json:"image"`
-	Price             string                   `json:"price"`
-	CartNum           uint16                   `json:"cartNum"`
+	CartNum           int64                    `json:"cartNum"`
 	IsFail            int                      `json:"isFail"`
 	ProductAttrUnique string                   `json:"productAttrUnique"` // 商品属性
 	AttrValue         request.ProductAttrValue `gorm:"-" json:"attrValue"`

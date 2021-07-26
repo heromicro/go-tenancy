@@ -62,3 +62,7 @@ type DeliveryOrder struct {
 	DeliveryName string `json:"deliveryName" form:"deliveryName"`
 	DeliveryType int    `json:"deliveryType" form:"deliveryType"`
 }
+
+type CheckOrder struct {
+	CartIds []uint `json:"cartIds" form:"cartIds"`
+}

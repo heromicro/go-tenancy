@@ -11,7 +11,7 @@ import (
 )
 
 func GetCartList(ctx *gin.Context) {
-	if list, fails, total, err := service.GetCartList(ctx); err != nil {
+	if list, fails, total, err := service.GetCartList(ctx, nil); err != nil {
 		g.TENANCY_LOG.Error("获取失败!", zap.Any("err", err))
 		response.FailWithMessage("获取失败:"+err.Error(), ctx)
 	} else {

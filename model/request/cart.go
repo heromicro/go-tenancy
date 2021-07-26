@@ -10,5 +10,5 @@ type CreateCart struct {
 }
 
 type ChangeCartNum struct {
-	CartNum uint16 `json:"cartNum" binding:"required"`
+	CartNum int64 `json:"cartNum" binding:"required"`
 }

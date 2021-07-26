@@ -48,8 +48,18 @@ func InitDeviceRouter(Router *gin.RouterGroup) {
 	{
 		CartRouter.GET("/getCartList", device.GetCartList)
 		CartRouter.GET("/getProductCount", device.GetProductCount)
-		CartRouter.POST("/createCart", device.CreateCart)
+		CartRouter.POST("/createCart", device.CreateCart) // 添加购物车
 		CartRouter.POST("/changeCartNum/:id", device.ChangeCartNum)
 		CartRouter.DELETE("/deleteCart", device.DeleteCart)
+	}
+	// 订单
+	OrderRouter := Router.Group("/order")
+	{
+		OrderRouter.POST("/checkOrder", device.CheckOrder)
+	}
+	// 患者管理
+	PatientRouter := Router.Group("/patient")
+	{
+		PatientRouter.GET("/getPatientList", device.GetPatientList)
 	}
 }

@@ -14,7 +14,7 @@ type Cart struct {
 type BaseCart struct {
 	ProductType       int32  `gorm:"column:product_type;type:tinyint;not null;default:1" json:"productType" binding:"required"`                   // 类型 1=普通产品，2.预售商品
 	ProductAttrUnique string `gorm:"column:product_attr_unique;type:varchar(16);not null;default:''" json:"productAttrUnique" binding:"required"` // 商品属性
-	CartNum           uint16 `gorm:"column:cart_num;type:smallint unsigned;not null;default:0" json:"cartNum" binding:"required"`                 // 商品数量
+	CartNum           int64  `gorm:"column:cart_num;type:smallint unsigned;not null;default:0" json:"cartNum" binding:"required"`                 // 商品数量
 	Source            uint8  `gorm:"column:source;type:tinyint unsigned;not null;default:0" json:"source"`                                        // 来源 1.直播间,2.预售商品,3.助力商品
 	SourceID          uint   `gorm:"column:source_id;type:int unsigned;not null;default:0" json:"sourceId"`                                       // 来源关联 id
 	IsPay             int    `gorm:"column:is_pay;type:tinyint(1);not null;default:2" json:"isPay"`                                               // 2 = 未购买 1 = 已购买                                              // 是否删除

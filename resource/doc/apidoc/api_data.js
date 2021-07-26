@@ -943,6 +943,331 @@ define({ "api": [
     }
   },
   {
+    "type": "get",
+    "url": "/v1/device/patient/getPatientList",
+    "title": "患者列表",
+    "version": "0.0.1",
+    "name": "患者列表",
+    "group": "患者管理",
+    "permission": [
+      {
+        "name": "device",
+        "title": "床旁设备授权",
+        "description": "<p>床旁设备授权，区分设备所在医院</p> <p>床旁设备请求平台接口之前都需要获取授权，并将授权凭证放置在头部信息中。</p>"
+      }
+    ],
+    "description": "<p>获取医院患者数据</p>",
+    "header": {
+      "fields": {
+        "Header": [
+          {
+            "group": "Header",
+            "type": "String",
+            "optional": false,
+            "field": "Authorization",
+            "description": "<p>接口需要带上此头信息</p>"
+          }
+        ]
+      },
+      "examples": [
+        {
+          "title": "Header-Example",
+          "content": "\"Authorization: Bearer 5f048fe\"",
+          "type": "Header"
+        }
+      ]
+    },
+    "examples": [
+      {
+        "title": "Curl example",
+        "content": "curl -H \"Authorization: Bearer 5f048fe\" -i http://10.0.0.26:8085/v1/device/patient/getPatientList",
+        "type": "bash"
+      }
+    ],
+    "success": {
+      "fields": {
+        "Success 200": [
+          {
+            "group": "Success 200",
+            "type": "Number",
+            "optional": false,
+            "field": "id",
+            "description": ""
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "name",
+            "description": "<p>患者名称</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "phone",
+            "description": "<p>手机</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Number",
+            "optional": false,
+            "field": "sex",
+            "description": "<p>性别</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Number",
+            "optional": false,
+            "field": "age",
+            "description": "<p>年龄</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "locName",
+            "description": "<p>科室</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "bedNum",
+            "description": "<p>床号</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "hospitalNo",
+            "description": "<p>住院号</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "disease",
+            "description": "<p>病种</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "hospitalName",
+            "description": "<p>医院</p>"
+          }
+        ]
+      },
+      "examples": [
+        {
+          "title": "Response:",
+          "content": "HTTP/1.1 200 OK\n{\n    \"status\": 200,\n    \"data\": {\n        \"list\": [\n            {\n                \"id\": 1,\n                \"createdAt\": \"2021-07-26T12:24:42+08:00\",\n                \"updatedAt\": \"2021-07-26T12:24:42+08:00\",\n                \"name\": \"八两金\",\n                \"phone\": \"13845687419\",\n                \"sex\": 2,\n                \"age\": 32,\n                \"locName\": \"泌尿科一区\",\n                \"bedNum\": \"15\",\n                \"hospitalNo\": \"88956655\",\n                \"disease\": \"不孕不育\",\n                \"sysTenancyId\": 1,\n                \"hospitalName\": \"宝安中心人民医院\"\n            }\n        ],\n        \"total\": 1,\n        \"page\": 1,\n        \"pageSize\": -1\n    },\n    \"message\": \"获取成功\"\n}",
+          "type": "json"
+        }
+      ]
+    },
+    "filename": "v1/device/patient.js",
+    "groupTitle": "患者管理",
+    "sampleRequest": [
+      {
+        "url": "http://10.0.0.26:8085/v1/device/patient/getPatientList"
+      }
+    ],
+    "error": {
+      "fields": {
+        "Error 4xx": [
+          {
+            "group": "Error 4xx",
+            "optional": false,
+            "field": "status",
+            "description": "<p>4001 授权错误时返回的状态码，得到次状态码需要重新授权。</p>"
+          },
+          {
+            "group": "Error 4xx",
+            "optional": false,
+            "field": "message",
+            "description": "<p>授权失败的具体描述信息</p>"
+          }
+        ]
+      },
+      "examples": [
+        {
+          "title": "Response (example):",
+          "content": "HTTP/1.1 200 OK\n{\n      \"status\": 4001,\n      \"data\": {},\n      \"message\": \"mutil: invalid token\"\n}",
+          "type": "json"
+        }
+      ]
+    }
+  },
+  {
+    "type": "post",
+    "url": "/v1/device/order/checkOrder",
+    "title": "用户下单数据",
+    "version": "0.0.1",
+    "name": "用户下单数据",
+    "group": "订单管理管理",
+    "permission": [
+      {
+        "name": "device",
+        "title": "床旁设备授权",
+        "description": "<p>床旁设备授权，区分设备所在医院</p> <p>床旁设备请求平台接口之前都需要获取授权，并将授权凭证放置在头部信息中。</p>"
+      }
+    ],
+    "description": "<p>获取用户下单数据详情</p>",
+    "body": [
+      {
+        "group": "Body",
+        "type": "Number[]",
+        "optional": false,
+        "field": "cartIds",
+        "description": "<p>购物车ids</p>"
+      }
+    ],
+    "header": {
+      "fields": {
+        "Header": [
+          {
+            "group": "Header",
+            "type": "String",
+            "optional": false,
+            "field": "Authorization",
+            "description": "<p>接口需要带上此头信息</p>"
+          }
+        ]
+      },
+      "examples": [
+        {
+          "title": "Header-Example",
+          "content": "\"Authorization: Bearer 5f048fe\"",
+          "type": "Header"
+        }
+      ]
+    },
+    "examples": [
+      {
+        "title": "Curl example",
+        "content": "curl -H \"Authorization: Bearer 5f048fe\" -i http://10.0.0.26:8085/v1/device/order/checkOrder",
+        "type": "bash"
+      }
+    ],
+    "success": {
+      "fields": {
+        "Success 200": [
+          {
+            "group": "Success 200",
+            "type": "Number",
+            "optional": false,
+            "field": "finalPrice",
+            "description": "<p>订单最终价格</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Number",
+            "optional": false,
+            "field": "finalOtPrice",
+            "description": "<p>订单最终原价</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Number",
+            "optional": false,
+            "field": "totalPrice",
+            "description": "<p>订单总价</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Number",
+            "optional": false,
+            "field": "totalOtPrice",
+            "description": "<p>订单原价</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Number",
+            "optional": false,
+            "field": "postagePrice",
+            "description": "<p>订单邮费</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Number",
+            "optional": false,
+            "field": "downPrice",
+            "description": "<p>订单优惠价格</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Number",
+            "optional": false,
+            "field": "totalNum",
+            "description": "<p>商品总数</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Number",
+            "optional": false,
+            "field": "orderType",
+            "description": "<p>订单类型 1：普通，2：自提</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Object[]",
+            "optional": false,
+            "field": "productPrices",
+            "description": "<p>商品价格</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Object[]",
+            "optional": false,
+            "field": "products",
+            "description": "<p>商品信息</p>"
+          }
+        ]
+      },
+      "examples": [
+        {
+          "title": "Response:",
+          "content": "HTTP/1.1 200 OK\n{\n    \"status\": 200,\n    \"data\": {\n        \"sysTenancyId\": 1,\n        \"name\": \"宝安中心人民医院\",\n        \"Avatar\": \"\",\n        \"products\": [\n            {\n                \"id\": 6,\n                \"sysTenancyId\": 1,\n                \"specType\": 1,\n                \"productId\": 1,\n                \"storeName\": \"领立裁腰带短袖连衣裙\",\n                \"image\": \"http://127.0.0.1:8090/uploads/def/20200816/9a6a2e1231fb19517ed1de71206a0657.jpg\",\n                \"cartNum\": 6,\n                \"isFail\": 2,\n                \"productAttrUnique\": \"e2fe28308fd2\",\n                \"attrValue\": {\n                    \"productId\": 0,\n                    \"sku\": \"S\",\n                    \"stock\": 99,\n                    \"sales\": 1,\n                    \"image\": \"\\thttp://127.0.0.1:8090/uploads/def/20200816/9a6a2e1231fb19517ed1de71206a0657.jpg\",\n                    \"barCode\": \"123456\",\n                    \"cost\": 50,\n                    \"otPrice\": 180,\n                    \"price\": 160,\n                    \"volume\": 1,\n                    \"weight\": 1,\n                    \"extensionOne\": 0,\n                    \"extensionTwo\": 0,\n                    \"unique\": \"e2fe28308fd2\",\n                    \"detail\": {\n                        \"尺寸\": \"S\"\n                    },\n                    \"value0\": \"S\"\n                }\n            }\n        ],\n        \"finalPrice\": \"960\",\n        \"finalOtPrice\": \"1080\",\n        \"totalPrice\": \"960\",\n        \"totalOtPrice\": \"1080\",\n        \"postagePrice\": \"0\",\n        \"downPrice\": \"0\",\n        \"productPrices\": {\n            \"1\": {\n                \"otPrice\": \"1080\",\n                \"price\": \"960\"\n            }\n        },\n        \"totalNum\": 6,\n        \"orderType\": 2\n    },\n    \"message\": \"获取成功\"\n}",
+          "type": "json"
+        }
+      ]
+    },
+    "filename": "v1/device/order.js",
+    "groupTitle": "订单管理管理",
+    "sampleRequest": [
+      {
+        "url": "http://10.0.0.26:8085/v1/device/order/checkOrder"
+      }
+    ],
+    "error": {
+      "fields": {
+        "Error 4xx": [
+          {
+            "group": "Error 4xx",
+            "optional": false,
+            "field": "status",
+            "description": "<p>4001 授权错误时返回的状态码，得到次状态码需要重新授权。</p>"
+          },
+          {
+            "group": "Error 4xx",
+            "optional": false,
+            "field": "message",
+            "description": "<p>授权失败的具体描述信息</p>"
+          }
+        ]
+      },
+      "examples": [
+        {
+          "title": "Response (example):",
+          "content": "HTTP/1.1 200 OK\n{\n      \"status\": 4001,\n      \"data\": {},\n      \"message\": \"mutil: invalid token\"\n}",
+          "type": "json"
+        }
+      ]
+    }
+  },
+  {
     "type": "post",
     "url": "/v1/device/cart/changeCartNum/1",
     "title": "修改购物车商品数量",

@@ -17,6 +17,7 @@ func InitAttrTemplateRouter(Router *gin.RouterGroup) {
 	}
 }
 
+// 品牌
 func InitBrandRouter(Router *gin.RouterGroup) {
 	BrandRouter := Router.Group("/brand")
 	{

@@ -15,7 +15,7 @@ import (
 
 // CreateCart
 func CreateCart(req request.CreateCart) (model.Cart, error) {
-	cart := model.Cart{BaseCart: req.BaseCart, SysUserID: req.SysUserID, SysTenancyID: req.SysTenancyID, ProductID: req.ProductID}
+	var cart model.Cart
 	err := g.TENANCY_DB.Model(&model.Cart{}).
 		Where("sys_user_id = ?", req.SysUserID).
 		Where("sys_tenancy_id = ?", req.SysTenancyID).
@@ -23,6 +23,14 @@ func CreateCart(req request.CreateCart) (model.Cart, error) {
 		Where("product_attr_unique = ?", req.ProductAttrUnique).
 		First(&cart).Error
 	if errors.Is(err, gorm.ErrRecordNotFound) { // 没有商品直接新建
+		cart = model.Cart{BaseCart: model.BaseCart{
+			ProductType:       req.ProductType,
+			ProductAttrUnique: req.ProductAttrUnique,
+			CartNum:           req.CartNum,
+			IsPay:             g.StatusFalse,
+			IsNew:             req.IsNew,
+			IsFail:            g.StatusFalse,
+		}, SysUserID: req.SysUserID, SysTenancyID: req.SysTenancyID, ProductID: req.ProductID}
 		err = g.TENANCY_DB.Model(&model.Cart{}).Create(&cart).Error
 		if err != nil {
 			return cart, err
@@ -41,7 +49,7 @@ func CreateCart(req request.CreateCart) (model.Cart, error) {
 }
 
 // ChangeCartNum
-func ChangeCartNum(cartNum uint16, id, sysUserID, sysTenancyID uint) error {
+func ChangeCartNum(cartNum int64, id, sysUserID, sysTenancyID uint) error {
 	return g.TENANCY_DB.Model(&model.Cart{}).
 		Where("sys_user_id = ?", sysUserID).
 		Where("sys_tenancy_id = ?", sysTenancyID).
@@ -72,11 +80,11 @@ func GetProductCount(sysUserID, sysTenancyID uint) (int64, error) {
 }
 
 // GetCartList
-func GetCartList(ctx *gin.Context) ([]response.CartList, []response.CartProduct, int64, error) {
+func GetCartList(ctx *gin.Context, cartIds []uint) ([]response.CartList, []response.CartProduct, int64, error) {
 	cartList := []response.CartList{}
 	fails := []response.CartProduct{}
 	var count int64
-	cartProducts, err := GetCartProducts(multi.GetTenancyId(ctx), multi.GetUserId(ctx))
+	cartProducts, err := GetCartProducts(multi.GetTenancyId(ctx), multi.GetUserId(ctx), cartIds)
 	if err != nil {
 		return cartList, fails, count, fmt.Errorf("get cart %w", err)
 	}
