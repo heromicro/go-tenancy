@@ -10,7 +10,7 @@ import (
 
 func TestExpressList(t *testing.T) {
 	params := []param{
-		{args: map[string]interface{}{"page": 1, "pageSize": 10, "name": ""}, length: 34},
+		{args: map[string]interface{}{"page": 1, "pageSize": 10, "name": ""}, length: 33},
 		{args: map[string]interface{}{"page": 1, "pageSize": 10, "name": "汤氏物流"}, length: 1},
 	}
 	for _, param := range params {

@@ -30,7 +30,7 @@ type OrderProduct struct {
 }
 
 type OrderCondition struct {
-	Type       int                    `json:"type"`
+	Type       string                 `json:"type"`
 	Name       string                 `json:"name"`
 	Conditions map[string]interface{} `json:"conditions"`
 	IsDeleted  bool                   `json:"is_deleted"`

@@ -164,7 +164,7 @@ func UpdateProduct(req request.UpdateProduct, id uint, ctx *gin.Context) error {
 	tenancyId := multi.GetTenancyId(ctx)
 	err := g.TENANCY_DB.Transaction(func(tx *gorm.DB) error {
 		if multi.IsAdmin(ctx) {
-			if err := tx.Where("id = ?", id).Updates(map[string]interface{}{"store_name": req.StoreName, "is_benefit": req.IsBenefit, "is_best": req.IsBest, "is_hot": req.IsHot, "is_new": req.IsNew, "sort": req.Sort}).Error; err != nil {
+			if err := tx.Model(&model.Product{}).Where("id = ?", id).Updates(map[string]interface{}{"store_name": req.StoreName, "is_benefit": req.IsBenefit, "is_best": req.IsBest, "is_hot": req.IsHot, "is_new": req.IsNew, "sort": req.Sort}).Error; err != nil {
 				return err
 			}
 		} else if multi.IsTenancy(ctx) {
@@ -247,7 +247,7 @@ func GetProductCategoryIdsById(id uint) ([]uint, error) {
 
 func SetProductContent(tx *gorm.DB, productId, tenancyId uint, productType int32, content string) error {
 	var conModel model.ProductContent
-	if err := g.TENANCY_DB.Model(&model.ProductContent{}).Where("product_id = ?", productId).Where("sys_tenancy_id = ?", tenancyId).First(&conModel).Error; err != nil {
+	if err := g.TENANCY_DB.Model(&model.ProductContent{}).Where("product_id = ?", productId).First(&conModel).Error; err != nil {
 		return err
 	}
 

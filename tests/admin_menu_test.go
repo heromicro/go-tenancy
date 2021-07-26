@@ -77,14 +77,14 @@ func TestBaseMenu(t *testing.T) {
 func TestClientMenuList(t *testing.T) {
 	auth := baseWithLoginTester(t)
 	defer baseLogOut(auth)
-	obj := auth.POST("v1/admin/menu/getClientMenuList").
+	obj := auth.GET("v1/admin/menu/merchant/getClientMenuList").
 		WithJSON(map[string]interface{}{"page": 1, "pageSize": 10}).
 		Expect().Status(http.StatusOK).JSON().Object()
 	obj.Keys().ContainsOnly("status", "data", "message")
 	obj.Value("status").Number().Equal(200)
 	obj.Value("message").String().Equal("获取成功")
 
-	data := obj.Value("data").Array()
+	data := obj.Value("data").Object().Value("list").Array()
 	data.Length().Ge(0)
 	first := data.First().Object()
 	first.Keys().ContainsOnly(

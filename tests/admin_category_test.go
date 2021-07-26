@@ -19,7 +19,7 @@ func TestCategoryList(t *testing.T) {
 	data := obj.Value("data").Array()
 	data.Length().Ge(0)
 	first := data.First().Object()
-	first.Keys().ContainsOnly("id", "pid", "cateName", "status", "path", "sort", "level", "children", "pic", "createdAt", "updatedAt")
+	first.Keys().ContainsOnly("id", "pid", "cateName", "status", "path", "sort", "level", "pic", "createdAt", "updatedAt")
 	first.Value("id").Number().Ge(0)
 }
 
