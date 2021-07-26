@@ -25,3 +25,13 @@ func GetPatientList(ctx *gin.Context) {
 		}, "获取成功", ctx)
 	}
 }
+
+// GetPatientDetail
+func GetPatientDetail(ctx *gin.Context) {
+	if patient, err := service.GetPatientById(multi.GetUserId(ctx), multi.GetTenancyId(ctx)); err != nil {
+		g.TENANCY_LOG.Error("获取失败!", zap.Any("err", err))
+		response.FailWithMessage("获取失败:"+err.Error(), ctx)
+	} else {
+		response.OkWithDetailed(patient, "获取成功", ctx)
+	}
+}

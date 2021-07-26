@@ -60,6 +60,7 @@ func InitDeviceRouter(Router *gin.RouterGroup) {
 	// 患者管理
 	PatientRouter := Router.Group("/patient")
 	{
+		PatientRouter.GET("/getPatientDetail", device.GetPatientDetail)
 		PatientRouter.GET("/getPatientList", device.GetPatientList)
 	}
 }
