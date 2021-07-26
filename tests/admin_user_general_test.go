@@ -82,7 +82,7 @@ func userGeneralTest(t *testing.T, params map[string]interface{}, length int) {
 			"realName",
 			"birthday",
 			"mark",
-			"addres",
+			"address",
 			"lastTime",
 			"lastIp",
 			"nowMoney",
@@ -112,7 +112,7 @@ func TestUserGetOrderList(t *testing.T) {
 	res.Keys().ContainsOnly("list", "total", "page", "pageSize", "stat")
 	res.Value("pageSize").Number().Equal(10)
 	res.Value("page").Number().Equal(1)
-	res.Value("total").Number().Equal(5)
+	res.Value("total").Number().Equal(6)
 }
 
 func TestUserGetBillList(t *testing.T) {
@@ -148,8 +148,8 @@ func TestUserGetGeneralDetail(t *testing.T) {
 	res.Value("nowMoney").Number().Equal(0)
 	res.Value("payCount").Number().Equal(5)
 	res.Value("payPrice").Number().Equal(20)
-	res.Value("totalPayCount").Number().Equal(5)
-	res.Value("totalPayPrice").Number().Equal(673)
+	res.Value("totalPayCount").Number().Equal(6)
+	res.Value("totalPayPrice").Number().Equal(762)
 	res.Value("groupId").Number().Equal(2)
 	res.Value("labelId").Array().First().Equal(1)
 	res.Value("avatarUrl").String().Equal("https://thirdwx.qlogo.cn/mmopen/vi_32/PEyYoZmTJtaJdeYWWibrnDUadmXKVYyTtyRq2nxtWbBic5jJTLTT4KHmox1tNvOicgIXxspgmxicghpCFob1icAIWFw/132")
@@ -219,8 +219,8 @@ func TestUserSetUserGroup(t *testing.T) {
 	obj.Value("message").String().Equal("获取成功")
 
 	data := map[string]interface{}{
-		"id":  2,
-		"ids": []int{0},
+		"group_id": 2,
+		"ids":      []int{0},
 	}
 	obj = auth.POST(fmt.Sprintf("v1/admin/cuser/setUserGroup/%d", cuserId)).
 		WithJSON(data).

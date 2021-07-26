@@ -15,7 +15,7 @@ func TestDeviceCartList(t *testing.T) {
 	obj.Value("message").String().Equal("获取成功")
 
 	data := obj.Value("data").Object()
-	data.Keys().ContainsOnly("list", "total")
+	data.Keys().ContainsOnly("list", "total", "fails")
 	data.Value("total").Number().Ge(0)
 
 	list := data.Value("list").Array()

@@ -9,6 +9,7 @@ import (
 	"github.com/snowlyg/go-tenancy/core"
 	"github.com/snowlyg/go-tenancy/g"
 	"github.com/snowlyg/go-tenancy/initialize"
+	"github.com/snowlyg/go-tenancy/model"
 	"github.com/snowlyg/multi"
 )
 
@@ -106,10 +107,15 @@ func tenancyWithLoginTester(t *testing.T) *httpexpect.Expect {
 }
 
 func deviceWithLoginTester(t *testing.T) *httpexpect.Expect {
+	var tenancy model.SysTenancy
+	err := g.TENANCY_DB.Model(&model.SysTenancy{}).First(&tenancy).Error
+	if err != nil {
+		t.Fatal(err)
+	}
 	e := baseTester(t)
 	obj := e.POST("v1/public/device/login").
 		WithJSON(map[string]interface{}{
-			"uuid":       "51b5825f-d3af-4a8c-92b6-6d55a4d52dc3",
+			"uuid":       tenancy.UUID,
 			"name":       "八两金",
 			"phone":      "13845687419",
 			"sex":        2,

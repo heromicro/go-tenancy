@@ -10,9 +10,6 @@ func TestProductList(t *testing.T) {
 	params := []param{
 		{args: map[string]interface{}{"page": 1, "pageSize": 10, "type": "1"}, length: 3},
 		{args: map[string]interface{}{"page": 1, "pageSize": 10, "type": "2"}, length: 1},
-		// {args: map[string]interface{}{"page": 1, "pageSize": 10, "type": "3"}, length: 1},
-		// {args: map[string]interface{}{"page": 1, "pageSize": 10, "type": "4"}, length: 1},
-		// {args: map[string]interface{}{"page": 1, "pageSize": 10, "type": "5"}, length: 1},
 		{args: map[string]interface{}{"page": 1, "pageSize": 10, "type": "6"}, length: 1},
 		{args: map[string]interface{}{"page": 1, "pageSize": 10, "type": "7"}, length: 1},
 	}

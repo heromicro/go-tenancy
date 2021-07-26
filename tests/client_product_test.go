@@ -107,16 +107,6 @@ func TestGetClientProductFilter(t *testing.T) {
 
 func TestClinetProductProcess(t *testing.T) {
 	data := map[string]interface{}{
-		"attr": []map[string]interface{}{
-			{
-				"detail": []string{"S",
-					"L",
-					"XL",
-					"XXL",
-				},
-				"value": "尺寸",
-			},
-		},
 		"attrValue": []map[string]interface{}{
 			{
 				"image":        "http://127.0.0.1:8089/uploads/file/b39024efbc6de61976f585c8421c6bba_20210702150027.png",
@@ -207,16 +197,6 @@ func TestClinetProductProcess(t *testing.T) {
 	if productId > 0 {
 
 		update := map[string]interface{}{
-			"attr": []map[string]interface{}{
-				{
-					"detail": []string{"S",
-						"L",
-						"XL",
-						"XXL",
-					},
-					"value": "尺寸",
-				},
-			},
 			"attrValue": []map[string]interface{}{
 				{
 					"image":        "http://127.0.0.1:8089/uploads/file/b39024efbc6de61976f585c8421c6bba_20210702150027.png",
@@ -273,14 +253,14 @@ func TestClinetProductProcess(t *testing.T) {
 		product = obj.Value("data").Object()
 
 		product.Value("id").Number().Ge(0)
-		product.Value("storeName").String().Equal(data["storeName"].(string))
-		product.Value("storeInfo").String().Equal(data["storeInfo"].(string))
-		product.Value("keyword").String().Equal(data["keyword"].(string))
-		product.Value("barCode").String().Equal(data["barCode"].(string))
+		product.Value("storeName").String().Equal(update["storeName"].(string))
+		product.Value("storeInfo").String().Equal(update["storeInfo"].(string))
+		product.Value("keyword").String().Equal(update["keyword"].(string))
+		product.Value("barCode").String().Equal(update["barCode"].(string))
 		product.Value("isShow").Number().Equal(2)
 		product.Value("status").Number().Equal(2)
-		product.Value("unitName").String().Equal(data["unitName"].(string))
-		product.Value("sort").Number().Equal(data["sort"].(int))
+		product.Value("unitName").String().Equal(update["unitName"].(string))
+		product.Value("sort").Number().Equal(update["sort"].(int))
 		product.Value("rank").Number().Equal(0)
 		product.Value("sales").Number().Equal(0)
 		product.Value("price").Number().Equal(0)
@@ -291,24 +271,24 @@ func TestClinetProductProcess(t *testing.T) {
 		product.Value("isBenefit").Number().Equal(2)
 		product.Value("isBest").Number().Equal(2)
 		product.Value("isNew").Number().Equal(2)
-		product.Value("isGood").Number().Equal(data["isGood"].(int))
+		product.Value("isGood").Number().Equal(update["isGood"].(int))
 		product.Value("productType").Number().Equal(1)
 		product.Value("ficti").Number().Equal(0)
 		product.Value("browse").Number().Equal(0)
 		product.Value("codePath").String().Equal("")
-		product.Value("videoLink").String().Equal(data["videoLink"].(string))
-		product.Value("specType").Number().Equal(data["specType"].(int))
+		product.Value("videoLink").String().Equal(update["videoLink"].(string))
+		product.Value("specType").Number().Equal(update["specType"].(int))
 		product.Value("refusal").String().Equal("")
 		product.Value("rate").Number().Equal(5)
 		product.Value("replyCount").Number().Equal(0)
-		product.Value("isGiftBag").Number().Equal(2)
+		product.Value("isGiftBag").Number().Equal(update["isGiftBag"].(int))
 		product.Value("careCount").Number().Equal(0)
 		product.Value("image").String().NotEmpty()
 		product.Value("sliderImage").String().NotEmpty()
 		product.Value("oldId").Number().Equal(0)
-		product.Value("tempId").Number().Equal(data["tempId"].(int))
-		product.Value("sysBrandId").Number().Equal(data["sysBrandId"].(int))
-		product.Value("productCategoryId").Number().Equal(data["cateId"].(int))
+		product.Value("tempId").Number().Equal(update["tempId"].(int))
+		product.Value("sysBrandId").Number().Equal(update["sysBrandId"].(int))
+		product.Value("productCategoryId").Number().Equal(update["cateId"].(int))
 
 		obj = auth.POST("v1/merchant/product/changeProductIsShow").
 			WithJSON(map[string]interface{}{"id": productId, "isShow": 1}).

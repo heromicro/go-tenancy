@@ -2,6 +2,7 @@ package service
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"strconv"
 	"strings"
@@ -247,17 +248,17 @@ func GetProductCategoryIdsById(id uint) ([]uint, error) {
 
 func SetProductContent(tx *gorm.DB, productId, tenancyId uint, productType int32, content string) error {
 	var conModel model.ProductContent
-	if err := g.TENANCY_DB.Model(&model.ProductContent{}).Where("product_id = ?", productId).First(&conModel).Error; err != nil {
-		return err
-	}
+	err := g.TENANCY_DB.Model(&model.ProductContent{}).Where("product_id = ?", productId).First(&conModel).Error
 
-	if conModel.ProductID > 0 {
-		if err := tx.Model(&model.ProductContent{}).Where("product_id = ?", productId).Updates(map[string]interface{}{"content": content}).Error; err != nil {
-			return err
-		}
-	} else {
+	if errors.Is(err, gorm.ErrRecordNotFound) {
 		con := model.ProductContent{Content: content, ProductID: productId, Type: productType}
 		if err := tx.Model(&model.ProductContent{}).Create(&con).Error; err != nil {
+			return err
+		}
+	} else if err != nil {
+		return err
+	} else {
+		if err := tx.Model(&model.ProductContent{}).Where("product_id = ?", productId).Updates(map[string]interface{}{"content": content}).Error; err != nil {
 			return err
 		}
 	}

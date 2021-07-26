@@ -25,7 +25,7 @@ func TestClientAutoList(t *testing.T) {
 	list := data.Value("list").Array()
 	list.Length().Ge(0)
 	first := list.First().Object()
-	first.Keys().ContainsOnly("id", "labelName", "type", "sysTenancyId", "createdAt", "updatedAt")
+	first.Keys().ContainsOnly("userNum", "sysTenancyId", "id", "createdAt", "min", "max", "userLabelId", "labelName", "updatedAt", "type")
 }
 
 func TestClientAutoProcess(t *testing.T) {

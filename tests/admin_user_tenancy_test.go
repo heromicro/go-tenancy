@@ -29,7 +29,7 @@ func TestTenancyUserList(t *testing.T) {
 	list := data.Value("list").Array()
 	list.Length().Ge(0)
 	first := list.First().Object()
-	first.Keys().ContainsOnly("id", "userName", "email", "phone", "nickName", "headerImg", "authorityName", "authorityType", "authorityId", "tenancyName", "tenancyId", "defaultRouter", "createdAt", "updatedAt")
+	first.Keys().ContainsOnly("id", "userName", "email", "phone", "nickName", "status", "headerImg", "authorityName", "authorityType", "authorityId", "tenancyName", "tenancyId", "defaultRouter", "createdAt", "updatedAt")
 	first.Value("id").Number().Ge(0)
 }
 

@@ -50,6 +50,7 @@ func refundOrderlist(t *testing.T, params map[string]interface{}, length int) {
 		list.Length().Ge(0)
 		first := list.First().Object()
 		first.Keys().ContainsOnly(
+
 			"id",
 			"createdAt",
 			"updatedAt",
@@ -83,6 +84,7 @@ func refundOrderlist(t *testing.T, params map[string]interface{}, length int) {
 			"orderId",
 			"sysUserId",
 			"sysTenancyId",
+			"activityType",
 			"refundProduct",
 		)
 		first.Value("id").Number().Ge(0)

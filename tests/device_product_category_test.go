@@ -16,7 +16,17 @@ func TestDeviceProductCategoryList(t *testing.T) {
 
 	data := obj.Value("data").Array()
 	first := data.First().Object()
-	first.Keys().ContainsOnly("id", "cateName", "pic", "children")
+	first.Keys().ContainsOnly("id",
+		"createdAt",
+		"updatedAt",
+		"pid",
+		"path",
+		"sort",
+		"pic",
+		"status",
+		"children",
+		"cateName",
+		"level")
 	first.Value("id").Number().Ge(0)
 
 }

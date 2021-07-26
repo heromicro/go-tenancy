@@ -70,6 +70,7 @@ func refundOrderClientlist(t *testing.T, params map[string]interface{}, length i
 			"refundPrice",
 			"refundNum",
 			"failMessage",
+			"activityType",
 			"status",
 			"statusTime",
 			"isDel",
@@ -92,7 +93,7 @@ func TestClientRefundOrderRecord(t *testing.T) {
 	orderId := 1
 	auth := tenancyWithLoginTester(t)
 	defer baseLogOut(auth)
-	obj := auth.POST(fmt.Sprintf("v1/merchant/order/getRefundOrderRecord/%d", orderId)).
+	obj := auth.POST(fmt.Sprintf("v1/merchant/refundOrder/getRefundOrderRecord/%d", orderId)).
 		WithJSON(map[string]interface{}{
 			"page":     1,
 			"pageSize": 10,
@@ -111,13 +112,13 @@ func TestClientRefundOrderRemark(t *testing.T) {
 	orderId := 1
 	auth := tenancyWithLoginTester(t)
 	defer baseLogOut(auth)
-	obj := auth.GET(fmt.Sprintf("v1/merchant/order/getRefundOrderRemarkMap/%d", orderId)).
+	obj := auth.GET(fmt.Sprintf("v1/merchant/refundOrder/getRefundOrderRemarkMap/%d", orderId)).
 		Expect().Status(http.StatusOK).JSON().Object()
 	obj.Keys().ContainsOnly("status", "data", "message")
 	obj.Value("status").Number().Equal(200)
 	obj.Value("message").String().Equal("操作成功")
 
-	obj = auth.POST(fmt.Sprintf("v1/merchant/order/remarkRefundOrder/%d", orderId)).
+	obj = auth.POST(fmt.Sprintf("v1/merchant/refundOrder/remarkRefundOrder/%d", orderId)).
 		WithJSON(map[string]interface{}{"mer_mark": "remark"}).
 		Expect().Status(http.StatusOK).JSON().Object()
 	obj.Keys().ContainsOnly("status", "data", "message")
@@ -129,13 +130,13 @@ func TestClientRefundOrderAudit(t *testing.T) {
 	orderId := 1
 	auth := tenancyWithLoginTester(t)
 	defer baseLogOut(auth)
-	obj := auth.GET(fmt.Sprintf("v1/merchant/order/getRefundOrderMap/%d", orderId)).
+	obj := auth.GET(fmt.Sprintf("v1/merchant/refundOrder/getRefundOrderMap/%d", orderId)).
 		Expect().Status(http.StatusOK).JSON().Object()
 	obj.Keys().ContainsOnly("status", "data", "message")
 	obj.Value("status").Number().Equal(200)
 	obj.Value("message").String().Equal("操作成功")
 
-	obj = auth.POST(fmt.Sprintf("v1/merchant/order/auditRefundOrder/%d", orderId)).
+	obj = auth.POST(fmt.Sprintf("v1/merchant/refundOrder/auditRefundOrder/%d", orderId)).
 		WithJSON(map[string]interface{}{"status": 1}).
 		Expect().Status(http.StatusOK).JSON().Object()
 	obj.Keys().ContainsOnly("status", "data", "message")
