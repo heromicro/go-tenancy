@@ -114,7 +114,7 @@ func GetAuthorityInfoList(info request.PageInfo, authorityType int) ([]model.Sys
 	return authority, total, err
 }
 
-// GetAuthorityInfo 获取所有角色信息
+// GetAuthorityInfo 获取角色信息
 func GetAuthorityInfo(auth model.SysAuthority) (model.SysAuthority, error) {
 	var sa model.SysAuthority
 	err := g.TENANCY_DB.Preload("DataAuthorityId").Where("authority_id = ?", auth.AuthorityId).First(&sa).Error
@@ -155,4 +155,44 @@ func GetUserAuthorityIds() ([]int, error) {
 		return generalAuthorityIds, fmt.Errorf("get authority ids %w", err)
 	}
 	return generalAuthorityIds, nil
+}
+
+// getAuthorityMap
+func getAuthorityMap(authorityType int) (map[string][]model.SysAuthority, error) {
+	var authority []model.SysAuthority
+	treeMap := make(map[string][]model.SysAuthority)
+	err := g.TENANCY_DB.Model(&model.SysAuthority{}).Where("authority_type", authorityType).Find(&authority).Error
+	for _, v := range authority {
+		treeMap[v.ParentId] = append(treeMap[v.ParentId], v)
+	}
+	return treeMap, err
+}
+
+// GetAuthorityOptions
+func GetAuthorityOptions(authorityType int) ([]Option, error) {
+	var options []Option
+	options = append(options, Option{Label: "请选择", Value: 0})
+	treeMap, err := getAuthorityMap(authorityType)
+
+	for _, opt := range treeMap["0"] {
+		options = append(options, Option{Label: opt.AuthorityName, Value: opt.AuthorityId})
+	}
+	for i := 0; i < len(options); i++ {
+		getAuthorityOption(&options[i], treeMap)
+	}
+
+	return options, err
+}
+
+// getAuthorityOption
+func getAuthorityOption(op *Option, treeMap map[string][]model.SysAuthority) {
+	id, ok := op.Value.(string)
+	if ok {
+		for _, opt := range treeMap[id] {
+			op.Children = append(op.Children, Option{Label: opt.AuthorityName, Value: opt.AuthorityId})
+		}
+		for i := 0; i < len(op.Children); i++ {
+			getAuthorityOption(&op.Children[i], treeMap)
+		}
+	}
 }

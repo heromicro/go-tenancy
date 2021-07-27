@@ -15,9 +15,9 @@ var Admin = new(admin)
 type admin struct{}
 
 var admins = []model.SysUser{
-	{Username: "admin", Password: "e10adc3949ba59abbe56e057f20f883e", AuthorityId: AdminAuthorityId, AdminInfo: model.AdminInfo{Email: "admin@admin.com", Phone: "13800138000", NickName: "超级管理员", SysUserID: 1}},
+	{Username: "admin", Password: "e10adc3949ba59abbe56e057f20f883e", AuthorityId: AdminAuthorityId, AdminInfo: model.AdminInfo{BaseUserInfo: model.BaseUserInfo{Email: "admin@admin.com", Phone: "13800138000", NickName: "超级管理员", SysUserID: 1}}},
 
-	{Username: "a303176530", Password: "e10adc3949ba59abbe56e057f20f883e", AuthorityId: TenancyAuthorityId, TenancyInfo: model.TenancyInfo{Email: "a303176530@admin.com", Phone: "13800138000", NickName: "商户管理员", SysUserID: 2, SysTenancyID: 1}},
+	{Username: "a303176530", Password: "e10adc3949ba59abbe56e057f20f883e", AuthorityId: TenancyAuthorityId, TenancyInfo: model.TenancyInfo{BaseUserInfo: model.BaseUserInfo{Email: "a303176530@admin.com", Phone: "13800138000", NickName: "商户管理员", SysUserID: 2}, SysTenancyID: 1}},
 }
 
 var users = []model.SysUser{

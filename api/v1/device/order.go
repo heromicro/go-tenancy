@@ -45,10 +45,10 @@ func CreateOrder(ctx *gin.Context) {
 		response.FailWithMessage(errs.Error(), ctx)
 		return
 	}
-	if chart, err := service.CreateOrder(req, ctx); err != nil {
+	if err := service.CreateOrder(req, ctx); err != nil {
 		g.TENANCY_LOG.Error("获取失败!", zap.Any("err", err))
 		response.FailWithMessage("获取失败:"+err.Error(), ctx)
 	} else {
-		response.OkWithData(chart, ctx)
+		response.OkWithMessage("获取成功", ctx)
 	}
 }

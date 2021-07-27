@@ -13,37 +13,69 @@ import (
 	"go.uber.org/zap"
 )
 
-// RegisterAdmin 员工注册
-func RegisterAdmin(ctx *gin.Context) {
-	var R request.Register
-	if errs := ctx.ShouldBindJSON(&R); errs != nil {
+// RegisterAdminMap 设置用户分组表单
+func RegisterAdminMap(ctx *gin.Context) {
+	if detail, err := service.RegisterAdminMap(0, ctx); err != nil {
+		g.TENANCY_LOG.Error("获取失败", zap.Any("err", err))
+		response.FailWithMessage("获取失败:"+err.Error(), ctx)
+	} else {
+		response.OkWithDetailed(detail, "获取成功", ctx)
+	}
+}
+
+// UpdateAdminMap 设置用户分组表单
+func UpdateAdminMap(ctx *gin.Context) {
+	var req request.GetById
+	if errs := ctx.ShouldBindUri(&req); errs != nil {
 		response.FailWithMessage(errs.Error(), ctx)
 		return
 	}
-	user := &model.SysUser{Username: R.Username, Password: R.Password, AuthorityId: R.AuthorityId}
-	userReturn, err := service.Register(*user, multi.AdminAuthority)
+	if detail, err := service.RegisterAdminMap(req.Id, ctx); err != nil {
+		g.TENANCY_LOG.Error("获取失败", zap.Any("err", err))
+		response.FailWithMessage("获取失败:"+err.Error(), ctx)
+	} else {
+		response.OkWithDetailed(detail, "获取成功", ctx)
+	}
+}
+
+// RegisterAdmin 员工注册
+func RegisterAdmin(ctx *gin.Context) {
+	var req request.Register
+	if errs := ctx.ShouldBindJSON(&req); errs != nil {
+		response.FailWithMessage(errs.Error(), ctx)
+		return
+	}
+	if req.Password != req.ConfirmPassword {
+		response.FailWithMessage("两次输入密码不一致", ctx)
+		return
+	}
+
+	id, err := service.Register(req, multi.AdminAuthority)
 	if err != nil {
 		g.TENANCY_LOG.Error("注册失败", zap.Any("err", err))
 		response.FailWithMessage(err.Error(), ctx)
 	} else {
-		response.OkWithDetailed(gin.H{"id": userReturn.ID, "userName": userReturn.Username, "authorityId": userReturn.AuthorityId}, "注册成功", ctx)
+		response.OkWithDetailed(gin.H{"user_id": id}, "注册成功", ctx)
 	}
 }
 
 // RegisterTenancy 商户注册
 func RegisterTenancy(ctx *gin.Context) {
-	var R request.Register
-	if errs := ctx.ShouldBindJSON(&R); errs != nil {
+	var req request.Register
+	if errs := ctx.ShouldBindJSON(&req); errs != nil {
 		response.FailWithMessage(errs.Error(), ctx)
 		return
 	}
-	user := &model.SysUser{Username: R.Username, Password: R.Password, AuthorityId: R.AuthorityId}
-	userReturn, err := service.Register(*user, multi.TenancyAuthority)
+	if req.Password != req.ConfirmPassword {
+		response.FailWithMessage("两次输入密码不一致", ctx)
+		return
+	}
+	id, err := service.Register(req, multi.TenancyAuthority)
 	if err != nil {
 		g.TENANCY_LOG.Error("注册失败", zap.Any("err", err))
 		response.FailWithMessage(err.Error(), ctx)
 	} else {
-		response.OkWithDetailed(gin.H{"id": userReturn.ID, "userName": userReturn.Username, "authorityId": userReturn.AuthorityId}, "注册成功", ctx)
+		response.OkWithDetailed(gin.H{"user_id": id}, "注册成功", ctx)
 	}
 }
 
@@ -170,38 +202,12 @@ func SetUserInfo(ctx *gin.Context) {
 		return
 	}
 
-	if user.IsAdmin() {
-		var admin model.AdminInfo
-		_ = ctx.ShouldBindJSON(&admin)
-		if _, err := service.SetUserAdminInfo(admin, user.AdminInfo.ID, userId); err != nil {
-			g.TENANCY_LOG.Error("设置失败", zap.Any("err", err))
-			response.FailWithMessage("设置失败", ctx)
-		} else {
-			response.OkWithMessage("设置成功", ctx)
-		}
-	} else if user.IsTenancy() {
-		var tenancy model.TenancyInfo
-		_ = ctx.ShouldBindJSON(&tenancy)
-		tenancy.ID = user.TenancyInfo.ID
-		if _, err := service.SetUserTenancyInfo(tenancy, user.TenancyInfo.ID, userId); err != nil {
-			g.TENANCY_LOG.Error("设置失败", zap.Any("err", err))
-			response.FailWithMessage("设置失败", ctx)
-		} else {
-			response.OkWithMessage("设置成功", ctx)
-		}
-		//TODO::不能修改用户信息
-		// } else if user.IsGeneral() {
-		// 	var general model.SysGeneralInfo
-		// 	_ = ctx.ShouldBindJSON(&general)
-		// 	general.ID = user.GeneralInfo.ID
-		// 	if _, err := service.SetUserGeneralInfo(general, user.GeneralInfo.ID, userId); err != nil {
-		// 		g.TENANCY_LOG.Error("设置失败", zap.Any("err", err))
-		// 		response.FailWithMessage("设置失败", ctx)
-		// 	} else {
-		// 		response.OkWithMessage("设置成功", ctx)
-		// 	}
+	var info request.UpdateUser
+	_ = ctx.ShouldBindJSON(&info)
+	if err := service.UpdateAdminInfo(info, user, multi.GetTenancyId(ctx)); err != nil {
+		g.TENANCY_LOG.Error("设置失败", zap.Any("err", err))
+		response.FailWithMessage("设置失败", ctx)
 	} else {
-		g.TENANCY_LOG.Error("未知角色", zap.Any("err", user.AuthorityType()))
-		response.FailWithMessage("未知角色", ctx)
+		response.OkWithMessage("设置成功", ctx)
 	}
 }

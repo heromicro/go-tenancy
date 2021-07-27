@@ -46,23 +46,23 @@ func (su *SysUser) AuthorityType() int {
 
 type AdminInfo struct {
 	g.TENANCY_MODEL
+	BaseUserInfo
+	SysUserID uint `json:"sysUserId" form:"sysUserId" gorm:"column:sys_user_id;comment:关联标记"`
+}
+
+type TenancyInfo struct {
+	g.TENANCY_MODEL
+	BaseUserInfo
+	SysTenancyID uint `json:"sysTenancyId" form:"sysTenancyId" gorm:"column:sys_tenancy_id;comment:关联标记"`
+}
+
+type BaseUserInfo struct {
 	Email     string `json:"email" gorm:"default:'';comment:员工邮箱"`
 	Phone     string `json:"phone" gorm:"type:char(15);default:'';comment:员工手机号" `
 	NickName  string `json:"nickName" gorm:"type:varchar(16);default:'员工姓名';comment:员工姓名" `
 	HeaderImg string `json:"headerImg" gorm:"default:http://qmplusimg.henrongyi.top/head.png;comment:用户头像"`
 
 	SysUserID uint `json:"sysUserId" form:"sysUserId" gorm:"column:sys_user_id;comment:关联标记"`
-}
-
-type TenancyInfo struct {
-	g.TENANCY_MODEL
-	Email     string `json:"email" gorm:"default:'';comment:员工邮箱"`
-	Phone     string `json:"phone" gorm:"type:char(15);default:'';comment:员工手机号" `
-	NickName  string `json:"nickName" gorm:"type:varchar(16);default:'员工姓名';comment:员工姓名" `
-	HeaderImg string `json:"headerImg" gorm:"default:http://qmplusimg.henrongyi.top/head.png;comment:用户头像"`
-
-	SysUserID    uint `json:"sysUserId" form:"sysUserId" gorm:"column:sys_user_id;comment:关联标记"`
-	SysTenancyID uint `json:"sysTenancyId" form:"sysTenancyId" gorm:"column:sys_tenancy_id;comment:关联标记"`
 }
 
 const (

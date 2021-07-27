@@ -584,16 +584,15 @@ func CreateOrder(req request.CreateOrder, ctx *gin.Context) error {
 	if err != nil {
 		return err
 	}
-	// err := g.TENANCY_DB.Transaction(func(tx *gorm.DB) error {
-
-	// 	err := g.TENANCY_DB.Model(&model.Order{}).Create(&order).Error
-	// 	if err != nil {
-	// 		return err
-	// 	}
-	// 	return nil
-	// })
-	// if err != nil {
-	// 	return err
-	// }
+	err = g.TENANCY_DB.Transaction(func(tx *gorm.DB) error {
+		err := g.TENANCY_DB.Model(&model.Order{}).Create(&order).Error
+		if err != nil {
+			return err
+		}
+		return nil
+	})
+	if err != nil {
+		return err
+	}
 	return nil
 }

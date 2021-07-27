@@ -97,7 +97,7 @@ func GetProductCategoryInfoList(tenancyId uint, isCuser bool) ([]response.Produc
 	return productCategoryList, err
 }
 
-// getCategoryMap
+// getProductCategoryMap
 func getProductCategoryMap(tenancyId uint, isCuser bool) (map[int32][]response.ProductCategory, error) {
 	var productCategoryList []response.ProductCategory
 	treeMap := make(map[int32][]response.ProductCategory)

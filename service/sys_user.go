@@ -1,11 +1,13 @@
 package service
 
 import (
+	"encoding/json"
 	"errors"
 	"fmt"
 	"strconv"
 	"time"
 
+	"github.com/gin-gonic/gin"
 	"github.com/snowlyg/go-tenancy/g"
 	"github.com/snowlyg/go-tenancy/model"
 	"github.com/snowlyg/go-tenancy/model/request"
@@ -16,20 +18,61 @@ import (
 	"gorm.io/gorm"
 )
 
+func RegisterAdminMap(id uint, ctx *gin.Context) (Form, error) {
+	var form Form
+	var formStr string
+	if id > 0 {
+		user, err := FindUserById(fmt.Sprintf("%d", id))
+		if err != nil {
+			return Form{}, err
+		}
+		formStr = fmt.Sprintf(`{"rule":[{"type":"select","field":"authorityId","value":["%s"],"title":"身份","props":{"multiple":true,"placeholder":"请选择身份"},"options":[]},{"type":"input","field":"nickName","value":"%s","title":"管理员姓名","props":{"type":"text","placeholder":"请输入管理员姓名"}},{"type":"input","field":"username","value":"%s","title":"账号","props":{"type":"text","placeholder":"请输入账号"},"validate":[{"message":"请输入账号","required":true,"type":"string","trigger":"change"}]},{"type":"input","field":"phone","value":"%s","title":" 联系电话","props":{"type":"text","placeholder":"请输入联系电话"}},{"type":"switch","field":"status","value":%d,"title":"是否开启","props":{"activeValue":1,"inactiveValue":0,"inactiveText":"关闭","activeText":"开启"}}],"action":"\/sys\/system\/admin\/update\/2.html","method":"PUT","title":"编辑管理员","config":{}}`, user.AuthorityId, user.AdminInfo.NickName, user.Username, user.AdminInfo.Phone, user.Status)
+	} else {
+		formStr = `{"rule":[{"type":"select","field":"authorityId","value":[],"title":"身份","props":{"multiple":true,"placeholder":"请选择身份"},"options":[]},{"type":"input","field":"RealName","value":"","title":"管理员姓名","props":{"type":"text","placeholder":"请输入管理员姓名"}},{"type":"input","field":"username","value":"","title":"账号","props":{"type":"text","placeholder":"请输入账号"},"validate":[{"message":"请输入账号","required":true,"type":"string","trigger":"change"}]},{"type":"input","field":"phone","value":"","title":" 联系电话","props":{"type":"text","placeholder":"请输入联系电话"}},{"type":"input","field":"password","value":"","title":"密码","props":{"type":"password","placeholder":"请输入密码"},"validate":[{"message":"请输入密码","required":true,"type":"string","trigger":"change"}]},{"type":"input","field":"confirmPassword","value":"","title":"确认密码","props":{"type":"password","placeholder":"请输入确认密码"},"validate":[{"message":"请输入确认密码","required":true,"type":"string","trigger":"change"}]},{"type":"switch","field":"status","value":1,"title":"是否开启","props":{"activeValue":1,"inactiveValue":2,"inactiveText":"关闭","activeText":"开启"}}],"action":"","method":"POST","title":"添加管理员","config":{}}`
+	}
+
+	err := json.Unmarshal([]byte(formStr), &form)
+	if err != nil {
+		return form, err
+	}
+	if id > 0 {
+		form.SetAction(fmt.Sprintf("%s/%d", "/user/setUserInfo", id), ctx)
+	} else {
+		form.SetAction("/user/registerAdmin", ctx)
+	}
+	opts, err := GetAuthorityOptions(multi.AdminAuthority)
+	if err != nil {
+		return form, err
+	}
+	form.Rule[0].Options = opts
+	return form, nil
+}
+
 // Register 用户注册
-func Register(u model.SysUser, authorityType int) (model.SysUser, error) {
-	var user model.SysUser
+func Register(req request.Register, authorityType int) (uint, error) {
 	if !errors.Is(g.TENANCY_DB.
-		Where("sys_users.username = ?", u.Username).
+		Where("sys_users.username = ?", req.Username).
 		Where("sys_authorities.authority_type = ?", authorityType).
 		Joins("left join sys_authorities on sys_authorities.authority_id = sys_users.authority_id").
-		First(&user).Error, gorm.ErrRecordNotFound) { // 判断用户名是否注册
-		return user, errors.New("用户名已注册")
+		First(&model.SysUser{}).Error, gorm.ErrRecordNotFound) { // 判断用户名是否注册
+		return 0, errors.New("用户名已注册")
 	}
 	// 否则 附加uuid 密码md5简单加密 注册
-	u.Password = utils.MD5V([]byte(u.Password))
-	err := g.TENANCY_DB.Create(&u).Error
-	return u, err
+	user := model.SysUser{Username: req.Username, Password: utils.MD5V([]byte(req.Password)), AuthorityId: req.AuthorityId[0], Status: req.Status}
+	err := g.TENANCY_DB.Transaction(func(tx *gorm.DB) error {
+		err := tx.Create(&user).Error
+		if err != nil {
+			return err
+		}
+		adminInfo := model.AdminInfo{BaseUserInfo: model.BaseUserInfo{NickName: req.NickName, Phone: req.Phone, SysUserID: user.ID}}
+		err = tx.Create(&adminInfo).Error
+		if err != nil {
+			return err
+		}
+		return nil
+	})
+
+	return user.ID, err
 }
 
 // Login 用户登录
@@ -265,48 +308,51 @@ func DeleteUser(id uint) (err error) {
 	return g.TENANCY_DB.Where("id = ?", id).Delete(&user).Error
 }
 
-// SetUserAdminInfo 设置admin信息
-func SetUserAdminInfo(reqUser model.AdminInfo, infoId uint, userId string) (model.AdminInfo, error) {
-	if infoId > 0 {
-		reqUser.ID = infoId
-		err := g.TENANCY_DB.Updates(&reqUser).Error
-		if err != nil {
-			return reqUser, err
-		}
-	} else {
-		id, err := strconv.Atoi(userId)
-		if err != nil {
-			return reqUser, err
-		}
-		reqUser.SysUserID = uint(id)
-		err = g.TENANCY_DB.Create(&reqUser).Error
-		if err != nil {
-			return reqUser, err
-		}
-	}
-	return reqUser, nil
-}
+// UpdateAdminInfo 设置关联信息
+func UpdateAdminInfo(userInfo request.UpdateUser, user model.SysUser, tenancyId uint) error {
+	err := g.TENANCY_DB.Transaction(func(tx *gorm.DB) error {
+		tx.Model(&model.SysUser{}).Where("id = ?", user.ID).Updates(map[string]interface{}{"authority_id": userInfo.AuthorityId[0], "username": userInfo.Username, "status": userInfo.Status})
 
-// SetUserTenancyInfo 设置商户信息
-func SetUserTenancyInfo(reqUser model.TenancyInfo, infoId uint, userId string) (model.TenancyInfo, error) {
-	if infoId > 0 {
-		reqUser.ID = infoId
-		err := g.TENANCY_DB.Updates(&reqUser).Error
-		if err != nil {
-			return reqUser, err
+		info := map[string]interface{}{"nick_name": userInfo.NickName, "phone": userInfo.Phone}
+		if user.IsAdmin() {
+			if user.AdminInfo.ID > 0 {
+				err := tx.Model(&model.AdminInfo{}).Where("id = ?", user.AdminInfo.ID).Updates(info).Error
+				if err != nil {
+					return err
+				}
+			} else {
+				info["sys_user_id"] = user.ID
+				err := tx.Model(&model.AdminInfo{}).Create(info).Error
+				if err != nil {
+					return err
+				}
+			}
+
+		} else if user.IsTenancy() {
+			if user.TenancyInfo.ID > 0 {
+				err := tx.Model(&model.TenancyInfo{}).Where("id = ?", user.TenancyInfo.ID).Updates(info).Error
+				if err != nil {
+					return err
+				}
+			} else {
+				info["sys_user_id"] = user.ID
+				info["sys_tenancy_id"] = tenancyId
+				err := tx.Model(&model.TenancyInfo{}).Create(info).Error
+				if err != nil {
+					return err
+				}
+			}
+		} else {
+			g.TENANCY_LOG.Error("未知角色", zap.Any("err", user.AuthorityType()))
+			return fmt.Errorf("未知角色")
 		}
-	} else {
-		id, err := strconv.Atoi(userId)
-		if err != nil {
-			return reqUser, err
-		}
-		reqUser.SysUserID = uint(id)
-		err = g.TENANCY_DB.Create(&reqUser).Error
-		if err != nil {
-			return reqUser, err
-		}
+
+		return nil
+	})
+	if err != nil {
+		return err
 	}
-	return reqUser, nil
+	return nil
 }
 
 // SetUserGeneralInfo 设置普通用户信息
@@ -332,10 +378,10 @@ func SetUserGeneralInfo(reqUser model.GeneralInfo, infoId uint, userId string) (
 }
 
 // FindUserById 通过id获取用户信息
-func FindUserById(id string) (*model.SysUser, error) {
+func FindUserById(id string) (model.SysUser, error) {
 	var u model.SysUser
 	err := g.TENANCY_DB.Where("`id` = ?", id).Preload("Authority").Preload("AdminInfo").Preload("TenancyInfo").Preload("GeneralInfo").First(&u).Error
-	return &u, err
+	return u, err
 }
 
 // DelToken 删除token

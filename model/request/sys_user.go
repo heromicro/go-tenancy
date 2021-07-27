@@ -2,9 +2,13 @@ package request
 
 // User register structure
 type Register struct {
-	Username    string `json:"username" binding:"required"`
-	Password    string `json:"password" binding:"required"`
-	AuthorityId string `json:"authorityId" binding:"required"`
+	Username        string   `json:"username" binding:"required"`
+	Password        string   `json:"password" binding:"required"`
+	ConfirmPassword string   `json:"confirmPassword" binding:"required"`
+	AuthorityId     []string `json:"authorityId" binding:"required"`
+	NickName        string   `json:"nickName"`
+	Phone           string   `json:"phone"`
+	Status          int      `json:"status"`
 }
 
 // User login structure
@@ -35,10 +39,12 @@ type SetUserAuth struct {
 }
 
 // Modify  user's auth structure
-type SetAdminInfo struct {
-	Id        uint   `json:"id" form:"id"  binding:"required,gt=0"`
-	Email     string `json:"email"  binding:"required"`
-	Phone     string `json:"phone"  binding:"required"`
-	Name      string `json:"nickName"  binding:"required"`
-	HeaderImg string `json:"headerImg"  binding:"required"`
+type UpdateUser struct {
+	Status      int      `json:"status"`
+	Email       string   `json:"email"`
+	Phone       string   `json:"phone"`
+	NickName    string   `json:"nickName"`
+	Username    string   `json:"username"  binding:"required"`
+	HeaderImg   string   `json:"headerImg" `
+	AuthorityId []string `json:"authorityId" binding:"required"`
 }

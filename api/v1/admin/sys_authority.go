@@ -75,7 +75,7 @@ func UpdateAuthority(ctx *gin.Context) {
 	}
 }
 
-// GetAdminAuthorityList 分页获取角色列表
+// GetAdminAuthorityList 分页获取管理角色列表
 func GetAdminAuthorityList(ctx *gin.Context) {
 	var pageInfo request.PageInfo
 	if errs := ctx.ShouldBindJSON(&pageInfo); errs != nil {
@@ -95,7 +95,7 @@ func GetAdminAuthorityList(ctx *gin.Context) {
 	}
 }
 
-// GetTenancyAuthorityList 分页获取角色列表
+// GetTenancyAuthorityList 分页获取商户角色列表
 func GetTenancyAuthorityList(ctx *gin.Context) {
 	var pageInfo request.PageInfo
 	if errs := ctx.ShouldBindJSON(&pageInfo); errs != nil {
@@ -115,7 +115,7 @@ func GetTenancyAuthorityList(ctx *gin.Context) {
 	}
 }
 
-// GetGeneralAuthorityList 分页获取角色列表
+// GetGeneralAuthorityList 分页获取用户角色列表
 func GetGeneralAuthorityList(ctx *gin.Context) {
 	var pageInfo request.PageInfo
 	if errs := ctx.ShouldBindJSON(&pageInfo); errs != nil {
@@ -135,7 +135,7 @@ func GetGeneralAuthorityList(ctx *gin.Context) {
 	}
 }
 
-// GetAuthorityList 分页获取角色列表
+// GetAuthorityList 分页获取所有角色列表
 func GetAuthorityList(ctx *gin.Context) {
 	var pageInfo request.PageInfo
 	if errs := ctx.ShouldBindJSON(&pageInfo); errs != nil {
