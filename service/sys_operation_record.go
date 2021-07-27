@@ -57,16 +57,8 @@ func GetSysOperationRecordInfoList(info request.SysOperationRecordSearch, ctx *g
 				return nil, 0, err
 			}
 		}
-	} else if multi.IsAdmin(ctx) {
-		adminUsers, _, err = GetAdminInfoList(request.PageInfo{})
-		if err != nil {
-			return nil, 0, err
-		}
 	}
-	tenancyUsers, _, err = GetTenancyInfoList(request.PageInfo{})
-	if err != nil {
-		return nil, 0, err
-	}
+
 	// 如果有条件搜索 下方会自动创建搜索语句
 	if info.Method != "" {
 		db = db.Where("method = ?", info.Method)
@@ -82,31 +74,43 @@ func GetSysOperationRecordInfoList(info request.SysOperationRecordSearch, ctx *g
 	if err != nil {
 		return nil, total, err
 	}
-	err = db.Order("id desc").Limit(limit).Omit("tenancy_name,user_name,nick_name").Offset(offset).Find(&sysOperationRecords).Error
+	err = db.Order("id desc").Limit(limit).Offset(offset).Find(&sysOperationRecords).Error
 	if err != nil && !errors.Is(err, gorm.ErrRecordNotFound) {
 		return nil, total, err
 	}
 
-	if len(tenancyUsers) > 0 {
-		for i := 0; i < len(sysOperationRecords); i++ {
+	var opUserIds []uint
+	for _, sysOperationRecord := range sysOperationRecords {
+		opUserIds = append(opUserIds, sysOperationRecord.UserID)
+	}
+
+	tenancyUsers, err = GetTenancyByUserIds(opUserIds)
+	if err != nil {
+		return nil, 0, err
+	}
+
+	if multi.IsAdmin(ctx) {
+		adminUsers, err = GetAdminByUserIds(opUserIds)
+		if err != nil {
+			return nil, 0, err
+		}
+	}
+	for i := 0; i < len(sysOperationRecords); i++ {
+		if len(tenancyUsers) > 0 {
 			for _, tenancyUser := range tenancyUsers {
 				if tenancyUser.ID == sysOperationRecords[i].UserID {
 					sysOperationRecords[i].NickName = tenancyUser.NickName
 					sysOperationRecords[i].TenancyName = tenancyUser.TenancyName
 					sysOperationRecords[i].UserName = tenancyUser.Username
-					break
 				}
 			}
 		}
-	}
 
-	if len(adminUsers) > 0 {
-		for i := 0; i < len(sysOperationRecords); i++ {
+		if len(adminUsers) > 0 {
 			for _, adminUser := range adminUsers {
 				if adminUser.ID == sysOperationRecords[i].UserID {
 					sysOperationRecords[i].NickName = adminUser.NickName
 					sysOperationRecords[i].UserName = adminUser.Username
-					break
 				}
 			}
 		}

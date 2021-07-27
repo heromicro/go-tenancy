@@ -14,7 +14,7 @@ type SysOperationRecord struct {
 	Body         string        `json:"body"`
 	Resp         string        `json:"resp"`
 	UserID       uint          `json:"userId"`
-	TenancyName  string        `json:"tenancyName"`
-	UserName     string        `json:"userName"`
-	NickName     string        `json:"nickName"`
+	TenancyName  string        `gorm:"-" json:"tenancyName"`
+	UserName     string        `gorm:"-" json:"userName"`
+	NickName     string        `gorm:"-" json:"nickName"`
 }

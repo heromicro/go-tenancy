@@ -290,32 +290,41 @@ func GetAdminInfoList(info request.PageInfo) ([]response.SysAdminUser, int64, er
 	return userList, total, err
 }
 
-// GetTenancyInfoList 分页获取数据
-func GetTenancyInfoList(info request.PageInfo) ([]response.SysTenancyUser, int64, error) {
+// GetTenancyByUserIds
+func GetTenancyByUserIds(userIds []uint) ([]response.SysTenancyUser, error) {
 	var userList []response.SysTenancyUser
 	var tenancyAuthorityIds []int
-	var total int64
-	limit := info.PageSize
-	offset := info.PageSize * (info.Page - 1)
 	err := g.TENANCY_DB.Model(&model.SysAuthority{}).Where("authority_type", multi.TenancyAuthority).Select("authority_id").Find(&tenancyAuthorityIds).Error
 	if err != nil {
-		return userList, 0, err
+		return userList, err
 	}
-	db := g.TENANCY_DB.Model(&model.SysUser{}).Where("sys_users.authority_id IN (?)", tenancyAuthorityIds)
-	if limit > 0 {
-		err = db.Count(&total).Error
-		if err != nil {
-			return userList, total, err
-		}
-		db = db.Limit(limit).Offset(offset)
-	}
-	err = db.
+	err = g.TENANCY_DB.Model(&model.SysUser{}).
 		Select("sys_users.id,sys_users.status,sys_users.username,sys_users.authority_id,sys_users.created_at,sys_users.updated_at, tenancy_infos.email, tenancy_infos.phone, tenancy_infos.nick_name, tenancy_infos.header_img,sys_authorities.authority_name,sys_authorities.authority_type,sys_users.authority_id,sys_tenancies.name as tenancy_name").
 		Joins("left join tenancy_infos on tenancy_infos.sys_user_id = sys_users.id").
 		Joins("left join sys_authorities on sys_authorities.authority_id = sys_users.authority_id").
 		Joins("left join sys_tenancies on tenancy_infos.sys_tenancy_id = sys_tenancies.id").
+		Where("sys_users.authority_id IN (?)", tenancyAuthorityIds).
+		Where("sys_users.id IN (?)", userIds).
 		Find(&userList).Error
-	return userList, total, err
+	return userList, err
+}
+
+// GetAdminByUserIds
+func GetAdminByUserIds(userIds []uint) ([]response.SysAdminUser, error) {
+	var userList []response.SysAdminUser
+	var adminAuthorityIds []int
+	err := g.TENANCY_DB.Model(&model.SysAuthority{}).Where("authority_type", multi.AdminAuthority).Select("authority_id").Find(&adminAuthorityIds).Error
+	if err != nil {
+		return userList, err
+	}
+	err = g.TENANCY_DB.Model(&model.SysUser{}).
+		Select("sys_users.id,sys_users.status,sys_users.username,sys_users.authority_id,sys_users.created_at,sys_users.updated_at, admin_infos.email, admin_infos.phone, admin_infos.nick_name, admin_infos.header_img,sys_authorities.authority_name,sys_authorities.authority_type,sys_users.authority_id").
+		Joins("left join admin_infos on admin_infos.sys_user_id = sys_users.id").
+		Joins("left join sys_authorities on sys_authorities.authority_id = sys_users.authority_id").
+		Where("sys_users.authority_id IN (?)", adminAuthorityIds).
+		Where("sys_users.id IN (?)", userIds).
+		Find(&userList).Error
+	return userList, err
 }
 
 // SetUserAuthority  设置一个用户的权限
@@ -423,4 +432,32 @@ func CleanToken(userId string) error {
 		return fmt.Errorf("clean token %w", err)
 	}
 	return nil
+}
+
+// GetTenancyInfoList 分页获取数据
+func GetTenancyInfoList(info request.PageInfo) ([]response.SysTenancyUser, int64, error) {
+	var userList []response.SysTenancyUser
+	var tenancyAuthorityIds []int
+	var total int64
+	limit := info.PageSize
+	offset := info.PageSize * (info.Page - 1)
+	err := g.TENANCY_DB.Model(&model.SysAuthority{}).Where("authority_type", multi.TenancyAuthority).Select("authority_id").Find(&tenancyAuthorityIds).Error
+	if err != nil {
+		return userList, 0, err
+	}
+	db := g.TENANCY_DB.Model(&model.SysUser{}).Where("sys_users.authority_id IN (?)", tenancyAuthorityIds)
+	if limit > 0 {
+		err = db.Count(&total).Error
+		if err != nil {
+			return userList, total, err
+		}
+		db = db.Limit(limit).Offset(offset)
+	}
+	err = db.
+		Select("sys_users.id,sys_users.status,sys_users.username,sys_users.authority_id,sys_users.created_at,sys_users.updated_at, tenancy_infos.email, tenancy_infos.phone, tenancy_infos.nick_name, tenancy_infos.header_img,sys_authorities.authority_name,sys_authorities.authority_type,sys_users.authority_id,sys_tenancies.name as tenancy_name").
+		Joins("left join tenancy_infos on tenancy_infos.sys_user_id = sys_users.id").
+		Joins("left join sys_authorities on sys_authorities.authority_id = sys_users.authority_id").
+		Joins("left join sys_tenancies on tenancy_infos.sys_tenancy_id = sys_tenancies.id").
+		Find(&userList).Error
+	return userList, total, err
 }
