@@ -520,8 +520,12 @@ func DeleteOrder(id uint) error {
 }
 
 func CheckOrder(req request.CheckOrder, ctx *gin.Context) (response.CheckOrder, error) {
+	return GetOrderInfoByCartId(multi.GetTenancyId(ctx), multi.GetUserId(ctx), req.CartIds)
+}
+
+func GetOrderInfoByCartId(tenancyId, userId uint, cartIds []uint) (response.CheckOrder, error) {
 	var res response.CheckOrder
-	list, fails, _, err := GetCartList(ctx, req.CartIds)
+	list, fails, _, err := GetCartList(tenancyId, userId, cartIds)
 	if err != nil {
 		return res, fmt.Errorf("获取购物车信息 %w", err)
 	}
@@ -555,20 +559,41 @@ func CheckOrder(req request.CheckOrder, ctx *gin.Context) (response.CheckOrder, 
 
 	res.FinalOtPrice = res.TotalOtPrice.Sub(res.PostagePrice).Sub(res.DownPrice)
 	res.FinalPrice = res.TotalPrice.Sub(res.PostagePrice).Sub(res.DownPrice)
-
 	return res, nil
 }
 
-func CreateOrder(req request.CreateOrder, ctx *gin.Context) (uint, error) {
+// CreateOrder 新建订单 减商品库存-》修改购物车商品支付状态-》生成订单组-》生成订单
+func CreateOrder(req request.CreateOrder, ctx *gin.Context) error {
+	orderInfo, err := GetOrderInfoByCartId(multi.GetTenancyId(ctx), multi.GetUserId(ctx), req.CartIds)
+	totalPrice, _ := orderInfo.TotalPrice.Float64()
+	postagePrice, _ := orderInfo.PostagePrice.Float64()
+	finalPrice, _ := orderInfo.FinalPrice.Float64()
 	order := model.Order{
 		BaseOrder: model.BaseOrder{
-			OrderType: req.OrderType,
-			PayType:   req.PayType,
+			OrderSn:      g.CreateOrderSn(req.PayType),
+			OrderType:    req.OrderType,
+			PayType:      req.PayType,
+			Remark:       req.Remark,
+			TotalNum:     orderInfo.TotalNum,
+			TotalPrice:   totalPrice,
+			TotalPostage: postagePrice,
+			PayPostage:   postagePrice,
+			PayPrice:     finalPrice,
 		},
 	}
-	err := g.TENANCY_DB.Model(&model.Order{}).Create(&order).Error
 	if err != nil {
-		return order.ID, err
+		return err
 	}
-	return order.ID, nil
+	// err := g.TENANCY_DB.Transaction(func(tx *gorm.DB) error {
+
+	// 	err := g.TENANCY_DB.Model(&model.Order{}).Create(&order).Error
+	// 	if err != nil {
+	// 		return err
+	// 	}
+	// 	return nil
+	// })
+	// if err != nil {
+	// 	return err
+	// }
+	return nil
 }

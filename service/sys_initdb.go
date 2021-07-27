@@ -158,6 +158,7 @@ func InitDB(conf request.InitDB) error {
 		model.OrderReceipt{},
 		model.OrderProduct{},
 		model.GroupOrder{},
+		model.CartOrder{},
 
 		model.RefundOrder{},
 		model.RefundProduct{},

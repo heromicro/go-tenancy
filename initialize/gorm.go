@@ -65,6 +65,7 @@ func MysqlTables(db *gorm.DB) {
 		model.OrderReceipt{},
 		model.OrderProduct{},
 		model.GroupOrder{},
+		model.CartOrder{},
 
 		model.RefundOrder{},
 		model.RefundProduct{},

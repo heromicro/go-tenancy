@@ -4,12 +4,10 @@ import (
 	"errors"
 	"fmt"
 
-	"github.com/gin-gonic/gin"
 	"github.com/snowlyg/go-tenancy/g"
 	"github.com/snowlyg/go-tenancy/model"
 	"github.com/snowlyg/go-tenancy/model/request"
 	"github.com/snowlyg/go-tenancy/model/response"
-	"github.com/snowlyg/multi"
 	"gorm.io/gorm"
 )
 
@@ -80,11 +78,11 @@ func GetProductCount(sysUserID, sysTenancyID uint) (int64, error) {
 }
 
 // GetCartList
-func GetCartList(ctx *gin.Context, cartIds []uint) ([]response.CartList, []response.CartProduct, int64, error) {
+func GetCartList(tenancyId, userId uint, cartIds []uint) ([]response.CartList, []response.CartProduct, int64, error) {
 	cartList := []response.CartList{}
 	fails := []response.CartProduct{}
 	var count int64
-	cartProducts, err := GetCartProducts(multi.GetTenancyId(ctx), multi.GetUserId(ctx), cartIds)
+	cartProducts, err := GetCartProducts(tenancyId, userId, cartIds)
 	if err != nil {
 		return cartList, fails, count, fmt.Errorf("get cart %w", err)
 	}

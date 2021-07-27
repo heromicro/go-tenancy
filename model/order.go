@@ -49,8 +49,6 @@ type Order struct {
 	SysTenancyID     uint  `gorm:"index:sys_tenancy_id;column:sys_tenancy_id;type:int;not null" json:"sysTenancyId"` // 商户 id
 	GroupOrderID     int   `gorm:"column:group_order_id;type:int" json:"groupOrderId"`
 	ReconciliationID uint8 `gorm:"column:reconciliation_id;type:tinyint unsigned;not null;default:0" json:"reconciliationId"` // 对账id
-
-	// VerifyServiceID  uint   `gorm:"column:verify_service_id;type:int unsigned;default:0" json:"verifyServiceId"`               // 核销客服 id
 }
 
 type BaseOrder struct {
@@ -58,7 +56,7 @@ type BaseOrder struct {
 	RealName       string    `gorm:"column:real_name;type:varchar(32);not null" json:"realName"`                                      // 用户姓名
 	UserPhone      string    `gorm:"column:user_phone;type:varchar(18);not null" json:"userPhone"`                                    // 用户电话
 	UserAddress    string    `gorm:"column:user_address;type:varchar(128);not null" json:"userAddress"`                               // 详细地址
-	TotalNum       uint      `gorm:"column:total_num;type:int unsigned;not null;default:0" json:"totalNum"`                           // 订单商品总数
+	TotalNum       int64     `gorm:"column:total_num;type:int unsigned;not null;default:0" json:"totalNum"`                           // 订单商品总数
 	TotalPrice     float64   `gorm:"column:total_price;type:decimal(8,2) unsigned;not null;default:0.00" json:"totalPrice"`           // 订单总价
 	TotalPostage   float64   `gorm:"column:total_postage;type:decimal(8,2) unsigned;not null;default:0.00" json:"totalPostage"`       // 邮费
 	PayPrice       float64   `gorm:"column:pay_price;type:decimal(8,2) unsigned;not null;default:0.00" json:"payPrice"`               // 实际支付金额
@@ -68,7 +66,7 @@ type BaseOrder struct {
 	Paid           int       `gorm:"column:paid;type:tinyint unsigned;not null;default:0" json:"paid"`                                // 支付状态
 	PayTime        time.Time `gorm:"column:pay_time;type:timestamp" json:"payTime"`                                                   // 支付时间
 	PayType        int       `gorm:"column:pay_type;type:tinyint(1);not null" json:"payType"`                                         // 支付方式  1=微信 2=小程序 3=h5 4=余额 5=支付宝
-	Status         int       `gorm:"column:status;type:tinyint(1);not null;default:6" json:"status"`                                  // 订单状态（1:待发货 2：待收货 3：待评价 4：已完成 5：已退款 6:待付款）
+	Status         int       `gorm:"column:status;type:tinyint(1);not null;default:6" json:"status"`                                  // 订单状态（1:待发货 2：待收货 3：待评价 4：已完成 5：已退款）
 	DeliveryType   int       `gorm:"column:delivery_type;type:varchar(32)" json:"deliveryType"`                                       // 发货类型(1:发货 2: 送货 3: 虚拟)
 	DeliveryName   string    `gorm:"column:delivery_name;type:varchar(64)" json:"deliveryName"`                                       // 快递名称/送货人姓名
 	DeliveryID     string    `gorm:"column:delivery_id;type:varchar(64)" json:"deliveryId"`                                           // 快递单号/手机号

@@ -72,4 +72,5 @@ type CreateOrder struct {
 	CartIds   []uint `json:"cartIds" form:"cartIds"`
 	OrderType int    `json:"orderType" form:"orderType"`
 	PayType   int    `json:"payType" form:"payType"`
+	Remark    string `json:"remark" form:"remark"`
 }
