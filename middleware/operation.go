@@ -52,11 +52,6 @@ func OperationRecord() gin.HandlerFunc {
 		record.ErrorMessage = ctx.Errors.ByType(gin.ErrorTypePrivate).String()
 		record.Status = ctx.Writer.Status()
 		record.Latency = latency
-
-		// 去除请求返回数据填充
-		if ctx.Request.Method != http.MethodGet {
-			record.Resp = writer.body.String()
-		}
 		if err := service.CreateSysOperationRecord(record); err != nil {
 			g.TENANCY_LOG.Error("create operation record error:", zap.Any("err", err))
 		}

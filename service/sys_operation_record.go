@@ -61,12 +61,12 @@ func GetSysOperationRecordInfoList(info request.SysOperationRecordSearch, ctx *g
 
 	// 如果有条件搜索 下方会自动创建搜索语句
 	if info.Method != "" {
-		db = db.Where("method = ?", info.Method)
+		db = db.Where("method LIKE ?", info.Method+"%")
 	}
 	if info.Path != "" {
-		db = db.Where("path LIKE ?", "%"+info.Path+"%")
+		db = db.Where("path LIKE ?", info.Path+"%")
 	}
-	if info.Status != 0 {
+	if info.Status > 0 {
 		db = db.Where("status = ?", info.Status)
 	}
 	var total int64
