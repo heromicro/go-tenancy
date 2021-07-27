@@ -60,6 +60,7 @@ func (*Local) DeleteFile(key string) error {
 	p := g.TENANCY_CONFIG.Local.Path + "/" + key
 	if strings.Contains(p, g.TENANCY_CONFIG.Local.Path) {
 		if err := os.Remove(p); err != nil {
+			g.TENANCY_LOG.Error("本地文件删除失败", zap.Any("err", err.Error()))
 			return errors.New("本地文件删除失败, err:" + err.Error())
 		}
 	}

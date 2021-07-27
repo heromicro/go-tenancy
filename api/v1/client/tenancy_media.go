@@ -43,7 +43,7 @@ func UploadFile(ctx *gin.Context) {
 }
 
 func DeleteFile(ctx *gin.Context) {
-	var file request.DeleteMedia
+	var file request.IdsReq
 	_ = ctx.ShouldBindJSON(&file)
 	if err := service.DeleteFile(file.Ids); err != nil {
 		g.TENANCY_LOG.Error("删除失败!", zap.Any("err", err))

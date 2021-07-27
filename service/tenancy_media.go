@@ -43,7 +43,7 @@ func Upload(file model.TenancyMedia) (model.TenancyMedia, error) {
 // FindFiles
 func FindFiles(ids []int) ([]model.TenancyMedia, error) {
 	var files []model.TenancyMedia
-	err := g.TENANCY_DB.Where("id in ?", ids).First(&files).Error
+	err := g.TENANCY_DB.Where("id in ?", ids).Find(&files).Error
 	return files, err
 }
 
@@ -63,6 +63,7 @@ func DeleteFile(ids []int) error {
 
 	var delIds []uint
 	for _, file := range files {
+
 		oss := upload.NewOss()
 		if err = oss.DeleteFile(file.Key); err != nil {
 			continue
@@ -70,7 +71,7 @@ func DeleteFile(ids []int) error {
 		delIds = append(delIds, file.ID)
 	}
 
-	err = g.TENANCY_DB.Unscoped().Where("id in ?", delIds).Delete(&model.TenancyMedia{}).Error
+	err = g.TENANCY_DB.Unscoped().Delete(&model.TenancyMedia{}, delIds).Error
 	return err
 }
 
