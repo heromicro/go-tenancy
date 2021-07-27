@@ -22,12 +22,12 @@ func TestAdminUserList(t *testing.T) {
 	data.Keys().ContainsOnly("list", "total", "page", "pageSize")
 	data.Value("pageSize").Number().Equal(10)
 	data.Value("page").Number().Equal(1)
-	data.Value("total").Number().Equal(1)
+	data.Value("total").Number().Ge(1)
 
 	list := data.Value("list").Array()
 	list.Length().Ge(0)
 	first := list.First().Object()
-	first.Keys().ContainsOnly("id", "userName", "email", "phone", "nickName", "headerImg", "authorityName", "authorityType", "authorityId", "defaultRouter", "createdAt", "updatedAt")
+	first.Keys().ContainsOnly("id", "userName", "email", "phone", "status", "nickName", "headerImg", "authorityName", "authorityType", "authorityId", "defaultRouter", "createdAt", "updatedAt")
 	first.Value("id").Number().Ge(0)
 }
 
@@ -78,20 +78,24 @@ func TestAdminLoginUser(t *testing.T) {
 func TestAdminUserProcess(t *testing.T) {
 	auth := baseWithLoginTester(t)
 	defer baseLogOut(auth)
-	obj := auth.POST("v1/admin/user/registerAdmin").
-		WithJSON(map[string]interface{}{"username": "chindeo", "password": "123456", "authorityId": source.AdminAuthorityId}).
+
+	// registerAdminMap
+	obj := auth.GET("v1/admin/user/registerAdminMap").
+		Expect().Status(http.StatusOK).JSON().Object()
+	obj.Keys().ContainsOnly("status", "data", "message")
+	obj.Value("status").Number().Equal(200)
+	obj.Value("message").String().Equal("获取成功")
+
+	obj = auth.POST("v1/admin/user/registerAdmin").
+		WithJSON(map[string]interface{}{"username": "chindeo11", "password": "123456", "ConfirmPassword": "123456", "authorityId": []string{source.AdminAuthorityId}}).
 		Expect().Status(http.StatusOK).JSON().Object()
 	obj.Keys().ContainsOnly("status", "data", "message")
 	obj.Value("status").Number().Equal(200)
 	obj.Value("message").String().Equal("注册成功")
 
 	user := obj.Value("data").Object()
-	user.Value("id").Number().Ge(0)
-	user.Value("userName").String().Equal("chindeo")
-	user.Value("authorityId").String().Equal(source.AdminAuthorityId)
-	userId := user.Value("id").Number().Raw()
+	userId := user.Value("user_id").Number().Raw()
 	if userId > 0 {
-
 		// setUserAuthority
 		obj = auth.POST("v1/admin/user/setUserAuthority").
 			WithJSON(map[string]interface{}{"id": userId, "authorityId": source.AdminAuthorityId}).
@@ -100,15 +104,46 @@ func TestAdminUserProcess(t *testing.T) {
 		obj.Value("status").Number().Equal(200)
 		obj.Value("message").String().Equal("修改成功")
 
-		// setAdminInfo
+		// setUserInfo
 		obj = auth.PUT(fmt.Sprintf("v1/admin/user/setUserInfo/%d", int(userId))).
-			WithJSON(map[string]interface{}{"email": "admin@admin.com", "phone": "13800138001"}).
+			WithJSON(map[string]interface{}{
+				"email":       "admin@admin.com",
+				"phone":       "13800138001",
+				"nickName":    "超级管理员",
+				"username":    "chindeo",
+				"hreaderImg":  "http://qmplusimg.henrongyi.top/head.png",
+				"status":      2,
+				"authorityId": []string{"999"}}).
 			Expect().Status(http.StatusOK).JSON().Object()
 		obj.Keys().ContainsOnly("status", "data", "message")
 		obj.Value("status").Number().Equal(200)
 		obj.Value("message").String().Equal("设置成功")
 
-		// setUserAuthority
+		// changeUserStatus
+		obj = auth.POST("v1/admin/user/changeUserStatus", int(userId)).
+			WithJSON(map[string]interface{}{
+				"id":     userId,
+				"status": 2}).
+			Expect().Status(http.StatusOK).JSON().Object()
+		obj.Keys().ContainsOnly("status", "data", "message")
+		obj.Value("status").Number().Equal(200)
+		obj.Value("message").String().Equal("修改成功")
+
+		// updateAdminMap
+		obj = auth.GET(fmt.Sprintf("v1/admin/user/updateAdminMap/%d", int(userId))).
+			Expect().Status(http.StatusOK).JSON().Object()
+		obj.Keys().ContainsOnly("status", "data", "message")
+		obj.Value("status").Number().Equal(200)
+		obj.Value("message").String().Equal("获取成功")
+
+		// changePasswordMap
+		obj = auth.GET(fmt.Sprintf("v1/admin/user/changePasswordMap/%d", int(userId))).
+			Expect().Status(http.StatusOK).JSON().Object()
+		obj.Keys().ContainsOnly("status", "data", "message")
+		obj.Value("status").Number().Equal(200)
+		obj.Value("message").String().Equal("获取成功")
+
+		// deleteUser
 		obj = auth.DELETE("v1/admin/user/deleteUser").
 			WithJSON(map[string]interface{}{"id": userId}).
 			Expect().Status(http.StatusOK).JSON().Object()
@@ -124,7 +159,7 @@ func TestAdminUserRegisterError(t *testing.T) {
 	auth := baseWithLoginTester(t)
 	defer baseLogOut(auth)
 	obj := auth.POST("v1/admin/user/registerAdmin").
-		WithJSON(map[string]interface{}{"username": "admin", "password": "123456", "authorityId": source.AdminAuthorityId}).
+		WithJSON(map[string]interface{}{"username": "admin", "password": "123456", "ConfirmPassword": "123456", "authorityId": []string{source.AdminAuthorityId}}).
 		Expect().Status(http.StatusOK).JSON().Object()
 	obj.Keys().ContainsOnly("status", "data", "message")
 	obj.Value("status").Number().Equal(4000)
@@ -136,7 +171,7 @@ func TestAdminUserRegisterAuthorityIdEmpty(t *testing.T) {
 	auth := baseWithLoginTester(t)
 	defer baseLogOut(auth)
 	obj := auth.POST("v1/admin/user/registerAdmin").
-		WithJSON(map[string]interface{}{"username": "admin_authrity_id_empty", "password": "123456", "authorityId": ""}).
+		WithJSON(map[string]interface{}{"username": "admin_authrity_id_empty", "password": "123456", "ConfirmPassword": "123456", "authorityId": nil}).
 		Expect().Status(http.StatusOK).JSON().Object()
 	obj.Keys().ContainsOnly("status", "data", "message")
 	obj.Value("status").Number().Equal(4000)

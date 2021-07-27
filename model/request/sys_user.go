@@ -21,7 +21,8 @@ type Login struct {
 
 // Modify password structure
 type ChangePassword struct {
-	Password        string `json:"password" binding:"required"`
+	Id              uint   `json:"id" form:"id"`
+	Password        string `json:"password"`
 	NewPassword     string `json:"newPassword" binding:"required"`
 	ConfirmPassword string `json:"confirmPassword" binding:"required"`
 }

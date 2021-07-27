@@ -248,17 +248,19 @@ func InitTenancyRouter(Router *gin.RouterGroup) {
 func InitUserRouter(Router *gin.RouterGroup) {
 	UserRouter := Router.Group("/user")
 	{
-		UserRouter.GET("/registerAdminMap", admin.RegisterAdminMap)  // 注册管理员表单
-		UserRouter.GET("/updateAdminMap/:id", admin.UpdateAdminMap)  // 编辑管理员表单
-		UserRouter.POST("/registerAdmin", admin.RegisterAdmin)       // 注册管理员
-		UserRouter.POST("/registerTenancy", admin.RegisterTenancy)   // 注册商户管理员
-		UserRouter.POST("/changePassword", admin.ChangePassword)     // 修改密码
-		UserRouter.POST("/changeProfile", admin.ChangeProfile)       // 修改个人信息
-		UserRouter.POST("/getAdminList", admin.GetAdminList)         // 分页获取管理员列表
-		UserRouter.POST("/getTenancyList", admin.GetTenancyList)     // 分页获取商户管理员列表
-		UserRouter.POST("/setUserAuthority", admin.SetUserAuthority) // 设置用户权限
-		UserRouter.DELETE("/deleteUser", admin.DeleteUser)           // 删除用户
-		UserRouter.PUT("/setUserInfo/:user_id", admin.SetUserInfo)   // 设置用户信息
+		UserRouter.GET("/changePasswordMap/:id", admin.ChangePasswordMap) // 注册管理员表单
+		UserRouter.GET("/registerAdminMap", admin.RegisterAdminMap)       // 注册管理员表单
+		UserRouter.GET("/updateAdminMap/:id", admin.UpdateAdminMap)       // 编辑管理员表单
+		UserRouter.POST("/registerAdmin", admin.RegisterAdmin)            // 注册管理员
+		UserRouter.POST("/registerTenancy", admin.RegisterTenancy)        // 注册商户管理员
+		UserRouter.POST("/changePassword", admin.ChangePassword)          // 修改密码
+		UserRouter.POST("/changeProfile", admin.ChangeProfile)            // 修改个人信息
+		UserRouter.POST("/changeUserStatus", admin.ChangeUserStatus)      // 修改账号状态
+		UserRouter.POST("/getAdminList", admin.GetAdminList)              // 分页获取管理员列表
+		UserRouter.POST("/getTenancyList", admin.GetTenancyList)          // 分页获取商户管理员列表
+		UserRouter.POST("/setUserAuthority", admin.SetUserAuthority)      // 设置用户权限
+		UserRouter.DELETE("/deleteUser", admin.DeleteUser)                // 删除用户
+		UserRouter.PUT("/setUserInfo/:user_id", admin.SetUserInfo)        // 设置用户信息
 
 	}
 }

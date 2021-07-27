@@ -5,13 +5,27 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/snowlyg/go-tenancy/g"
-	"github.com/snowlyg/go-tenancy/model"
 	"github.com/snowlyg/go-tenancy/model/request"
 	"github.com/snowlyg/go-tenancy/model/response"
 	"github.com/snowlyg/go-tenancy/service"
 	"github.com/snowlyg/multi"
 	"go.uber.org/zap"
 )
+
+// ChangePasswordMap 设置用户分组表单
+func ChangePasswordMap(ctx *gin.Context) {
+	var req request.GetById
+	if errs := ctx.ShouldBindUri(&req); errs != nil {
+		response.FailWithMessage(errs.Error(), ctx)
+		return
+	}
+	if detail, err := service.ChangePasswordMap(req.Id, ctx); err != nil {
+		g.TENANCY_LOG.Error("获取失败", zap.Any("err", err))
+		response.FailWithMessage("获取失败:"+err.Error(), ctx)
+	} else {
+		response.OkWithDetailed(detail, "获取成功", ctx)
+	}
+}
 
 // RegisterAdminMap 设置用户分组表单
 func RegisterAdminMap(ctx *gin.Context) {
@@ -49,6 +63,10 @@ func RegisterAdmin(ctx *gin.Context) {
 		response.FailWithMessage("两次输入密码不一致", ctx)
 		return
 	}
+	if len(req.AuthorityId) == 0 || req.AuthorityId[0] == "" {
+		response.FailWithMessage("用户角色为必选参数", ctx)
+		return
+	}
 
 	id, err := service.Register(req, multi.AdminAuthority)
 	if err != nil {
@@ -70,6 +88,10 @@ func RegisterTenancy(ctx *gin.Context) {
 		response.FailWithMessage("两次输入密码不一致", ctx)
 		return
 	}
+	if len(req.AuthorityId) == 0 || req.AuthorityId[0] == "" {
+		response.FailWithMessage("用户角色为必选参数", ctx)
+		return
+	}
 	id, err := service.Register(req, multi.TenancyAuthority)
 	if err != nil {
 		g.TENANCY_LOG.Error("注册失败", zap.Any("err", err))
@@ -81,17 +103,32 @@ func RegisterTenancy(ctx *gin.Context) {
 
 // ChangePassword 用户修改密码
 func ChangePassword(ctx *gin.Context) {
-	var user request.ChangePassword
-	if errs := ctx.ShouldBindJSON(&user); errs != nil {
+	var req request.ChangePassword
+	if errs := ctx.ShouldBindJSON(&req); errs != nil {
 		response.FailWithMessage(errs.Error(), ctx)
 		return
 	}
-	if user.NewPassword != user.ConfirmPassword {
+	if req.NewPassword != req.ConfirmPassword {
 		response.FailWithMessage("两次输入密码不一致", ctx)
 		return
 	}
-	U := &model.SysUser{Username: multi.GetUsername(ctx), Password: user.Password}
-	err := service.ChangePassword(U, user.NewPassword, multi.GetAuthorityType(ctx))
+	err := service.ChangePassword(multi.GetUserId(ctx), req, multi.GetAuthorityType(ctx))
+	if err != nil {
+		g.TENANCY_LOG.Error("修改失败", zap.Any("err", err))
+		response.FailWithMessage(err.Error(), ctx)
+	} else {
+		response.OkWithMessage("修改成功", ctx)
+	}
+}
+
+// ChangeUserStatus 用户修改密码
+func ChangeUserStatus(ctx *gin.Context) {
+	var changeStatus request.ChangeStatus
+	if errs := ctx.ShouldBindJSON(&changeStatus); errs != nil {
+		response.FailWithMessage(errs.Error(), ctx)
+		return
+	}
+	err := service.ChangeUserStatus(changeStatus)
 	if err != nil {
 		g.TENANCY_LOG.Error("修改失败", zap.Any("err", err))
 		response.FailWithMessage(err.Error(), ctx)

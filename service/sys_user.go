@@ -18,6 +18,19 @@ import (
 	"gorm.io/gorm"
 )
 
+func ChangePasswordMap(id uint, ctx *gin.Context) (Form, error) {
+	var form Form
+	formStr := fmt.Sprintf(`{"rule":[{"type":"input","field":"NewPassword","value":"","title":"密码","props":{"type":"password","placeholder":"请输入密码"},"validate":[{"message":"请输入密码","required":true,"type":"string","trigger":"change"}]},
+	{"type":"hidden","field":"id","value":%d,"title":"id","props":{"type":"hidden","placeholder":""}},{"type":"input","field":"confirmPassword","value":"","title":"确认密码","props":{"type":"password","placeholder":"请输入确认密码"},"validate":[{"message":"请输入确认密码","required":true,"type":"string","trigger":"change"}]}],"action":"","method":"POST","title":"修改密码","config":{}}`, id)
+
+	err := json.Unmarshal([]byte(formStr), &form)
+	if err != nil {
+		return form, err
+	}
+	form.SetAction("/user/changePassword", ctx)
+	return form, nil
+}
+
 func RegisterAdminMap(id uint, ctx *gin.Context) (Form, error) {
 	var form Form
 	var formStr string
@@ -26,7 +39,7 @@ func RegisterAdminMap(id uint, ctx *gin.Context) (Form, error) {
 		if err != nil {
 			return Form{}, err
 		}
-		formStr = fmt.Sprintf(`{"rule":[{"type":"select","field":"authorityId","value":["%s"],"title":"身份","props":{"multiple":true,"placeholder":"请选择身份"},"options":[]},{"type":"input","field":"nickName","value":"%s","title":"管理员姓名","props":{"type":"text","placeholder":"请输入管理员姓名"}},{"type":"input","field":"username","value":"%s","title":"账号","props":{"type":"text","placeholder":"请输入账号"},"validate":[{"message":"请输入账号","required":true,"type":"string","trigger":"change"}]},{"type":"input","field":"phone","value":"%s","title":" 联系电话","props":{"type":"text","placeholder":"请输入联系电话"}},{"type":"switch","field":"status","value":%d,"title":"是否开启","props":{"activeValue":1,"inactiveValue":0,"inactiveText":"关闭","activeText":"开启"}}],"action":"\/sys\/system\/admin\/update\/2.html","method":"PUT","title":"编辑管理员","config":{}}`, user.AuthorityId, user.AdminInfo.NickName, user.Username, user.AdminInfo.Phone, user.Status)
+		formStr = fmt.Sprintf(`{"rule":[{"type":"select","field":"authorityId","value":["%s"],"title":"身份","props":{"multiple":true,"placeholder":"请选择身份"},"options":[]},{"type":"input","field":"nickName","value":"%s","title":"管理员姓名","props":{"type":"text","placeholder":"请输入管理员姓名"}},{"type":"input","field":"username","value":"%s","title":"账号","props":{"type":"text","placeholder":"请输入账号"},"validate":[{"message":"请输入账号","required":true,"type":"string","trigger":"change"}]},{"type":"input","field":"phone","value":"%s","title":" 联系电话","props":{"type":"text","placeholder":"请输入联系电话"}},{"type":"switch","field":"status","value":%d,"title":"是否开启","props":{"activeValue":1,"inactiveValue":2,"inactiveText":"关闭","activeText":"开启"}}],"action":"\/sys\/system\/admin\/update\/2.html","method":"PUT","title":"编辑管理员","config":{}}`, user.AuthorityId, user.AdminInfo.NickName, user.Username, user.AdminInfo.Phone, user.Status)
 	} else {
 		formStr = `{"rule":[{"type":"select","field":"authorityId","value":[],"title":"身份","props":{"multiple":true,"placeholder":"请选择身份"},"options":[]},{"type":"input","field":"RealName","value":"","title":"管理员姓名","props":{"type":"text","placeholder":"请输入管理员姓名"}},{"type":"input","field":"username","value":"","title":"账号","props":{"type":"text","placeholder":"请输入账号"},"validate":[{"message":"请输入账号","required":true,"type":"string","trigger":"change"}]},{"type":"input","field":"phone","value":"","title":" 联系电话","props":{"type":"text","placeholder":"请输入联系电话"}},{"type":"input","field":"password","value":"","title":"密码","props":{"type":"password","placeholder":"请输入密码"},"validate":[{"message":"请输入密码","required":true,"type":"string","trigger":"change"}]},{"type":"input","field":"confirmPassword","value":"","title":"确认密码","props":{"type":"password","placeholder":"请输入确认密码"},"validate":[{"message":"请输入确认密码","required":true,"type":"string","trigger":"change"}]},{"type":"switch","field":"status","value":1,"title":"是否开启","props":{"activeValue":1,"inactiveValue":2,"inactiveText":"关闭","activeText":"开启"}}],"action":"","method":"POST","title":"添加管理员","config":{}}`
 	}
@@ -211,21 +224,29 @@ func tenancyLogin(u *model.SysUser) (response.LoginResponse, error) {
 }
 
 // ChangePassword 修改用户密码
-func ChangePassword(u *model.SysUser, newPassword string, authorityType int) error {
-	var user model.SysUser
-	u.Password = utils.MD5V([]byte(u.Password))
-	err := g.TENANCY_DB.Model(&model.SysUser{}).
-		Where("sys_users.username = ? AND sys_users.password = ?", u.Username, u.Password).
-		Where("sys_authorities.authority_type = ?", authorityType).
-		Joins("left join sys_authorities on sys_authorities.authority_id = sys_users.authority_id").
-		First(&user).Error
-	if errors.Is(err, gorm.ErrRecordNotFound) {
-		return errors.New("修改失败，原密码与当前账户不符")
+func ChangePassword(id uint, req request.ChangePassword, authorityType int) error {
+	if req.Id > 0 {
+		id = req.Id
+	} else {
+		err := g.TENANCY_DB.Model(&model.SysUser{}).
+			Where("sys_users.id = ? AND sys_users.password = ?", id, utils.MD5V([]byte(req.Password))).
+			Where("sys_authorities.authority_type = ?", authorityType).
+			Joins("left join sys_authorities on sys_authorities.authority_id = sys_users.authority_id").
+			First(&model.SysUser{}).Error
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return errors.New("修改失败，原密码与当前账户不符")
+		}
 	}
-	if user.ID == 0 {
-		return errors.New("修改失败，原密码与当前账户不符")
+	err := g.TENANCY_DB.Model(&model.SysUser{}).Where("id = ?", id).Update("password", utils.MD5V([]byte(req.NewPassword))).Error
+	if err != nil {
+		return err
 	}
-	err = g.TENANCY_DB.Model(&model.SysUser{}).Where("id = ?", user.ID).Update("password", utils.MD5V([]byte(newPassword))).Error
+	return nil
+}
+
+// ChangeUserStatus 修改用户密码
+func ChangeUserStatus(changeStatus request.ChangeStatus) error {
+	err := g.TENANCY_DB.Model(&model.SysUser{}).Where("id = ?", changeStatus.Id).Update("status", changeStatus.Status).Error
 	if err != nil {
 		return err
 	}
@@ -253,7 +274,7 @@ func GetAdminInfoList(info request.PageInfo) ([]response.SysAdminUser, int64, er
 	if err != nil {
 		return userList, 0, err
 	}
-	db := g.TENANCY_DB.Model(&model.SysUser{}).Where("sys_users.authority_id IN (?)", adminAuthorityIds)
+	db := g.TENANCY_DB.Model(&model.SysUser{}).Where("sys_users.authority_id IN (?)", adminAuthorityIds).Where("sys_users.username != ?", "admin")
 	if limit > 0 {
 		err = db.Count(&total).Error
 		if err != nil {
@@ -262,7 +283,7 @@ func GetAdminInfoList(info request.PageInfo) ([]response.SysAdminUser, int64, er
 		db = db.Limit(limit).Offset(offset)
 	}
 	err = db.
-		Select("sys_users.id,sys_users.username,sys_users.authority_id,sys_users.created_at,sys_users.updated_at, admin_infos.email, admin_infos.phone, admin_infos.nick_name, admin_infos.header_img,sys_authorities.authority_name,sys_authorities.authority_type,sys_users.authority_id").
+		Select("sys_users.id,sys_users.status,sys_users.username,sys_users.authority_id,sys_users.created_at,sys_users.updated_at, admin_infos.email, admin_infos.phone, admin_infos.nick_name, admin_infos.header_img,sys_authorities.authority_name,sys_authorities.authority_type,sys_users.authority_id").
 		Joins("left join admin_infos on admin_infos.sys_user_id = sys_users.id").
 		Joins("left join sys_authorities on sys_authorities.authority_id = sys_users.authority_id").
 		Find(&userList).Error
@@ -289,7 +310,7 @@ func GetTenancyInfoList(info request.PageInfo) ([]response.SysTenancyUser, int64
 		db = db.Limit(limit).Offset(offset)
 	}
 	err = db.
-		Select("sys_users.id,sys_users.username,sys_users.authority_id,sys_users.created_at,sys_users.updated_at, tenancy_infos.email, tenancy_infos.phone, tenancy_infos.nick_name, tenancy_infos.header_img,sys_authorities.authority_name,sys_authorities.authority_type,sys_users.authority_id,sys_tenancies.name as tenancy_name").
+		Select("sys_users.id,sys_users.status,sys_users.username,sys_users.authority_id,sys_users.created_at,sys_users.updated_at, tenancy_infos.email, tenancy_infos.phone, tenancy_infos.nick_name, tenancy_infos.header_img,sys_authorities.authority_name,sys_authorities.authority_type,sys_users.authority_id,sys_tenancies.name as tenancy_name").
 		Joins("left join tenancy_infos on tenancy_infos.sys_user_id = sys_users.id").
 		Joins("left join sys_authorities on sys_authorities.authority_id = sys_users.authority_id").
 		Joins("left join sys_tenancies on tenancy_infos.sys_tenancy_id = sys_tenancies.id").

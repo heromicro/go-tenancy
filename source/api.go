@@ -16,9 +16,11 @@ var baseApis = []model.SysApi{
 
 	{Path: "/v1/auth/logout", Description: "退出", ApiGroup: "user", Method: "GET"},
 	{Path: "/v1/auth/clean", Description: "清空 token", ApiGroup: "user", Method: "GET"},
+	{Path: "/v1/admin/user/changePasswordMap/:id", Description: "管理员修改密码表单", ApiGroup: "user", Method: "GET"},
 	{Path: "/v1/admin/user/updateAdminMap/:id", Description: "管理员编辑表单", ApiGroup: "user", Method: "GET"},
 	{Path: "/v1/admin/user/registerAdminMap", Description: "管理员注册表单", ApiGroup: "user", Method: "GET"},
 	{Path: "/v1/admin/user/registerAdmin", Description: "管理员注册", ApiGroup: "user", Method: "POST"},
+	{Path: "/v1/admin/user/changeUserStatus", Description: "修改状态", ApiGroup: "user", Method: "POST"},
 	{Path: "/v1/admin/user/changePassword", Description: "修改密码", ApiGroup: "user", Method: "POST"},
 	{Path: "/v1/admin/user/changeProfile", Description: "修改个人信息", ApiGroup: "user", Method: "POST"},
 	{Path: "/v1/admin/user/getAdminList", Description: "获取管理员列表", ApiGroup: "user", Method: "POST"},

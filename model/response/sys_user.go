@@ -14,6 +14,7 @@ type SysAdminUser struct {
 	HeaderImg     string `json:"headerImg"`
 	AuthorityName string `json:"authorityName"`
 	AuthorityType int    `json:"authorityType"`
+	Status        int    `json:"status"`
 	AuthorityId   string `json:"authorityId"`
 	DefaultRouter string `json:"defaultRouter"`
 }

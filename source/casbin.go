@@ -13,13 +13,11 @@ var Casbin = new(casbin)
 type casbin struct{}
 
 var carbines = []gormadapter.CasbinRule{
-	{Ptype: "p", V0: AdminAuthorityId, V1: "/v1/admin/user/registerAdminMap", V2: "GET"},
-	{Ptype: "p", V0: AdminAuthorityId, V1: "/v1/admin/user/updateAdminMap/:id", V2: "GET"},
-	{Ptype: "p", V0: AdminAuthorityId, V1: "/v1/admin/user/registerTenancy", V2: "POST"},
-	{Ptype: "p", V0: AdminAuthorityId, V1: "/v1/admin/user/registerAdmin", V2: "POST"},
+
 	{Ptype: "p", V0: AdminAuthorityId, V1: "/v1/auth/logout", V2: "GET"},
 	{Ptype: "p", V0: AdminAuthorityId, V1: "/v1/auth/clean", V2: "GET"},
 
+	// api管理
 	{Ptype: "p", V0: AdminAuthorityId, V1: "/v1/admin/api/createApi", V2: "POST"},
 	{Ptype: "p", V0: AdminAuthorityId, V1: "/v1/admin/api/getApiList", V2: "POST"},
 	{Ptype: "p", V0: AdminAuthorityId, V1: "/v1/admin/api/getApiById", V2: "POST"},
@@ -27,6 +25,7 @@ var carbines = []gormadapter.CasbinRule{
 	{Ptype: "p", V0: AdminAuthorityId, V1: "/v1/admin/api/updateApi", V2: "POST"},
 	{Ptype: "p", V0: AdminAuthorityId, V1: "/v1/admin/api/getAllApis", V2: "POST"},
 
+	// 角色管理
 	{Ptype: "p", V0: AdminAuthorityId, V1: "/v1/admin/authority/createAuthority", V2: "POST"},
 	{Ptype: "p", V0: AdminAuthorityId, V1: "/v1/admin/authority/deleteAuthority", V2: "DELETE"},
 	{Ptype: "p", V0: AdminAuthorityId, V1: "/v1/admin/authority/getAuthorityList", V2: "POST"},
@@ -36,6 +35,7 @@ var carbines = []gormadapter.CasbinRule{
 	{Ptype: "p", V0: AdminAuthorityId, V1: "/v1/admin/authority/setDataAuthority", V2: "POST"},
 	{Ptype: "p", V0: AdminAuthorityId, V1: "/v1/admin/authority/updateAuthority", V2: "PUT"},
 	{Ptype: "p", V0: AdminAuthorityId, V1: "/v1/admin/authority/copyAuthority", V2: "POST"},
+
 	// 菜单
 	{Ptype: "p", V0: AdminAuthorityId, V1: "/v1/admin/menu/getMenu", V2: "GET"},
 	{Ptype: "p", V0: AdminAuthorityId, V1: "/v1/admin/menu/getAddMenuMap", V2: "GET"},
@@ -53,6 +53,13 @@ var carbines = []gormadapter.CasbinRule{
 
 	{Ptype: "p", V0: AdminAuthorityId, V1: "/v1/admin/menu/merchant/getClientMenuList", V2: "GET"},
 
+	// 管理员管理
+	{Ptype: "p", V0: AdminAuthorityId, V1: "/v1/admin/user/registerAdminMap", V2: "GET"},
+	{Ptype: "p", V0: AdminAuthorityId, V1: "/v1/admin/user/registerTenancy", V2: "POST"},
+	{Ptype: "p", V0: AdminAuthorityId, V1: "/v1/admin/user/registerAdmin", V2: "POST"},
+	{Ptype: "p", V0: AdminAuthorityId, V1: "/v1/admin/user/changePasswordMap/:id", V2: "GET"},
+	{Ptype: "p", V0: AdminAuthorityId, V1: "/v1/admin/user/updateAdminMap/:id", V2: "GET"},
+	{Ptype: "p", V0: AdminAuthorityId, V1: "/v1/admin/user/changeUserStatus", V2: "POST"},
 	{Ptype: "p", V0: AdminAuthorityId, V1: "/v1/admin/user/changePassword", V2: "POST"},
 	{Ptype: "p", V0: AdminAuthorityId, V1: "/v1/admin/user/changeProfile", V2: "POST"},
 	{Ptype: "p", V0: AdminAuthorityId, V1: "/v1/admin/user/getAdminList", V2: "POST"},
