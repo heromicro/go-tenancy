@@ -28,7 +28,7 @@
  *     "Authorization: Bearer 5f048fe"
  *
  * @apiExample {bash} Curl example
- * curl -H "Authorization: Bearer 5f048fe" -i http://10.0.0.26:8085/v1/device/product/getProductList
+ * curl -H "Authorization: Bearer 5f048fe" -i http://127.0.0.1:8089/v1/device/product/getProductList
  *
  * @apiUse TokenError
  *
@@ -72,7 +72,7 @@
  *     "Authorization: Bearer 5f048fe"
  *
  * @apiExample {bash} Curl example
- * curl -H "Authorization: Bearer 5f048fe" -i http://10.0.0.26:8085/v1/device/product/getProductById/1
+ * curl -H "Authorization: Bearer 5f048fe" -i http://127.0.0.1:8089/v1/device/product/getProductById/1
  *
  * @apiSuccess {Number}   id            商品id
  * @apiSuccess {String}   storeName     商品名称

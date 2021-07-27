@@ -12,7 +12,7 @@
  *     "Authorization: Bearer 5f048fe"
  *
  * @apiExample {bash} Curl example
- * curl -H "Authorization: Bearer 5f048fe" -i http://10.0.0.26:8085/v1/device/productCategory/getProductCategoryList
+ * curl -H "Authorization: Bearer 5f048fe" -i http://127.0.0.1:8089/v1/device/productCategory/getProductCategoryList
  *
  * @apiSuccess {Number}   id            分类id
  * @apiSuccess {Number}   pid           上级id

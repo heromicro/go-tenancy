@@ -18,7 +18,6 @@ type OrderList struct {
 	SysTenancyID     uint           `json:"sysTenancyId"`
 	GroupOrderID     int            `json:"groupOrderId"`
 	ReconciliationID uint8          `json:"reconciliationId"`
-	CartID           uint           `json:"cartId"`
 	OrderProduct     []OrderProduct `gorm:"-" json:"orderProduct"`
 }
 
@@ -44,7 +43,6 @@ type OrderDetail struct {
 	SysTenancyID     uint   `json:"sysTenancyId"`
 	GroupOrderID     int    `json:"groupOrderId"`
 	ReconciliationID uint8  `json:"reconciliationId"`
-	CartID           uint   `json:"cartId"`
 	UserNickName     string `json:"userNickName" form:"userNickName"`
 }
 

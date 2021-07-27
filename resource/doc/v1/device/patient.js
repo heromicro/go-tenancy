@@ -12,7 +12,7 @@
  *     "Authorization: Bearer 5f048fe"
  *
  * @apiExample {bash} Curl example
- * curl -H "Authorization: Bearer 5f048fe" -i http://10.0.0.26:8085/v1/device/patient/getPatientList
+ * curl -H "Authorization: Bearer 5f048fe" -i http://127.0.0.1:8089/v1/device/patient/getPatientList
  *
  * @apiSuccess {Number}   id            
  * @apiSuccess {String}   name           患者名称
@@ -72,7 +72,7 @@
  *     "Authorization: Bearer 5f048fe"
  *
  * @apiExample {bash} Curl example
- * curl -H "Authorization: Bearer 5f048fe" -i http://10.0.0.26:8085/v1/device/patient/getPatientDetail
+ * curl -H "Authorization: Bearer 5f048fe" -i http://127.0.0.1:8089/v1/device/patient/getPatientDetail
  *
  * @apiSuccess {Number}   id            
  * @apiSuccess {String}   name           患者名称

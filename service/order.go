@@ -558,3 +558,17 @@ func CheckOrder(req request.CheckOrder, ctx *gin.Context) (response.CheckOrder, 
 
 	return res, nil
 }
+
+func CreateOrder(req request.CreateOrder, ctx *gin.Context) (uint, error) {
+	order := model.Order{
+		BaseOrder: model.BaseOrder{
+			OrderType: req.OrderType,
+			PayType:   req.PayType,
+		},
+	}
+	err := g.TENANCY_DB.Model(&model.Order{}).Create(&order).Error
+	if err != nil {
+		return order.ID, err
+	}
+	return order.ID, nil
+}

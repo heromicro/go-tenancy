@@ -49,10 +49,8 @@ type Order struct {
 	SysTenancyID     uint  `gorm:"index:sys_tenancy_id;column:sys_tenancy_id;type:int;not null" json:"sysTenancyId"` // 商户 id
 	GroupOrderID     int   `gorm:"column:group_order_id;type:int" json:"groupOrderId"`
 	ReconciliationID uint8 `gorm:"column:reconciliation_id;type:tinyint unsigned;not null;default:0" json:"reconciliationId"` // 对账id
-	CartID           uint  `gorm:"column:cart_id;type:varchar(256);not null" json:"cartId"`                                   // 购物车id
 
 	// VerifyServiceID  uint   `gorm:"column:verify_service_id;type:int unsigned;default:0" json:"verifyServiceId"`               // 核销客服 id
-	// CouponID       string    `gorm:"column:coupon_id;type:varchar(128);not null;default:''" json:"couponId"`                          // 优惠券id
 }
 
 type BaseOrder struct {
@@ -70,7 +68,7 @@ type BaseOrder struct {
 	Paid           int       `gorm:"column:paid;type:tinyint unsigned;not null;default:0" json:"paid"`                                // 支付状态
 	PayTime        time.Time `gorm:"column:pay_time;type:timestamp" json:"payTime"`                                                   // 支付时间
 	PayType        int       `gorm:"column:pay_type;type:tinyint(1);not null" json:"payType"`                                         // 支付方式  1=微信 2=小程序 3=h5 4=余额 5=支付宝
-	Status         int       `gorm:"column:status;type:tinyint(1);not null;default:0" json:"status"`                                  // 订单状态（1:待发货 2：待收货 3：待评价 4：已完成 5：已退款）
+	Status         int       `gorm:"column:status;type:tinyint(1);not null;default:6" json:"status"`                                  // 订单状态（1:待发货 2：待收货 3：待评价 4：已完成 5：已退款 6:待付款）
 	DeliveryType   int       `gorm:"column:delivery_type;type:varchar(32)" json:"deliveryType"`                                       // 发货类型(1:发货 2: 送货 3: 虚拟)
 	DeliveryName   string    `gorm:"column:delivery_name;type:varchar(64)" json:"deliveryName"`                                       // 快递名称/送货人姓名
 	DeliveryID     string    `gorm:"column:delivery_id;type:varchar(64)" json:"deliveryId"`                                           // 快递单号/手机号

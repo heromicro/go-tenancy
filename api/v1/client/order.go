@@ -15,11 +15,11 @@ func DeliveryOrderMap(ctx *gin.Context) {
 		response.FailWithMessage(errs.Error(), ctx)
 		return
 	}
-	if chart, err := service.DeliveryOrderMap(req.Id, ctx); err != nil {
+	if order, err := service.DeliveryOrderMap(req.Id, ctx); err != nil {
 		g.TENANCY_LOG.Error("获取失败!", zap.Any("err", err))
 		response.FailWithMessage("获取失败:"+err.Error(), ctx)
 	} else {
-		response.OkWithData(chart, ctx)
+		response.OkWithData(order, ctx)
 	}
 }
 
@@ -29,11 +29,11 @@ func GetOrderRemarkMap(ctx *gin.Context) {
 		response.FailWithMessage(errs.Error(), ctx)
 		return
 	}
-	if chart, err := service.GetOrderRemarkMap(req.Id, ctx); err != nil {
+	if order, err := service.GetOrderRemarkMap(req.Id, ctx); err != nil {
 		g.TENANCY_LOG.Error("获取失败!", zap.Any("err", err))
 		response.FailWithMessage("获取失败:"+err.Error(), ctx)
 	} else {
-		response.OkWithData(chart, ctx)
+		response.OkWithData(order, ctx)
 	}
 }
 
@@ -43,11 +43,11 @@ func GetEditOrderMap(ctx *gin.Context) {
 		response.FailWithMessage(errs.Error(), ctx)
 		return
 	}
-	if chart, err := service.GetEditOrderMap(req.Id, ctx); err != nil {
+	if order, err := service.GetEditOrderMap(req.Id, ctx); err != nil {
 		g.TENANCY_LOG.Error("获取失败!", zap.Any("err", err))
 		response.FailWithMessage("获取失败:"+err.Error(), ctx)
 	} else {
-		response.OkWithData(chart, ctx)
+		response.OkWithData(order, ctx)
 	}
 }
 
@@ -75,21 +75,21 @@ func GetOrderList(ctx *gin.Context) {
 
 // GetOrderChart
 func GetOrderChart(ctx *gin.Context) {
-	if chart, err := service.GetChart(ctx); err != nil {
+	if order, err := service.GetChart(ctx); err != nil {
 		g.TENANCY_LOG.Error("获取失败!", zap.Any("err", err))
 		response.FailWithMessage("获取失败:"+err.Error(), ctx)
 	} else {
-		response.OkWithData(chart, ctx)
+		response.OkWithData(order, ctx)
 	}
 }
 
 // GetOrderFilter
 func GetOrderFilter(ctx *gin.Context) {
-	if chart, err := service.GetFilter(ctx); err != nil {
+	if order, err := service.GetFilter(ctx); err != nil {
 		g.TENANCY_LOG.Error("获取失败!", zap.Any("err", err))
 		response.FailWithMessage("获取失败:"+err.Error(), ctx)
 	} else {
-		response.OkWithData(chart, ctx)
+		response.OkWithData(order, ctx)
 	}
 }
 
@@ -100,11 +100,11 @@ func GetOrderById(ctx *gin.Context) {
 		response.FailWithMessage(errs.Error(), ctx)
 		return
 	}
-	if chart, err := service.GetOrderById(req.Id, ctx); err != nil {
+	if order, err := service.GetOrderById(req.Id, ctx); err != nil {
 		g.TENANCY_LOG.Error("获取失败!", zap.Any("err", err))
 		response.FailWithMessage("获取失败:"+err.Error(), ctx)
 	} else {
-		response.OkWithData(chart, ctx)
+		response.OkWithData(order, ctx)
 	}
 }
 

@@ -159,7 +159,7 @@ define({ "api": [
     "groupTitle": "公共方法",
     "sampleRequest": [
       {
-        "url": "http://10.0.0.26:8085/v1/public/device/login"
+        "url": "http://127.0.0.1:8089/v1/public/device/login"
       }
     ]
   },
@@ -201,7 +201,7 @@ define({ "api": [
     "examples": [
       {
         "title": "Curl example",
-        "content": "curl -H \"Authorization: Bearer 5f048fe\" -i http://10.0.0.26:8085/v1/auth/logout",
+        "content": "curl -H \"Authorization: Bearer 5f048fe\" -i http://127.0.0.1:8089/v1/auth/logout",
         "type": "bash"
       }
     ],
@@ -218,7 +218,7 @@ define({ "api": [
     "groupTitle": "公共方法",
     "sampleRequest": [
       {
-        "url": "http://10.0.0.26:8085/v1/auth/logout"
+        "url": "http://127.0.0.1:8089/v1/auth/logout"
       }
     ],
     "error": {
@@ -285,7 +285,7 @@ define({ "api": [
     "examples": [
       {
         "title": "Curl example",
-        "content": "curl -H \"Authorization: Bearer 5f048fe\" -i http://10.0.0.26:8085/v1/device/productCategory/getProductCategoryList",
+        "content": "curl -H \"Authorization: Bearer 5f048fe\" -i http://127.0.0.1:8089/v1/device/productCategory/getProductCategoryList",
         "type": "bash"
       }
     ],
@@ -355,7 +355,7 @@ define({ "api": [
     "groupTitle": "商品分类",
     "sampleRequest": [
       {
-        "url": "http://10.0.0.26:8085/v1/device/productCategory/getProductCategoryList"
+        "url": "http://127.0.0.1:8089/v1/device/productCategory/getProductCategoryList"
       }
     ],
     "error": {
@@ -528,7 +528,7 @@ define({ "api": [
     "examples": [
       {
         "title": "Curl example",
-        "content": "curl -H \"Authorization: Bearer 5f048fe\" -i http://10.0.0.26:8085/v1/device/product/getProductList",
+        "content": "curl -H \"Authorization: Bearer 5f048fe\" -i http://127.0.0.1:8089/v1/device/product/getProductList",
         "type": "bash"
       }
     ],
@@ -545,7 +545,7 @@ define({ "api": [
     "groupTitle": "商品管理",
     "sampleRequest": [
       {
-        "url": "http://10.0.0.26:8085/v1/device/product/getProductList"
+        "url": "http://127.0.0.1:8089/v1/device/product/getProductList"
       }
     ],
     "error": {
@@ -612,7 +612,7 @@ define({ "api": [
     "examples": [
       {
         "title": "Curl example",
-        "content": "curl -H \"Authorization: Bearer 5f048fe\" -i http://10.0.0.26:8085/v1/device/product/getProductById/1",
+        "content": "curl -H \"Authorization: Bearer 5f048fe\" -i http://127.0.0.1:8089/v1/device/product/getProductById/1",
         "type": "bash"
       }
     ],
@@ -913,7 +913,7 @@ define({ "api": [
     "groupTitle": "商品管理",
     "sampleRequest": [
       {
-        "url": "http://10.0.0.26:8085/v1/device/product/getProductById/1"
+        "url": "http://127.0.0.1:8089/v1/device/product/getProductById/1"
       }
     ],
     "error": {
@@ -980,7 +980,7 @@ define({ "api": [
     "examples": [
       {
         "title": "Curl example",
-        "content": "curl -H \"Authorization: Bearer 5f048fe\" -i http://10.0.0.26:8085/v1/device/patient/getPatientList",
+        "content": "curl -H \"Authorization: Bearer 5f048fe\" -i http://127.0.0.1:8089/v1/device/patient/getPatientList",
         "type": "bash"
       }
     ],
@@ -1071,7 +1071,7 @@ define({ "api": [
     "groupTitle": "患者管理",
     "sampleRequest": [
       {
-        "url": "http://10.0.0.26:8085/v1/device/patient/getPatientList"
+        "url": "http://127.0.0.1:8089/v1/device/patient/getPatientList"
       }
     ],
     "error": {
@@ -1138,7 +1138,7 @@ define({ "api": [
     "examples": [
       {
         "title": "Curl example",
-        "content": "curl -H \"Authorization: Bearer 5f048fe\" -i http://10.0.0.26:8085/v1/device/patient/getPatientDetail",
+        "content": "curl -H \"Authorization: Bearer 5f048fe\" -i http://127.0.0.1:8089/v1/device/patient/getPatientDetail",
         "type": "bash"
       }
     ],
@@ -1229,7 +1229,7 @@ define({ "api": [
     "groupTitle": "患者管理",
     "sampleRequest": [
       {
-        "url": "http://10.0.0.26:8085/v1/device/patient/getPatientDetail"
+        "url": "http://127.0.0.1:8089/v1/device/patient/getPatientDetail"
       }
     ],
     "error": {
@@ -1305,7 +1305,7 @@ define({ "api": [
     "examples": [
       {
         "title": "Curl example",
-        "content": "curl -H \"Authorization: Bearer 5f048fe\" -i http://10.0.0.26:8085/v1/device/order/checkOrder",
+        "content": "curl -H \"Authorization: Bearer 5f048fe\" -i http://127.0.0.1:8089/v1/device/order/checkOrder",
         "type": "bash"
       }
     ],
@@ -1396,7 +1396,7 @@ define({ "api": [
     "groupTitle": "订单管理管理",
     "sampleRequest": [
       {
-        "url": "http://10.0.0.26:8085/v1/device/order/checkOrder"
+        "url": "http://127.0.0.1:8089/v1/device/order/checkOrder"
       }
     ],
     "error": {
@@ -1484,7 +1484,7 @@ define({ "api": [
     "examples": [
       {
         "title": "Curl example",
-        "content": "curl -H \"Authorization: Bearer 5f048fe\" -i http://10.0.0.26:8085/v1/device/cart/changeCartNum/1",
+        "content": "curl -H \"Authorization: Bearer 5f048fe\" -i http://127.0.0.1:8089/v1/device/cart/changeCartNum/1",
         "type": "bash"
       }
     ],
@@ -1501,7 +1501,7 @@ define({ "api": [
     "groupTitle": "购物车管理",
     "sampleRequest": [
       {
-        "url": "http://10.0.0.26:8085/v1/device/cart/changeCartNum/1"
+        "url": "http://127.0.0.1:8089/v1/device/cart/changeCartNum/1"
       }
     ],
     "error": {
@@ -1577,7 +1577,7 @@ define({ "api": [
     "examples": [
       {
         "title": "Curl example",
-        "content": "curl -H \"Authorization: Bearer 5f048fe\" -i http://10.0.0.26:8085/v1/device/cart/getProductCount",
+        "content": "curl -H \"Authorization: Bearer 5f048fe\" -i http://127.0.0.1:8089/v1/device/cart/getProductCount",
         "type": "bash"
       }
     ],
@@ -1594,7 +1594,7 @@ define({ "api": [
     "groupTitle": "购物车管理",
     "sampleRequest": [
       {
-        "url": "http://10.0.0.26:8085/v1/device/cart/deleteCart"
+        "url": "http://127.0.0.1:8089/v1/device/cart/deleteCart"
       }
     ],
     "error": {
@@ -1794,7 +1794,7 @@ define({ "api": [
     "examples": [
       {
         "title": "Curl example",
-        "content": "curl -H \"Authorization: Bearer 5f048fe\" -i http://10.0.0.26:8085/v1/cart/createCart",
+        "content": "curl -H \"Authorization: Bearer 5f048fe\" -i http://127.0.0.1:8089/v1/cart/createCart",
         "type": "bash"
       }
     ],
@@ -1802,7 +1802,7 @@ define({ "api": [
     "groupTitle": "购物车管理",
     "sampleRequest": [
       {
-        "url": "http://10.0.0.26:8085/v1/device/cart/createCart"
+        "url": "http://127.0.0.1:8089/v1/device/cart/createCart"
       }
     ],
     "error": {
@@ -1869,7 +1869,7 @@ define({ "api": [
     "examples": [
       {
         "title": "Curl example",
-        "content": "curl -H \"Authorization: Bearer 5f048fe\" -i http://10.0.0.26:8085/v1/device/cart/getProductCount",
+        "content": "curl -H \"Authorization: Bearer 5f048fe\" -i http://127.0.0.1:8089/v1/device/cart/getProductCount",
         "type": "bash"
       }
     ],
@@ -1897,7 +1897,7 @@ define({ "api": [
     "groupTitle": "购物车管理",
     "sampleRequest": [
       {
-        "url": "http://10.0.0.26:8085/v1/device/cart/getProductCount"
+        "url": "http://127.0.0.1:8089/v1/device/cart/getProductCount"
       }
     ],
     "error": {
@@ -1964,7 +1964,7 @@ define({ "api": [
     "examples": [
       {
         "title": "Curl example",
-        "content": "curl -H \"Authorization: Bearer 5f048fe\" -i http://10.0.0.26:8085/v1/device/cart/getCartList",
+        "content": "curl -H \"Authorization: Bearer 5f048fe\" -i http://127.0.0.1:8089/v1/device/cart/getCartList",
         "type": "bash"
       }
     ],
@@ -2020,7 +2020,7 @@ define({ "api": [
     "groupTitle": "购物车管理",
     "sampleRequest": [
       {
-        "url": "http://10.0.0.26:8085/v1/device/cart/getCartList"
+        "url": "http://127.0.0.1:8089/v1/device/cart/getCartList"
       }
     ],
     "error": {

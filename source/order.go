@@ -24,17 +24,17 @@ var groupOrders = []model.GroupOrder{
 }
 
 var orders = []model.Order{
-	{SysUserID: 3, SysTenancyID: 1, GroupOrderID: 1, ReconciliationID: 0, CartID: 1, BaseOrder: model.BaseOrder{OrderSn: g.CreateOrderSn(model.PayTypeWx), RealName: "real_name", UserPhone: "user_phone", UserAddress: "user_address", TotalNum: 10, TotalPrice: 20.00, TotalPostage: 30.00, PayPrice: 50.00, PayPostage: 30.00, CommissionRate: 15.00, OrderType: model.OrderTypeGeneral, Paid: g.StatusFalse, PayTime: time.Now(), PayType: model.PayTypeWx, Status: model.OrderStatusRefund, DeliveryType: model.DeliverTypeFH, DeliveryName: "delivery_name", DeliveryID: "delivery_id", Mark: "mark", Remark: "remark", AdminMark: "admin_mark", VerifyCode: "", VerifyTime: time.Now(), ActivityType: model.GeneralSale, Cost: 5.00, IsDel: g.StatusFalse}},
+	{SysUserID: 3, SysTenancyID: 1, GroupOrderID: 1, ReconciliationID: 0, BaseOrder: model.BaseOrder{OrderSn: g.CreateOrderSn(model.PayTypeWx), RealName: "real_name", UserPhone: "user_phone", UserAddress: "user_address", TotalNum: 10, TotalPrice: 20.00, TotalPostage: 30.00, PayPrice: 50.00, PayPostage: 30.00, CommissionRate: 15.00, OrderType: model.OrderTypeGeneral, Paid: g.StatusFalse, PayTime: time.Now(), PayType: model.PayTypeWx, Status: model.OrderStatusRefund, DeliveryType: model.DeliverTypeFH, DeliveryName: "delivery_name", DeliveryID: "delivery_id", Mark: "mark", Remark: "remark", AdminMark: "admin_mark", VerifyCode: "", VerifyTime: time.Now(), ActivityType: model.GeneralSale, Cost: 5.00, IsDel: g.StatusFalse}},
 
-	{SysUserID: 3, SysTenancyID: 1, GroupOrderID: 2, CartID: 2, BaseOrder: model.BaseOrder{OrderSn: g.CreateOrderSn(model.PayTypeWx), RealName: "发斯蒂芬斯蒂芬", UserPhone: "13672286043", UserAddress: "北京市北京市东城区 的是非得失", TotalNum: 1, TotalPrice: 88.00, TotalPostage: 1.00, PayPrice: 89.00, PayPostage: 1.00, CommissionRate: 0.2000, OrderType: model.OrderTypeGeneral, Paid: g.StatusFalse, PayTime: time.Now(), PayType: model.PayTypeWx, Status: model.OrderStatusNoReceive, Cost: 100.00, IsDel: g.StatusTrue}},
+	{SysUserID: 3, SysTenancyID: 1, GroupOrderID: 2, BaseOrder: model.BaseOrder{OrderSn: g.CreateOrderSn(model.PayTypeWx), RealName: "发斯蒂芬斯蒂芬", UserPhone: "13672286043", UserAddress: "北京市北京市东城区 的是非得失", TotalNum: 1, TotalPrice: 88.00, TotalPostage: 1.00, PayPrice: 89.00, PayPostage: 1.00, CommissionRate: 0.2000, OrderType: model.OrderTypeGeneral, Paid: g.StatusFalse, PayTime: time.Now(), PayType: model.PayTypeWx, Status: model.OrderStatusNoReceive, Cost: 100.00, IsDel: g.StatusTrue}},
 
-	{SysUserID: 3, SysTenancyID: 1, GroupOrderID: 2, CartID: 2, BaseOrder: model.BaseOrder{OrderSn: g.CreateOrderSn(model.PayTypeWx), RealName: "发斯蒂芬斯蒂芬", UserPhone: "13672286043", UserAddress: "北京市北京市东城区 的是非得失", TotalNum: 1, TotalPrice: 88.00, TotalPostage: 1.00, PayPrice: 89.00, PayPostage: 1.00, CommissionRate: 0.2000, OrderType: model.OrderTypeGeneral, Paid: g.StatusTrue, PayTime: time.Now(), PayType: model.PayTypeWx, Status: model.OrderStatusNoReceive, Cost: 100.00, IsDel: g.StatusFalse}},
+	{SysUserID: 3, SysTenancyID: 1, GroupOrderID: 2, BaseOrder: model.BaseOrder{OrderSn: g.CreateOrderSn(model.PayTypeWx), RealName: "发斯蒂芬斯蒂芬", UserPhone: "13672286043", UserAddress: "北京市北京市东城区 的是非得失", TotalNum: 1, TotalPrice: 88.00, TotalPostage: 1.00, PayPrice: 89.00, PayPostage: 1.00, CommissionRate: 0.2000, OrderType: model.OrderTypeGeneral, Paid: g.StatusTrue, PayTime: time.Now(), PayType: model.PayTypeWx, Status: model.OrderStatusNoReceive, Cost: 100.00, IsDel: g.StatusFalse}},
 
-	{SysUserID: 3, SysTenancyID: 1, GroupOrderID: 3, CartID: 3, BaseOrder: model.BaseOrder{OrderSn: g.CreateOrderSn(model.PayTypeWx), RealName: "发斯蒂芬斯蒂芬", UserPhone: "13672286043", UserAddress: "北京市北京市东城区 的是非得失", TotalNum: 1, TotalPrice: 88.00, TotalPostage: 1.00, PayPrice: 89.00, PayPostage: 1.00, CommissionRate: 0.2000, OrderType: model.OrderTypeGeneral, Paid: g.StatusTrue, PayTime: time.Now(), PayType: model.PayTypeWx, Status: model.OrderStatusNoComment, Cost: 100.00, IsDel: g.StatusFalse}},
+	{SysUserID: 3, SysTenancyID: 1, GroupOrderID: 3, BaseOrder: model.BaseOrder{OrderSn: g.CreateOrderSn(model.PayTypeWx), RealName: "发斯蒂芬斯蒂芬", UserPhone: "13672286043", UserAddress: "北京市北京市东城区 的是非得失", TotalNum: 1, TotalPrice: 88.00, TotalPostage: 1.00, PayPrice: 89.00, PayPostage: 1.00, CommissionRate: 0.2000, OrderType: model.OrderTypeGeneral, Paid: g.StatusTrue, PayTime: time.Now(), PayType: model.PayTypeWx, Status: model.OrderStatusNoComment, Cost: 100.00, IsDel: g.StatusFalse}},
 
-	{SysUserID: 3, SysTenancyID: 1, GroupOrderID: 4, CartID: 4, BaseOrder: model.BaseOrder{OrderSn: g.CreateOrderSn(model.PayTypeWx), RealName: "发斯蒂芬斯蒂芬", UserPhone: "13672286043", UserAddress: "北京市北京市东城区 的是非得失", TotalNum: 1, TotalPrice: 88.00, TotalPostage: 1.00, PayPrice: 89.00, PayPostage: 1.00, CommissionRate: 0.2000, OrderType: model.OrderTypeGeneral, Paid: g.StatusTrue, PayTime: time.Now(), PayType: model.PayTypeWx, Status: model.OrderStatusFinish, Cost: 100.00, IsDel: g.StatusFalse}},
+	{SysUserID: 3, SysTenancyID: 1, GroupOrderID: 4, BaseOrder: model.BaseOrder{OrderSn: g.CreateOrderSn(model.PayTypeWx), RealName: "发斯蒂芬斯蒂芬", UserPhone: "13672286043", UserAddress: "北京市北京市东城区 的是非得失", TotalNum: 1, TotalPrice: 88.00, TotalPostage: 1.00, PayPrice: 89.00, PayPostage: 1.00, CommissionRate: 0.2000, OrderType: model.OrderTypeGeneral, Paid: g.StatusTrue, PayTime: time.Now(), PayType: model.PayTypeWx, Status: model.OrderStatusFinish, Cost: 100.00, IsDel: g.StatusFalse}},
 
-	{SysUserID: 3, SysTenancyID: 1, GroupOrderID: 5, CartID: 5, BaseOrder: model.BaseOrder{OrderSn: g.CreateOrderSn(model.PayTypeWx), RealName: "发斯蒂芬斯蒂芬", UserPhone: "13672286043", UserAddress: "北京市北京市东城区 的是非得失", TotalNum: 4, TotalPrice: 352.00, TotalPostage: 4.00, PayPrice: 356.00, PayPostage: 4.00, CommissionRate: 0.2000, OrderType: model.OrderTypeGeneral, Paid: g.StatusTrue, PayTime: time.Now(), PayType: model.PayTypeWx, Status: model.OrderStatusNoDeliver, Cost: 400.00, IsDel: g.StatusFalse}},
+	{SysUserID: 3, SysTenancyID: 1, GroupOrderID: 5, BaseOrder: model.BaseOrder{OrderSn: g.CreateOrderSn(model.PayTypeWx), RealName: "发斯蒂芬斯蒂芬", UserPhone: "13672286043", UserAddress: "北京市北京市东城区 的是非得失", TotalNum: 4, TotalPrice: 352.00, TotalPostage: 4.00, PayPrice: 356.00, PayPostage: 4.00, CommissionRate: 0.2000, OrderType: model.OrderTypeGeneral, Paid: g.StatusTrue, PayTime: time.Now(), PayType: model.PayTypeWx, Status: model.OrderStatusNoDeliver, Cost: 400.00, IsDel: g.StatusFalse}},
 }
 
 func getOrderProducts() []model.OrderProduct {
@@ -77,6 +77,16 @@ var orderStatus = []model.OrderStatus{
 	{OrderID: 5, ChangeType: "pay_success", ChangeMessage: "订单支付成功", ChangeTime: time.Now()},
 }
 
+var orderCarts = []model.CartOrder{
+	{OrderID: 1, CartID: 1},
+	{OrderID: 2, CartID: 2},
+	{OrderID: 3, CartID: 3},
+	{OrderID: 4, CartID: 4},
+	{OrderID: 5, CartID: 5},
+	{OrderID: 6, CartID: 6},
+	{OrderID: 7, CartID: 7},
+}
+
 //@description: orders 表数据初始化
 func (a *order) Init() error {
 	return g.TENANCY_DB.Transaction(func(tx *gorm.DB) error {
@@ -95,6 +105,9 @@ func (a *order) Init() error {
 			return err
 		}
 		if err := tx.Model(&model.OrderStatus{}).Create(&orderStatus).Error; err != nil { // 遇到错误时回滚事务
+			return err
+		}
+		if err := tx.Model(&model.CartOrder{}).Create(&orderCarts).Error; err != nil { // 遇到错误时回滚事务
 			return err
 		}
 		color.Info.Println("\n[Mysql] --> orders 表初始数据成功!")

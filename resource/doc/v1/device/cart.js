@@ -31,7 +31,7 @@
  * @apiSuccess {Number}   isFail     是否过期 1 是，2否
  * 
  * @apiExample {bash} Curl example
- * curl -H "Authorization: Bearer 5f048fe" -i http://10.0.0.26:8085/v1/cart/createCart
+ * curl -H "Authorization: Bearer 5f048fe" -i http://127.0.0.1:8089/v1/cart/createCart
  *
  * @apiUse TokenError
  *
@@ -75,7 +75,7 @@
  *     "Authorization: Bearer 5f048fe"
  *
  * @apiExample {bash} Curl example
- * curl -H "Authorization: Bearer 5f048fe" -i http://10.0.0.26:8085/v1/device/cart/getCartList
+ * curl -H "Authorization: Bearer 5f048fe" -i http://127.0.0.1:8089/v1/device/cart/getCartList
  *
  * @apiUse TokenError
  * 
@@ -153,7 +153,7 @@
  *     "Authorization: Bearer 5f048fe"
  *
  * @apiExample {bash} Curl example
- * curl -H "Authorization: Bearer 5f048fe" -i http://10.0.0.26:8085/v1/device/cart/changeCartNum/1
+ * curl -H "Authorization: Bearer 5f048fe" -i http://127.0.0.1:8089/v1/device/cart/changeCartNum/1
  *
  * @apiUse TokenError
  * 
@@ -182,7 +182,7 @@
  *     "Authorization: Bearer 5f048fe"
  *
  * @apiExample {bash} Curl example
- * curl -H "Authorization: Bearer 5f048fe" -i http://10.0.0.26:8085/v1/device/cart/getProductCount
+ * curl -H "Authorization: Bearer 5f048fe" -i http://127.0.0.1:8089/v1/device/cart/getProductCount
  *
  * @apiUse TokenError
  * 
@@ -215,7 +215,7 @@
  *     "Authorization: Bearer 5f048fe"
  *
  * @apiExample {bash} Curl example
- * curl -H "Authorization: Bearer 5f048fe" -i http://10.0.0.26:8085/v1/device/cart/getProductCount
+ * curl -H "Authorization: Bearer 5f048fe" -i http://127.0.0.1:8089/v1/device/cart/getProductCount
  *
  * @apiUse TokenError
  * 
