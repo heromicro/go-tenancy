@@ -126,9 +126,20 @@ func CreateProduct(req request.CreateProduct, tenancyId uint) (model.Product, er
 	product.IsBest = g.StatusFalse
 	product.IsNew = g.StatusFalse
 	product.ProductType = model.GeneralSale
-	product.Status = model.AuditProductStatus
 
-	err := g.TENANCY_DB.Transaction(func(tx *gorm.DB) error {
+	tenancy, err := GetTenancyByID(tenancyId)
+	if err != nil {
+		return product, err
+	}
+
+	// 开启商品审核的商家，审核商品
+	if tenancy.IsAudit == g.StatusTrue {
+		product.Status = model.AuditProductStatus
+	} else {
+		product.Status = model.SuccessProductStatus
+	}
+
+	err = g.TENANCY_DB.Transaction(func(tx *gorm.DB) error {
 		err := tx.Model(&model.Product{}).Create(&product).Error
 		if err != nil {
 			return fmt.Errorf("create product %w", err)
@@ -169,17 +180,25 @@ func UpdateProduct(req request.UpdateProduct, id uint, ctx *gin.Context) error {
 				return err
 			}
 		} else if multi.IsTenancy(ctx) {
+			tenancy, err := GetTenancyByID(tenancyId)
+			if err != nil {
+				return err
+			}
 			product := model.Product{
 				BaseProduct: req.BaseProduct,
 			}
-			product.Status = model.AuditProductStatus
+
+			// 开启审核商品需要审核
+			if tenancy.IsAudit == g.StatusTrue {
+				product.Status = model.AuditProductStatus
+			}
 			product.IsShow = g.StatusFalse
 			product.ProductCategoryID = req.CateId
 			product.SliderImage = strings.Join(req.SliderImages, ",")
 			if err := tx.Where("id = ?", id).Updates(&product).Error; err != nil {
 				return err
 			}
-			err := SetProductAttrValue(tx, true, id, req.ProductType, req.AttrValue)
+			err = SetProductAttrValue(tx, true, id, req.ProductType, req.AttrValue)
 			if err != nil {
 				return fmt.Errorf("set product attr %w", err)
 			}

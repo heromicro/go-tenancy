@@ -30,14 +30,13 @@ type BaseTenancy struct {
 	PostageScore   float64 `gorm:"column:postage_score;type:decimal(11,1);default:5.0" json:"postageScore"` // 物流评分
 	Mark           string  `gorm:"column:mark;type:varchar(256);not null" json:"mark"`                      // 商户备注
 	Sort           uint    `gorm:"column:sort;type:int unsigned;not null;default:0" json:"sort"`
-	IsAudit        uint8   `gorm:"column:is_audit;type:tinyint unsigned;not null;default:2" json:"isAudit"`       // 添加的产品是否审核 1不审核2审核
-	IsBest         uint8   `gorm:"column:is_best;type:tinyint unsigned;not null;default:2" json:"isBest"`         // 是否推荐
-	IsTrader       uint8   `gorm:"column:is_trader;type:tinyint unsigned;not null;default:2" json:"isTrader"`     // 是否自营
-	State          int     `gorm:"column:state;type:tinyint unsigned;not null;default:0" json:"State"`            // 商户是否 1开启2关闭
-	Info           string  `gorm:"column:info;type:varchar(256);not null;default:''" json:"Info"`                 // 店铺简介
-	ServicePhone   string  `gorm:"column:service_phone;type:varchar(13);not null;default:''" json:"servicePhone"` // 店铺电话
-	CareCount      uint    `gorm:"column:care_count;type:int unsigned;default:0" json:"careCount"`                // 关注总数
-	CopyProductNum int     `gorm:"column:copy_product_num;type:int;default:0" json:"copyProductNum"`              // 剩余复制商品次数
+	IsAudit        int     `gorm:"column:is_audit;type:tinyint(1);not null;default:2" json:"isAudit"`   // 添加的产品是否审核 1不审核2审核
+	IsBest         int     `gorm:"column:is_best;type:tinyint(1);not null;default:2" json:"isBest"`     // 是否推荐
+	IsTrader       int     `gorm:"column:is_trader;type:tinyint(1);not null;default:2" json:"isTrader"` // 是否自营
+	State          int     `gorm:"column:state;type:tinyint(1);not null;default:0" json:"State"`        // 商户是否 1开启2关闭
+	Info           string  `gorm:"column:info;type:varchar(256);not null;default:''" json:"Info"`       // 店铺简介
+	CareCount      uint    `gorm:"column:care_count;type:int unsigned;default:0" json:"careCount"`      // 关注总数
+	CopyProductNum int     `gorm:"column:copy_product_num;type:int;default:0" json:"copyProductNum"`    // 剩余复制商品次数
 
 	SysRegionCode uint `json:"sysRegionCode" form:"sysRegionCode" gorm:"column:sys_region_code;comment:商户所属区域code" binding:"required"`
 }
