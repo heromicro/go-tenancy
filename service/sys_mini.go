@@ -37,7 +37,7 @@ func GetMiniByID(id uint) (model.SysMini, error) {
 // UpdateMini
 func UpdateMini(m request.UpdateSysMini) (model.SysMini, error) {
 	var mini model.SysMini
-	err := g.TENANCY_DB.Where("name = ?", m.Name).Where("id <> ?", m.Id).First(&mini).Error
+	err := g.TENANCY_DB.Where("name = ?", m.Name).Not("id = ?", m.Id).First(&mini).Error
 	if !errors.Is(err, gorm.ErrRecordNotFound) {
 		return mini, errors.New("商户名称已被注冊")
 	}

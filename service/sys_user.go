@@ -35,7 +35,7 @@ func RegisterAdminMap(id uint, ctx *gin.Context) (Form, error) {
 	var form Form
 	var formStr string
 	if id > 0 {
-		user, err := FindUserById(fmt.Sprintf("%d", id))
+		user, err := FindUserByStringId(fmt.Sprintf("%d", id))
 		if err != nil {
 			return Form{}, err
 		}
@@ -173,7 +173,7 @@ func tenancyLogin(u *model.SysUser) (response.LoginResponse, error) {
 		Where("sys_authorities.authority_type = ?", multi.TenancyAuthority).
 		Select("sys_users.id,sys_users.username,sys_users.authority_id,sys_users.created_at,sys_users.updated_at,sys_tenancies.id  as tenancy_id,sys_tenancies.name as tenancy_name,tenancy_infos.email, tenancy_infos.phone, tenancy_infos.nick_name, tenancy_infos.header_img,sys_authorities.authority_name,sys_authorities.authority_type,sys_authorities.default_router,sys_users.authority_id").
 		Joins("left join tenancy_infos on tenancy_infos.sys_user_id = sys_users.id").
-		Joins("left join sys_tenancies on tenancy_infos.sys_tenancy_id = sys_tenancies.id").
+		Joins("left join sys_tenancies on sys_users.sys_tenancy_id = sys_tenancies.id").
 		Joins("left join sys_authorities on sys_authorities.authority_id = sys_users.authority_id").
 		First(&tenancy).Error
 	if errors.Is(err, gorm.ErrRecordNotFound) {
@@ -300,7 +300,7 @@ func GetTenancyByUserIds(userIds []uint) ([]response.SysTenancyUser, error) {
 		Select("sys_users.id,sys_users.status,sys_users.username,sys_users.authority_id,sys_users.created_at,sys_users.updated_at, tenancy_infos.email, tenancy_infos.phone, tenancy_infos.nick_name, tenancy_infos.header_img,sys_authorities.authority_name,sys_authorities.authority_type,sys_users.authority_id,sys_tenancies.name as tenancy_name").
 		Joins("left join tenancy_infos on tenancy_infos.sys_user_id = sys_users.id").
 		Joins("left join sys_authorities on sys_authorities.authority_id = sys_users.authority_id").
-		Joins("left join sys_tenancies on tenancy_infos.sys_tenancy_id = sys_tenancies.id").
+		Joins("left join sys_tenancies on sys_users.sys_tenancy_id = sys_tenancies.id").
 		Where("sys_users.authority_id IN (?)", tenancyAuthorityIds).
 		Where("sys_users.id IN (?)", userIds).
 		Find(&userList).Error
@@ -330,9 +330,42 @@ func SetUserAuthority(id uint, authorityId string) error {
 }
 
 // DeleteUser 删除用户
-func DeleteUser(id uint) (err error) {
-	var user model.SysUser
-	return g.TENANCY_DB.Where("id = ?", id).Delete(&user).Error
+func DeleteUser(id uint) error {
+	user, err := FindUserByStringId(fmt.Sprintf("%d", id))
+	if err != nil {
+		return err
+	}
+	err = g.TENANCY_DB.Transaction(func(tx *gorm.DB) error {
+		err := tx.Where("id = ?", id).Delete(&model.SysUser{}).Error
+		if err != nil {
+			return err
+		}
+		if user.AdminInfo.ID > 0 {
+			err = tx.Where("id = ?", user.AdminInfo.ID).Delete(&model.AdminInfo{}).Error
+			if err != nil {
+				return err
+			}
+		}
+		if user.TenancyInfo.ID > 0 {
+			err = tx.Where("id = ?", user.TenancyInfo.ID).Delete(&model.TenancyInfo{}).Error
+			if err != nil {
+				return err
+			}
+		}
+
+		if user.GeneralInfo.ID > 0 {
+			err = tx.Where("id = ?", user.GeneralInfo.ID).Delete(&model.GeneralInfo{}).Error
+			if err != nil {
+				return err
+			}
+		}
+
+		return nil
+	})
+	if err != nil {
+		return err
+	}
+	return nil
 }
 
 // UpdateAdminInfo 设置关联信息
@@ -384,7 +417,7 @@ func UpdateAdminInfo(userInfo request.UpdateUser, user model.SysUser, tenancyId 
 
 func GetUserByTenancyId(tenanacyId uint) (model.SysUser, error) {
 	var u model.SysUser
-	adminAuthorityIds, err := GetUserAuthorityIds(multi.AdminAuthority)
+	adminAuthorityIds, err := GetUserAuthorityIds(multi.TenancyAuthority)
 	if err != nil {
 		return u, err
 	}
@@ -392,15 +425,22 @@ func GetUserByTenancyId(tenanacyId uint) (model.SysUser, error) {
 		Select("sys_users.*").
 		Joins("left join sys_authorities on sys_authorities.authority_id = sys_users.authority_id").
 		Where("sys_users.authority_id IN (?)", adminAuthorityIds).
-		Where("`sys_users.sys_tenancy_id` = ?", tenanacyId).
+		Where("sys_users.sys_tenancy_id = ?", tenanacyId).
 		First(&u).Error
 	return u, err
 }
 
-// FindUserById 通过id获取用户信息
-func FindUserById(id string) (model.SysUser, error) {
+// FindUserByStringId 通过id获取用户信息
+func FindUserByStringId(id string) (model.SysUser, error) {
 	var u model.SysUser
 	err := g.TENANCY_DB.Where("`id` = ?", id).Preload("Authority").Preload("AdminInfo").Preload("TenancyInfo").Preload("GeneralInfo").First(&u).Error
+	return u, err
+}
+
+// FindUserByTenancyId 通过tenancy_id获取用户信息
+func FindUserByTenancyId(tenancyId uint) (model.SysUser, error) {
+	var u model.SysUser
+	err := g.TENANCY_DB.Where("sys_tenancy_id = ?", tenancyId).Preload("Authority").Preload("AdminInfo").Preload("TenancyInfo").Preload("GeneralInfo").First(&u).Error
 	return u, err
 }
 

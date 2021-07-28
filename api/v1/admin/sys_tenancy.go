@@ -42,16 +42,16 @@ func LoginTenancy(ctx *gin.Context) {
 
 // CreateTenancy
 func CreateTenancy(ctx *gin.Context) {
-	var tenancy model.SysTenancy
+	var tenancy request.CreateTenancy
 	if errs := ctx.ShouldBindJSON(&tenancy); errs != nil {
 		response.FailWithMessage(errs.Error(), ctx)
 		return
 	}
-	if returnTenancy, err := service.CreateTenancy(tenancy); err != nil {
+	if id, err := service.CreateTenancy(tenancy); err != nil {
 		g.TENANCY_LOG.Error("创建失败!", zap.Any("err", err))
 		response.FailWithMessage("添加失败:"+err.Error(), ctx)
 	} else {
-		response.OkWithDetailed(returnTenancy, "创建成功", ctx)
+		response.OkWithDetailed(gin.H{"id": id}, "创建成功", ctx)
 	}
 }
 

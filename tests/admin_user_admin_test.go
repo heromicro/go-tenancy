@@ -22,13 +22,6 @@ func TestAdminUserList(t *testing.T) {
 	data.Keys().ContainsOnly("list", "total", "page", "pageSize")
 	data.Value("pageSize").Number().Equal(10)
 	data.Value("page").Number().Equal(1)
-	data.Value("total").Number().Ge(1)
-
-	list := data.Value("list").Array()
-	list.Length().Ge(0)
-	first := list.First().Object()
-	first.Keys().ContainsOnly("id", "userName", "email", "phone", "status", "nickName", "headerImg", "authorityName", "authorityType", "authorityId", "defaultRouter", "createdAt", "updatedAt")
-	first.Value("id").Number().Ge(0)
 }
 
 func TestAdminLoginUser(t *testing.T) {

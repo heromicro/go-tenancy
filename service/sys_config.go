@@ -179,7 +179,7 @@ func ChangeConfigStatus(changeStatus request.ChangeStatus) error {
 
 // UpdateConfig
 func UpdateConfig(m model.SysConfig, id uint) (model.SysConfig, error) {
-	err := g.TENANCY_DB.Where("config_key = ?", m.ConfigKey).Where("id <> ?", id).First(&model.SysConfig{}).Error
+	err := g.TENANCY_DB.Where("config_key = ?", m.ConfigKey).Not("id = ?", id).First(&model.SysConfig{}).Error
 	if !errors.Is(err, gorm.ErrRecordNotFound) {
 		return m, fmt.Errorf("设置key:%s已经使用", m.ConfigKey)
 	}

@@ -66,7 +66,7 @@ func UpdateAutoLabel(labelRule request.LabelRule, id uint) error {
 	err = g.TENANCY_DB.Model(&model.UserLabel{}).Where("label_name = ?", labelRule.LabelName).
 		Where("sys_tenancy_id = ?", labelRule.SysTenancyID).
 		Where("type = ?", model.UserLabelTypeZD).
-		Where("id <> ?", rule.UserLabelID).
+		Not("id = ?", rule.UserLabelID).
 		First(&label).Error
 	if !errors.Is(err, gorm.ErrRecordNotFound) {
 		return errors.New("名称已被注冊")

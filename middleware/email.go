@@ -21,7 +21,7 @@ func ErrorToEmail() gin.HandlerFunc {
 		if waitUse != nil {
 			username = waitUse.Username
 		} else {
-			user, err := service.FindUserById(ctx.GetHeader("X-USER-ID"))
+			user, err := service.FindUserByStringId(ctx.GetHeader("X-USER-ID"))
 			if err != nil {
 				username = "Unknown"
 			}

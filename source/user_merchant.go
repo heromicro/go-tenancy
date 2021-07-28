@@ -14,12 +14,12 @@ var UserMerchant = new(userMerchant)
 type userMerchant struct{}
 
 var userMerchants = []model.UserMerchant{
-	{SysUserID: 3, SysTenancyID: 1, FirstPayTime: time.Now(), LastPayTime: time.Now(), PayCount: 3, PayPrice: 534.00, LastTime: time.Now(), Status: g.StatusTrue},
+	{SysUserID: 7, SysTenancyID: 1, FirstPayTime: time.Now(), LastPayTime: time.Now(), PayCount: 3, PayPrice: 534.00, LastTime: time.Now(), Status: g.StatusTrue},
 }
 
 var userTenancyUserLabels = []model.UserUserLabel{
-	{SysUserID: 3, UserLabelID: 3, SysTenancyID: 1},
-	{SysUserID: 4, UserLabelID: 4, SysTenancyID: 1},
+	{SysUserID: 7, UserLabelID: 3, SysTenancyID: 1},
+	{SysUserID: 8, UserLabelID: 4, SysTenancyID: 1},
 }
 
 func (m *userMerchant) Init() error {

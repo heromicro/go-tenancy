@@ -100,7 +100,7 @@ func GetUserLabelByIds(ids []string, tenancyId uint) ([]response.UserLabelWithUs
 
 // UpdateUserLabel
 func UpdateUserLabel(userLabel model.UserLabel, id uint) (model.UserLabel, error) {
-	err := g.TENANCY_DB.Where("label_name = ?", userLabel.LabelName).Where("sys_tenancy_id = ?", userLabel.SysTenancyID).Where("id <> ?", id).First(&userLabel).Error
+	err := g.TENANCY_DB.Where("label_name = ?", userLabel.LabelName).Where("sys_tenancy_id = ?", userLabel.SysTenancyID).Not("id = ?", id).First(&userLabel).Error
 	if !errors.Is(err, gorm.ErrRecordNotFound) {
 		return userLabel, errors.New("名称已被注冊")
 	}

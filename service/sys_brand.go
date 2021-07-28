@@ -67,7 +67,7 @@ func ChangeBrandStatus(changeStatus request.ChangeStatus) error {
 
 // UpdateBrand
 func UpdateBrand(brand model.SysBrand, id uint) (model.SysBrand, error) {
-	err := g.TENANCY_DB.Where("brand_name = ?", brand.BrandName).Where("id <> ?", id).First(&brand).Error
+	err := g.TENANCY_DB.Where("brand_name = ?", brand.BrandName).Not("id = ?", id).First(&brand).Error
 	if !errors.Is(err, gorm.ErrRecordNotFound) {
 		return brand, errors.New("名称已被注冊")
 	}

@@ -14,6 +14,7 @@ import (
 	"github.com/snowlyg/go-tenancy/model/request"
 	"github.com/snowlyg/go-tenancy/model/response"
 	"github.com/snowlyg/go-tenancy/source"
+	"github.com/snowlyg/go-tenancy/utils"
 	"github.com/snowlyg/multi"
 	"gorm.io/gorm"
 )
@@ -41,7 +42,7 @@ func LoginTenancy(id uint) (response.LoginTenancy, error) {
 	err := g.TENANCY_DB.Model(&model.SysUser{}).
 		Select("sys_users.id,sys_users.username,sys_users.authority_id,sys_users.created_at,sys_users.updated_at,sys_tenancies.id as tenancy_id,sys_tenancies.name as tenancy_name,sys_tenancies.status,tenancy_infos.email, tenancy_infos.phone, tenancy_infos.nick_name, tenancy_infos.header_img,sys_authorities.authority_name,sys_authorities.authority_type,sys_authorities.default_router,sys_users.authority_id").
 		Joins("left join tenancy_infos on tenancy_infos.sys_user_id = sys_users.id").
-		Joins("left join sys_tenancies on tenancy_infos.sys_tenancy_id = sys_tenancies.id").
+		Joins("left join sys_tenancies on sys_users.sys_tenancy_id = sys_tenancies.id").
 		Joins("left join sys_authorities on sys_authorities.authority_id = sys_users.authority_id").
 		Where("sys_authorities.authority_type = ?", multi.TenancyAuthority).
 		Where("sys_tenancies.id = ?", id).
@@ -85,14 +86,42 @@ func LoginTenancy(id uint) (response.LoginTenancy, error) {
 }
 
 // CreateTenancy
-func CreateTenancy(tenancy model.SysTenancy) (model.SysTenancy, error) {
-	err := g.TENANCY_DB.Where("name = ?", tenancy.Name).First(&tenancy).Error
+func CreateTenancy(req request.CreateTenancy) (uint, error) {
+	err := g.TENANCY_DB.Where("name = ?", req.Name).First(&model.SysTenancy{}).Error
 	if !errors.Is(err, gorm.ErrRecordNotFound) {
-		return tenancy, errors.New("名称已被注冊")
+		return 0, errors.New("商户名称已被注冊")
 	}
-	tenancy.UUID = uuid.NewV4()
-	err = g.TENANCY_DB.Create(&tenancy).Error
-	return tenancy, err
+	err = g.TENANCY_DB.
+		Where("sys_users.username = ?", req.Username).
+		Where("sys_authorities.authority_type = ?", multi.TenancyAuthority).
+		Joins("left join sys_authorities on sys_authorities.authority_id = sys_users.authority_id").
+		First(&model.SysUser{}).Error
+	if !errors.Is(err, gorm.ErrRecordNotFound) { // 判断用户名是否注册
+		return 0, errors.New("管理员用户名已注册")
+	}
+
+	err = g.TENANCY_DB.Transaction(func(tx *gorm.DB) error {
+		req.SysTenancy.UUID = uuid.NewV4()
+		req.SysTenancy.Status = g.StatusTrue
+		req.SysTenancy.State = g.StatusTrue
+		err = tx.Model(&model.SysTenancy{}).Create(&req.SysTenancy).Error
+		if err != nil {
+			return err
+		}
+		user := model.SysUser{Username: req.Username, Password: utils.MD5V([]byte("123456")), AuthorityId: source.TenancyAuthorityId, Status: g.StatusTrue, SysTenancyID: req.SysTenancy.ID}
+		err = tx.Create(&user).Error
+		if err != nil {
+			return err
+		}
+		tenancyInfo := model.TenancyInfo{BaseUserInfo: model.BaseUserInfo{NickName: req.Name, SysUserID: user.ID}}
+		err = tx.Create(&tenancyInfo).Error
+		if err != nil {
+			return err
+		}
+		return nil
+	})
+
+	return req.SysTenancy.ID, err
 }
 
 // GetTenancyByID
@@ -140,7 +169,46 @@ func UpdateClientTenancy(req request.UpdateClientTenancy, id uint) error {
 
 // DeleteTenancy
 func DeleteTenancy(id uint) error {
-	return g.TENANCY_DB.Where("id = ?", id).Delete(&model.SysTenancy{}).Error
+	user, err := FindUserByTenancyId(id)
+	if err != nil {
+		return err
+	}
+	err = g.TENANCY_DB.Transaction(func(tx *gorm.DB) error {
+		err := tx.Where("id = ?", id).Delete(&model.SysTenancy{}).Error
+		if err != nil {
+			return err
+		}
+		if user.ID > 0 {
+			err = tx.Where("id = ?", user.ID).Delete(&model.SysUser{}).Error
+			if err != nil {
+				return err
+			}
+		}
+		if user.AdminInfo.ID > 0 {
+			err = tx.Where("id = ?", user.AdminInfo.ID).Delete(&model.AdminInfo{}).Error
+			if err != nil {
+				return err
+			}
+		}
+		if user.TenancyInfo.ID > 0 {
+			err = tx.Where("id = ?", user.TenancyInfo.ID).Delete(&model.TenancyInfo{}).Error
+			if err != nil {
+				return err
+			}
+		}
+		if user.GeneralInfo.ID > 0 {
+			err = tx.Where("id = ?", user.GeneralInfo.ID).Delete(&model.GeneralInfo{}).Error
+			if err != nil {
+				return err
+			}
+		}
+		return nil
+	})
+	if err != nil {
+		return err
+	}
+	return nil
+
 }
 
 // GetTenanciesInfoList

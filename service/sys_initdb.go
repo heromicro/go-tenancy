@@ -33,10 +33,7 @@ func createTable(dsn string, driver string, createSql string) error {
 		return err
 	}
 	defer func(db *sql.DB) {
-		err := db.Close()
-		if err != nil {
-
-		}
+		_ = db.Close()
 	}(db)
 	if err = db.Ping(); err != nil {
 		return err
@@ -105,9 +102,6 @@ func InitDB(conf request.InitDB) error {
 		SkipInitializeWithVersion: false,   // 根据版本自动配置
 	}
 	if db, err := gorm.Open(mysql.New(mysqlConfig), &gorm.Config{DisableForeignKeyConstraintWhenMigrating: true}); err != nil {
-		//g.TENANCY_LOG.Error("MySQL启动异常", zap.Any("err", err))
-		//os.Exit(0)
-		//return nil
 		_ = WriteConfig(g.TENANCY_VP, BaseMysql)
 		return nil
 	} else {

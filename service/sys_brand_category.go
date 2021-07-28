@@ -68,7 +68,7 @@ func ChangeBrandCategoryStatus(changeStatus request.ChangeStatus) error {
 
 // UpdateBrandCategory
 func UpdateBrandCategory(brandCategory model.SysBrandCategory, id uint) (model.SysBrandCategory, error) {
-	err := g.TENANCY_DB.Where("cate_name = ?", brandCategory.CateName).Where("id <> ?", id).First(&brandCategory).Error
+	err := g.TENANCY_DB.Where("cate_name = ?", brandCategory.CateName).Not("id = ?", id).First(&brandCategory).Error
 	if !errors.Is(err, gorm.ErrRecordNotFound) {
 		return brandCategory, errors.New("名称已被注冊")
 	}

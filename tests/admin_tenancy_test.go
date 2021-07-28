@@ -23,7 +23,7 @@ func TestTenancyList(t *testing.T) {
 	}
 
 	year, month, _ := time.Now().Date()
-	date := fmt.Sprintf("%d/%02d/01-%d/%02d/28", year, month, year, month)
+	date := fmt.Sprintf("%d/%02d/01-%d/%02d/30", year, month, year, month)
 	params := []param{
 		{name: "no_date", args: map[string]interface{}{"page": 1, "pageSize": 10, "status": "1", "keyword": "", "date": ""}, length: 4},
 		{name: "today", args: map[string]interface{}{"page": 1, "pageSize": 10, "status": "1", "keyword": "", "date": "today"}, length: 1},
@@ -66,7 +66,6 @@ func list(t *testing.T, params map[string]interface{}, length int) {
 		"sales",
 		"serviceScore",
 		"Avatar",
-		"regAdminId",
 		"sort",
 		"isAudit",
 		"servicePhone",
@@ -132,6 +131,7 @@ func TestGetTenancyCount(t *testing.T) {
 
 func TestTenancyProcess(t *testing.T) {
 	data := map[string]interface{}{
+		"username":      "bafvetyy",
 		"name":          "宝安妇女儿童医院",
 		"tele":          "0755-23568911",
 		"address":       "xxx街道666号",
@@ -150,17 +150,10 @@ func TestTenancyProcess(t *testing.T) {
 
 	tenancy := obj.Value("data").Object()
 	tenancy.Value("id").Number().Ge(0)
-	tenancy.Value("uuid").String().NotEmpty()
-	tenancy.Value("name").String().Equal(data["name"].(string))
-	tenancy.Value("tele").String().Equal(data["tele"].(string))
-	tenancy.Value("address").String().Equal(data["address"].(string))
-	tenancy.Value("businessTime").String().Equal(data["businessTime"].(string))
-	tenancy.Value("sysRegionCode").Number().Equal(data["sysRegionCode"].(int))
-	tenancy.Value("status").Number().Equal(data["status"].(int))
 	tenancyId := tenancy.Value("id").Number().Raw()
 	if tenancyId > 0 {
-
 		update := map[string]interface{}{
+			"username":      "bafvetyy",
 			"name":          "宝安妇女儿童附属医院",
 			"tele":          "0755-235689111",
 			"address":       "xxx街道667号",
@@ -199,6 +192,13 @@ func TestTenancyProcess(t *testing.T) {
 		tenancy.Value("businessTime").String().Equal(update["businessTime"].(string))
 		tenancy.Value("sysRegionCode").Number().Equal(update["sysRegionCode"].(int))
 		tenancy.Value("status").Number().Equal(update["status"].(int))
+
+		// changePasswordMap
+		obj = auth.GET(fmt.Sprintf("v1/admin/tenancy/changePasswordMap/%d", int(tenancyId))).
+			Expect().Status(http.StatusOK).JSON().Object()
+		obj.Keys().ContainsOnly("status", "data", "message")
+		obj.Value("status").Number().Equal(200)
+		obj.Value("message").String().Equal("获取成功")
 
 		// setTenancyRegion
 		obj = auth.POST("v1/admin/tenancy/setTenancyRegion").
@@ -252,6 +252,7 @@ func TestTenancyProcess(t *testing.T) {
 }
 func TestTenancyRegisterError(t *testing.T) {
 	data := map[string]interface{}{
+		"username":      "bafvetyy",
 		"name":          "宝安中心人民医院",
 		"tele":          "0755-23568911",
 		"address":       "xxx街道666号",
@@ -266,7 +267,7 @@ func TestTenancyRegisterError(t *testing.T) {
 		Expect().Status(http.StatusOK).JSON().Object()
 	obj.Keys().ContainsOnly("status", "data", "message")
 	obj.Value("status").Number().Equal(4000)
-	obj.Value("message").String().Equal("添加失败:名称已被注冊")
+	obj.Value("message").String().Equal("添加失败:商户名称已被注冊")
 
 }
 

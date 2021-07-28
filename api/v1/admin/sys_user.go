@@ -233,7 +233,7 @@ func DeleteUser(ctx *gin.Context) {
 // SetUserInfo 设置用户信息
 func SetUserInfo(ctx *gin.Context) {
 	userId := ctx.Param("user_id")
-	user, err := service.FindUserById(userId)
+	user, err := service.FindUserByStringId(userId)
 	if err != nil {
 		response.FailWithMessage(err.Error(), ctx)
 		return

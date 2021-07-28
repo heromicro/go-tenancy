@@ -74,7 +74,7 @@ func GetUserGroupByID(id uint) (model.UserGroup, error) {
 
 // UpdateUserGroup
 func UpdateUserGroup(userGroup model.UserGroup, id uint) (model.UserGroup, error) {
-	err := g.TENANCY_DB.Where("group_name = ?", userGroup.GroupName).Where("id <> ?", id).First(&userGroup).Error
+	err := g.TENANCY_DB.Where("group_name = ?", userGroup.GroupName).Not("id = ?", id).First(&userGroup).Error
 	if !errors.Is(err, gorm.ErrRecordNotFound) {
 		return userGroup, errors.New("名称已被注冊")
 	}

@@ -86,7 +86,7 @@ func ChangeExpressStatus(changeStatus request.ChangeStatus) error {
 
 // UpdateExpress
 func UpdateExpress(express model.Express, id uint) (model.Express, error) {
-	err := g.TENANCY_DB.Where("code = ?", express.Code).Where("id <> ?", id).First(&express).Error
+	err := g.TENANCY_DB.Where("code = ?", express.Code).Not("id = ?", id).First(&express).Error
 	if !errors.Is(err, gorm.ErrRecordNotFound) {
 		return express, errors.New("物流代码已被注冊")
 	}

@@ -72,7 +72,7 @@ func ChangeProductCategoryStatus(changeStatus request.ChangeStatus) error {
 
 // UpdateProductCategory
 func UpdateProductCategory(productCategory model.ProductCategory, id uint) (model.ProductCategory, error) {
-	err := g.TENANCY_DB.Where("cate_name = ?", productCategory.CateName).Where("id <> ?", id).First(&productCategory).Error
+	err := g.TENANCY_DB.Where("cate_name = ?", productCategory.CateName).Not("id = ?", id).First(&productCategory).Error
 	if !errors.Is(err, gorm.ErrRecordNotFound) {
 		return productCategory, errors.New("名称已被注冊")
 	}
