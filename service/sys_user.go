@@ -53,7 +53,13 @@ func RegisterAdminMap(id uint, ctx *gin.Context) (Form, error) {
 	} else {
 		form.SetAction("/user/registerAdmin", ctx)
 	}
-	opts, err := GetAuthorityOptions(multi.AdminAuthority)
+	authorityType := multi.NoneAuthority
+	if multi.IsAdmin(ctx) {
+		authorityType = multi.AdminAuthority
+	} else if multi.IsTenancy(ctx) {
+		authorityType = multi.TenancyAuthority
+	}
+	opts, err := GetAuthorityOptions(authorityType)
 	if err != nil {
 		return form, err
 	}
@@ -62,7 +68,7 @@ func RegisterAdminMap(id uint, ctx *gin.Context) (Form, error) {
 }
 
 // Register 用户注册
-func Register(req request.Register, authorityType int) (uint, error) {
+func Register(req request.Register, authorityType int, tenancyId uint) (uint, error) {
 	if !errors.Is(g.TENANCY_DB.
 		Where("sys_users.username = ?", req.Username).
 		Where("sys_authorities.authority_type = ?", authorityType).
@@ -71,13 +77,13 @@ func Register(req request.Register, authorityType int) (uint, error) {
 		return 0, errors.New("用户名已注册")
 	}
 	// 否则 附加uuid 密码md5简单加密 注册
-	user := model.SysUser{Username: req.Username, Password: utils.MD5V([]byte(req.Password)), AuthorityId: req.AuthorityId[0], Status: req.Status}
+	user := model.SysUser{Username: req.Username, Password: utils.MD5V([]byte(req.Password)), AuthorityId: req.AuthorityId[0], Status: req.Status, SysTenancyID: tenancyId}
 	err := g.TENANCY_DB.Transaction(func(tx *gorm.DB) error {
 		err := tx.Create(&user).Error
 		if err != nil {
 			return err
 		}
-		adminInfo := model.AdminInfo{BaseUserInfo: model.BaseUserInfo{NickName: req.NickName, Phone: req.Phone, SysUserID: user.ID}}
+		adminInfo := model.AdminInfo{NickName: req.NickName, Phone: req.Phone, SysUserID: user.ID}
 		err = tx.Create(&adminInfo).Error
 		if err != nil {
 			return err
@@ -346,12 +352,6 @@ func DeleteUser(id uint) error {
 				return err
 			}
 		}
-		if user.TenancyInfo.ID > 0 {
-			err = tx.Where("id = ?", user.TenancyInfo.ID).Delete(&model.TenancyInfo{}).Error
-			if err != nil {
-				return err
-			}
-		}
 
 		if user.GeneralInfo.ID > 0 {
 			err = tx.Where("id = ?", user.GeneralInfo.ID).Delete(&model.GeneralInfo{}).Error
@@ -382,6 +382,7 @@ func UpdateAdminInfo(userInfo request.UpdateUser, user model.SysUser, tenancyId 
 				}
 			} else {
 				info["sys_user_id"] = user.ID
+				info["sys_tenancy_id"] = tenancyId
 				err := tx.Model(&model.AdminInfo{}).Create(info).Error
 				if err != nil {
 					return err
@@ -389,20 +390,6 @@ func UpdateAdminInfo(userInfo request.UpdateUser, user model.SysUser, tenancyId 
 			}
 
 		} else if user.IsTenancy() {
-			if user.TenancyInfo.ID > 0 {
-				err := tx.Model(&model.TenancyInfo{}).Where("id = ?", user.TenancyInfo.ID).Updates(info).Error
-				if err != nil {
-					return err
-				}
-			} else {
-				info["sys_user_id"] = user.ID
-				info["sys_tenancy_id"] = tenancyId
-				err := tx.Model(&model.TenancyInfo{}).Create(info).Error
-				if err != nil {
-					return err
-				}
-			}
-		} else {
 			g.TENANCY_LOG.Error("未知角色", zap.Any("err", user.AuthorityType()))
 			return fmt.Errorf("未知角色")
 		}
@@ -433,14 +420,14 @@ func GetUserByTenancyId(tenanacyId uint) (model.SysUser, error) {
 // FindUserByStringId 通过id获取用户信息
 func FindUserByStringId(id string) (model.SysUser, error) {
 	var u model.SysUser
-	err := g.TENANCY_DB.Where("`id` = ?", id).Preload("Authority").Preload("AdminInfo").Preload("TenancyInfo").Preload("GeneralInfo").First(&u).Error
+	err := g.TENANCY_DB.Where("`id` = ?", id).Preload("Authority").Preload("AdminInfo").Preload("GeneralInfo").First(&u).Error
 	return u, err
 }
 
 // FindUserByTenancyId 通过tenancy_id获取用户信息
 func FindUserByTenancyId(tenancyId uint) (model.SysUser, error) {
 	var u model.SysUser
-	err := g.TENANCY_DB.Where("sys_tenancy_id = ?", tenancyId).Preload("Authority").Preload("AdminInfo").Preload("TenancyInfo").Preload("GeneralInfo").First(&u).Error
+	err := g.TENANCY_DB.Where("sys_tenancy_id = ?", tenancyId).Preload("Authority").Preload("AdminInfo").Preload("GeneralInfo").First(&u).Error
 	return u, err
 }
 
@@ -465,7 +452,7 @@ func CleanToken(userId string) error {
 }
 
 // GetTenancyInfoList 分页获取数据
-func GetTenancyInfoList(info request.PageInfo) ([]response.SysTenancyUser, int64, error) {
+func GetTenancyInfoList(info request.PageInfo, tenancyId uint) ([]response.SysTenancyUser, int64, error) {
 	var userList []response.SysTenancyUser
 	var tenancyAuthorityIds []int
 	var total int64
@@ -475,7 +462,7 @@ func GetTenancyInfoList(info request.PageInfo) ([]response.SysTenancyUser, int64
 	if err != nil {
 		return userList, 0, err
 	}
-	db := g.TENANCY_DB.Model(&model.SysUser{}).Where("sys_users.authority_id IN (?)", tenancyAuthorityIds)
+	db := g.TENANCY_DB.Model(&model.SysUser{})
 	if limit > 0 {
 		err = db.Count(&total).Error
 		if err != nil {
@@ -488,6 +475,8 @@ func GetTenancyInfoList(info request.PageInfo) ([]response.SysTenancyUser, int64
 		Joins("left join tenancy_infos on tenancy_infos.sys_user_id = sys_users.id").
 		Joins("left join sys_authorities on sys_authorities.authority_id = sys_users.authority_id").
 		Joins("left join sys_tenancies on sys_users.sys_tenancy_id = sys_tenancies.id").
+		Where("sys_users.authority_id IN (?)", tenancyAuthorityIds).
+		Where("sys_users.sys_tenancy_id = ?", tenancyId).
 		Find(&userList).Error
 	return userList, total, err
 }

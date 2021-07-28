@@ -2,7 +2,6 @@ package service
 
 import (
 	"errors"
-	"fmt"
 
 	"github.com/gin-gonic/gin"
 	"github.com/snowlyg/go-tenancy/g"
@@ -46,17 +45,7 @@ func GetSysOperationRecordInfoList(info request.SysOperationRecordSearch, ctx *g
 	var err error
 	db := g.TENANCY_DB.Model(&model.SysOperationRecord{})
 	if multi.IsTenancy(ctx) {
-		var userIds []int64
-		tenancyId := multi.GetTenancyId(ctx)
-		err = g.TENANCY_DB.Model(&model.TenancyInfo{}).Select("sys_user_id").Where("sys_tenancy_id = ?", tenancyId).Find(&userIds).Error
-		if err == nil {
-			db = db.Where("user_id in ?", userIds)
-		} else if !errors.Is(err, gorm.ErrRecordNotFound) {
-			fmt.Printf("err %+v\n\n\n\n", err)
-			if err != nil {
-				return nil, 0, err
-			}
-		}
+		db = db.Where("sys_tenancy_id = ?", multi.GetTenancyId(ctx))
 	}
 
 	// 如果有条件搜索 下方会自动创建搜索语句

@@ -30,12 +30,13 @@ func OperationRecord() gin.HandlerFunc {
 
 		record := model.SysOperationRecord{
 			BaseOperationRecord: model.BaseOperationRecord{
-				Ip:     ctx.ClientIP(),
-				Method: ctx.Request.Method,
-				Path:   ctx.Request.URL.Path,
-				Agent:  ctx.Request.UserAgent(),
-				Body:   string(body),
-				UserID: multi.GetUserId(ctx),
+				Ip:           ctx.ClientIP(),
+				Method:       ctx.Request.Method,
+				Path:         ctx.Request.URL.Path,
+				Agent:        ctx.Request.UserAgent(),
+				Body:         string(body),
+				UserID:       multi.GetUserId(ctx),
+				SysTenancyID: multi.GetTenancyId(ctx),
 			},
 		}
 
@@ -52,6 +53,7 @@ func OperationRecord() gin.HandlerFunc {
 		record.ErrorMessage = ctx.Errors.ByType(gin.ErrorTypePrivate).String()
 		record.Status = ctx.Writer.Status()
 		record.Latency = latency
+		record.Resp = writer.body.String()
 		if err := service.CreateSysOperationRecord(record); err != nil {
 			g.TENANCY_LOG.Error("create operation record error:", zap.Any("err", err))
 		}

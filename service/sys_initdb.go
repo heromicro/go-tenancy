@@ -114,7 +114,6 @@ func InitDB(conf request.InitDB) error {
 	err := g.TENANCY_DB.AutoMigrate(
 		model.SysUser{},
 		model.AdminInfo{},
-		model.TenancyInfo{},
 		model.GeneralInfo{},
 		model.SysAuthority{},
 		model.SysApi{},

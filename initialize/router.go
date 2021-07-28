@@ -43,7 +43,7 @@ func Routers(app *gin.Engine) {
 		public.InitInitRouter(PublicGroup)   // 自动初始化相关
 	}
 
-	V1Group := app.Group("/v1", middleware.Auth(), middleware.OperationRecord())
+	V1Group := app.Group("/v1", middleware.Auth())
 	{
 		Auth := V1Group.Group("/auth")
 		{
@@ -51,55 +51,61 @@ func Routers(app *gin.Engine) {
 		}
 
 		// 商户和员工
-		AdminGroup := V1Group.Group(g.TENANCY_CONFIG.System.AdminPreix, middleware.IsAdmin(), middleware.CasbinHandler())
+		AdminGroup := V1Group.Group(g.TENANCY_CONFIG.System.AdminPreix, middleware.IsAdmin(), middleware.CasbinHandler(), middleware.OperationRecord())
 		{
-			admin.InitApiRouter(AdminGroup)                // 注册功能api路由
-			admin.InitUserRouter(AdminGroup)               // 注册用户路由
-			admin.InitCUserRouter(AdminGroup)              // 注册c用户路由
-			admin.InitTenancyRouter(AdminGroup)            // 注册商户路由
-			admin.InitMiniRouter(AdminGroup)               // 注册小程序路由
-			admin.InitBrandRouter(AdminGroup)              // 注册品牌路由
-			admin.InitBrandCategoryRouter(AdminGroup)      // 注册品牌分类路由
-			admin.InitConfigCategoryRouter(AdminGroup)     // 注册系统配置分类路由
-			admin.InitConfigRouter(AdminGroup)             // 注册系统配置路由
-			admin.InitConfigValueRouter(AdminGroup)        // 注册系统配置值路由
-			admin.InitMenuRouter(AdminGroup)               // 注册menu路由
-			admin.InitEmailRouter(AdminGroup)              // 邮件相关路由
-			admin.InitSystemRouter(AdminGroup)             // system相关路由
-			admin.InitCasbinRouter(AdminGroup)             // 权限相关路由
-			admin.InitAuthorityRouter(AdminGroup)          // 注册角色路由
-			admin.InitMediaRouter(AdminGroup)              // 媒体库路由
-			admin.InitCategoryRouter(AdminGroup)           // 商品分类路由
-			admin.InitProductRouter(AdminGroup)            // 商品路由
-			admin.InitOrderRouter(AdminGroup)              // 订单路由
-			admin.InitRefundOrderRouter(AdminGroup)        // 退款订单路由
-			admin.InitExpressRouter(AdminGroup)            // 物流公司路由
-			admin.InitUserGroupRouter(AdminGroup)          // 用户分组路由
-			admin.InitUserLabelRouter(AdminGroup)          // 用户标签路由
-			admin.InitSysOperationRecordRouter(AdminGroup) // 操作记录
+			admin.InitApiRouter(AdminGroup)            // 注册功能api路由
+			admin.InitUserRouter(AdminGroup)           // 注册用户路由
+			admin.InitCUserRouter(AdminGroup)          // 注册c用户路由
+			admin.InitTenancyRouter(AdminGroup)        // 注册商户路由
+			admin.InitMiniRouter(AdminGroup)           // 注册小程序路由
+			admin.InitBrandRouter(AdminGroup)          // 注册品牌路由
+			admin.InitBrandCategoryRouter(AdminGroup)  // 注册品牌分类路由
+			admin.InitConfigCategoryRouter(AdminGroup) // 注册系统配置分类路由
+			admin.InitConfigRouter(AdminGroup)         // 注册系统配置路由
+			admin.InitConfigValueRouter(AdminGroup)    // 注册系统配置值路由
+			admin.InitMenuRouter(AdminGroup)           // 注册menu路由
+			admin.InitEmailRouter(AdminGroup)          // 邮件相关路由
+			admin.InitSystemRouter(AdminGroup)         // system相关路由
+			admin.InitCasbinRouter(AdminGroup)         // 权限相关路由
+			admin.InitAuthorityRouter(AdminGroup)      // 注册角色路由
+			admin.InitMediaRouter(AdminGroup)          // 媒体库路由
+			admin.InitCategoryRouter(AdminGroup)       // 商品分类路由
+			admin.InitProductRouter(AdminGroup)        // 商品路由
+			admin.InitOrderRouter(AdminGroup)          // 订单路由
+			admin.InitRefundOrderRouter(AdminGroup)    // 退款订单路由
+			admin.InitExpressRouter(AdminGroup)        // 物流公司路由
+			admin.InitUserGroupRouter(AdminGroup)      // 用户分组路由
+			admin.InitUserLabelRouter(AdminGroup)      // 用户标签路由
+		}
+		AdminLogGroup := V1Group.Group(g.TENANCY_CONFIG.System.AdminPreix, middleware.IsAdmin(), middleware.CasbinHandler())
+		{
+			admin.InitSysOperationRecordRouter(AdminLogGroup) // 操作记录
 		}
 
 		// 商户和员工
-		ClientGroup := V1Group.Group(g.TENANCY_CONFIG.System.ClientPreix, middleware.IsTenancy(), middleware.CasbinHandler())
+		ClientGroup := V1Group.Group(g.TENANCY_CONFIG.System.ClientPreix, middleware.IsTenancy(), middleware.CasbinHandler(), middleware.OperationRecord())
 		{
-
-			client.InitTenancyRouter(ClientGroup)            // 注册商户路由
-			client.InitBrandRouter(ClientGroup)              // 注册品牌路由
-			client.InitConfigRouter(ClientGroup)             // 注册系统配置路由
-			client.InitConfigValueRouter(ClientGroup)        // 注册系统配置值路由
-			client.InitMenuRouter(ClientGroup)               // 注册menu路由
-			client.InitMediaRouter(ClientGroup)              // 媒体库路由
-			client.InitCategoryRouter(ClientGroup)           // 商品分类路由
-			client.InitAttrTemplateRouter(ClientGroup)       // 规格模板路由
-			client.InitProductRouter(ClientGroup)            // 商品路由
-			client.InitShippingTemplateRouter(ClientGroup)   // 运费模板路由
-			client.InitOrderRouter(ClientGroup)              // 订单路由
-			client.InitRefundOrderRouter(ClientGroup)        // 退款订单路由
-			client.InitExpressRouter(ClientGroup)            // 物流公司路由
-			client.InitUserLabelRouter(ClientGroup)          // 用户标签路由
-			client.InitCUserRouter(ClientGroup)              // 用户管理路由
-			client.InitPatientRouter(ClientGroup)            // 患者管理路由
-			client.InitSysOperationRecordRouter(ClientGroup) // 操作记录
+			client.InitUserRouter(ClientGroup)             // 注册用户路由
+			client.InitTenancyRouter(ClientGroup)          // 注册商户路由
+			client.InitBrandRouter(ClientGroup)            // 注册品牌路由
+			client.InitConfigRouter(ClientGroup)           // 注册系统配置路由
+			client.InitConfigValueRouter(ClientGroup)      // 注册系统配置值路由
+			client.InitMenuRouter(ClientGroup)             // 注册menu路由
+			client.InitMediaRouter(ClientGroup)            // 媒体库路由
+			client.InitCategoryRouter(ClientGroup)         // 商品分类路由
+			client.InitAttrTemplateRouter(ClientGroup)     // 规格模板路由
+			client.InitProductRouter(ClientGroup)          // 商品路由
+			client.InitShippingTemplateRouter(ClientGroup) // 运费模板路由
+			client.InitOrderRouter(ClientGroup)            // 订单路由
+			client.InitRefundOrderRouter(ClientGroup)      // 退款订单路由
+			client.InitExpressRouter(ClientGroup)          // 物流公司路由
+			client.InitUserLabelRouter(ClientGroup)        // 用户标签路由
+			client.InitCUserRouter(ClientGroup)            // 用户管理路由
+			client.InitPatientRouter(ClientGroup)          // 患者管理路由
+		}
+		ClientLogGroup := V1Group.Group(g.TENANCY_CONFIG.System.ClientPreix, middleware.IsTenancy(), middleware.CasbinHandler())
+		{
+			client.InitSysOperationRecordRouter(ClientLogGroup) // 操作记录
 		}
 
 		// GeneralGroup := V1Group.Group("/user", middleware.IsGeneral())
@@ -107,7 +113,7 @@ func Routers(app *gin.Engine) {
 		// 	user.InitDeviceRouter(GeneralGroup)
 		// }
 
-		DeviceGroup := V1Group.Group("/device", middleware.IsDevice())
+		DeviceGroup := V1Group.Group("/device", middleware.IsDevice(), middleware.OperationRecord())
 		{
 			device.InitDeviceRouter(DeviceGroup)
 		}

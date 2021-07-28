@@ -15,13 +15,12 @@ var Admin = new(admin)
 type admin struct{}
 
 var admins = []model.SysUser{
-	{Username: "admin", Password: "e10adc3949ba59abbe56e057f20f883e", AuthorityId: AdminAuthorityId, AdminInfo: model.AdminInfo{BaseUserInfo: model.BaseUserInfo{Email: "admin@admin.com", Phone: "13800138000", NickName: "超级管理员", SysUserID: 1}}},
-
-	{Username: "a303176530", Password: "e10adc3949ba59abbe56e057f20f883e", AuthorityId: TenancyAuthorityId, TenancyInfo: model.TenancyInfo{BaseUserInfo: model.BaseUserInfo{Email: "a303176530@admin.com", Phone: "13800138000", NickName: "商户管理员", SysUserID: 2}}, SysTenancyID: 1},
-	{Username: "a303176532", Password: "e10adc3949ba59abbe56e057f20f883e", AuthorityId: TenancyAuthorityId, TenancyInfo: model.TenancyInfo{BaseUserInfo: model.BaseUserInfo{Email: "a303176530@admin.com", Phone: "13800138000", NickName: "商户管理员", SysUserID: 3}}, SysTenancyID: 2},
-	{Username: "a303176533", Password: "e10adc3949ba59abbe56e057f20f883e", AuthorityId: TenancyAuthorityId, TenancyInfo: model.TenancyInfo{BaseUserInfo: model.BaseUserInfo{Email: "a303176530@admin.com", Phone: "13800138000", NickName: "商户管理员", SysUserID: 4}}, SysTenancyID: 3},
-	{Username: "a303176534", Password: "e10adc3949ba59abbe56e057f20f883e", AuthorityId: TenancyAuthorityId, TenancyInfo: model.TenancyInfo{BaseUserInfo: model.BaseUserInfo{Email: "a303176530@admin.com", Phone: "13800138000", NickName: "商户管理员", SysUserID: 5}}, SysTenancyID: 4},
-	{Username: "a303176535", Password: "e10adc3949ba59abbe56e057f20f883e", AuthorityId: TenancyAuthorityId, TenancyInfo: model.TenancyInfo{BaseUserInfo: model.BaseUserInfo{Email: "a303176530@admin.com", Phone: "13800138000", NickName: "商户管理员", SysUserID: 6}}, SysTenancyID: 5},
+	{Username: "admin", Password: "e10adc3949ba59abbe56e057f20f883e", AuthorityId: AdminAuthorityId, AdminInfo: model.AdminInfo{Email: "admin@admin.com", Phone: "13800138000", NickName: "超级管理员", SysUserID: 1}},
+	{Username: "a303176530", Password: "e10adc3949ba59abbe56e057f20f883e", AuthorityId: TenancyAuthorityId, AdminInfo: model.AdminInfo{Email: "a303176530@admin.com", Phone: "13800138000", NickName: "商户管理员", SysUserID: 2}, SysTenancyID: 1},
+	{Username: "a303176532", Password: "e10adc3949ba59abbe56e057f20f883e", AuthorityId: TenancyAuthorityId, AdminInfo: model.AdminInfo{Email: "a303176530@admin.com", Phone: "13800138000", NickName: "商户管理员", SysUserID: 3}, SysTenancyID: 2},
+	{Username: "a303176533", Password: "e10adc3949ba59abbe56e057f20f883e", AuthorityId: TenancyAuthorityId, AdminInfo: model.AdminInfo{Email: "a303176530@admin.com", Phone: "13800138000", NickName: "商户管理员", SysUserID: 4}, SysTenancyID: 3},
+	{Username: "a303176534", Password: "e10adc3949ba59abbe56e057f20f883e", AuthorityId: TenancyAuthorityId, AdminInfo: model.AdminInfo{Email: "a303176530@admin.com", Phone: "13800138000", NickName: "商户管理员", SysUserID: 5}, SysTenancyID: 4},
+	{Username: "a303176535", Password: "e10adc3949ba59abbe56e057f20f883e", AuthorityId: TenancyAuthorityId, AdminInfo: model.AdminInfo{Email: "a303176530@admin.com", Phone: "13800138000", NickName: "商户管理员", SysUserID: 6}, SysTenancyID: 5},
 }
 
 var users = []model.SysUser{

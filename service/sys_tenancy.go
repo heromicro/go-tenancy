@@ -113,7 +113,7 @@ func CreateTenancy(req request.CreateTenancy) (uint, error) {
 		if err != nil {
 			return err
 		}
-		tenancyInfo := model.TenancyInfo{BaseUserInfo: model.BaseUserInfo{NickName: req.Name, SysUserID: user.ID}}
+		tenancyInfo := model.AdminInfo{NickName: req.Name, SysUserID: user.ID}
 		err = tx.Create(&tenancyInfo).Error
 		if err != nil {
 			return err
@@ -190,12 +190,7 @@ func DeleteTenancy(id uint) error {
 				return err
 			}
 		}
-		if user.TenancyInfo.ID > 0 {
-			err = tx.Where("id = ?", user.TenancyInfo.ID).Delete(&model.TenancyInfo{}).Error
-			if err != nil {
-				return err
-			}
-		}
+
 		if user.GeneralInfo.ID > 0 {
 			err = tx.Where("id = ?", user.GeneralInfo.ID).Delete(&model.GeneralInfo{}).Error
 			if err != nil {

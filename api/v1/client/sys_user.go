@@ -1,4 +1,4 @@
-package admin
+package client
 
 import (
 	"fmt"
@@ -52,8 +52,8 @@ func UpdateAdminMap(ctx *gin.Context) {
 	}
 }
 
-// RegisterAdmin 员工注册
-func RegisterAdmin(ctx *gin.Context) {
+// RegisterTenancy 商户注册
+func RegisterTenancy(ctx *gin.Context) {
 	var req request.Register
 	if errs := ctx.ShouldBindJSON(&req); errs != nil {
 		response.FailWithMessage(errs.Error(), ctx)
@@ -67,8 +67,7 @@ func RegisterAdmin(ctx *gin.Context) {
 		response.FailWithMessage("用户角色为必选参数", ctx)
 		return
 	}
-
-	id, err := service.Register(req, multi.AdminAuthority, multi.GetTenancyId(ctx))
+	id, err := service.Register(req, multi.TenancyAuthority, multi.GetTenancyId(ctx))
 	if err != nil {
 		g.TENANCY_LOG.Error("注册失败", zap.Any("err", err))
 		response.FailWithMessage(err.Error(), ctx)
@@ -97,7 +96,7 @@ func ChangePassword(ctx *gin.Context) {
 	}
 }
 
-// ChangeUserStatus 用户修改密码
+// ChangeUserStatus 用户修改状态
 func ChangeUserStatus(ctx *gin.Context) {
 	var changeStatus request.ChangeStatus
 	if errs := ctx.ShouldBindJSON(&changeStatus); errs != nil {
@@ -138,7 +137,7 @@ func GetAdminList(ctx *gin.Context) {
 		response.FailWithMessage(errs.Error(), ctx)
 		return
 	}
-	if list, total, err := service.GetAdminInfoList(pageInfo); err != nil {
+	if list, total, err := service.GetTenancyInfoList(pageInfo, multi.GetTenancyId(ctx)); err != nil {
 		g.TENANCY_LOG.Error("获取失败", zap.Any("err", err))
 		response.FailWithMessage("获取失败:"+err.Error(), ctx)
 	} else {
@@ -148,21 +147,6 @@ func GetAdminList(ctx *gin.Context) {
 			Page:     pageInfo.Page,
 			PageSize: pageInfo.PageSize,
 		}, "获取成功", ctx)
-	}
-}
-
-// SetUserAuthority 设置用户权限
-func SetUserAuthority(ctx *gin.Context) {
-	var sua request.SetUserAuth
-	if errs := ctx.ShouldBindJSON(&sua); errs != nil {
-		response.FailWithMessage(errs.Error(), ctx)
-		return
-	}
-	if err := service.SetUserAuthority(sua.Id, sua.AuthorityId); err != nil {
-		g.TENANCY_LOG.Error("修改失败", zap.Any("err", err))
-		response.FailWithMessage("修改失败", ctx)
-	} else {
-		response.OkWithMessage("修改成功", ctx)
 	}
 }
 

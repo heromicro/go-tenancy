@@ -21,7 +21,6 @@ type SysUser struct {
 	SysTenancyID uint         `json:"sysTenancyId" form:"sysTenancyId" gorm:"column:sys_tenancy_id;comment:关联标记"`
 
 	AdminInfo   AdminInfo   `json:"adminInfo" gorm:"foreignKey:SysUserID;references:ID;comment:管理员信息"`
-	TenancyInfo TenancyInfo `json:"tenancyInfo" gorm:"foreignKey:SysUserID;references:ID;comment:商户信息"`
 	GeneralInfo GeneralInfo `json:"generalInfo" gorm:"foreignKey:SysUserID;references:ID;comment:普通用户信息"`
 }
 
@@ -47,16 +46,6 @@ func (su *SysUser) AuthorityType() int {
 
 type AdminInfo struct {
 	g.TENANCY_MODEL
-	BaseUserInfo
-	SysUserID uint `json:"sysUserId" form:"sysUserId" gorm:"column:sys_user_id;comment:关联标记"`
-}
-
-type TenancyInfo struct {
-	g.TENANCY_MODEL
-	BaseUserInfo
-}
-
-type BaseUserInfo struct {
 	Email     string `json:"email" gorm:"default:'';comment:员工邮箱"`
 	Phone     string `json:"phone" gorm:"type:char(15);default:'';comment:员工手机号" `
 	NickName  string `json:"nickName" gorm:"type:varchar(16);default:'员工姓名';comment:员工姓名" `

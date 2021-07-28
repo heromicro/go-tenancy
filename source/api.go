@@ -24,7 +24,6 @@ var baseApis = []model.SysApi{
 	{Path: "/v1/admin/user/changePassword", Description: "修改密码", ApiGroup: "user", Method: "POST"},
 	{Path: "/v1/admin/user/changeProfile", Description: "修改个人信息", ApiGroup: "user", Method: "POST"},
 	{Path: "/v1/admin/user/getAdminList", Description: "获取管理员列表", ApiGroup: "user", Method: "POST"},
-	{Path: "/v1/admin/user/getTenancyList", Description: "获取商户员工列表", ApiGroup: "user", Method: "POST"},
 	{Path: "/v1/admin/user/setUserAuthority", Description: "修改用户角色", ApiGroup: "user", Method: "POST"},
 	{Path: "/v1/admin/user/setUserInfo", Description: "设置用户信息", ApiGroup: "user", Method: "PUT"},
 	{Path: "/v1/admin/user/deleteUser", Description: "删除用户", ApiGroup: "user", Method: "DELETE"},
@@ -313,7 +312,17 @@ var baseApis = []model.SysApi{
 	{Path: "/v1/merchant/userLabel/auto/createUserLabel", Description: "添加用户标签", ApiGroup: "userAutoLabelClient", Method: "POST"},
 	{Path: "/v1/merchant/userLabel/auto/updateUserLabel/:id", Description: "更新用户标签", ApiGroup: "userAutoLabelClient", Method: "PUT"},
 	{Path: "/v1/merchant/userLabel/auto/deleteUserLabel/:id", Description: "删除用户标签", ApiGroup: "userAutoLabelClient", Method: "DELETE"},
-
+	// 管理员管理
+	{Path: "/v1/merchant/user/changePasswordMap/:id", Description: "管理员修改密码表单", ApiGroup: "user", Method: "GET"},
+	{Path: "/v1/merchant/user/updateAdminMap/:id", Description: "管理员编辑表单", ApiGroup: "user", Method: "GET"},
+	{Path: "/v1/merchant/user/registerAdminMap", Description: "管理员注册表单", ApiGroup: "user", Method: "GET"},
+	{Path: "/v1/merchant/user/registerAdmin", Description: "管理员注册", ApiGroup: "user", Method: "POST"},
+	{Path: "/v1/merchant/user/changeUserStatus", Description: "修改状态", ApiGroup: "user", Method: "POST"},
+	{Path: "/v1/merchant/user/changePassword", Description: "修改密码", ApiGroup: "user", Method: "POST"},
+	{Path: "/v1/merchant/user/changeProfile", Description: "修改个人信息", ApiGroup: "user", Method: "POST"},
+	{Path: "/v1/merchant/user/getAdminList", Description: "获取管理员列表", ApiGroup: "user", Method: "POST"},
+	{Path: "/v1/merchant/user/setUserInfo", Description: "设置用户信息", ApiGroup: "user", Method: "PUT"},
+	{Path: "/v1/merchant/user/deleteUser", Description: "删除用户", ApiGroup: "user", Method: "DELETE"},
 	// 用户管理
 	{Path: "/v1/merchant/cuser/getGeneralList", Description: "获取c用户列表", ApiGroup: "cuserClient", Method: "POST"},
 	{Path: "/v1/merchant/cuser/getGeneralDetail/:id", Description: "获取c用户列表", ApiGroup: "cuserClient", Method: "GET"},
