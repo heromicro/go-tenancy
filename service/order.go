@@ -169,12 +169,12 @@ func GetChart(ctx *gin.Context) (map[string]interface{}, error) {
 func getOrderConditions() []response.OrderCondition {
 	conditions := []response.OrderCondition{
 		{Name: "all", Type: "0", Conditions: nil},
-		{Name: "unpaid", Type: "1", Conditions: map[string]interface{}{"paid": g.StatusFalse, "is_del": g.StatusTrue}},
+		{Name: "unpaid", Type: "1", Conditions: map[string]interface{}{"paid": g.StatusFalse, "is_del": g.StatusFalse}},
 		{Name: "unshipped", Type: "2", Conditions: map[string]interface{}{"paid": g.StatusTrue, "status": model.OrderStatusNoDeliver, "is_del": g.StatusTrue}},
-		{Name: "untake", Type: "3", Conditions: map[string]interface{}{"status": model.OrderStatusNoReceive, "is_del": g.StatusTrue}},
-		{Name: "unevaluate", Type: "4", Conditions: map[string]interface{}{"status": model.OrderStatusNoComment, "is_del": g.StatusTrue}},
-		{Name: "complete", Type: "5", Conditions: map[string]interface{}{"status": model.OrderStatusFinish, "is_del": g.StatusTrue}},
-		{Name: "refund", Type: "6", Conditions: map[string]interface{}{"status": model.OrderStatusRefund, "is_del": g.StatusTrue}},
+		{Name: "untake", Type: "3", Conditions: map[string]interface{}{"status": model.OrderStatusNoReceive, "is_del": g.StatusFalse}},
+		{Name: "unevaluate", Type: "4", Conditions: map[string]interface{}{"status": model.OrderStatusNoComment, "is_del": g.StatusFalse}},
+		{Name: "complete", Type: "5", Conditions: map[string]interface{}{"status": model.OrderStatusFinish, "is_del": g.StatusFalse}},
+		{Name: "refund", Type: "6", Conditions: map[string]interface{}{"status": model.OrderStatusRefund, "is_del": g.StatusFalse}},
 		{Name: "del", Type: "7", Conditions: map[string]interface{}{"is_del": g.StatusTrue}},
 	}
 	return conditions
