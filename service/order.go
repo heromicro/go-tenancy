@@ -339,13 +339,14 @@ func GetOrderInfoList(info request.OrderPageInfo, ctx *gin.Context) ([]response.
 			orderIds = append(orderIds, order.ID)
 		}
 
-		var orderProducts []response.OrderProduct
+		orderProducts := []response.OrderProduct{}
 		err = g.TENANCY_DB.Model(&model.OrderProduct{}).Where("order_id in ?", orderIds).Find(&orderProducts).Error
 		if err != nil {
 			return orderList, stat, total, err
 		}
 
 		for i := 0; i < len(orderList); i++ {
+			orderList[i].OrderProduct = []response.OrderProduct{}
 			for _, orderProduct := range orderProducts {
 				if orderList[i].ID == orderProduct.OrderID {
 					orderList[i].OrderProduct = append(orderList[i].OrderProduct, orderProduct)
