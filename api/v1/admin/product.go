@@ -94,12 +94,12 @@ func ChangeProductStatus(ctx *gin.Context) {
 
 // ChangeMutilProductStatus
 func ChangeMutilProductStatus(ctx *gin.Context) {
-	var changeStatus request.ChangeMutilProductStatus
+	var changeStatus request.ChangeProductStatus
 	if errs := ctx.ShouldBindJSON(&changeStatus); errs != nil {
 		response.FailWithMessage(errs.Error(), ctx)
 		return
 	}
-	err := service.ChangeMutilProductStatus(changeStatus)
+	err := service.ChangeProductStatus(changeStatus)
 	if err != nil {
 		g.TENANCY_LOG.Error("获取失败!", zap.Any("err", err))
 		response.FailWithMessage("获取失败:"+err.Error(), ctx)

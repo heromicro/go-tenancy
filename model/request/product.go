@@ -23,15 +23,10 @@ type SetProductFicti struct {
 }
 
 type ChangeProductStatus struct {
-	Id      uint   `json:"id" form:"id" binding:"required,gt=0"`
+	Id      []uint `json:"id" form:"id" binding:"required,gt=0"`
 	Status  int    `json:"status" binding:"required"`
 	Refusal string `json:"refusal" `
 }
-type ChangeMutilProductStatus struct {
-	Id     []uint `json:"id" form:"id" binding:"required,gt=0"`
-	Status int    `json:"status" binding:"required"`
-}
-
 type ChangeProductIsShow struct {
 	Id     uint `json:"id" form:"id" binding:"required,gt=0"`
 	IsShow int  `json:"isShow" binding:"required"`

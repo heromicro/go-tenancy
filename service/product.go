@@ -176,7 +176,7 @@ func UpdateProduct(req request.UpdateProduct, id uint, ctx *gin.Context) error {
 	tenancyId := multi.GetTenancyId(ctx)
 	err := g.TENANCY_DB.Transaction(func(tx *gorm.DB) error {
 		if multi.IsAdmin(ctx) {
-			if err := tx.Model(&model.Product{}).Where("id = ?", id).Updates(map[string]interface{}{"store_name": req.StoreName, "is_benefit": req.IsBenefit, "is_best": req.IsBest, "is_hot": req.IsHot, "is_new": req.IsNew, "sort": req.Sort}).Error; err != nil {
+			if err := tx.Model(&model.Product{}).Where("id = ?", id).Updates(map[string]interface{}{"store_name": req.StoreName, "is_benefit": req.IsBenefit, "is_best": req.IsBest, "is_hot": req.IsHot, "is_new": req.IsNew, "rank": req.Rank}).Error; err != nil {
 				return err
 			}
 		} else if multi.IsTenancy(ctx) {
@@ -476,12 +476,7 @@ func GetProductFictiByID(id uint) (int32, error) {
 
 // ChangeProductStatus
 func ChangeProductStatus(changeStatus request.ChangeProductStatus) error {
-	return g.TENANCY_DB.Model(&model.Product{}).Where("id = ?", changeStatus.Id).Updates(map[string]interface{}{"status": changeStatus.Status, "refusal": changeStatus.Refusal}).Error
-}
-
-// ChangeMutilProductStatus
-func ChangeMutilProductStatus(changeStatus request.ChangeMutilProductStatus) error {
-	return g.TENANCY_DB.Model(&model.Product{}).Where("id in ?", changeStatus.Id).Updates(map[string]interface{}{"status": changeStatus.Status}).Error
+	return g.TENANCY_DB.Model(&model.Product{}).Where("id in ?", changeStatus.Id).Updates(map[string]interface{}{"status": changeStatus.Status, "refusal": changeStatus.Refusal}).Error
 }
 
 // ChangeProductIsShow
