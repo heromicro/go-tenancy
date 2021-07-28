@@ -10,6 +10,21 @@ import (
 	"go.uber.org/zap"
 )
 
+// ChangeTenancyPasswordMap 设置用户分组表单
+func ChangeTenancyPasswordMap(ctx *gin.Context) {
+	var req request.GetById
+	if errs := ctx.ShouldBindUri(&req); errs != nil {
+		response.FailWithMessage(errs.Error(), ctx)
+		return
+	}
+	if detail, err := service.ChangeTenancyPasswordMap(req.Id, ctx); err != nil {
+		g.TENANCY_LOG.Error("获取失败", zap.Any("err", err))
+		response.FailWithMessage("获取失败:"+err.Error(), ctx)
+	} else {
+		response.OkWithDetailed(detail, "获取成功", ctx)
+	}
+}
+
 //LoginTenancy 后台登录
 func LoginTenancy(ctx *gin.Context) {
 	var req request.GetById

@@ -117,6 +117,7 @@ var baseApis = []model.SysApi{
 
 	// 商户
 	{Path: "/v1/admin/tenancy/getTenancySelect", Description: "获取下拉列表", ApiGroup: "tenancy", Method: "GET"},
+	{Path: "/v1/admin/tenancy/changePasswordMap/:id", Description: "获取商户管理员编辑表单", ApiGroup: "tenancy", Method: "GET"},
 	{Path: "/v1/admin/tenancy/changeCopyMap/:id", Description: "获取修改商品复制次数map", ApiGroup: "tenancy", Method: "GET"},
 	{Path: "/v1/admin/tenancy/getTenancies/:code", Description: "根据地区获取商户", ApiGroup: "tenancy", Method: "GET"},
 	{Path: "/v1/admin/tenancy/getTenancyCount", Description: "获取Tenancy对应状态数量", ApiGroup: "tenancy", Method: "GET"},

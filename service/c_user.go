@@ -265,7 +265,7 @@ func SetUserLabel(id, tenancyId uint, reqlabelIds []uint) error {
 
 func GetGeneralDetail(id, tenancyId uint) (response.GeneralUserDetail, error) {
 	var user response.GeneralUserDetail
-	generalAuthorityIds, err := GetUserAuthorityIds()
+	generalAuthorityIds, err := GetUserAuthorityIds(multi.GeneralAuthority)
 	if err != nil {
 		return user, err
 	}
@@ -297,7 +297,7 @@ func GetGeneralInfoList(info request.UserPageInfo, ctx *gin.Context) ([]response
 	limit := info.PageSize
 	offset := info.PageSize * (info.Page - 1)
 
-	generalAuthorityIds, err := GetUserAuthorityIds()
+	generalAuthorityIds, err := GetUserAuthorityIds(multi.GeneralAuthority)
 	if err != nil {
 		return userList, 0, err
 	}

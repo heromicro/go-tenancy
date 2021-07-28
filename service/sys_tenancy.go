@@ -18,6 +18,23 @@ import (
 	"gorm.io/gorm"
 )
 
+func ChangeTenancyPasswordMap(id uint, ctx *gin.Context) (Form, error) {
+	var form Form
+	user, err := GetUserByTenancyId(id)
+	if err != nil {
+		return form, err
+	}
+	formStr := fmt.Sprintf(`{"rule":[{"type":"input","field":"NewPassword","value":"","title":"密码","props":{"type":"password","placeholder":"请输入密码"},"validate":[{"message":"请输入密码","required":true,"type":"string","trigger":"change"}]},
+	{"type":"hidden","field":"id","value":%d,"title":"id","props":{"type":"hidden","placeholder":""}},{"type":"input","field":"confirmPassword","value":"","title":"确认密码","props":{"type":"password","placeholder":"请输入确认密码"},"validate":[{"message":"请输入确认密码","required":true,"type":"string","trigger":"change"}]}],"action":"","method":"POST","title":"修改密码","config":{}}`, user.ID)
+
+	err = json.Unmarshal([]byte(formStr), &form)
+	if err != nil {
+		return form, err
+	}
+	form.SetAction("/user/changePassword", ctx)
+	return form, nil
+}
+
 func LoginTenancy(id uint) (response.LoginTenancy, error) {
 	var loginTenancy response.LoginTenancy
 	var token string

@@ -12,12 +12,13 @@ import (
 type SysUser struct {
 	g.TENANCY_MODEL
 
-	Username    string       `json:"userName" gorm:"not null;type:varchar(32);comment:用户登录名"`
-	Password    string       `json:"-"  gorm:"not null;type:varchar(128);comment:用户登录密码"`
-	Authority   SysAuthority `json:"authority" gorm:"foreignKey:AuthorityId;references:AuthorityId;comment:用户角色"`
-	AuthorityId string       `json:"authorityId" gorm:"not null;comment:用户角色ID"`
+	Username string `json:"userName" gorm:"not null;type:varchar(32);comment:用户登录名"`
+	Password string `json:"-"  gorm:"not null;type:varchar(128);comment:用户登录密码"`
+	Status   int    `gorm:"column:status;type:tinyint(1);not null;default:1" json:"status"` // 1为正常，2为禁止
 
-	Status int `gorm:"column:status;type:tinyint(1);not null;default:1" json:"status"` // 1为正常，2为禁止
+	Authority    SysAuthority `json:"authority" gorm:"foreignKey:AuthorityId;references:AuthorityId;comment:用户角色"`
+	AuthorityId  string       `json:"authorityId" gorm:"not null;comment:用户角色ID"`
+	SysTenancyID uint         `json:"sysTenancyId" form:"sysTenancyId" gorm:"column:sys_tenancy_id;comment:关联标记"`
 
 	AdminInfo   AdminInfo   `json:"adminInfo" gorm:"foreignKey:SysUserID;references:ID;comment:管理员信息"`
 	TenancyInfo TenancyInfo `json:"tenancyInfo" gorm:"foreignKey:SysUserID;references:ID;comment:商户信息"`
@@ -53,7 +54,6 @@ type AdminInfo struct {
 type TenancyInfo struct {
 	g.TENANCY_MODEL
 	BaseUserInfo
-	SysTenancyID uint `json:"sysTenancyId" form:"sysTenancyId" gorm:"column:sys_tenancy_id;comment:关联标记"`
 }
 
 type BaseUserInfo struct {

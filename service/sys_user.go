@@ -266,13 +266,12 @@ func ChangeProfile(user request.ChangeProfile, sysUserId uint) error {
 // GetAdminInfoList 分页获取数据
 func GetAdminInfoList(info request.PageInfo) ([]response.SysAdminUser, int64, error) {
 	var userList []response.SysAdminUser
-	var adminAuthorityIds []int
 	var total int64
 	limit := info.PageSize
 	offset := info.PageSize * (info.Page - 1)
-	err := g.TENANCY_DB.Model(&model.SysAuthority{}).Where("authority_type", multi.AdminAuthority).Select("authority_id").Find(&adminAuthorityIds).Error
+	adminAuthorityIds, err := GetUserAuthorityIds(multi.AdminAuthority)
 	if err != nil {
-		return userList, 0, err
+		return userList, total, err
 	}
 	db := g.TENANCY_DB.Model(&model.SysUser{}).Where("sys_users.authority_id IN (?)", adminAuthorityIds).Where("sys_users.username != ?", "admin")
 	if limit > 0 {
@@ -293,8 +292,7 @@ func GetAdminInfoList(info request.PageInfo) ([]response.SysAdminUser, int64, er
 // GetTenancyByUserIds
 func GetTenancyByUserIds(userIds []uint) ([]response.SysTenancyUser, error) {
 	var userList []response.SysTenancyUser
-	var tenancyAuthorityIds []int
-	err := g.TENANCY_DB.Model(&model.SysAuthority{}).Where("authority_type", multi.TenancyAuthority).Select("authority_id").Find(&tenancyAuthorityIds).Error
+	tenancyAuthorityIds, err := GetUserAuthorityIds(multi.TenancyAuthority)
 	if err != nil {
 		return userList, err
 	}
@@ -312,8 +310,7 @@ func GetTenancyByUserIds(userIds []uint) ([]response.SysTenancyUser, error) {
 // GetAdminByUserIds
 func GetAdminByUserIds(userIds []uint) ([]response.SysAdminUser, error) {
 	var userList []response.SysAdminUser
-	var adminAuthorityIds []int
-	err := g.TENANCY_DB.Model(&model.SysAuthority{}).Where("authority_type", multi.AdminAuthority).Select("authority_id").Find(&adminAuthorityIds).Error
+	adminAuthorityIds, err := GetUserAuthorityIds(multi.AdminAuthority)
 	if err != nil {
 		return userList, err
 	}
@@ -385,26 +382,19 @@ func UpdateAdminInfo(userInfo request.UpdateUser, user model.SysUser, tenancyId 
 	return nil
 }
 
-// SetUserGeneralInfo 设置普通用户信息
-func SetUserGeneralInfo(reqUser model.GeneralInfo, infoId uint, userId string) (model.GeneralInfo, error) {
-	if infoId > 0 {
-		reqUser.ID = infoId
-		err := g.TENANCY_DB.Updates(&reqUser).Error
-		if err != nil {
-			return reqUser, err
-		}
-	} else {
-		id, err := strconv.Atoi(userId)
-		if err != nil {
-			return reqUser, err
-		}
-		reqUser.SysUserID = uint(id)
-		err = g.TENANCY_DB.Create(&reqUser).Error
-		if err != nil {
-			return reqUser, err
-		}
+func GetUserByTenancyId(tenanacyId uint) (model.SysUser, error) {
+	var u model.SysUser
+	adminAuthorityIds, err := GetUserAuthorityIds(multi.AdminAuthority)
+	if err != nil {
+		return u, err
 	}
-	return reqUser, nil
+	err = g.TENANCY_DB.Model(&model.SysUser{}).
+		Select("sys_users.*").
+		Joins("left join sys_authorities on sys_authorities.authority_id = sys_users.authority_id").
+		Where("sys_users.authority_id IN (?)", adminAuthorityIds).
+		Where("`sys_users.sys_tenancy_id` = ?", tenanacyId).
+		First(&u).Error
+	return u, err
 }
 
 // FindUserById 通过id获取用户信息
@@ -457,7 +447,7 @@ func GetTenancyInfoList(info request.PageInfo) ([]response.SysTenancyUser, int64
 		Select("sys_users.id,sys_users.status,sys_users.username,sys_users.authority_id,sys_users.created_at,sys_users.updated_at, tenancy_infos.email, tenancy_infos.phone, tenancy_infos.nick_name, tenancy_infos.header_img,sys_authorities.authority_name,sys_authorities.authority_type,sys_users.authority_id,sys_tenancies.name as tenancy_name").
 		Joins("left join tenancy_infos on tenancy_infos.sys_user_id = sys_users.id").
 		Joins("left join sys_authorities on sys_authorities.authority_id = sys_users.authority_id").
-		Joins("left join sys_tenancies on tenancy_infos.sys_tenancy_id = sys_tenancies.id").
+		Joins("left join sys_tenancies on sys_users.sys_tenancy_id = sys_tenancies.id").
 		Find(&userList).Error
 	return userList, total, err
 }

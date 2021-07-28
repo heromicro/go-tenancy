@@ -228,19 +228,20 @@ func InitSystemRouter(Router *gin.RouterGroup) {
 func InitTenancyRouter(Router *gin.RouterGroup) {
 	TenancyRouter := Router.Group("/tenancy")
 	{
-		TenancyRouter.GET("/getTenancySelect", admin.GetTenancySelect)        // 获取Tenancy列表(不分页)
-		TenancyRouter.GET("/changeCopyMap/:id", admin.ChangeCopyMap)          // 获取修改商品复制次数map
-		TenancyRouter.GET("/getTenancies/:code", admin.GetTenanciesByRegion)  // 获取Tenancy列表(不分页)
-		TenancyRouter.GET("/getTenancyCount", admin.GetTenancyCount)          // 获取Tenancy对应状态数量
-		TenancyRouter.POST("/createTenancy", admin.CreateTenancy)             // 创建Tenancy
-		TenancyRouter.POST("/setCopyProductNum/:id", admin.SetCopyProductNum) // 设置商品复制次数
-		TenancyRouter.POST("/loginTenancy/:id", admin.LoginTenancy)           // 登录商户
-		TenancyRouter.POST("/getTenancyList", admin.GetTenanciesList)         // 获取Tenancy列表
-		TenancyRouter.GET("/getTenancyById/:id", admin.GetTenancyById)        // 获取单条Tenancy消息
-		TenancyRouter.POST("/setTenancyRegion", admin.SetTenancyRegion)       // 设置商户地区
-		TenancyRouter.POST("/changeTenancyStatus", admin.ChangeTenancyStatus) // 设置商户显示/隐藏
-		TenancyRouter.PUT("/updateTenancy/:id", admin.UpdateTenancy)          // 更新Tenancy
-		TenancyRouter.DELETE("/deleteTenancy/:id", admin.DeleteTenancy)       // 删除Tenancy
+		TenancyRouter.GET("/changePasswordMap/:id", admin.ChangeTenancyPasswordMap) // 注册管理员表单
+		TenancyRouter.GET("/getTenancySelect", admin.GetTenancySelect)              // 获取Tenancy列表(不分页)
+		TenancyRouter.GET("/changeCopyMap/:id", admin.ChangeCopyMap)                // 获取修改商品复制次数map
+		TenancyRouter.GET("/getTenancies/:code", admin.GetTenanciesByRegion)        // 获取Tenancy列表(不分页)
+		TenancyRouter.GET("/getTenancyCount", admin.GetTenancyCount)                // 获取Tenancy对应状态数量
+		TenancyRouter.POST("/createTenancy", admin.CreateTenancy)                   // 创建Tenancy
+		TenancyRouter.POST("/setCopyProductNum/:id", admin.SetCopyProductNum)       // 设置商品复制次数
+		TenancyRouter.POST("/loginTenancy/:id", admin.LoginTenancy)                 // 登录商户
+		TenancyRouter.POST("/getTenancyList", admin.GetTenanciesList)               // 获取Tenancy列表
+		TenancyRouter.GET("/getTenancyById/:id", admin.GetTenancyById)              // 获取单条Tenancy消息
+		TenancyRouter.POST("/setTenancyRegion", admin.SetTenancyRegion)             // 设置商户地区
+		TenancyRouter.POST("/changeTenancyStatus", admin.ChangeTenancyStatus)       // 设置商户显示/隐藏
+		TenancyRouter.PUT("/updateTenancy/:id", admin.UpdateTenancy)                // 更新Tenancy
+		TenancyRouter.DELETE("/deleteTenancy/:id", admin.DeleteTenancy)             // 删除Tenancy
 	}
 }
 
@@ -249,11 +250,11 @@ func InitUserRouter(Router *gin.RouterGroup) {
 	UserRouter := Router.Group("/user")
 	{
 		UserRouter.GET("/changePasswordMap/:id", admin.ChangePasswordMap) // 注册管理员表单
+		UserRouter.POST("/changePassword", admin.ChangePassword)          // 修改密码
 		UserRouter.GET("/registerAdminMap", admin.RegisterAdminMap)       // 注册管理员表单
 		UserRouter.GET("/updateAdminMap/:id", admin.UpdateAdminMap)       // 编辑管理员表单
 		UserRouter.POST("/registerAdmin", admin.RegisterAdmin)            // 注册管理员
 		UserRouter.POST("/registerTenancy", admin.RegisterTenancy)        // 注册商户管理员
-		UserRouter.POST("/changePassword", admin.ChangePassword)          // 修改密码
 		UserRouter.POST("/changeProfile", admin.ChangeProfile)            // 修改个人信息
 		UserRouter.POST("/changeUserStatus", admin.ChangeUserStatus)      // 修改账号状态
 		UserRouter.POST("/getAdminList", admin.GetAdminList)              // 分页获取管理员列表

@@ -11,7 +11,7 @@ require (
 	github.com/bwmarrin/snowflake v0.3.0
 	github.com/casbin/casbin/v2 v2.28.4
 	github.com/casbin/gorm-adapter/v3 v3.2.9
-	github.com/chindeo/pkg v0.0.2-0.20210722085716-355174e9a03e
+	github.com/chindeo/pkg v0.0.2-0.20210727100922-29df0ccacf30
 	github.com/denisenkom/go-mssqldb v0.10.0 // indirect
 	github.com/fasthttp-contrib/websocket v0.0.0-20160511215533-1f3b11f56072 // indirect
 	github.com/fatih/structs v1.1.0 // indirect

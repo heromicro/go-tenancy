@@ -8,7 +8,6 @@ import (
 	"github.com/snowlyg/go-tenancy/model"
 	"github.com/snowlyg/go-tenancy/model/request"
 	"github.com/snowlyg/go-tenancy/model/response"
-	"github.com/snowlyg/multi"
 	"go.uber.org/zap"
 	"gorm.io/gorm"
 )
@@ -148,9 +147,9 @@ func findChildrenAuthority(authority *model.SysAuthority) error {
 	return err
 }
 
-func GetUserAuthorityIds() ([]int, error) {
+func GetUserAuthorityIds(authorityType int) ([]int, error) {
 	var generalAuthorityIds []int
-	err := g.TENANCY_DB.Model(&model.SysAuthority{}).Where("authority_type", multi.GeneralAuthority).Select("authority_id").Find(&generalAuthorityIds).Error
+	err := g.TENANCY_DB.Model(&model.SysAuthority{}).Where("authority_type", authorityType).Select("authority_id").Find(&generalAuthorityIds).Error
 	if err != nil {
 		return generalAuthorityIds, fmt.Errorf("get authority ids %w", err)
 	}
