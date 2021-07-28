@@ -40,7 +40,11 @@ func GetMenuMap(id uint, ctx *gin.Context, isTenancy bool) (Form, error) {
 			form.SetAction("/menu/addBaseMenu", ctx)
 		}
 	}
-	opts, err := GetMenusOptions()
+	userType := multi.AdminAuthority
+	if isTenancy {
+		userType = multi.TenancyAuthority
+	}
+	opts, err := GetMenusOptions(userType)
 	if err != nil {
 		return form, err
 	}
@@ -144,8 +148,8 @@ func getBaseMenuTreeMap(userType int) (map[uint][]model.SysBaseMenu, error) {
 }
 
 // GetBaseMenuTree 获取基础路由树
-func GetBaseMenuTree() ([]model.SysBaseMenu, error) {
-	treeMap, err := getBaseMenuTreeMap(1)
+func GetBaseMenuTree(userType int) ([]model.SysBaseMenu, error) {
+	treeMap, err := getBaseMenuTreeMap(userType)
 	if err != nil {
 		return nil, err
 	}
@@ -168,16 +172,14 @@ func AddMenuAuthority(menus []model.SysBaseMenu, authorityId string) error {
 func GetMenuAuthority(info *request.GetAuthorityId) ([]model.SysMenu, error) {
 	var menus []model.SysMenu
 	err := g.TENANCY_DB.Where("authority_id = ? ", info.AuthorityId).Where("is_tenancy = ?", g.StatusFalse).Where("is_menu = ?", g.StatusTrue).Order("sort desc").Find(&menus).Error
-	//sql := "SELECT authority_menu.keep_alive,authority_menu.default_menu,authority_menu.created_at,authority_menu.updated_at,authority_menu.deleted_at,authority_menu.menu_level,authority_menu.parent_id,authority_menu.path,authority_menu.`name`,authority_menu.hidden,authority_menu.component,authority_menu.title,authority_menu.icon,authority_menu.sort,authority_menu.menu_id,authority_menu.authority_id FROM authority_menu WHERE authority_menu.authority_id = ? ORDER BY authority_menu.sort ASC"
-	//err = g.TENANCY_DB.Raw(sql, authorityId).Scan(&menus).Error
 	return menus, err
 }
 
 // GetMenusOptions
-func GetMenusOptions() ([]Option, error) {
+func GetMenusOptions(userType int) ([]Option, error) {
 	var options []Option
 	options = append(options, Option{Label: "请选择", Value: 0})
-	treeMap, err := getBaseMenuTreeMap(1)
+	treeMap, err := getBaseMenuTreeMap(userType)
 
 	for _, opt := range treeMap[0] {
 		options = append(options, Option{Label: opt.MenuName, Value: opt.ID})
