@@ -6,7 +6,7 @@ import (
 	"testing"
 )
 
-var cuserId = 3
+var cuserId = 7
 
 func TestGeneralUserList(t *testing.T) {
 	params := []param{
@@ -148,8 +148,8 @@ func TestUserGetGeneralDetail(t *testing.T) {
 	res.Value("nowMoney").Number().Equal(0)
 	res.Value("payCount").Number().Equal(5)
 	res.Value("payPrice").Number().Equal(20)
-	res.Value("totalPayCount").Number().Equal(6)
-	res.Value("totalPayPrice").Number().Equal(762)
+	res.Value("totalPayCount").Number().Equal(4)
+	res.Value("totalPayPrice").Number().Equal(623)
 	res.Value("groupId").Number().Equal(2)
 	res.Value("labelId").Array().First().Equal(1)
 	res.Value("avatarUrl").String().Equal("https://thirdwx.qlogo.cn/mmopen/vi_32/PEyYoZmTJtaJdeYWWibrnDUadmXKVYyTtyRq2nxtWbBic5jJTLTT4KHmox1tNvOicgIXxspgmxicghpCFob1icAIWFw/132")

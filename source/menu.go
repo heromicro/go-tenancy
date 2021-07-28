@@ -78,9 +78,9 @@ var menus = []model.SysBaseMenu{
 	{TENANCY_MODEL: g.TENANCY_MODEL{ID: 121}, Pid: 87, Path: "/87/", Icon: "", MenuName: "评论管理", Route: "/admin/product/comment", Params: "", Sort: 0, Hidden: 2, IsTenancy: 2, IsMenu: 1},
 	{TENANCY_MODEL: g.TENANCY_MODEL{ID: 122}, Pid: 107, Path: "/106/107/", Icon: "", MenuName: "会员领取记录", Route: "/merchant/marketing/coupon/user", Params: "", Sort: 0, Hidden: 2, IsTenancy: 1, IsMenu: 1},
 
-	{TENANCY_MODEL: g.TENANCY_MODEL{ID: 466}, Pid: 101, Path: "/101/", Icon: "", MenuName: "用户反馈", Route: "/admin/feedback", Params: "", Sort: 0, Hidden: 2, IsTenancy: 2, IsMenu: 1},
-	{TENANCY_MODEL: g.TENANCY_MODEL{ID: 467}, Pid: 466, Path: "/101/466/", Icon: "", MenuName: "反馈分类", Route: "/admin/feedback/classify", Params: "", Sort: 0, Hidden: 2, IsTenancy: 2, IsMenu: 1},
-	{TENANCY_MODEL: g.TENANCY_MODEL{ID: 468}, Pid: 466, Path: "/101/466/", Icon: "", MenuName: "反馈列表", Route: "/admin/feedback/list", Params: "", Sort: 0, Hidden: 2, IsTenancy: 2, IsMenu: 1},
+	// {TENANCY_MODEL: g.TENANCY_MODEL{ID: 466}, Pid: 101, Path: "/101/", Icon: "", MenuName: "用户反馈", Route: "/admin/feedback", Params: "", Sort: 0, Hidden: 2, IsTenancy: 2, IsMenu: 1},
+	// {TENANCY_MODEL: g.TENANCY_MODEL{ID: 467}, Pid: 466, Path: "/101/466/", Icon: "", MenuName: "反馈分类", Route: "/admin/feedback/classify", Params: "", Sort: 0, Hidden: 2, IsTenancy: 2, IsMenu: 1},
+	// {TENANCY_MODEL: g.TENANCY_MODEL{ID: 468}, Pid: 466, Path: "/101/466/", Icon: "", MenuName: "反馈列表", Route: "/admin/feedback/list", Params: "", Sort: 0, Hidden: 2, IsTenancy: 2, IsMenu: 1},
 
 	{TENANCY_MODEL: g.TENANCY_MODEL{ID: 512}, Pid: 0, Path: "/", Icon: "s-order", MenuName: "订单", Route: "/merchant/order", Params: "", Sort: 99, Hidden: 2, IsTenancy: 1, IsMenu: 1},
 	{TENANCY_MODEL: g.TENANCY_MODEL{ID: 513}, Pid: 512, Path: "/512/", Icon: "", MenuName: "订单管理", Route: "/merchant/order/list", Params: "", Sort: 0, Hidden: 2, IsTenancy: 1, IsMenu: 1},

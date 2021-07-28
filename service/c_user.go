@@ -271,15 +271,21 @@ func GetGeneralDetail(id, tenancyId uint) (response.GeneralUserDetail, error) {
 	}
 
 	err = g.TENANCY_DB.Model(&model.SysUser{}).
-		Select("sys_users.id as uid,general_infos.mark,general_infos.real_name,general_infos.phone,general_infos.address,general_infos.id_card,general_infos.birthday,general_infos.avatar_url,general_infos.nick_name,general_infos.now_money,general_infos.pay_count,general_infos.pay_price,general_infos.group_id, sum(orders.pay_price) as total_pay_price, count(orders.id) as total_pay_count").
+		Select("sys_users.id as uid,general_infos.mark,general_infos.real_name,general_infos.phone,general_infos.address,general_infos.id_card,general_infos.birthday,general_infos.avatar_url,general_infos.nick_name,general_infos.now_money,general_infos.pay_count,general_infos.pay_price,general_infos.group_id").
 		Joins("left join general_infos on general_infos.sys_user_id = sys_users.id").
-		Joins("left join orders on orders.sys_user_id = sys_users.id").
 		Where("sys_users.authority_id IN (?)", generalAuthorityIds).
 		Where("sys_users.id = ?", id).
 		First(&user).Error
 	if err != nil {
 		return user, fmt.Errorf("get general detail %w", err)
 	}
+
+	u, err := GetThisMonthOrderPriceByUserId(id)
+	if err != nil {
+		return user, err
+	}
+	user.TotalPayCount = u.TotalPayCount
+	user.TotalPayPrice = u.TotalPayPrice
 
 	labelIds, err := GetUserLabelIdsByUserId(user.Uid, tenancyId)
 	if err != nil {

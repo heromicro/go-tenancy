@@ -596,3 +596,36 @@ func CreateOrder(req request.CreateOrder, ctx *gin.Context) error {
 	}
 	return nil
 }
+
+func GetThisMonthOrdersByUserId(userId uint) ([]model.Order, error) {
+	var orders []model.Order
+	err := g.TENANCY_DB.Model(&model.Order{}).
+		Where("sys_user_id = ?", userId).
+		Where("DATE_FORMAT(`created_at`,'%Y%m')=DATE_FORMAT(CURDATE(),'%Y%m')").
+		Where("paid = ?", g.StatusTrue).
+		Not("status = ?", model.OrderStatusRefund).
+		Where("is_del = ?", g.StatusFalse).
+		Where("is_system_del = ?", g.StatusFalse).
+		Find(&orders).Error
+	if err != nil {
+		return orders, err
+	}
+	return orders, nil
+}
+
+func GetThisMonthOrderPriceByUserId(userId uint) (response.GeneralUserDetail, error) {
+	var user response.GeneralUserDetail
+	err := g.TENANCY_DB.Model(&model.Order{}).
+		Select("sum(orders.pay_price) as total_pay_price, count(orders.id) as total_pay_count").
+		Where("sys_user_id = ?", userId).
+		Where("DATE_FORMAT(`created_at`,'%Y%m')=DATE_FORMAT(CURDATE(),'%Y%m')").
+		Where("paid = ?", g.StatusTrue).
+		Not("status = ?", model.OrderStatusRefund).
+		Where("is_del = ?", g.StatusFalse).
+		Where("is_system_del = ?", g.StatusFalse).
+		Find(&user).Error
+	if err != nil {
+		return user, err
+	}
+	return user, nil
+}
