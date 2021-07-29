@@ -43,7 +43,7 @@
                 "storeName": "领立裁腰带短袖连衣裙",
                 "sales": 1,
                 "price": 80,
-                "image": "http://127.0.0.1:8090/uploads/def/20200816/9a6a2e1231fb19517ed1de71206a0657.jpg"
+                "image": "http://127.0.0.1:8089/uploads/file/9a6a2e1231fb19517ed1de71206a0657.jpg"
             }
         ],
         "total": 1,
@@ -142,7 +142,7 @@
         "specType": 1,
         "rate": 5,
         "isGiftBag": 2,
-        "image": "http://127.0.0.1:8090/uploads/def/20200816/9a6a2e1231fb19517ed1de71206a0657.jpg",
+        "image": "http://127.0.0.1:8089/uploads/file/9a6a2e1231fb19517ed1de71206a0657.jpg",
         "tempId": 99,
         "sysTenancyId": 1,
         "sysBrandId": 2,
@@ -152,17 +152,17 @@
         "brandName": "苹果",
         "tempName": "",
         "content": "<p>好手机</p>",
-        "sliderImage": "http://127.0.0.1:8090/uploads/def/20200816/9a6a2e1231fb19517ed1de71206a0657.jpg,http://127.0.0.1:8090/uploads/def/20200816/9a6a2e1231fb19517ed1de71206a0657.jpg",
+        "sliderImage": "http://127.0.0.1:8089/uploads/file/9a6a2e1231fb19517ed1de71206a0657.jpg,http://127.0.0.1:8089/uploads/file/9a6a2e1231fb19517ed1de71206a0657.jpg",
         "sliderImages": [
-            "http://127.0.0.1:8090/uploads/def/20200816/9a6a2e1231fb19517ed1de71206a0657.jpg",
-            "http://127.0.0.1:8090/uploads/def/20200816/9a6a2e1231fb19517ed1de71206a0657.jpg"
+            "http://127.0.0.1:8089/uploads/file/9a6a2e1231fb19517ed1de71206a0657.jpg",
+            "http://127.0.0.1:8089/uploads/file/9a6a2e1231fb19517ed1de71206a0657.jpg"
         ],
         "attrValue": [
             {
                 "sku": "S",
                 "stock": 99,
                 "sales": 1,
-                "image": "\thttp://127.0.0.1:8090/uploads/def/20200816/9a6a2e1231fb19517ed1de71206a0657.jpg",
+                "image": "\thttp://127.0.0.1:8089/uploads/file/9a6a2e1231fb19517ed1de71206a0657.jpg",
                 "barCode": "123456",
                 "cost": 50,
                 "otPrice": 180,
@@ -181,7 +181,7 @@
                 "sku": "L",
                 "stock": 100,
                 "sales": 0,
-                "image": "\thttp://127.0.0.1:8090/uploads/def/20200816/9a6a2e1231fb19517ed1de71206a0657.jpg",
+                "image": "\thttp://127.0.0.1:8089/uploads/file/9a6a2e1231fb19517ed1de71206a0657.jpg",
                 "barCode": "123456",
                 "cost": 50,
                 "otPrice": 180,
@@ -200,7 +200,7 @@
                 "sku": "XL",
                 "stock": 100,
                 "sales": 0,
-                "image": "\thttp://127.0.0.1:8090/uploads/def/20200816/9a6a2e1231fb19517ed1de71206a0657.jpg",
+                "image": "\thttp://127.0.0.1:8089/uploads/file/9a6a2e1231fb19517ed1de71206a0657.jpg",
                 "barCode": "123456",
                 "cost": 50,
                 "otPrice": 180,
@@ -219,7 +219,7 @@
                 "sku": "XXL",
                 "stock": 100,
                 "sales": 0,
-                "image": "\thttp://127.0.0.1:8090/uploads/def/20200816/9a6a2e1231fb19517ed1de71206a0657.jpg",
+                "image": "\thttp://127.0.0.1:8089/uploads/file/9a6a2e1231fb19517ed1de71206a0657.jpg",
                 "barCode": "123456",
                 "cost": 50,
                 "otPrice": 180,

@@ -521,7 +521,7 @@ func SetProductFicti(req request.SetProductFicti, id uint) error {
 // DeleteProduct
 func DeleteProduct(id uint) error {
 	err := g.TENANCY_DB.Transaction(func(tx *gorm.DB) error {
-		err := tx.Delete(&model.Product{}, 1).Error
+		err := tx.Delete(&model.Product{}, id).Error
 		if err != nil {
 			return err
 		}

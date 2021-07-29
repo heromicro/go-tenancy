@@ -102,7 +102,7 @@
                               "sysTenancyId": 1,
                               "productId": 3,
                               "storeName": "精梳棉修身短袖T恤（圆/V领）",
-                              "image": "http://127.0.0.1:8090/uploads/def/20200816/9a6a2e1231fb19517ed1de71206a0657.jpg",
+                              "image": "http://127.0.0.1:8089/uploads/file/9a6a2e1231fb19517ed1de71206a0657.jpg",
                               "price": "40.00",
                               "cartNum": 10,
                               "productAttrUnique": "e2fe28308fd2",

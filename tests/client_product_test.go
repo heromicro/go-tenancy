@@ -4,6 +4,9 @@ import (
 	"fmt"
 	"net/http"
 	"testing"
+
+	"github.com/snowlyg/go-tenancy/g"
+	"github.com/snowlyg/go-tenancy/model"
 )
 
 func TestClinetProductList(t *testing.T) {
@@ -12,7 +15,7 @@ func TestClinetProductList(t *testing.T) {
 		{args: map[string]interface{}{"page": 1, "pageSize": 10, "type": "1", "keyword": "领立"}, length: 1},
 		{args: map[string]interface{}{"page": 1, "pageSize": 10, "type": "1", "isGiftBag": "1"}, length: 0},
 		{args: map[string]interface{}{"page": 1, "pageSize": 10, "type": "1", "cateId": 185}, length: 0},
-		{args: map[string]interface{}{"page": 1, "pageSize": 10, "type": "1", "tenancyCategoryId": 173}, length: 1},
+		{args: map[string]interface{}{"page": 1, "pageSize": 10, "type": "1", "tenancyCategoryId": 174}, length: 1},
 		{args: map[string]interface{}{"page": 1, "pageSize": 10, "type": "2"}, length: 1},
 		{args: map[string]interface{}{"page": 1, "pageSize": 10, "type": "3"}, length: 1},
 		{args: map[string]interface{}{"page": 1, "pageSize": 10, "type": "4"}, length: 1},
@@ -218,8 +221,8 @@ func TestClinetProductProcess(t *testing.T) {
 			"cateId":    183,
 			"content":   "<p>是的发生的发sadsdfsdfsdf</p>",
 			"image":     "http://127.0.0.1:8089/uploads/file/b39024efbc6de61976f585c8421c6bba_20210702150027.png",
-			"isGiftBag": 1,
-			"isGood":    2,
+			"isGiftBag": g.StatusTrue,
+			"isGood":    g.StatusFalse,
 			"keyword":   "sdfdsfsdfsdf",
 			"sliderImages": []string{
 				"http://127.0.0.1:8089/uploads/file/b39024efbc6de61976f585c8421c6bba_20210702150027.png",
@@ -257,8 +260,8 @@ func TestClinetProductProcess(t *testing.T) {
 		product.Value("storeInfo").String().Equal(update["storeInfo"].(string))
 		product.Value("keyword").String().Equal(update["keyword"].(string))
 		product.Value("barCode").String().Equal(update["barCode"].(string))
-		product.Value("isShow").Number().Equal(2)
-		product.Value("status").Number().Equal(2)
+		product.Value("isShow").Number().Equal(g.StatusFalse)
+		product.Value("status").Number().Equal(model.SuccessProductStatus)
 		product.Value("unitName").String().Equal(update["unitName"].(string))
 		product.Value("sort").Number().Equal(update["sort"].(int))
 		product.Value("rank").Number().Equal(0)
@@ -267,12 +270,12 @@ func TestClinetProductProcess(t *testing.T) {
 		product.Value("cost").Number().Equal(0)
 		product.Value("otPrice").Number().Equal(0)
 		product.Value("stock").Number().Equal(0)
-		product.Value("isHot").Number().Equal(2)
-		product.Value("isBenefit").Number().Equal(2)
-		product.Value("isBest").Number().Equal(2)
-		product.Value("isNew").Number().Equal(2)
+		product.Value("isHot").Number().Equal(g.StatusFalse)
+		product.Value("isBenefit").Number().Equal(g.StatusFalse)
+		product.Value("isBest").Number().Equal(g.StatusFalse)
+		product.Value("isNew").Number().Equal(g.StatusFalse)
 		product.Value("isGood").Number().Equal(update["isGood"].(int))
-		product.Value("productType").Number().Equal(1)
+		product.Value("productType").Number().Equal(model.GeneralSale)
 		product.Value("ficti").Number().Equal(0)
 		product.Value("browse").Number().Equal(0)
 		product.Value("codePath").String().Equal("")
