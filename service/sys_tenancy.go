@@ -40,8 +40,8 @@ func LoginTenancy(id uint) (response.LoginTenancy, error) {
 	var loginTenancy response.LoginTenancy
 	var token string
 	err := g.TENANCY_DB.Model(&model.SysUser{}).
-		Select("sys_users.id,sys_users.username,sys_users.authority_id,sys_users.created_at,sys_users.updated_at,sys_tenancies.id as tenancy_id,sys_tenancies.name as tenancy_name,sys_tenancies.status,tenancy_infos.email, tenancy_infos.phone, tenancy_infos.nick_name, tenancy_infos.header_img,sys_authorities.authority_name,sys_authorities.authority_type,sys_authorities.default_router,sys_users.authority_id").
-		Joins("left join tenancy_infos on tenancy_infos.sys_user_id = sys_users.id").
+		Select("sys_users.id,sys_users.username,sys_users.authority_id,sys_users.created_at,sys_users.updated_at,sys_tenancies.id as tenancy_id,sys_tenancies.name as tenancy_name,sys_tenancies.status,admin_infos.email, admin_infos.phone, admin_infos.nick_name, admin_infos.header_img,sys_authorities.authority_name,sys_authorities.authority_type,sys_authorities.default_router,sys_users.authority_id").
+		Joins("left join admin_infos on admin_infos.sys_user_id = sys_users.id").
 		Joins("left join sys_tenancies on sys_users.sys_tenancy_id = sys_tenancies.id").
 		Joins("left join sys_authorities on sys_authorities.authority_id = sys_users.authority_id").
 		Where("sys_authorities.authority_type = ?", multi.TenancyAuthority).
@@ -108,7 +108,7 @@ func CreateTenancy(req request.CreateTenancy) (uint, error) {
 		if err != nil {
 			return err
 		}
-		user := model.SysUser{Username: req.Username, Password: utils.MD5V([]byte("123456")), AuthorityId: source.TenancyAuthorityId, Status: g.StatusTrue, SysTenancyID: req.SysTenancy.ID}
+		user := model.SysUser{Username: req.Username, Password: utils.MD5V([]byte("123456")), AuthorityId: source.TenancyAuthorityId, Status: g.StatusTrue, IsShow: g.StatusFalse, SysTenancyID: req.SysTenancy.ID}
 		err = tx.Create(&user).Error
 		if err != nil {
 			return err

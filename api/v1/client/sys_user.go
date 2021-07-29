@@ -96,22 +96,6 @@ func ChangePassword(ctx *gin.Context) {
 	}
 }
 
-// ChangeUserStatus 用户修改状态
-func ChangeUserStatus(ctx *gin.Context) {
-	var changeStatus request.ChangeStatus
-	if errs := ctx.ShouldBindJSON(&changeStatus); errs != nil {
-		response.FailWithMessage(errs.Error(), ctx)
-		return
-	}
-	err := service.ChangeUserStatus(changeStatus)
-	if err != nil {
-		g.TENANCY_LOG.Error("修改失败", zap.Any("err", err))
-		response.FailWithMessage(err.Error(), ctx)
-	} else {
-		response.OkWithMessage("修改成功", ctx)
-	}
-}
-
 // ChangeProfile 用户修改信息
 func ChangeProfile(ctx *gin.Context) {
 	var user request.ChangeProfile
@@ -137,7 +121,7 @@ func GetAdminList(ctx *gin.Context) {
 		response.FailWithMessage(errs.Error(), ctx)
 		return
 	}
-	if list, total, err := service.GetTenancyInfoList(pageInfo, multi.GetTenancyId(ctx)); err != nil {
+	if list, total, err := service.GetTenancyInfoList(pageInfo, multi.GetUserId(ctx), multi.GetTenancyId(ctx)); err != nil {
 		g.TENANCY_LOG.Error("获取失败", zap.Any("err", err))
 		response.FailWithMessage("获取失败:"+err.Error(), ctx)
 	} else {

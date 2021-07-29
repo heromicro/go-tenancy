@@ -155,7 +155,6 @@ func InitUserRouter(Router *gin.RouterGroup) {
 		UserRouter.GET("/updateAdminMap/:id", client.UpdateAdminMap)       // 编辑管理员表单
 		UserRouter.POST("/registerAdmin", client.RegisterTenancy)          // 注册管理员
 		UserRouter.POST("/changeProfile", client.ChangeProfile)            // 修改个人信息
-		UserRouter.POST("/changeUserStatus", client.ChangeUserStatus)      // 修改账号状态
 		UserRouter.POST("/getAdminList", client.GetAdminList)              // 分页获取管理员列表
 		UserRouter.DELETE("/deleteUser", client.DeleteUser)                // 删除用户
 		UserRouter.PUT("/setUserInfo/:user_id", client.SetUserInfo)        // 设置用户信息

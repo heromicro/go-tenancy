@@ -77,7 +77,7 @@ func Register(req request.Register, authorityType int, tenancyId uint) (uint, er
 		return 0, errors.New("用户名已注册")
 	}
 	// 否则 附加uuid 密码md5简单加密 注册
-	user := model.SysUser{Username: req.Username, Password: utils.MD5V([]byte(req.Password)), AuthorityId: req.AuthorityId[0], Status: req.Status, SysTenancyID: tenancyId}
+	user := model.SysUser{Username: req.Username, Password: utils.MD5V([]byte(req.Password)), AuthorityId: req.AuthorityId[0], Status: req.Status, IsShow: g.StatusTrue, SysTenancyID: tenancyId}
 	err := g.TENANCY_DB.Transaction(func(tx *gorm.DB) error {
 		err := tx.Create(&user).Error
 		if err != nil {
@@ -131,20 +131,23 @@ func adminLogin(u *model.SysUser) (response.LoginResponse, error) {
 			User:  admin,
 			Token: token,
 		}, errors.New("用户名或者密码错误")
-	}
-	if err != nil {
+	} else if err != nil {
 		return response.LoginResponse{
 			User:  admin,
 			Token: token,
 		}, err
-	}
-
-	if admin.ID == 0 {
+	} else if admin.ID == 0 {
 		return response.LoginResponse{
 			User:  admin,
 			Token: token,
 		}, errors.New("用户名或者密码错误")
+	} else if admin.Status == g.StatusFalse {
+		return response.LoginResponse{
+			User:  admin,
+			Token: token,
+		}, errors.New("账号已被冻结")
 	}
+
 	claims := &multi.CustomClaims{
 		ID:            strconv.FormatUint(uint64(admin.ID), 10),
 		Username:      admin.Username,
@@ -177,8 +180,8 @@ func tenancyLogin(u *model.SysUser) (response.LoginResponse, error) {
 	err := g.TENANCY_DB.Model(&model.SysUser{}).
 		Where("sys_users.username = ? AND sys_users.password = ?", u.Username, u.Password).
 		Where("sys_authorities.authority_type = ?", multi.TenancyAuthority).
-		Select("sys_users.id,sys_users.username,sys_users.authority_id,sys_users.created_at,sys_users.updated_at,sys_tenancies.id  as tenancy_id,sys_tenancies.name as tenancy_name,tenancy_infos.email, tenancy_infos.phone, tenancy_infos.nick_name, tenancy_infos.header_img,sys_authorities.authority_name,sys_authorities.authority_type,sys_authorities.default_router,sys_users.authority_id").
-		Joins("left join tenancy_infos on tenancy_infos.sys_user_id = sys_users.id").
+		Select("sys_users.id,sys_users.username,sys_users.authority_id,sys_users.created_at,sys_users.updated_at,sys_tenancies.id  as tenancy_id,sys_tenancies.name as tenancy_name,admin_infos.email, admin_infos.phone, admin_infos.nick_name, admin_infos.header_img,sys_authorities.authority_name,sys_authorities.authority_type,sys_authorities.default_router,sys_users.authority_id").
+		Joins("left join admin_infos on admin_infos.sys_user_id = sys_users.id").
 		Joins("left join sys_tenancies on sys_users.sys_tenancy_id = sys_tenancies.id").
 		Joins("left join sys_authorities on sys_authorities.authority_id = sys_users.authority_id").
 		First(&tenancy).Error
@@ -270,7 +273,7 @@ func ChangeProfile(user request.ChangeProfile, sysUserId uint) error {
 }
 
 // GetAdminInfoList 分页获取数据
-func GetAdminInfoList(info request.PageInfo) ([]response.SysAdminUser, int64, error) {
+func GetAdminInfoList(info request.PageInfo, userId uint) ([]response.SysAdminUser, int64, error) {
 	var userList []response.SysAdminUser
 	var total int64
 	limit := info.PageSize
@@ -279,7 +282,8 @@ func GetAdminInfoList(info request.PageInfo) ([]response.SysAdminUser, int64, er
 	if err != nil {
 		return userList, total, err
 	}
-	db := g.TENANCY_DB.Model(&model.SysUser{}).Where("sys_users.authority_id IN (?)", adminAuthorityIds).Where("sys_users.username != ?", "admin")
+	db := g.TENANCY_DB.Model(&model.SysUser{})
+
 	if limit > 0 {
 		err = db.Count(&total).Error
 		if err != nil {
@@ -291,6 +295,9 @@ func GetAdminInfoList(info request.PageInfo) ([]response.SysAdminUser, int64, er
 		Select("sys_users.id,sys_users.status,sys_users.username,sys_users.authority_id,sys_users.created_at,sys_users.updated_at, admin_infos.email, admin_infos.phone, admin_infos.nick_name, admin_infos.header_img,sys_authorities.authority_name,sys_authorities.authority_type,sys_users.authority_id").
 		Joins("left join admin_infos on admin_infos.sys_user_id = sys_users.id").
 		Joins("left join sys_authorities on sys_authorities.authority_id = sys_users.authority_id").
+		Where("sys_users.authority_id IN (?)", adminAuthorityIds).
+		Where("sys_users.is_show = ?", g.StatusTrue).
+		Not("sys_users.id = ?", userId).
 		Find(&userList).Error
 	return userList, total, err
 }
@@ -303,8 +310,8 @@ func GetTenancyByUserIds(userIds []uint) ([]response.SysTenancyUser, error) {
 		return userList, err
 	}
 	err = g.TENANCY_DB.Model(&model.SysUser{}).
-		Select("sys_users.id,sys_users.status,sys_users.username,sys_users.authority_id,sys_users.created_at,sys_users.updated_at, tenancy_infos.email, tenancy_infos.phone, tenancy_infos.nick_name, tenancy_infos.header_img,sys_authorities.authority_name,sys_authorities.authority_type,sys_users.authority_id,sys_tenancies.name as tenancy_name").
-		Joins("left join tenancy_infos on tenancy_infos.sys_user_id = sys_users.id").
+		Select("sys_users.id,sys_users.status,sys_users.username,sys_users.authority_id,sys_users.created_at,sys_users.updated_at, admin_infos.email, admin_infos.phone, admin_infos.nick_name, admin_infos.header_img,sys_authorities.authority_name,sys_authorities.authority_type,sys_users.authority_id,sys_tenancies.name as tenancy_name").
+		Joins("left join admin_infos on admin_infos.sys_user_id = sys_users.id").
 		Joins("left join sys_authorities on sys_authorities.authority_id = sys_users.authority_id").
 		Joins("left join sys_tenancies on sys_users.sys_tenancy_id = sys_tenancies.id").
 		Where("sys_users.authority_id IN (?)", tenancyAuthorityIds).
@@ -374,7 +381,7 @@ func UpdateAdminInfo(userInfo request.UpdateUser, user model.SysUser, tenancyId 
 		tx.Model(&model.SysUser{}).Where("id = ?", user.ID).Updates(map[string]interface{}{"authority_id": userInfo.AuthorityId[0], "username": userInfo.Username, "status": userInfo.Status})
 
 		info := map[string]interface{}{"nick_name": userInfo.NickName, "phone": userInfo.Phone}
-		if user.IsAdmin() {
+		if user.IsAdmin() || user.IsTenancy() {
 			if user.AdminInfo.ID > 0 {
 				err := tx.Model(&model.AdminInfo{}).Where("id = ?", user.AdminInfo.ID).Updates(info).Error
 				if err != nil {
@@ -389,9 +396,9 @@ func UpdateAdminInfo(userInfo request.UpdateUser, user model.SysUser, tenancyId 
 				}
 			}
 
-		} else if user.IsTenancy() {
-			g.TENANCY_LOG.Error("未知角色", zap.Any("err", user.AuthorityType()))
-			return fmt.Errorf("未知角色")
+		} else {
+			g.TENANCY_LOG.Error("角色错误", zap.Any("err", user.AuthorityType()))
+			return fmt.Errorf("角色错误")
 		}
 
 		return nil
@@ -452,7 +459,7 @@ func CleanToken(userId string) error {
 }
 
 // GetTenancyInfoList 分页获取数据
-func GetTenancyInfoList(info request.PageInfo, tenancyId uint) ([]response.SysTenancyUser, int64, error) {
+func GetTenancyInfoList(info request.PageInfo, userId, tenancyId uint) ([]response.SysTenancyUser, int64, error) {
 	var userList []response.SysTenancyUser
 	var tenancyAuthorityIds []int
 	var total int64
@@ -471,12 +478,14 @@ func GetTenancyInfoList(info request.PageInfo, tenancyId uint) ([]response.SysTe
 		db = db.Limit(limit).Offset(offset)
 	}
 	err = db.
-		Select("sys_users.id,sys_users.status,sys_users.username,sys_users.authority_id,sys_users.created_at,sys_users.updated_at, tenancy_infos.email, tenancy_infos.phone, tenancy_infos.nick_name, tenancy_infos.header_img,sys_authorities.authority_name,sys_authorities.authority_type,sys_users.authority_id,sys_tenancies.name as tenancy_name").
-		Joins("left join tenancy_infos on tenancy_infos.sys_user_id = sys_users.id").
+		Select("sys_users.id,sys_users.status,sys_users.username,sys_users.authority_id,sys_users.created_at,sys_users.updated_at, admin_infos.email, admin_infos.phone, admin_infos.nick_name, admin_infos.header_img,sys_authorities.authority_name,sys_authorities.authority_type,sys_users.authority_id,sys_tenancies.name as tenancy_name").
+		Joins("left join admin_infos on admin_infos.sys_user_id = sys_users.id").
 		Joins("left join sys_authorities on sys_authorities.authority_id = sys_users.authority_id").
 		Joins("left join sys_tenancies on sys_users.sys_tenancy_id = sys_tenancies.id").
 		Where("sys_users.authority_id IN (?)", tenancyAuthorityIds).
 		Where("sys_users.sys_tenancy_id = ?", tenancyId).
+		Where("sys_users.is_show = ?", g.StatusTrue).
+		Not("sys_users.id = ?", userId).
 		Find(&userList).Error
 	return userList, total, err
 }

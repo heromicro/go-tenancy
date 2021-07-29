@@ -14,7 +14,8 @@ type SysUser struct {
 
 	Username string `json:"userName" gorm:"not null;type:varchar(32);comment:用户登录名"`
 	Password string `json:"-"  gorm:"not null;type:varchar(128);comment:用户登录密码"`
-	Status   int    `gorm:"column:status;type:tinyint(1);not null;default:1" json:"status"` // 1为正常，2为禁止
+	Status   int    `gorm:"column:status;type:tinyint(1);not null;default:1" json:"status"`   // 账号冻结 1为正常，2为禁止
+	IsShow   int    `gorm:"column:is_show;type:tinyint(1);not null;default:1" json:"is_show"` // 是否显示 1为正常，2为禁止
 
 	Authority    SysAuthority `json:"authority" gorm:"foreignKey:AuthorityId;references:AuthorityId;comment:用户角色"`
 	AuthorityId  string       `json:"authorityId" gorm:"not null;comment:用户角色ID"`
