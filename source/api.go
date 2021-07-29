@@ -14,8 +14,11 @@ type api struct{}
 
 var baseApis = []model.SysApi{
 
+	// 授权
 	{Path: "/v1/auth/logout", Description: "退出", ApiGroup: "user", Method: "GET"},
 	{Path: "/v1/auth/clean", Description: "清空 token", ApiGroup: "user", Method: "GET"},
+
+	// 管理员管理
 	{Path: "/v1/admin/user/changePasswordMap/:id", Description: "管理员修改密码表单", ApiGroup: "user", Method: "GET"},
 	{Path: "/v1/admin/user/updateAdminMap/:id", Description: "管理员编辑表单", ApiGroup: "user", Method: "GET"},
 	{Path: "/v1/admin/user/registerAdminMap", Description: "管理员注册表单", ApiGroup: "user", Method: "GET"},
@@ -28,6 +31,7 @@ var baseApis = []model.SysApi{
 	{Path: "/v1/admin/user/setUserInfo/:user_id", Description: "设置用户信息", ApiGroup: "user", Method: "PUT"},
 	{Path: "/v1/admin/user/deleteUser", Description: "删除用户", ApiGroup: "user", Method: "DELETE"},
 
+	// 用户管理
 	{Path: "/v1/admin/cuser/getGeneralList", Description: "获取c用户列表", ApiGroup: "cuser", Method: "POST"},
 	{Path: "/v1/admin/cuser/getGeneralDetail/:id", Description: "获取c用户列表", ApiGroup: "cuser", Method: "GET"},
 	{Path: "/v1/admin/cuser/getOrderList/:id", Description: "消费列表", ApiGroup: "cuser", Method: "POST"},
@@ -40,12 +44,12 @@ var baseApis = []model.SysApi{
 	{Path: "/v1/admin/cuser/setUserLabelMap/:id", Description: "设置用户标签表单", ApiGroup: "cuser", Method: "GET"},
 	{Path: "/v1/admin/cuser/editUser/:id", Description: "编辑用户", ApiGroup: "cuser", Method: "POST"},
 	{Path: "/v1/admin/cuser/editUserMap/:id", Description: "编辑用户表单", ApiGroup: "cuser", Method: "GET"},
-
 	{Path: "/v1/admin/cuser/batchSetUserGroupMap", Description: "批量设置用户分组", ApiGroup: "cuser", Method: "POST"},
 	{Path: "/v1/admin/cuser/batchSetUserGroup", Description: "批量设置用户分组表单", ApiGroup: "cuser", Method: "POST"},
 	{Path: "/v1/admin/cuser/batchSetUserLabelMap", Description: "批量设置用户标签", ApiGroup: "cuser", Method: "POST"},
 	{Path: "/v1/admin/cuser/batchSetUserLabel", Description: "批量设置用户标签表单", ApiGroup: "cuser", Method: "POST"},
 
+	// api 管理
 	{Path: "/v1/admin/api/createApi", Description: "创建api", ApiGroup: "api", Method: "POST"},
 	{Path: "/v1/admin/api/getApiList", Description: "获取api列表", ApiGroup: "api", Method: "POST"},
 	{Path: "/v1/admin/api/getApiById", Description: "获取api详细信息", ApiGroup: "api", Method: "POST"},
@@ -53,6 +57,7 @@ var baseApis = []model.SysApi{
 	{Path: "/v1/admin/api/updateApi", Description: "更新Api", ApiGroup: "api", Method: "POST"},
 	{Path: "/v1/admin/api/getAllApis", Description: "获取所有api", ApiGroup: "api", Method: "POST"},
 
+	// 角色管理
 	{Path: "/v1/admin/authority/createAuthority", Description: "创建角色", ApiGroup: "authority", Method: "POST"},
 	{Path: "/v1/admin/authority/deleteAuthority", Description: "删除角色", ApiGroup: "authority", Method: "POST"},
 	{Path: "/v1/admin/authority/getAuthorityList", Description: "获取角色列表", ApiGroup: "authority", Method: "POST"},
@@ -60,6 +65,7 @@ var baseApis = []model.SysApi{
 	{Path: "/v1/admin/authority/updateAuthority", Description: "更新角色信息", ApiGroup: "authority", Method: "PUT"},
 	{Path: "/v1/admin/authority/copyAuthority", Description: "拷贝角色", ApiGroup: "authority", Method: "POST"},
 
+	// 菜单管理
 	{Path: "/v1/admin/menu/getMenu", Description: "获取菜单树", ApiGroup: "menu", Method: "GET"},
 	{Path: "/v1/admin/menu/getAddMenuMap", Description: "添加表单", ApiGroup: "menu", Method: "GET"},
 	{Path: "/v1/admin/menu/getAddTenancyMenuMap", Description: "添加是商户菜单表单", ApiGroup: "menu", Method: "GET"},
@@ -73,23 +79,25 @@ var baseApis = []model.SysApi{
 	{Path: "/v1/admin/menu/deleteBaseMenu/:id", Description: "删除菜单", ApiGroup: "menu", Method: "POST"},
 	{Path: "/v1/admin/menu/updateBaseMenu/:id", Description: "更新菜单", ApiGroup: "menu", Method: "POST"},
 	{Path: "/v1/admin/menu/getBaseMenuById/:id", Description: "根据id获取菜单", ApiGroup: "menu", Method: "POST"},
-
+	// 商户菜单
 	{Path: "/v1/admin/menu/merchant/getClientMenuList", Description: "获取商户菜单", ApiGroup: "menu", Method: "GET"},
 
+	// 多媒体文件管理
 	{Path: "/v1/admin/media/getUpdateMediaMap/:id", Description: "获取媒体文件表单", ApiGroup: "media", Method: "GET"},
 	{Path: "/v1/admin/media/upload", Description: "上传媒体文件", ApiGroup: "media", Method: "POST"},
 	{Path: "/v1/admin/media/getFileList", Description: "获取媒体文件列表", ApiGroup: "media", Method: "POST"},
 	{Path: "/v1/admin/media/updateMediaName/:id", Description: "修改媒体文件名称", ApiGroup: "media", Method: "POST"},
 	{Path: "/v1/admin/media/deleteFile", Description: "删除媒体文件", ApiGroup: "media", Method: "DELETE"},
 
+	// casbin 管理
 	{Path: "/v1/admin/casbin/updateCasbin", Description: "更改角色api权限", ApiGroup: "casbin", Method: "POST"},
 	{Path: "/v1/admin/casbin/getPolicyPathByAuthorityId", Description: "获取权限列表", ApiGroup: "casbin", Method: "POST"},
-	{Path: "/v1/admin/casbin/casbinTest/:pathParam", Description: "RESTFUL模式测试", ApiGroup: "casbin", Method: "GET"},
 
+	// 系统配置管理
 	{Path: "/v1/admin/system/getSystemConfig", Description: "获取配置文件内容", ApiGroup: "system", Method: "POST"},
 	{Path: "/v1/admin/system/setSystemConfig", Description: "设置配置文件内容", ApiGroup: "system", Method: "POST"},
 	{Path: "/v1/admin/system/getServerInfo", Description: "获取服务器信息", ApiGroup: "system", Method: "POST"},
-
+	// 系统配置值管理
 	{Path: "/v1/admin/configValue/saveConfigValue/:category", Description: "保持配置表单", ApiGroup: "configValue", Method: "POST"},
 
 	// 配置
@@ -178,15 +186,13 @@ var baseApis = []model.SysApi{
 	{Path: "/v1/admin/mini/updateMini", Description: "更新小程序", ApiGroup: "mini", Method: "PUT"},
 	{Path: "/v1/admin/mini/deleteMini", Description: "删除小程序", ApiGroup: "mini", Method: "DELETE"},
 
+	// 角色管理
 	{Path: "/v1/admin/authority/getAdminAuthorityList", Description: "获取员工角色列表", ApiGroup: "authority", Method: "POST"},
 	{Path: "/v1/admin/authority/getTenancyAuthorityList", Description: "获取商户角色列表", ApiGroup: "authority", Method: "POST"},
 	{Path: "/v1/admin/authority/getGeneralAuthorityList", Description: "获取普通用户角色列表", ApiGroup: "authority", Method: "POST"},
 
-	{Path: "/v1/admin/sysOperationRecord/createSysOperationRecord", Description: "新增操作记录", ApiGroup: "sysOperationRecord", Method: "POST"},
-	{Path: "/v1/admin/sysOperationRecord/deleteSysOperationRecord", Description: "删除操作记录", ApiGroup: "sysOperationRecord", Method: "DELETE"},
-	{Path: "/v1/admin/sysOperationRecord/findSysOperationRecord", Description: "根据ID获取操作记录", ApiGroup: "sysOperationRecord", Method: "GET"},
+	// 操作记录
 	{Path: "/v1/admin/sysOperationRecord/getSysOperationRecordList", Description: "获取操作记录列表", ApiGroup: "sysOperationRecord", Method: "POST"},
-	{Path: "/v1/admin/sysOperationRecord/deleteSysOperationRecordByIds", Description: "批量删除操作历史", ApiGroup: "sysOperationRecord", Method: "DELETE"},
 
 	//订单
 	{Path: "/v1/admin/order/getOrderList", Description: "订单列表", ApiGroup: "order", Method: "POST"},
@@ -195,6 +201,7 @@ var baseApis = []model.SysApi{
 	//退款订单
 	{Path: "/v1/admin/refundOrder/getRefundOrderList", Description: "退款订单列表", ApiGroup: "refundOrder", Method: "POST"},
 
+	// other
 	{Path: "/v1/admin/email/emailTest", Description: "发送测试邮件", ApiGroup: "email", Method: "POST"},
 	{Path: "/v1/admin/api/deleteApisByIds", Description: "批量删除api", ApiGroup: "api", Method: "DELETE"},
 
@@ -256,6 +263,10 @@ var baseApis = []model.SysApi{
 	{Path: "/v1/merchant/product/restoreProduct/:id", Description: "还原商品", ApiGroup: "productClient", Method: "GET"},
 	{Path: "/v1/merchant/product/deleteProduct/:id", Description: "加入回收站", ApiGroup: "productClient", Method: "DELETE"},
 	{Path: "/v1/merchant/product/destoryProduct/:id", Description: "删除商品", ApiGroup: "productClient", Method: "DELETE"},
+
+	// 商品评论
+	{Path: "/v1/merchant/product/getProductReplyList", Description: "获取商品评论列表", ApiGroup: "productClientReply", Method: "POST"},
+
 	//订单
 	{Path: "/v1/merchant/order/deliveryOrderMap/:id", Description: "订单发货表单", ApiGroup: "orderClient", Method: "GET"},
 	{Path: "/v1/merchant/order/getOrderRemarkMap/:id", Description: "订单备注表单", ApiGroup: "orderClient", Method: "GET"},
@@ -333,7 +344,7 @@ var baseApis = []model.SysApi{
 
 	//物流信息
 	{Path: "/v1/merchant/express/getExpressByCode/:code", Description: "物流信息", ApiGroup: "expressClient", Method: "GET"},
-
+	// 操作记录
 	{Path: "/v1/merchant/sysOperationRecord/getSysOperationRecordList", Description: "获取操作记录列表", ApiGroup: "sysOperationRecordClient", Method: "POST"},
 
 	//TODO:: 用户权限

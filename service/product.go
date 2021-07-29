@@ -340,6 +340,32 @@ func SetProductCategory(tx *gorm.DB, id, tenancyId uint, reqIds []uint) error {
 	return nil
 }
 
+func GetProductForReplysByIds(ids []uint, tenancyId uint) ([]response.ProductForReply, error) {
+	var productForReplies []response.ProductForReply
+	err := g.TENANCY_DB.Model(&model.Product{}).
+		Select("id,store_name,image").
+		Where("sys_tenancy_id = ?", tenancyId).
+		Where("id in ?", ids).
+		Find(&productForReplies).Error
+	if err != nil {
+		return productForReplies, err
+	}
+	return productForReplies, nil
+}
+
+func GetProductIdsByKeyword(keyword string, tenancyId uint) ([]uint, error) {
+	var ids []uint
+	err := g.TENANCY_DB.Model(&model.Product{}).
+		Select("id").
+		Where("sys_tenancy_id = ?", tenancyId).
+		Where(g.TENANCY_DB.Where("id like ?", keyword+"%").Or("store_name like ?", keyword+"%").Or("store_info like ?", keyword+"%").Or("keyword like ?", keyword+"%")).
+		Find(&ids).Error
+	if err != nil {
+		return ids, err
+	}
+	return ids, nil
+}
+
 // GetCartProducts
 func GetCartProducts(sysTenancyID, sysUserID uint, cartIds []uint) ([]response.CartProduct, error) {
 	var cartProducts []response.CartProduct

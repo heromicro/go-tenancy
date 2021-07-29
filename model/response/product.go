@@ -52,3 +52,9 @@ type ProductCate struct {
 	ID       uint   `json:"id"`
 	CateName string `json:"cateName"` // 分类名称
 }
+
+type ProductForReply struct {
+	ID        uint   `json:"id"`
+	StoreName string `json:"storeName"`
+	Image     string `json:"image"` // 商品名称
+}

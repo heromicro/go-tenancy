@@ -95,6 +95,7 @@ func Routers(app *gin.Engine) {
 			client.InitCategoryRouter(ClientGroup)         // 商品分类路由
 			client.InitAttrTemplateRouter(ClientGroup)     // 规格模板路由
 			client.InitProductRouter(ClientGroup)          // 商品路由
+			client.InitProductReplyRouter(ClientGroup)     // 商品路由
 			client.InitShippingTemplateRouter(ClientGroup) // 运费模板路由
 			client.InitOrderRouter(ClientGroup)            // 订单路由
 			client.InitRefundOrderRouter(ClientGroup)      // 退款订单路由

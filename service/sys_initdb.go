@@ -196,6 +196,7 @@ func InitDB(conf request.InitDB) error {
 		source.AttrTemplate,
 		source.Product,
 		source.ProductProductCate,
+		source.ProductReply,
 		source.ShippingTemplate,
 		source.ShippingTemplateFree,
 		source.ShippingTemplateRegion,

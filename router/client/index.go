@@ -86,6 +86,16 @@ func InitProductRouter(Router *gin.RouterGroup) {
 	}
 }
 
+// 患者管理
+func InitProductReplyRouter(Router *gin.RouterGroup) {
+	ProductReplyRouter := Router.Group("/productReply")
+	{
+		// ProductReplyRouter.GET("/replyMap/:id", client.GetReplyMap)
+		// ProductReplyRouter.GET("/reply/:id", client.AddReply)
+		ProductReplyRouter.POST("/getProductReplyList", client.GetProductReplyList)
+	}
+}
+
 // 商户
 func InitTenancyRouter(Router *gin.RouterGroup) {
 	TenancyRouter := Router.Group("/tenancy")

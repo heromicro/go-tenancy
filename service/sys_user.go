@@ -174,7 +174,7 @@ func adminLogin(u *model.SysUser) (response.LoginResponse, error) {
 
 // tenancyLogin
 func tenancyLogin(u *model.SysUser) (response.LoginResponse, error) {
-	var tenancy response.SysTenancyUser
+	var tenancy response.SysAdminUser
 	var token string
 	u.Password = utils.MD5V([]byte(u.Password))
 	err := g.TENANCY_DB.Model(&model.SysUser{}).
@@ -302,21 +302,26 @@ func GetAdminInfoList(info request.PageInfo, userId uint) ([]response.SysAdminUs
 	return userList, total, err
 }
 
+
+
 // GetTenancyByUserIds
-func GetTenancyByUserIds(userIds []uint) ([]response.SysTenancyUser, error) {
-	var userList []response.SysTenancyUser
+func GetTenancyByUserIds(userIds []uint, tenancyId uint) ([]response.SysAdminUser, error) {
+	var userList []response.SysAdminUser
 	tenancyAuthorityIds, err := GetUserAuthorityIds(multi.TenancyAuthority)
 	if err != nil {
 		return userList, err
 	}
-	err = g.TENANCY_DB.Model(&model.SysUser{}).
+	db := g.TENANCY_DB.Model(&model.SysUser{}).
 		Select("sys_users.id,sys_users.status,sys_users.username,sys_users.authority_id,sys_users.created_at,sys_users.updated_at, admin_infos.email, admin_infos.phone, admin_infos.nick_name, admin_infos.header_img,sys_authorities.authority_name,sys_authorities.authority_type,sys_users.authority_id,sys_tenancies.name as tenancy_name").
 		Joins("left join admin_infos on admin_infos.sys_user_id = sys_users.id").
 		Joins("left join sys_authorities on sys_authorities.authority_id = sys_users.authority_id").
 		Joins("left join sys_tenancies on sys_users.sys_tenancy_id = sys_tenancies.id").
 		Where("sys_users.authority_id IN (?)", tenancyAuthorityIds).
-		Where("sys_users.id IN (?)", userIds).
-		Find(&userList).Error
+		Where("sys_users.id IN (?)", userIds)
+	if tenancyId > 0 {
+		db = db.Where("sys_users.sys_tenancy_id = ?", tenancyId)
+	}
+	err = db.Find(&userList).Error
 	return userList, err
 }
 
@@ -459,8 +464,8 @@ func CleanToken(userId string) error {
 }
 
 // GetTenancyInfoList 分页获取数据
-func GetTenancyInfoList(info request.PageInfo, userId, tenancyId uint) ([]response.SysTenancyUser, int64, error) {
-	var userList []response.SysTenancyUser
+func GetTenancyInfoList(info request.PageInfo, userId, tenancyId uint) ([]response.SysAdminUser, int64, error) {
+	var userList []response.SysAdminUser
 	var tenancyAuthorityIds []int
 	var total int64
 	limit := info.PageSize

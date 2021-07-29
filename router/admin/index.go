@@ -191,10 +191,6 @@ func InitSysOperationRecordRouter(Router *gin.RouterGroup) {
 	SysOperationRecordRouter := Router.Group("/sysOperationRecord")
 	{
 		SysOperationRecordRouter.POST("/getSysOperationRecordList", admin.GetSysOperationRecordList)           // 获取SysOperationRecord列表
-		SysOperationRecordRouter.POST("/createSysOperationRecord", admin.CreateSysOperationRecord)             // 新建SysOperationRecord
-		SysOperationRecordRouter.DELETE("/deleteSysOperationRecord", admin.DeleteSysOperationRecord)           // 删除SysOperationRecord
-		SysOperationRecordRouter.DELETE("/deleteSysOperationRecordByIds", admin.DeleteSysOperationRecordByIds) // 批量删除SysOperationRecord
-		SysOperationRecordRouter.GET("/findSysOperationRecord", admin.FindSysOperationRecord)                  // 根据ID获取SysOperationRecord
 	}
 }
 

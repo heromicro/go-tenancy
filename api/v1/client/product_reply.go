@@ -1,4 +1,4 @@
-package admin
+package client
 
 import (
 	"github.com/gin-gonic/gin"
@@ -6,17 +6,17 @@ import (
 	"github.com/snowlyg/go-tenancy/model/request"
 	"github.com/snowlyg/go-tenancy/model/response"
 	"github.com/snowlyg/go-tenancy/service"
+	"github.com/snowlyg/multi"
 	"go.uber.org/zap"
 )
 
-// GetSysOperationRecordList 分页获取SysOperationRecord列表
-func GetSysOperationRecordList(ctx *gin.Context) {
-	var pageInfo request.SysOperationRecordSearch
+func GetProductReplyList(ctx *gin.Context) {
+	var pageInfo request.ProductReplyPageInfo
 	if errs := ctx.ShouldBindJSON(&pageInfo); errs != nil {
 		response.FailWithMessage(errs.Error(), ctx)
 		return
 	}
-	if list, total, err := service.GetSysOperationRecordInfoList(pageInfo, ctx); err != nil {
+	if list, total, err := service.GetProductReplyInfoList(pageInfo, multi.GetTenancyId(ctx)); err != nil {
 		g.TENANCY_LOG.Error("获取失败!", zap.Any("err", err))
 		response.FailWithMessage("获取失败:"+err.Error(), ctx)
 	} else {

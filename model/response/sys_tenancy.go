@@ -17,10 +17,10 @@ type Counts struct {
 }
 
 type LoginTenancy struct {
-	Admin SysTenancyUser `json:"admin"`
-	Exp   int64          `json:"exp"`
-	Token string         `json:"token"`
-	Url   string         `json:"url"`
+	Admin SysAdminUser `json:"admin"`
+	Exp   int64        `json:"exp"`
+	Token string       `json:"token"`
+	Url   string       `json:"url"`
 }
 
 type TenancyInfo struct {

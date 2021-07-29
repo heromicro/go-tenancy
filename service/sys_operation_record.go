@@ -17,23 +17,6 @@ func CreateSysOperationRecord(sysOperationRecord model.SysOperationRecord) error
 	return g.TENANCY_DB.Create(&sysOperationRecord).Error
 }
 
-// DeleteSysOperationRecordByIds 批量删除记录
-func DeleteSysOperationRecordByIds(ids request.IdsReq) error {
-	return g.TENANCY_DB.Delete(&[]model.SysOperationRecord{}, "id in (?)", ids.Ids).Error
-}
-
-// DeleteSysOperationRecord 删除操作记录
-func DeleteSysOperationRecord(sysOperationRecord model.SysOperationRecord) error {
-	return g.TENANCY_DB.Delete(&sysOperationRecord).Error
-}
-
-// GetSysOperationRecord 根据id获取单条操作记录
-func GetSysOperationRecord(id uint) (model.SysOperationRecord, error) {
-	var sysOperationRecord model.SysOperationRecord
-	err := g.TENANCY_DB.Where("id = ?", id).First(&sysOperationRecord).Error
-	return sysOperationRecord, err
-}
-
 // GetSysOperationRecordInfoList 分页获取操作记录列表
 func GetSysOperationRecordInfoList(info request.SysOperationRecordSearch, ctx *gin.Context) ([]response.SysOperationRecord, int64, error) {
 	limit := info.PageSize
@@ -41,7 +24,7 @@ func GetSysOperationRecordInfoList(info request.SysOperationRecordSearch, ctx *g
 	// 创建db
 	var sysOperationRecords []response.SysOperationRecord
 	var adminUsers []response.SysAdminUser
-	var tenancyUsers []response.SysTenancyUser
+	var tenancyUsers []response.SysAdminUser
 	var err error
 	db := g.TENANCY_DB.Model(&model.SysOperationRecord{})
 	if multi.IsTenancy(ctx) {
@@ -73,7 +56,7 @@ func GetSysOperationRecordInfoList(info request.SysOperationRecordSearch, ctx *g
 		opUserIds = append(opUserIds, sysOperationRecord.UserID)
 	}
 
-	tenancyUsers, err = GetTenancyByUserIds(opUserIds)
+	tenancyUsers, err = GetTenancyByUserIds(opUserIds, multi.GetTenancyId(ctx))
 	if err != nil {
 		return nil, 0, err
 	}
