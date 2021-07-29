@@ -67,3 +67,21 @@ func productReplyClientlist(t *testing.T, params map[string]interface{}, length 
 		first.Value("id").Number().Ge(0)
 	}
 }
+
+func TestProductReply(t *testing.T) {
+	auth := tenancyWithLoginTester(t)
+	defer baseLogOut(auth)
+	obj := auth.GET("v1/merchant/productReply/replyMap/1").
+		Expect().Status(http.StatusOK).JSON().Object()
+	obj.Keys().ContainsOnly("status", "data", "message")
+	obj.Value("status").Number().Equal(200)
+	obj.Value("message").String().Equal("操作成功")
+
+	obj = auth.POST("v1/merchant/productReply/reply/1").
+		WithJSON(map[string]interface{}{"content": "pageSize"}).
+		Expect().Status(http.StatusOK).JSON().Object()
+	obj.Keys().ContainsOnly("status", "data", "message")
+	obj.Value("status").Number().Equal(200)
+	obj.Value("message").String().Equal("操作成功")
+
+}

@@ -1,13 +1,36 @@
 package service
 
 import (
+	"encoding/json"
+	"fmt"
 	"strings"
+	"time"
 
+	"github.com/gin-gonic/gin"
 	"github.com/snowlyg/go-tenancy/g"
 	"github.com/snowlyg/go-tenancy/model"
 	"github.com/snowlyg/go-tenancy/model/request"
 	"github.com/snowlyg/go-tenancy/model/response"
 )
+
+func GetReplyMap(id uint, ctx *gin.Context) (Form, error) {
+	var form Form
+	formStr := `{"rule":[{"type":"input","field":"content","value":"","title":"回复内容","props":{"type":"textarea","placeholder":"请输入回复内容"},"validate":[{"message":"请输入回复内容","required":true,"type":"string","trigger":"change"}]}],"action":"","method":"POST","title":"评价回复","config":{}}`
+	err := json.Unmarshal([]byte(formStr), &form)
+	if err != nil {
+		return form, err
+	}
+	form.SetAction(fmt.Sprintf("%s/%d", "/productReply/reply", id), ctx)
+	return form, err
+}
+
+func AddReply(id uint, content string) error {
+	err := g.TENANCY_DB.Model(&model.ProductReply{}).Where("id = ?", id).Updates(map[string]interface{}{"merchant_reply_content": content, "merchant_reply_time": time.Now()}).Error
+	if err != nil {
+		return err
+	}
+	return nil
+}
 
 // GetProductReplyInfoList
 func GetProductReplyInfoList(info request.ProductReplyPageInfo, tenancyId uint) ([]response.ProductReplyList, int64, error) {

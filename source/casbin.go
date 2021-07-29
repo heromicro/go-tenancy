@@ -297,6 +297,8 @@ var carbines = []gormadapter.CasbinRule{
 	{Ptype: "p", V0: TenancyAuthorityId, V1: "/v1/merchant/product/deleteProduct/:id", V2: "DELETE"},
 	{Ptype: "p", V0: TenancyAuthorityId, V1: "/v1/merchant/product/destoryProduct/:id", V2: "DELETE"},
 	// 商品评论
+	{Ptype: "p", V0: TenancyAuthorityId, V1: "/v1/merchant/productReply/replyMap/:id", V2: "GET"},
+	{Ptype: "p", V0: TenancyAuthorityId, V1: "/v1/merchant/productReply/reply/:id", V2: "POST"},
 	{Ptype: "p", V0: TenancyAuthorityId, V1: "/v1/merchant/productReply/getProductReplyList", V2: "POST"},
 	//操作日志
 	{Ptype: "p", V0: TenancyAuthorityId, V1: "/v1/merchant/sysOperationRecord/getSysOperationRecordList", V2: "POST"},

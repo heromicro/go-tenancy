@@ -9,3 +9,7 @@ type ProductReplyPageInfo struct {
 	Status   string `json:"status" form:"status"`
 	Date     string `json:"date" form:"date"`
 }
+
+type ProductReply struct {
+	Content string `json:"content" form:"content"`
+}

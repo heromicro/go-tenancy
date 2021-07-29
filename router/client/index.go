@@ -90,8 +90,8 @@ func InitProductRouter(Router *gin.RouterGroup) {
 func InitProductReplyRouter(Router *gin.RouterGroup) {
 	ProductReplyRouter := Router.Group("/productReply")
 	{
-		// ProductReplyRouter.GET("/replyMap/:id", client.GetReplyMap)
-		// ProductReplyRouter.GET("/reply/:id", client.AddReply)
+		ProductReplyRouter.GET("/replyMap/:id", client.GetReplyMap)
+		ProductReplyRouter.POST("/reply/:id", client.AddReply)
 		ProductReplyRouter.POST("/getProductReplyList", client.GetProductReplyList)
 	}
 }

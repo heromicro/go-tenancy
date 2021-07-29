@@ -265,6 +265,8 @@ var baseApis = []model.SysApi{
 	{Path: "/v1/merchant/product/destoryProduct/:id", Description: "删除商品", ApiGroup: "productClient", Method: "DELETE"},
 
 	// 商品评论
+	{Path: "/v1/merchant/product/replyMap/:id", Description: "回复评论表单", ApiGroup: "productClientReply", Method: "GET"},
+	{Path: "/v1/merchant/product/reply/:id", Description: "回复评论", ApiGroup: "productClientReply", Method: "POST"},
 	{Path: "/v1/merchant/product/getProductReplyList", Description: "获取商品评论列表", ApiGroup: "productClientReply", Method: "POST"},
 
 	//订单
