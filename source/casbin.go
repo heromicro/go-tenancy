@@ -344,6 +344,8 @@ var carbines = []gormadapter.CasbinRule{
 	// 管理员管理
 	{Ptype: "p", V0: TenancyAuthorityId, V1: "/v1/merchant/user/registerAdminMap", V2: "GET"},
 	{Ptype: "p", V0: TenancyAuthorityId, V1: "/v1/merchant/user/registerAdmin", V2: "POST"},
+	{Ptype: "p", V0: TenancyAuthorityId, V1: "/v1/merchant/user/changeProfileMap", V2: "GET"},
+	{Ptype: "p", V0: TenancyAuthorityId, V1: "/v1/merchant/user/changeLoginPasswordMap", V2: "GET"},
 	{Ptype: "p", V0: TenancyAuthorityId, V1: "/v1/merchant/user/changePasswordMap/:id", V2: "GET"},
 	{Ptype: "p", V0: TenancyAuthorityId, V1: "/v1/merchant/user/updateAdminMap/:id", V2: "GET"},
 	{Ptype: "p", V0: TenancyAuthorityId, V1: "/v1/merchant/user/changePassword", V2: "POST"},

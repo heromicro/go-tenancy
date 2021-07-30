@@ -169,7 +169,7 @@ func UpdateClientTenancy(req request.UpdateClientTenancy, id uint) error {
 
 // DeleteTenancy
 func DeleteTenancy(id uint) error {
-	user, err := FindUserByTenancyId(id)
+	user, err := GetUserByTenancyId(id)
 	if err != nil {
 		return err
 	}

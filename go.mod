@@ -41,7 +41,7 @@ require (
 	github.com/sergi/go-diff v1.2.0 // indirect
 	github.com/shirou/gopsutil v3.21.3+incompatible
 	github.com/shopspring/decimal v1.2.0
-	github.com/snowlyg/multi v0.0.0-20210617034456-78c1e847cda0
+	github.com/snowlyg/multi v0.0.0-20210730074719-233c70c26dc9
 	github.com/spf13/cast v1.3.1 // indirect
 	github.com/spf13/pflag v1.0.5 // indirect
 	github.com/spf13/viper v1.7.1
@@ -64,5 +64,3 @@ require (
 	gorm.io/driver/mysql v1.1.0
 	gorm.io/gorm v1.21.10
 )
-
-replace github.com/snowlyg/multi v0.0.0-20210617034456-78c1e847cda0 => D:\go\src\github.com\snowlyg\multi

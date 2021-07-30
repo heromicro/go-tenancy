@@ -159,16 +159,17 @@ func InitOrderRouter(Router *gin.RouterGroup) {
 func InitUserRouter(Router *gin.RouterGroup) {
 	UserRouter := Router.Group("/user")
 	{
-		UserRouter.GET("/changePasswordMap/:id", client.ChangePasswordMap) // 修改密码表单
-		UserRouter.POST("/changePassword", client.ChangePassword)          // 修改密码
-		UserRouter.GET("/registerAdminMap", client.RegisterAdminMap)       // 注册管理员表单
-		UserRouter.GET("/updateAdminMap/:id", client.UpdateAdminMap)       // 编辑管理员表单
-		UserRouter.POST("/registerAdmin", client.RegisterTenancy)          // 注册管理员
-		UserRouter.POST("/changeProfile", client.ChangeProfile)            // 修改个人信息
-		UserRouter.POST("/getAdminList", client.GetAdminList)              // 分页获取管理员列表
-		UserRouter.DELETE("/deleteUser", client.DeleteUser)                // 删除用户
-		UserRouter.PUT("/setUserInfo/:user_id", client.SetUserInfo)        // 设置用户信息
-
+		UserRouter.GET("/changeLoginPasswordMap", client.ChangeLoginPasswordMap) // 修改登录用户密码表单
+		UserRouter.GET("/changeProfileMap", client.ChangeProfileMap)             // 修改个人表单
+		UserRouter.GET("/changePasswordMap/:id", client.ChangePasswordMap)       // 修改密码表单
+		UserRouter.POST("/changePassword", client.ChangePassword)                // 修改密码
+		UserRouter.GET("/registerAdminMap", client.RegisterAdminMap)             // 注册管理员表单
+		UserRouter.GET("/updateAdminMap/:id", client.UpdateAdminMap)             // 编辑管理员表单
+		UserRouter.POST("/registerAdmin", client.RegisterTenancy)                // 注册管理员
+		UserRouter.POST("/changeProfile", client.ChangeProfile)                  // 修改个人信息
+		UserRouter.POST("/getAdminList", client.GetAdminList)                    // 分页获取管理员列表
+		UserRouter.DELETE("/deleteUser", client.DeleteUser)                      // 删除用户
+		UserRouter.PUT("/setUserInfo/:user_id", client.SetUserInfo)              // 设置用户信息
 	}
 }
 

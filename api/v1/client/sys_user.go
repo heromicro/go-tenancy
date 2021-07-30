@@ -12,7 +12,27 @@ import (
 	"go.uber.org/zap"
 )
 
-// ChangePasswordMap 修改用户密码笔刀呢
+// ChangeLoginPasswordMap 修改用户密码
+func ChangeLoginPasswordMap(ctx *gin.Context) {
+	if detail, err := service.ChangePasswordMap(multi.GetUserId(ctx), ctx); err != nil {
+		g.TENANCY_LOG.Error("获取失败", zap.Any("err", err))
+		response.FailWithMessage("获取失败:"+err.Error(), ctx)
+	} else {
+		response.OkWithDetailed(detail, "获取成功", ctx)
+	}
+}
+
+// ChangeProfileMap 修改用户密码表单
+func ChangeProfileMap(ctx *gin.Context) {
+	if detail, err := service.ChangeProfileMap(ctx); err != nil {
+		g.TENANCY_LOG.Error("获取失败", zap.Any("err", err))
+		response.FailWithMessage("获取失败:"+err.Error(), ctx)
+	} else {
+		response.OkWithDetailed(detail, "获取成功", ctx)
+	}
+}
+
+// ChangePasswordMap 修改用户密码表单
 func ChangePasswordMap(ctx *gin.Context) {
 	var req request.GetById
 	if errs := ctx.ShouldBindUri(&req); errs != nil {

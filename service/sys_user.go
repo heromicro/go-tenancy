@@ -18,6 +18,50 @@ import (
 	"gorm.io/gorm"
 )
 
+func ChangeProfileMap(ctx *gin.Context) (Form, error) {
+	var form Form
+	user, err := GetUserByUserIdAndTenancyId(multi.GetUserId(ctx), multi.GetTenancyId(ctx))
+	if err != nil {
+		return form, err
+	}
+	form = Form{
+		Rule: []Rule{
+			{
+				Title: "管理员姓名",
+				Type:  "input",
+				Field: "nickName",
+				Value: user.AdminInfo.NickName,
+				Props: map[string]interface{}{
+					"type":        "text",
+					"placeholder": "请输入管理员姓名"},
+				Validate: []map[string]interface{}{
+					{
+						"message":  "请输入管理员姓名",
+						"required": true,
+						"type":     "string",
+						"trigger":  "change",
+					},
+				},
+			},
+			{
+				Title: "联系电话",
+				Type:  "input",
+				Field: "phone",
+				Value: user.AdminInfo.Phone,
+				Props: map[string]interface{}{
+					"type":        "text",
+					"placeholder": "请输入联系电话",
+				},
+			},
+		},
+		Method: "POST",
+		Title:  "修改信息",
+	}
+
+	form.SetAction("/user/changeProfile", ctx)
+	return form, nil
+}
+
 func ChangePasswordMap(id uint, ctx *gin.Context) (Form, error) {
 	var form Form
 	formStr := fmt.Sprintf(`{"rule":[{"type":"input","field":"NewPassword","value":"","title":"密码","props":{"type":"password","placeholder":"请输入密码"},"validate":[{"message":"请输入密码","required":true,"type":"string","trigger":"change"}]},
@@ -302,8 +346,6 @@ func GetAdminInfoList(info request.PageInfo, userId uint) ([]response.SysAdminUs
 	return userList, total, err
 }
 
-
-
 // GetTenancyByUserIds
 func GetTenancyByUserIds(userIds []uint, tenancyId uint) ([]response.SysAdminUser, error) {
 	var userList []response.SysAdminUser
@@ -416,15 +458,33 @@ func UpdateAdminInfo(userInfo request.UpdateUser, user model.SysUser, tenancyId 
 
 func GetUserByTenancyId(tenanacyId uint) (model.SysUser, error) {
 	var u model.SysUser
-	adminAuthorityIds, err := GetUserAuthorityIds(multi.TenancyAuthority)
+	tenancyAuthorityIds, err := GetUserAuthorityIds(multi.TenancyAuthority)
 	if err != nil {
 		return u, err
 	}
 	err = g.TENANCY_DB.Model(&model.SysUser{}).
 		Select("sys_users.*").
 		Joins("left join sys_authorities on sys_authorities.authority_id = sys_users.authority_id").
-		Where("sys_users.authority_id IN (?)", adminAuthorityIds).
+		Where("sys_users.authority_id IN (?)", tenancyAuthorityIds).
 		Where("sys_users.sys_tenancy_id = ?", tenanacyId).
+		Preload("Authority").Preload("AdminInfo").Preload("GeneralInfo").
+		First(&u).Error
+	return u, err
+}
+
+func GetUserByUserIdAndTenancyId(userId, tenanacyId uint) (model.SysUser, error) {
+	var u model.SysUser
+	tenancyAuthorityIds, err := GetUserAuthorityIds(multi.TenancyAuthority)
+	if err != nil {
+		return u, err
+	}
+	err = g.TENANCY_DB.Model(&model.SysUser{}).
+		Select("sys_users.*").
+		Joins("left join sys_authorities on sys_authorities.authority_id = sys_users.authority_id").
+		Where("sys_users.authority_id IN (?)", tenancyAuthorityIds).
+		Where("sys_users.sys_tenancy_id = ?", tenanacyId).
+		Where("sys_users.id = ?", userId).
+		Preload("Authority").Preload("AdminInfo").Preload("GeneralInfo").
 		First(&u).Error
 	return u, err
 }
@@ -433,13 +493,6 @@ func GetUserByTenancyId(tenanacyId uint) (model.SysUser, error) {
 func FindUserByStringId(id string) (model.SysUser, error) {
 	var u model.SysUser
 	err := g.TENANCY_DB.Where("`id` = ?", id).Preload("Authority").Preload("AdminInfo").Preload("GeneralInfo").First(&u).Error
-	return u, err
-}
-
-// FindUserByTenancyId 通过tenancy_id获取用户信息
-func FindUserByTenancyId(tenancyId uint) (model.SysUser, error) {
-	var u model.SysUser
-	err := g.TENANCY_DB.Where("sys_tenancy_id = ?", tenancyId).Preload("Authority").Preload("AdminInfo").Preload("GeneralInfo").First(&u).Error
 	return u, err
 }
 

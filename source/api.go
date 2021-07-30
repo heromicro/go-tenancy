@@ -326,6 +326,8 @@ var baseApis = []model.SysApi{
 	{Path: "/v1/merchant/userLabel/auto/updateUserLabel/:id", Description: "更新用户标签", ApiGroup: "userAutoLabelClient", Method: "PUT"},
 	{Path: "/v1/merchant/userLabel/auto/deleteUserLabel/:id", Description: "删除用户标签", ApiGroup: "userAutoLabelClient", Method: "DELETE"},
 	// 管理员管理
+	{Path: "/v1/merchant/user/changeProfileMap", Description: "修改个人信息表单", ApiGroup: "user", Method: "GET"},
+	{Path: "/v1/merchant/user/changeLoginPasswordMap", Description: "修改登录用户密码表单", ApiGroup: "user", Method: "GET"},
 	{Path: "/v1/merchant/user/changePasswordMap/:id", Description: "管理员修改密码表单", ApiGroup: "user", Method: "GET"},
 	{Path: "/v1/merchant/user/updateAdminMap/:id", Description: "管理员编辑表单", ApiGroup: "user", Method: "GET"},
 	{Path: "/v1/merchant/user/registerAdminMap", Description: "管理员注册表单", ApiGroup: "user", Method: "GET"},

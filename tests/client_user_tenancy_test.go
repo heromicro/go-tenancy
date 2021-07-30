@@ -23,13 +23,6 @@ func TestTenancyUserList(t *testing.T) {
 	data.Value("pageSize").Number().Equal(10)
 	data.Value("page").Number().Equal(1)
 	data.Value("total").Number().Ge(1)
-	data.Value("list").Array().Length().Ge(0)
-
-	list := data.Value("list").Array()
-	list.Length().Ge(0)
-	first := list.First().Object()
-	first.Keys().ContainsOnly("id", "userName", "email", "phone", "nickName", "status", "headerImg", "authorityName", "authorityType", "authorityId", "tenancyName", "tenancyId", "defaultRouter", "createdAt", "updatedAt")
-	first.Value("id").Number().Ge(0)
 }
 
 func TestTenancyLoginUser(t *testing.T) {
@@ -115,6 +108,20 @@ func TestTenancyUserProcess(t *testing.T) {
 
 		// changePasswordMap
 		obj = auth.GET(fmt.Sprintf("v1/merchant/user/changePasswordMap/%d", int(userId))).
+			Expect().Status(http.StatusOK).JSON().Object()
+		obj.Keys().ContainsOnly("status", "data", "message")
+		obj.Value("status").Number().Equal(200)
+		obj.Value("message").String().Equal("获取成功")
+
+		// changeLoginPasswordMap
+		obj = auth.GET("v1/merchant/user/changeLoginPasswordMap").
+			Expect().Status(http.StatusOK).JSON().Object()
+		obj.Keys().ContainsOnly("status", "data", "message")
+		obj.Value("status").Number().Equal(200)
+		obj.Value("message").String().Equal("获取成功")
+
+		// changeLoginPasswordMap
+		obj = auth.GET("v1/merchant/user/changeProfileMap").
 			Expect().Status(http.StatusOK).JSON().Object()
 		obj.Keys().ContainsOnly("status", "data", "message")
 		obj.Value("status").Number().Equal(200)
