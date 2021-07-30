@@ -11,6 +11,7 @@ func InitAuthRouter(Router *gin.RouterGroup) {
 	Router.GET("/clean", public.Clean)   //清空授权
 }
 
+// 数据库初始化检测
 func InitInitRouter(Router *gin.RouterGroup) {
 	ApiRouter := Router.Group("/init")
 	{
@@ -18,6 +19,8 @@ func InitInitRouter(Router *gin.RouterGroup) {
 		ApiRouter.GET("/checkdb", public.CheckDB) // 创建Api
 	}
 }
+
+// 登录授权验证码
 func InitPublicRouter(Router *gin.RouterGroup) {
 	BaseRouter := Router.Group("/public", middleware.NeedInit())
 	{

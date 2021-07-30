@@ -21,3 +21,18 @@ If you don't have a QQ account, you can into the [iris-go-tenancy/community](htt
   ```shell
   cd resource/doc/ | apidoc -i v1/ -o apidoc/ -t template/
   ```
+
+###### 价格逻辑
+
+商品价格 
+- 商品售价 price
+- 商品原价 ot_price
+- 商品成本价 cost
+  
+订单价格 
+- 订单总价 total_price 商品
+- 订单邮费 total_postage
+- 订单支付总价 pay_price = total_price+total_postage
+- 订单支付邮费 pay_postage = total_postage
+- 订单平台手续费 commission_rate
+- 订单成本价 cost = 商品成本价

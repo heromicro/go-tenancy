@@ -557,9 +557,6 @@ func GetOrderInfoByCartId(tenancyId, userId uint, cartIds []uint) (response.Chec
 			res.TotalNum += product.CartNum
 		}
 	}
-
-	res.FinalOtPrice = res.TotalOtPrice.Sub(res.PostagePrice).Sub(res.DownPrice)
-	res.FinalPrice = res.TotalPrice.Sub(res.PostagePrice).Sub(res.DownPrice)
 	return res, nil
 }
 
@@ -568,7 +565,6 @@ func CreateOrder(req request.CreateOrder, ctx *gin.Context) error {
 	orderInfo, err := GetOrderInfoByCartId(multi.GetTenancyId(ctx), multi.GetUserId(ctx), req.CartIds)
 	totalPrice, _ := orderInfo.TotalPrice.Float64()
 	postagePrice, _ := orderInfo.PostagePrice.Float64()
-	finalPrice, _ := orderInfo.FinalPrice.Float64()
 	order := model.Order{
 		BaseOrder: model.BaseOrder{
 			OrderSn:      g.CreateOrderSn(req.PayType),
@@ -579,7 +575,6 @@ func CreateOrder(req request.CreateOrder, ctx *gin.Context) error {
 			TotalPrice:   totalPrice,
 			TotalPostage: postagePrice,
 			PayPostage:   postagePrice,
-			PayPrice:     finalPrice,
 		},
 	}
 	if err != nil {

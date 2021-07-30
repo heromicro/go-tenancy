@@ -52,10 +52,10 @@ type CheckOrder struct {
 }
 
 type CheckOrderDetail struct {
-	FinalPrice    decimal.Decimal                     `json:"finalPrice" form:"finalPrice"`       // 订单最终总价
-	FinalOtPrice  decimal.Decimal                     `json:"finalOtPrice" form:"finalOtPrice"`   // 订单最终原价
-	TotalPrice    decimal.Decimal                     `json:"totalPrice" form:"totalPrice"`       // 总价
-	TotalOtPrice  decimal.Decimal                     `json:"totalOtPrice" form:"totalOtPrice"`   // 原价
+	TotalPrice    decimal.Decimal                     `json:"totalPrice" form:"totalPrice"`       // 总计价格
+	TotalOtPrice  decimal.Decimal                     `json:"totalOtPrice" form:"totalOtPrice"`   // 总计原价
+	OrderPrice    decimal.Decimal                     `json:"orderPrice" form:"orderPrice"`       // 订单价格
+	OrderOtPrice  decimal.Decimal                     `json:"orderOtPrice" form:"orderOtPrice"`   // 订单原价
 	PostagePrice  decimal.Decimal                     `json:"postagePrice" form:"postagePrice"`   // 油费
 	DownPrice     decimal.Decimal                     `json:"downPrice" form:"downPrice"`         // 优惠价格
 	ProductPrices map[uint]map[string]decimal.Decimal `json:"productPrices" form:"productPrices"` // 商品价格
