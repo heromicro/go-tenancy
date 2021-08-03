@@ -84,13 +84,3 @@ tencent-cos:
   secret-key: 'xxxxxxxx'
   base-url: 'https://gin.vue.admin'
   path-prefix: 'gin-vue-admin'
-
-# alipay configuration
-alipay:
-  app-id: ''
-  private-key: ''
-  is-prod: false
-  charset: 'utf-8'
-  sign-type: 'RSA2'
-  private-key-type: 'PKCS1'
-  notify-url: ''

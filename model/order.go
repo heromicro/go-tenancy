@@ -22,14 +22,15 @@ const (
 	PayTypeAlipay      //支付宝
 )
 
-// 1:待发货 2：待收货 3：待评价 4：已完成 5：已退款  10:待付尾款 11:尾款过期未付
+// 0:待付款 1:待发货 2：待收货 3：待评价 4：已完成 5：已退款 6:已取消 10:待付尾款 11:尾款过期未付
 const (
-	OrderStatusUnknown   int = iota
-	OrderStatusNoDeliver     //待发货
-	OrderStatusNoReceive     //待收货
-	OrderStatusNoComment     //待评价
-	OrderStatusFinish        //已完成
-	OrderStatusRefund        //已退款
+	OrderStatusNoPay     int = iota //待付款
+	OrderStatusNoDeliver            //待发货
+	OrderStatusNoReceive            //待收货
+	OrderStatusNoComment            //待评价
+	OrderStatusFinish               //已完成
+	OrderStatusRefund               //已退款
+	OrderStatusCancel               //已取消
 )
 
 const (
@@ -66,7 +67,7 @@ type BaseOrder struct {
 	Paid           int       `gorm:"column:paid;type:tinyint unsigned;not null;default:2" json:"paid"`                                // 支付状态
 	PayTime        time.Time `gorm:"column:pay_time;type:timestamp" json:"payTime"`                                                   // 支付时间
 	PayType        int       `gorm:"column:pay_type;type:tinyint(1);not null" json:"payType"`                                         // 支付方式  1=微信 2=小程序 3=h5 4=余额 5=支付宝
-	Status         int       `gorm:"column:status;type:tinyint(1);not null;default:6" json:"status"`                                  // 订单状态（1:待发货 2：待收货 3：待评价 4：已完成 5：已退款）
+	Status         int       `gorm:"column:status;type:tinyint(1);not null;default:0" json:"status"`                                  // 订单状态（0：待付款 1:待发货 2：待收货 3：待评价 4：已完成 5：已退款 6：已取消）
 	DeliveryType   int       `gorm:"column:delivery_type;type:varchar(32)" json:"deliveryType"`                                       // 发货类型(1:发货 2: 送货 3: 虚拟)
 	DeliveryName   string    `gorm:"column:delivery_name;type:varchar(64)" json:"deliveryName"`                                       // 快递名称/送货人姓名
 	DeliveryID     string    `gorm:"column:delivery_id;type:varchar(64)" json:"deliveryId"`                                           // 快递单号/手机号

@@ -14,5 +14,4 @@ type Server struct {
 	Qiniu      Qiniu      `mapstructure:"qiniu" json:"qiniu" yaml:"qiniu"`
 	AliyunOSS  AliyunOSS  `mapstructure:"aliyun-oss" json:"aliyunOSS" yaml:"aliyun-oss"`
 	TencentCOS TencentCOS `mapstructure:"tencent-cos" json:"tencentCOS" yaml:"tencent-cos"`
-	Alipay     Alipay     `mapstructure:"alipay" json:"alipay" yaml:"alipay"`
 }

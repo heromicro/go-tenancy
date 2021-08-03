@@ -24,6 +24,5 @@ func main() {
 	// 初始化认证服务
 	initialize.Auth()
 	defer multi.AuthDriver.Close()
-	g.TENANCY_ALIAPY = core.AliPay() // 初始化支付宝支付
 	core.RunServer()
 }

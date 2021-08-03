@@ -11,6 +11,7 @@ import (
 	"github.com/shopspring/decimal"
 	"github.com/skip2/go-qrcode"
 	"github.com/snowlyg/go-tenancy/g"
+	"github.com/snowlyg/go-tenancy/job"
 	"github.com/snowlyg/go-tenancy/model"
 	"github.com/snowlyg/go-tenancy/model/request"
 	"github.com/snowlyg/go-tenancy/model/response"
@@ -581,8 +582,7 @@ func GetOrderInfoByCartId(tenancyId, userId uint, cartIds []uint) (response.Chec
 
 // CreateOrder 新建订单 生成订单组-》生成订单, 二维码需要 data:image/png;base64,
 func CreateOrder(req request.CreateOrder, tenancyId, userId uint, tenancyName string) ([]byte, error) {
-	var orderId uint
-	var orderType int
+	var order model.Order
 	patient, err := GetPatientById(userId, tenancyId)
 	if err != nil {
 		return nil, err
@@ -623,13 +623,13 @@ func CreateOrder(req request.CreateOrder, tenancyId, userId uint, tenancyName st
 		return nil, err
 	}
 	err = g.TENANCY_DB.Transaction(func(tx *gorm.DB) error {
-		err := g.TENANCY_DB.Model(&model.GroupOrder{}).Create(&groupOrder).Error
+		err := tx.Model(&model.GroupOrder{}).Create(&groupOrder).Error
 		if err != nil {
 			return err
 		}
-		order := model.Order{
+		order = model.Order{
 			BaseOrder: model.BaseOrder{
-				OrderSn:      g.CreateOrderSn(orderType),
+				OrderSn:      g.CreateOrderSn(req.OrderType),
 				RealName:     patient.Name,
 				UserPhone:    patient.Phone,
 				UserAddress:  userAddress,
@@ -648,12 +648,18 @@ func CreateOrder(req request.CreateOrder, tenancyId, userId uint, tenancyName st
 			GroupOrderID: groupOrder.ID,
 		}
 
-		err = g.TENANCY_DB.Model(&model.Order{}).Create(&order).Error
+		err = tx.Model(&model.Order{}).Create(&order).Error
 		if err != nil {
 			return err
 		}
-		orderId = order.ID
-		orderType = order.OrderType
+
+		// 订单状态
+		orderStatus := model.OrderStatus{ChangeType: "create", ChangeMessage: "生成订单", ChangeTime: time.Now(), OrderID: order.ID}
+		err = tx.Create(&orderStatus).Error
+		if err != nil {
+			return err
+		}
+
 		return nil
 	})
 	if err != nil {
@@ -664,7 +670,7 @@ func CreateOrder(req request.CreateOrder, tenancyId, userId uint, tenancyName st
 		return nil, err
 	}
 	// 生成支付地址二维码
-	payUrl := fmt.Sprintf("%s/v1/payOrder?orderId=%d&tenancyId=%d&userId=%d&orderType=%d", seitURL, orderId, tenancyId, userId, orderType)
+	payUrl := fmt.Sprintf("%s/v1/payOrder?orderId=%d&tenancyId=%d&userId=%d&orderType=%d", seitURL, order.ID, tenancyId, userId, order.OrderType)
 	q, err := qrcode.New(payUrl, qrcode.Medium)
 	if err != nil {
 		return nil, err
@@ -673,6 +679,15 @@ func CreateOrder(req request.CreateOrder, tenancyId, userId uint, tenancyName st
 	if err != nil {
 		return nil, err
 	}
+
+	checkOrderJob := job.CheckOrderPayStatus{
+		OrderId:   order.ID,
+		TenancyId: tenancyId,
+		UserId:    userId,
+		OrderType: order.OrderType,
+		CreatedAt: order.CreatedAt,
+	}
+	g.TENANCY_Timer.AddTaskByJob("CheckOrderPayStatus", "0 * * * * *", checkOrderJob)
 	return png, nil
 }
 

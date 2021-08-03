@@ -45,6 +45,21 @@ func GetConfigValueByKey(configKey string) (string, error) {
 func GetSeitURL() (string, error) {
 	return GetConfigValueByKey("site_url")
 }
+
 func GetSeitName() (string, error) {
 	return GetConfigValueByKey("site_name")
+}
+
+func GetAliPay() (map[string]string, error) {
+	conifg := map[string]string{}
+	alipayConfigs, err := GetConfigByCateKey("alipay", 0)
+	if err != nil {
+		return conifg, err
+	}
+
+	for _, alipayConfig := range alipayConfigs {
+		conifg[alipayConfig.ConfigKey] = alipayConfig.Value
+	}
+
+	return conifg, nil
 }

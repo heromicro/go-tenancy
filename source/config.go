@@ -30,10 +30,6 @@ var configs = []model.SysConfig{
 	{SysConfigCategoryID: 3, ConfigName: "微信分享标题", ConfigKey: "wechat_share_title", ConfigType: "input", ConfigRule: "", Required: 2, Info: "微信分享标题", Sort: 0, UserType: 2, Status: 1},
 	{SysConfigCategoryID: 3, ConfigName: "微信分享简介", ConfigKey: "wechat_share_synopsis", ConfigType: "textarea", ConfigRule: "", Required: 2, Info: "微信分享简介", Sort: 0, UserType: 2, Status: 1},
 	{SysConfigCategoryID: 3, ConfigName: "消息加解密方式", ConfigKey: "wechat_encode", ConfigType: "radio", ConfigRule: "0:明文模式;1:兼容模式;2:安全模式", Required: 1, Info: "如需使用安全模式请在管理中心修改，仅限服务号和认证订阅号", Sort: 1, UserType: 2, Status: 1},
-	// 194	0	一级分销比例	extension_one_rate	input		0	设置分销员一级分销比例, 最大为1(1=100%)	0	0	1	2020-05-08 15:38:03
-	// 195	0	二级分销比例	extension_two_rate	input		0	设置分销员二级分销比例, 最大为1(1=100%)	0	0	1	2020-05-08 15:39:03
-	// 196	0	开启分销	extension_status	radio	1:开启
-	// 0:关闭	1	是否开启分销,关闭后不进行返佣	1	0	1	2020-05-08 15:41:04
 	{SysConfigCategoryID: 5, ConfigName: "警戒库存", ConfigKey: "mer_store_stock", ConfigType: "input", ConfigRule: "", Required: 0, Info: "设置商品的警戒库存", Sort: 0, UserType: 1, Status: 1},
 	// 198	0	短信平台账号	sms_account	input		0	设置短信平台账号	0	0	0	2020-05-18 15:33:58
 	// 199	0	短信平台密码	sms_token	input		0	设置短信平台密码	0	0	0	2020-05-18 15:34:22
@@ -54,8 +50,6 @@ var configs = []model.SysConfig{
 	{SysConfigCategoryID: 5, ConfigName: "银行卡卡号", ConfigKey: "bank_number", ConfigType: "input", ConfigRule: "", Required: 1, Sort: 0, UserType: 1, Status: 1},
 	{SysConfigCategoryID: 5, ConfigName: "银行卡持卡人姓名", ConfigKey: "bank_name", ConfigType: "input", ConfigRule: "", Required: 1, Sort: 0, UserType: 1, Status: 1},
 	{SysConfigCategoryID: 5, ConfigName: "银行卡开户行地址", ConfigKey: "bank_address", ConfigType: "input", ConfigRule: "", Required: 1, Sort: 0, UserType: 1, Status: 1},
-	// 225	13	佣金最低提现金额	user_extract_min	number	佣金达到最低额才可以提现	1		0	0	1	2020-06-16 14:53:52
-	// 226	13	佣金冻结时间	lock_brokerage_timer	number		0	设置佣金冻结时间(天)	0	0	1	2020-06-17 14:36:16
 	{SysConfigCategoryID: 1, ConfigName: "快递查询密钥", ConfigKey: "express_app_code", ConfigType: "input", ConfigRule: "", Required: 2, Info: "阿里云快递查询接口密钥购买地址：https://market.aliyun.com/products/56928004/cmapi021863.html", Sort: 0, UserType: 2, Status: 1},
 	// 228	7	空间域名 Domain	uploadUrl	input		0	空间域名 Domain	0	0	1	2020-06-18 10:21:19
 	// 229	7	accessKey	accessKey	input		0	accessKey	0	0	1	2020-06-18 10:21:37
@@ -154,10 +148,13 @@ var configs = []model.SysConfig{
 	// 1:开启	0		0	0	1	2020-09-08 15:53:42
 	// 310	4	验证码时效配置(分钟)	sms_time	number		0		0	0	1	2020-09-08 15:53:42
 	{SysConfigCategoryID: 5, ConfigName: "打印机自动打印", ConfigKey: "printing_auto_status", ConfigType: "radio", ConfigRule: "	0:关闭;1:开启", Required: 2, Info: "开启后订单支付成功后自动打印", Sort: 0, UserType: 1, Status: 1},
-	{SysConfigCategoryID: 15, ConfigName: "支付宝支付状态", ConfigKey: "alipay_open", ConfigType: "radio", ConfigRule: "0:关闭 1:开启", Required: 2, Info: "", Sort: 0, UserType: 2, Status: 1},
-	{SysConfigCategoryID: 15, ConfigName: "支付宝app_id", ConfigKey: "alipay_app_id", ConfigType: "input", ConfigRule: "", Required: 2, Info: "", Sort: 0, UserType: 2, Status: 1},
-	{SysConfigCategoryID: 15, ConfigName: "支付宝公钥", ConfigKey: "alipay_public_key", ConfigType: "input", ConfigRule: "", Required: 2, Info: "", Sort: 0, UserType: 2, Status: 1},
-	{SysConfigCategoryID: 15, ConfigName: "支付密钥", ConfigKey: "alipay_private_key", ConfigType: "input", ConfigRule: "", Required: 2, Info: "", Sort: 0, UserType: 2, Status: 1},
+
+	{SysConfigCategoryID: 15, ConfigName: "支付宝支付状态", ConfigKey: "alipay_open", ConfigType: "radio", ConfigRule: "0:关闭;1:开启", Required: 2, Info: "是否开启支付宝支付", Sort: 0, UserType: 2, Status: 1},
+	{SysConfigCategoryID: 15, ConfigName: "支付宝支付环境", ConfigKey: "alipay_env", ConfigType: "radio", ConfigRule: "0:沙箱;1:正式", Required: 2, Info: "支付宝支付环境，是否使用沙箱环境", Sort: 0, UserType: 2, Status: 1},
+	{SysConfigCategoryID: 15, ConfigName: "支付宝app_id", ConfigKey: "alipay_app_id", ConfigType: "input", ConfigRule: "", Required: 2, Info: "支付宝支付appid", Sort: 0, UserType: 2, Status: 1},
+	{SysConfigCategoryID: 15, ConfigName: "支付宝公钥", ConfigKey: "alipay_public_key", ConfigType: "input", ConfigRule: "", Required: 2, Info: "支付宝支付应用公钥", Sort: 0, UserType: 2, Status: 1},
+	{SysConfigCategoryID: 15, ConfigName: "支付密钥", ConfigKey: "alipay_private_key", ConfigType: "input", ConfigRule: "", Required: 2, Info: "支付宝支付应用密钥", Sort: 0, UserType: 2, Status: 1},
+
 	{SysConfigCategoryID: 5, ConfigName: "打印机开启", ConfigKey: "printing_status", ConfigType: "radio", ConfigRule: "0:关闭;1:开启", Required: 2, Info: "", Sort: 0, UserType: 1, Status: 1},
 	{SysConfigCategoryID: 5, ConfigName: "开启发票", ConfigKey: "mer_open_receipt", ConfigType: "radio", ConfigRule: "0:关闭;1:开启", Required: 2, Info: "设置是否开启发票", Sort: 0, UserType: 1, Status: 1},
 }

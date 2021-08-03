@@ -1427,6 +1427,124 @@ define({ "api": [
   },
   {
     "type": "post",
+    "url": "/v1/device/order/createOrder",
+    "title": "用户结算订单",
+    "version": "0.0.1",
+    "name": "用户结算订单",
+    "group": "订单管理管理",
+    "permission": [
+      {
+        "name": "device",
+        "title": "床旁设备授权",
+        "description": "<p>床旁设备授权，区分设备所在医院</p> <p>床旁设备请求平台接口之前都需要获取授权，并将授权凭证放置在头部信息中。</p>"
+      }
+    ],
+    "description": "<p>用户结算订单，并生成待支付订单和支付二维码，用户通过支付宝或者微信扫码支付</p>",
+    "body": [
+      {
+        "group": "Body",
+        "type": "Number[]",
+        "optional": false,
+        "field": "cartIds",
+        "description": "<p>购物车ids</p>"
+      },
+      {
+        "group": "Body",
+        "type": "Number",
+        "optional": false,
+        "field": "orderType",
+        "description": "<p>订单类型：1：普通，2：自提</p>"
+      },
+      {
+        "group": "Body",
+        "type": "Number",
+        "optional": true,
+        "field": "remark",
+        "description": "<p>订单备注</p>"
+      }
+    ],
+    "header": {
+      "fields": {
+        "Header": [
+          {
+            "group": "Header",
+            "type": "String",
+            "optional": false,
+            "field": "Authorization",
+            "description": "<p>接口需要带上此头信息</p>"
+          }
+        ]
+      },
+      "examples": [
+        {
+          "title": "Header-Example",
+          "content": "\"Authorization: Bearer 5f048fe\"",
+          "type": "Header"
+        }
+      ]
+    },
+    "examples": [
+      {
+        "title": "Curl example",
+        "content": "curl -H \"Authorization: Bearer 5f048fe\" -i http://127.0.0.1:8089/v1/device/order/checkOrder",
+        "type": "bash"
+      }
+    ],
+    "success": {
+      "fields": {
+        "Success 200": [
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "qrcode",
+            "description": "<p>扫码支付二维码 base64 数据，需要在前面加上 data:image/png;base64, 才能显示为图片；例如data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAQAAAAEAAQMAAABmvDolAAAABlBMVEX///8AAABVwtN+AAACWklEQVR42uyYMbLjIBBEW0VAyBF0FF3sl5BqL8ZROAIhAaXe6sH+9l9vbtg1gUuFnoMR0zM94LM+679cC0leno4nEzMAn4FNu2kioALYfXJlqXDa9nkpG4AwFbCy7J4s8MR6BzzbcIA+/uVTQywgD8wJKMwdW1tPAWeZD1BGYbNkapIJ8JeUezPQxZtaOOvm8h5SXc/yqu6xgdvaHC9sWC9sPsfyWk/HBpYKhUSEw7P1CE9JPD4K6QDA6ngogS6l/RHoeQFWkyYCmJvedQXnXWdhPw9dTAAAvXI2xKowgSqxW2OYB7iH6cpCCtiqalTFn9/hrUBdVX3geHg6cwarZdTxLd4JAPR2hQb4xG5y9sD6OKwZgIXUOaUWyNR1jkXtt4WBgG5yYD2rlyC54oqvyQDrWXYqN8nu2vl6pNz4gA0k3ar5BKnbdFHX415IBwB0FtKtnrpB0z9UO+cC0A2xnpp26nqp/bYnkzM+wGy2p4WThN7ZYTF/DQUQgQog3rx9RSzbU0bNAABwMmWOJ8mMQCDq6ckajw8s2tTpFEjddljUnOUeJuf9QF2tp7o+N9kwqOE7PxXSCQB13t0T4ZI90Nydo8KMz/ZgeEBWzVyxpVVvBzI5LUwFADJAt54AbMw2rI8E3NpvQk+rs1+aWT/GPMD9lpUlKlYWhVk2z+PnTc7gQL9llTjMr8lwRoXpvif3EYB+s2cKNldcrdrz14yATiVZJ+iN6zFGzQPALqVSg72TOH440vcDdssKK5a0CWq1p8iZgLt49YPvO5CXu+Kxgc/6rH9s/Q4AAP//PZzXiSo38ugAAAAASUVORK5CYII=</p>"
+          }
+        ]
+      },
+      "examples": [
+        {
+          "title": "Response:",
+          "content": "HTTP/1.1 200 OK\n{\n\"status\": 200,\n\"data\": {\n    \"qrcode\": \"iVBORw0KGgoAAAANSUhEUgAAAQAAAAEAAQMAAABmvDolAAAABlBMVEX///8AAABVwtN+AAACWklEQVR42uyYMbLjIBBEW0VAyBF0FF3sl5BqL8ZROAIhAaXe6sH+9l9vbtg1gUuFnoMR0zM94LM+679cC0leno4nEzMAn4FNu2kioALYfXJlqXDa9nkpG4AwFbCy7J4s8MR6BzzbcIA+/uVTQywgD8wJKMwdW1tPAWeZD1BGYbNkapIJ8JeUezPQxZtaOOvm8h5SXc/yqu6xgdvaHC9sWC9sPsfyWk/HBpYKhUSEw7P1CE9JPD4K6QDA6ngogS6l/RHoeQFWkyYCmJvedQXnXWdhPw9dTAAAvXI2xKowgSqxW2OYB7iH6cpCCtiqalTFn9/hrUBdVX3geHg6cwarZdTxLd4JAPR2hQb4xG5y9sD6OKwZgIXUOaUWyNR1jkXtt4WBgG5yYD2rlyC54oqvyQDrWXYqN8nu2vl6pNz4gA0k3ar5BKnbdFHX415IBwB0FtKtnrpB0z9UO+cC0A2xnpp26nqp/bYnkzM+wGy2p4WThN7ZYTF/DQUQgQog3rx9RSzbU0bNAABwMmWOJ8mMQCDq6ckajw8s2tTpFEjddljUnOUeJuf9QF2tp7o+N9kwqOE7PxXSCQB13t0T4ZI90Nydo8KMz/ZgeEBWzVyxpVVvBzI5LUwFADJAt54AbMw2rI8E3NpvQk+rs1+aWT/GPMD9lpUlKlYWhVk2z+PnTc7gQL9llTjMr8lwRoXpvif3EYB+s2cKNldcrdrz14yATiVZJ+iN6zFGzQPALqVSg72TOH440vcDdssKK5a0CWq1p8iZgLt49YPvO5CXu+Kxgc/6rH9s/Q4AAP//PZzXiSo38ugAAAAASUVORK5CYII=\"\n},\n\"message\": \"获取成功\"\n}",
+          "type": "json"
+        }
+      ]
+    },
+    "filename": "v1/device/order.js",
+    "groupTitle": "订单管理管理",
+    "sampleRequest": [
+      {
+        "url": "http://127.0.0.1:8089/v1/device/order/createOrder"
+      }
+    ],
+    "error": {
+      "fields": {
+        "Error 4xx": [
+          {
+            "group": "Error 4xx",
+            "optional": false,
+            "field": "status",
+            "description": "<p>4001 授权错误时返回的状态码，得到次状态码需要重新授权。</p>"
+          },
+          {
+            "group": "Error 4xx",
+            "optional": false,
+            "field": "message",
+            "description": "<p>授权失败的具体描述信息</p>"
+          }
+        ]
+      },
+      "examples": [
+        {
+          "title": "Response (example):",
+          "content": "HTTP/1.1 200 OK\n{\n      \"status\": 4001,\n      \"data\": {},\n      \"message\": \"mutil: invalid token\"\n}",
+          "type": "json"
+        }
+      ]
+    }
+  },
+  {
+    "type": "post",
     "url": "/v1/device/cart/changeCartNum/1",
     "title": "修改购物车商品数量",
     "version": "0.0.1",

@@ -8,6 +8,7 @@ import (
 	"github.com/snowlyg/go-tenancy/model/request"
 	"github.com/snowlyg/go-tenancy/model/response"
 	"github.com/snowlyg/go-tenancy/service"
+	"github.com/snowlyg/multi"
 	"go.uber.org/zap"
 )
 
@@ -19,7 +20,7 @@ func PayOrder(ctx *gin.Context) {
 		return
 	}
 	userAgent := ctx.Request.UserAgent()
-	if url, err := service.PayOrder(req, userAgent); err != nil {
+	if url, err := service.PayOrder(req, userAgent, multi.GetTenancyName(ctx)); err != nil {
 		g.TENANCY_LOG.Error("操作失败!", zap.Any("err", err))
 		response.FailWithMessage("操作失败:"+err.Error(), ctx)
 	} else {

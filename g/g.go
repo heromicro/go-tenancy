@@ -1,7 +1,6 @@
 package g
 
 import (
-	"github.com/go-pay/gopay/alipay"
 	"github.com/spf13/viper"
 	"go.uber.org/zap"
 	"gorm.io/gorm"
@@ -17,7 +16,6 @@ const (
 )
 
 var (
-	TENANCY_ALIAPY *alipay.Client
 	TENANCY_DB     *gorm.DB
 	TENANCY_CONFIG config.Server
 	TENANCY_VP     *viper.Viper

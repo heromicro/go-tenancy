@@ -8,9 +8,7 @@ import (
 
 type OrderList struct {
 	TenancyResponse
-
 	model.BaseOrder
-
 	GroupOrderSn     string         `json:"groupOrderSn" form:"groupOrderSn"`
 	TenancyName      string         `json:"tenancyName" form:"tenancyName"`
 	IsTrader         int            `json:"isTrader" form:"isTrader"`
