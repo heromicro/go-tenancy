@@ -18,6 +18,7 @@ type CheckOrderPayStatus struct {
 }
 
 func (d CheckOrderPayStatus) Run() {
+
 	if time.Since(d.CreatedAt).Minutes() >= 15 {
 		err := ChangeOrderStatusByOrderId(d.OrderId, d.TenancyId, d.UserId, d.OrderType, model.OrderStatusCancel, "cancel", "取消订单[自动]")
 		if err != nil {

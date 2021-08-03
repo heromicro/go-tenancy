@@ -48,15 +48,3 @@ func ReloadSystem(ctx *gin.Context) {
 	}
 	response.OkWithMessage("重启系统成功", ctx)
 }
-
-// GetServerInfo 获取服务器信息
-func GetServerInfo(ctx *gin.Context) {
-	if server, err := service.GetServerInfo(); err != nil {
-		g.TENANCY_LOG.Error("获取失败!", zap.Any("err", err))
-		response.FailWithMessage("获取失败:"+err.Error(), ctx)
-		return
-	} else {
-		response.OkWithDetailed(gin.H{"server": server}, "获取成功", ctx)
-	}
-
-}

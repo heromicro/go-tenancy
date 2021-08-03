@@ -14,7 +14,7 @@ type ProductAttrValue struct {
 
 type BaseProductAttrValue struct {
 	Sku     string  `gorm:"index:sku;column:sku;type:varchar(128);not null" json:"sku"`             // 商品属性索引值 (attr_value|attr_value[|....])
-	Stock   uint    `gorm:"column:stock;type:int unsigned;not null" json:"stock"`                   // 属性对应的库存
+	Stock   int64    `gorm:"column:stock;type:int unsigned;not null" json:"stock"`                   // 属性对应的库存
 	Sales   uint    `gorm:"column:sales;type:int unsigned;not null;default:0" json:"sales"`         // 销量
 	Image   string  `gorm:"column:image;type:varchar(128)" json:"image"`                            // 图片
 	BarCode string  `gorm:"column:bar_code;type:varchar(50);not null;default:''" json:"barCode"`    // 产品条码

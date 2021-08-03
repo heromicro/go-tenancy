@@ -9,7 +9,6 @@ import (
 )
 
 func main() {
-
 	g.TENANCY_VP = core.Viper()      // 初始化Viper
 	g.TENANCY_LOG = core.Zap()       // 初始化zap日志库
 	g.TENANCY_DB = initialize.Gorm() // gorm连接数据库
@@ -20,9 +19,10 @@ func main() {
 		db, _ := g.TENANCY_DB.DB()
 		defer db.Close()
 	}
-	g.TENANCY_LOG.Info("cache type is", zap.String("缓存类型", g.TENANCY_CONFIG.System.CacheType))
+	g.TENANCY_LOG.Info("缓存类型是", zap.String("缓存类型", g.TENANCY_CONFIG.System.CacheType))
 	// 初始化认证服务
 	initialize.Auth()
 	defer multi.AuthDriver.Close()
+
 	core.RunServer()
 }

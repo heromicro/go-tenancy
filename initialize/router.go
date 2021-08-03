@@ -2,6 +2,7 @@ package initialize
 
 import (
 	"net/http"
+	"path/filepath"
 
 	"github.com/gin-contrib/static"
 	"github.com/gin-gonic/gin"
@@ -29,6 +30,7 @@ func App() *gin.Engine {
 
 // Routers
 func Routers(app *gin.Engine) {
+	app.LoadHTMLFiles(filepath.Join(g.TENANCY_CONFIG.Casbin.ModelPath, "resource/template/wechat-pay.tmpl"))
 	app.StaticFS(g.TENANCY_CONFIG.Local.Path, http.Dir(g.TENANCY_CONFIG.Local.Path)) // 为用户头像和文件提供静态地址
 	// Router.Use(middleware.LoadTls())  // 打开就能玩https了
 	g.TENANCY_LOG.Info("use middleware logger")

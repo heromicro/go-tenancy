@@ -20,10 +20,22 @@ func PayOrder(ctx *gin.Context) {
 		return
 	}
 	userAgent := ctx.Request.UserAgent()
-	if url, err := service.PayOrder(req, userAgent, multi.GetTenancyName(ctx)); err != nil {
+	if res, err := service.PayOrder(req, userAgent, multi.GetTenancyName(ctx)); err != nil {
 		g.TENANCY_LOG.Error("操作失败!", zap.Any("err", err))
 		response.FailWithMessage("操作失败:"+err.Error(), ctx)
 	} else {
-		ctx.Redirect(http.StatusFound, url)
+		if res.AliPayUrl != "" {
+			ctx.Redirect(http.StatusFound, res.AliPayUrl)
+		} else {
+			jsapi := map[string]interface{}{
+				"appId":     res.JSAPIPayParams.AppId,     //公众号名称，由商户传入
+				"timeStamp": res.JSAPIPayParams.TimeStamp, //时间戳，自1970年以来的秒数
+				"nonceStr":  res.JSAPIPayParams.NonceStr,  //随机串
+				"package":   res.JSAPIPayParams.Package,
+				"signType":  res.JSAPIPayParams.SignType, //微信签名方式：
+				"paySign":   res.JSAPIPayParams.PaySign,  //微信签名
+			}
+			ctx.HTML(200, "wechat-pay.tmpl", jsapi)
+		}
 	}
 }

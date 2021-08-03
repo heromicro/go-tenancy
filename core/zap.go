@@ -5,6 +5,7 @@ import (
 	"os"
 	"time"
 
+	"github.com/chindeo/pkg/file"
 	"github.com/snowlyg/go-tenancy/g"
 	"github.com/snowlyg/go-tenancy/utils"
 	"go.uber.org/zap"
@@ -14,7 +15,7 @@ import (
 var level zapcore.Level
 
 func Zap() (logger *zap.Logger) {
-	if ok, _ := utils.IsExists(g.TENANCY_CONFIG.Zap.Director); !ok { // 判断是否有Director文件夹
+	if file.IsExist(g.TENANCY_CONFIG.Zap.Director) { // 判断是否有Director文件夹
 		fmt.Printf("create %v directory\n", g.TENANCY_CONFIG.Zap.Director)
 		_ = os.Mkdir(g.TENANCY_CONFIG.Zap.Director, os.ModePerm)
 	}

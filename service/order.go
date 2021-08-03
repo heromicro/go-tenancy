@@ -11,7 +11,6 @@ import (
 	"github.com/shopspring/decimal"
 	"github.com/skip2/go-qrcode"
 	"github.com/snowlyg/go-tenancy/g"
-	"github.com/snowlyg/go-tenancy/job"
 	"github.com/snowlyg/go-tenancy/model"
 	"github.com/snowlyg/go-tenancy/model/request"
 	"github.com/snowlyg/go-tenancy/model/response"
@@ -582,6 +581,11 @@ func GetOrderInfoByCartId(tenancyId, userId uint, cartIds []uint) (response.Chec
 
 // CreateOrder 新建订单 生成订单组-》生成订单, 二维码需要 data:image/png;base64,
 func CreateOrder(req request.CreateOrder, tenancyId, userId uint, tenancyName string) ([]byte, error) {
+	var png []byte
+	seitURL, err := GetSeitURL()
+	if err != nil {
+		return nil, err
+	}
 	var order model.Order
 	patient, err := GetPatientById(userId, tenancyId)
 	if err != nil {
@@ -619,14 +623,13 @@ func CreateOrder(req request.CreateOrder, tenancyId, userId uint, tenancyName st
 		SysUserID:    userId,
 		Cost:         orderCost,
 	}
-	if err != nil {
-		return nil, err
-	}
 	err = g.TENANCY_DB.Transaction(func(tx *gorm.DB) error {
+		// 订单组
 		err := tx.Model(&model.GroupOrder{}).Create(&groupOrder).Error
 		if err != nil {
 			return err
 		}
+		// 订单
 		order = model.Order{
 			BaseOrder: model.BaseOrder{
 				OrderSn:      g.CreateOrderSn(req.OrderType),
@@ -660,34 +663,54 @@ func CreateOrder(req request.CreateOrder, tenancyId, userId uint, tenancyName st
 			return err
 		}
 
+		// 生成订单商品
+		var orderProducts []model.OrderProduct
+		for _, cartProduct := range orderInfo.Products {
+			cartInfo := request.CartInfo{
+				Product: request.CartInfoProduct{
+					Image:     cartProduct.AttrValue.Image,
+					StoreName: cartProduct.StoreName,
+				},
+				ProductAttr: request.CartInfoProductAttr{
+					Price: cartProduct.AttrValue.Price,
+					Sku:   cartProduct.AttrValue.Sku,
+				},
+			}
+			ci, _ := json.Marshal(&cartInfo)
+			orderProduct := model.OrderProduct{OrderID: order.ID, SysUserID: userId, CartID: cartProduct.Id, ProductID: cartProduct.ProductID, CartInfo: string(ci), BaseOrderProduct: model.BaseOrderProduct{ProductSku: cartProduct.AttrValue.Sku, IsRefund: 0, ProductNum: cartProduct.CartNum, ProductType: model.GeneralSale, RefundNum: 0, IsReply: g.StatusFalse, ProductPrice: cartProduct.AttrValue.Price}}
+			orderProducts = append(orderProducts, orderProduct)
+		}
+		err = tx.Create(&orderProducts).Error
+		if err != nil {
+			return err
+		}
+
+		// 减库存
+		for _, cartProduct := range orderInfo.Products {
+			stock := cartProduct.AttrValue.Stock - cartProduct.CartNum
+			err = tx.Model(&model.ProductAttrValue{}).Where("`unique` = ?", cartProduct.AttrValue.Unique).Update("stock", stock).Error
+			if err != nil {
+				return err
+			}
+		}
+
+		// 生成支付地址二维码
+		payUrl := fmt.Sprintf("%s/v1/payOrder?orderId=%d&tenancyId=%d&userId=%d&orderType=%d", seitURL, order.ID, tenancyId, userId, order.OrderType)
+		q, err := qrcode.New(payUrl, qrcode.Medium)
+		if err != nil {
+			return err
+		}
+		png, err = q.PNG(256)
+		if err != nil {
+			return err
+		}
+
 		return nil
 	})
 	if err != nil {
 		return nil, err
 	}
-	seitURL, err := GetSeitURL()
-	if err != nil {
-		return nil, err
-	}
-	// 生成支付地址二维码
-	payUrl := fmt.Sprintf("%s/v1/payOrder?orderId=%d&tenancyId=%d&userId=%d&orderType=%d", seitURL, order.ID, tenancyId, userId, order.OrderType)
-	q, err := qrcode.New(payUrl, qrcode.Medium)
-	if err != nil {
-		return nil, err
-	}
-	png, err := q.PNG(256)
-	if err != nil {
-		return nil, err
-	}
 
-	checkOrderJob := job.CheckOrderPayStatus{
-		OrderId:   order.ID,
-		TenancyId: tenancyId,
-		UserId:    userId,
-		OrderType: order.OrderType,
-		CreatedAt: order.CreatedAt,
-	}
-	g.TENANCY_Timer.AddTaskByJob("CheckOrderPayStatus", "0 * * * * *", checkOrderJob)
 	return png, nil
 }
 
@@ -722,4 +745,17 @@ func GetThisMonthOrderPriceByUserId(userId uint) (response.GeneralUserDetail, er
 		return user, err
 	}
 	return user, nil
+}
+func GetNoPayOrders() ([]model.Order, error) {
+	var orders []model.Order
+	err := g.TENANCY_DB.Model(&model.Order{}).
+		Where("paid = ?", g.StatusFalse).
+		Where("status = ?", model.OrderStatusNoPay).
+		Where("is_del = ?", g.StatusFalse).
+		Where("is_system_del = ?", g.StatusFalse).
+		Find(&orders).Error
+	if err != nil {
+		return orders, err
+	}
+	return orders, nil
 }

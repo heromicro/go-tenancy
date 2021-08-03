@@ -38,7 +38,8 @@ var configs = []model.SysConfig{
 	{SysConfigCategoryID: 6, ConfigName: "Mchid", ConfigKey: "pay_weixin_mchid", ConfigType: "input", ConfigRule: "", Required: 2, Info: "受理商ID，身份标识", Sort: 0, UserType: 2, Status: 1},
 	{SysConfigCategoryID: 6, ConfigName: "微信支付证书", ConfigKey: "pay_weixin_client_cert", ConfigType: "file", ConfigRule: "", Required: 2, Info: "微信支付证书，在微信商家平台中可以下载！文件名一般为apiclient_cert.pem", Sort: 0, UserType: 2, Status: 1},
 	{SysConfigCategoryID: 6, ConfigName: "微信支付证书密钥", ConfigKey: "pay_weixin_client_key", ConfigType: "file", ConfigRule: "", Required: 2, Info: "微信支付证书密钥，在微信商家平台中可以下载！文件名一般为apiclient_key.pem", Sort: 0, UserType: 2, Status: 1},
-	{SysConfigCategoryID: 6, ConfigName: "Key", ConfigKey: "pay_weixin_key", ConfigType: "input", ConfigRule: "", Required: 2, Info: "商户支付密钥Key。审核通过后，在微信发送的邮件中查看。", Sort: 0, UserType: 2, Status: 1},
+	{SysConfigCategoryID: 6, ConfigName: "V3Key", ConfigKey: "pay_weixin_key", ConfigType: "input", ConfigRule: "", Required: 2, Info: "商户支付密钥v3Key", Sort: 0, UserType: 2, Status: 1},
+	{SysConfigCategoryID: 6, ConfigName: "SerialNo", ConfigKey: "pay_serial_no", ConfigType: "input", ConfigRule: "", Required: 2, Info: "商户证书序列号", Sort: 0, UserType: 2, Status: 1},
 	{SysConfigCategoryID: 6, ConfigName: "开启", ConfigKey: "pay_weixin_open", ConfigType: "radio", ConfigRule: "0:关闭;1:开启", Required: 2, Info: "是否启用微信支付", Sort: 0, UserType: 2, Status: 1},
 	// 215	12	充值注意事项	recharge_attention	textarea		0	充值注意事项	0	0	1	2020-06-03 09:49:01
 	{SysConfigCategoryID: 1, ConfigName: "订单自动关闭时间", ConfigKey: "auto_close_order_timer", ConfigType: "number", ConfigRule: "", Required: 2, Info: "订单自动关闭时间(单位:分钟)", Sort: 0, UserType: 2, Status: 1},

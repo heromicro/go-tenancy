@@ -190,7 +190,7 @@ func InitMiniRouter(Router *gin.RouterGroup) {
 func InitSysOperationRecordRouter(Router *gin.RouterGroup) {
 	SysOperationRecordRouter := Router.Group("/sysOperationRecord")
 	{
-		SysOperationRecordRouter.POST("/getSysOperationRecordList", admin.GetSysOperationRecordList)           // 获取SysOperationRecord列表
+		SysOperationRecordRouter.POST("/getSysOperationRecordList", admin.GetSysOperationRecordList) // 获取SysOperationRecord列表
 	}
 }
 
@@ -215,7 +215,6 @@ func InitSystemRouter(Router *gin.RouterGroup) {
 	{
 		SystemRouter.POST("/getSystemConfig", admin.GetSystemConfig) // 获取配置文件内容
 		SystemRouter.POST("/setSystemConfig", admin.SetSystemConfig) // 设置配置文件内容
-		SystemRouter.POST("/getServerInfo", admin.GetServerInfo)     // 获取服务器信息
 		SystemRouter.POST("/reloadSystem", admin.ReloadSystem)       // 重启服务
 	}
 }

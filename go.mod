@@ -3,7 +3,6 @@ module github.com/snowlyg/go-tenancy
 go 1.16
 
 require (
-	github.com/StackExchange/wmi v0.0.0-20210224194228-fe8f1750fd46 // indirect
 	github.com/ajg/form v1.5.1 // indirect
 	github.com/aliyun/aliyun-oss-go-sdk v2.1.8+incompatible
 	github.com/andybalholm/brotli v1.0.3 // indirect
@@ -20,7 +19,6 @@ require (
 	github.com/gavv/httpexpect v2.0.0+incompatible
 	github.com/gin-contrib/static v0.0.1
 	github.com/gin-gonic/gin v1.7.2
-	github.com/go-ole/go-ole v1.2.5 // indirect
 	github.com/go-pay/gopay v1.5.53
 	github.com/go-playground/validator/v10 v10.6.1
 	github.com/go-redis/redis/v8 v8.8.2
@@ -33,14 +31,13 @@ require (
 	github.com/kr/text v0.2.0 // indirect
 	github.com/leodido/go-urn v1.2.1 // indirect
 	github.com/lestrrat-go/file-rotatelogs v2.4.0+incompatible
-	github.com/lestrrat-go/strftime v1.0.4 // indirect
+	github.com/lestrrat-go/strftime v1.0.5 // indirect
 	github.com/mojocn/base64Captcha v1.3.4
 	github.com/moul/http2curl v1.0.0 // indirect
 	github.com/qiniu/go-sdk/v7 v7.9.5
 	github.com/robfig/cron/v3 v3.0.1
 	github.com/satori/go.uuid v1.2.0
 	github.com/sergi/go-diff v1.2.0 // indirect
-	github.com/shirou/gopsutil v3.21.3+incompatible
 	github.com/shopspring/decimal v1.2.0
 	github.com/skip2/go-qrcode v0.0.0-20200617195104-da1b6568686e
 	github.com/snowlyg/multi v0.0.0-20210730074719-233c70c26dc9
@@ -48,7 +45,6 @@ require (
 	github.com/spf13/pflag v1.0.5 // indirect
 	github.com/spf13/viper v1.7.1
 	github.com/tencentyun/cos-go-sdk-v5 v0.7.25
-	github.com/tklauser/go-sysconf v0.3.5 // indirect
 	github.com/unrolled/secure v1.0.9
 	github.com/valyala/fasthttp v1.25.0 // indirect
 	github.com/xeipuuv/gojsonschema v1.2.0 // indirect

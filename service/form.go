@@ -1,6 +1,7 @@
 package service
 
 import (
+	"fmt"
 	"strings"
 
 	"github.com/gin-gonic/gin"
@@ -90,7 +91,7 @@ func (r *Rule) TransData(rule string, token []byte) {
 	case "file":
 		seitURL, _ := GetSeitURL()
 		r.Props = map[string]interface{}{
-			"action": seitURL + "v1/admin/media/upload",
+			"action": fmt.Sprintf("%s/v1/admin/media/upload", seitURL),
 			"data":   map[string]interface{}{},
 			"headers": map[string]interface{}{
 				"Authorization": "Bearer " + string(token),

@@ -24,6 +24,6 @@ type RefundOrderList struct {
 type RefundProduct struct {
 	RefundOrderID  uint `json:"refundOrderId"`  // 退款单
 	OrderProductID uint `json:"orderProductId"` // 订单产品id
-	RefundNum      uint `json:"refundNum"`      // 退货数
+	RefundNum      int64 `json:"refundNum"`      // 退货数
 	OrderProduct
 }

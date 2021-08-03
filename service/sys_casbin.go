@@ -76,7 +76,7 @@ var (
 func Casbin() (*casbin.SyncedEnforcer, error) {
 	once.Do(func() {
 		a, _ := gormadapter.NewAdapterByDB(g.TENANCY_DB)
-		e, _ = casbin.NewSyncedEnforcer(filepath.Join(g.TENANCY_CONFIG.Casbin.ModelPath, "rbac_model.conf"), a)
+		e, _ = casbin.NewSyncedEnforcer(filepath.Join(g.TENANCY_CONFIG.Casbin.ModelPath, "resource/rbac_model.conf"), a)
 
 		e.AddFunction("ParamsMatch", ParamsMatchFunc)
 	})

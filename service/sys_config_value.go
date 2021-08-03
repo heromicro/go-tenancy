@@ -60,6 +60,19 @@ func GetAliPay() (map[string]string, error) {
 	for _, alipayConfig := range alipayConfigs {
 		conifg[alipayConfig.ConfigKey] = alipayConfig.Value
 	}
+	return conifg, nil
+}
+
+func GetWechatPay() (map[string]string, error) {
+	conifg := map[string]string{}
+	wechatConfigs, err := GetConfigByCateKey("wechat_payment", 0)
+	if err != nil {
+		return conifg, err
+	}
+
+	for _, wechatConfig := range wechatConfigs {
+		conifg[wechatConfig.ConfigKey] = wechatConfig.Value
+	}
 
 	return conifg, nil
 }
