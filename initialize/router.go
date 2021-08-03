@@ -32,7 +32,6 @@ func Routers(app *gin.Engine) {
 	app.StaticFS(g.TENANCY_CONFIG.Local.Path, http.Dir(g.TENANCY_CONFIG.Local.Path)) // 为用户头像和文件提供静态地址
 	// Router.Use(middleware.LoadTls())  // 打开就能玩https了
 	g.TENANCY_LOG.Info("use middleware logger")
-
 	// 跨域
 	app.Use(middleware.Cors()) // 如需跨域可以打开
 	g.TENANCY_LOG.Info("use middleware cors")
@@ -41,6 +40,7 @@ func Routers(app *gin.Engine) {
 	{
 		public.InitPublicRouter(PublicGroup) // 注册基础功能路由 不做鉴权
 		public.InitInitRouter(PublicGroup)   // 自动初始化相关
+		public.InitPayRouter(PublicGroup)    // 自动初始化相关
 	}
 
 	V1Group := app.Group("/v1", middleware.Auth())

@@ -19,15 +19,15 @@
  *
  * @apiUse TokenError
  *         
- * @apiSuccess {Number}   finalPrice            订单最终价格
- * @apiSuccess {Number}   finalOtPrice            订单最终原价
- * @apiSuccess {Number}   totalPrice            订单总价
- * @apiSuccess {Number}   totalOtPrice            订单原价
+ * @apiSuccess {Number}   totalPrice            商品总价
+ * @apiSuccess {Number}   totalOtPrice            商品原价
+ * @apiSuccess {Number}   orderPrice            订单总价
+ * @apiSuccess {Number}   orderOtPrice            订单原价
  * @apiSuccess {Number}   postagePrice            订单邮费
  * @apiSuccess {Number}   downPrice            订单优惠价格
  * @apiSuccess {Number}   totalNum            商品总数
  * @apiSuccess {Number}   orderType            订单类型 1：普通，2：自提
- * @apiSuccess {Object[]}   productPrices            商品价格
+ * @apiSuccess {Object[]}   productPrices       商品价格
  * @apiSuccess {Object[]}   products            商品信息
  * 
  *
@@ -41,13 +41,13 @@
             "Avatar": "",
             "products": [
                 {
-                    "id": 6,
+                    "id": 5,
                     "sysTenancyId": 1,
-                    "specType": 1,
+                    "specType": 2,
                     "productId": 1,
                     "storeName": "领立裁腰带短袖连衣裙",
                     "image": "http://127.0.0.1:8089/uploads/file/9a6a2e1231fb19517ed1de71206a0657.jpg",
-                    "cartNum": 6,
+                    "cartNum": 2,
                     "isFail": 2,
                     "productAttrUnique": "e2fe28308fd2",
                     "attrValue": {
@@ -72,19 +72,19 @@
                     }
                 }
             ],
-            "finalPrice": "960",
-            "finalOtPrice": "1080",
-            "totalPrice": "960",
-            "totalOtPrice": "1080",
+            "totalPrice": "320",
+            "totalOtPrice": "360",
+            "orderPrice": "320",
+            "orderOtPrice": "360",
             "postagePrice": "0",
             "downPrice": "0",
             "productPrices": {
                 "1": {
-                    "otPrice": "1080",
-                    "price": "960"
+                    "otPrice": "360",
+                    "price": "320"
                 }
             },
-            "totalNum": 6,
+            "totalNum": 2,
             "orderType": 2
         },
         "message": "获取成功"

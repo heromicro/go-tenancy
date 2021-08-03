@@ -99,7 +99,7 @@ func GetFileRecordInfoList(info request.MediaPageInfo, ctx *gin.Context) (interf
 		url := fileLists[i].Url
 		if !strings.Contains(url, "http://") && !strings.Contains(url, "https://") {
 			seitURL, _ := GetSeitURL()
-			fileLists[i].Url = seitURL + fileLists[i].Url
+			fileLists[i].Url = fmt.Sprintf("%s/%s", seitURL, fileLists[i].Url)
 		}
 	}
 	return fileLists, total, err

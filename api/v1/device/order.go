@@ -6,6 +6,7 @@ import (
 	"github.com/snowlyg/go-tenancy/model/request"
 	"github.com/snowlyg/go-tenancy/model/response"
 	"github.com/snowlyg/go-tenancy/service"
+	"github.com/snowlyg/multi"
 	"go.uber.org/zap"
 )
 
@@ -45,10 +46,10 @@ func CreateOrder(ctx *gin.Context) {
 		response.FailWithMessage(errs.Error(), ctx)
 		return
 	}
-	if err := service.CreateOrder(req, ctx); err != nil {
+	if qrcode, err := service.CreateOrder(req, multi.GetTenancyId(ctx), multi.GetUserId(ctx), multi.GetTenancyName(ctx)); err != nil {
 		g.TENANCY_LOG.Error("获取失败!", zap.Any("err", err))
 		response.FailWithMessage("获取失败:"+err.Error(), ctx)
 	} else {
-		response.OkWithMessage("获取成功", ctx)
+		response.OkWithDetailed(gin.H{"qrcode": qrcode}, "获取成功", ctx)
 	}
 }

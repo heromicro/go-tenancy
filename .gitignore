@@ -17,4 +17,5 @@ main
 # ext
 *.log
 *.exe
+*.crt
 .air.toml

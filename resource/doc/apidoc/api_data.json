@@ -1316,28 +1316,28 @@
             "group": "Success 200",
             "type": "Number",
             "optional": false,
-            "field": "finalPrice",
-            "description": "<p>订单最终价格</p>"
-          },
-          {
-            "group": "Success 200",
-            "type": "Number",
-            "optional": false,
-            "field": "finalOtPrice",
-            "description": "<p>订单最终原价</p>"
-          },
-          {
-            "group": "Success 200",
-            "type": "Number",
-            "optional": false,
             "field": "totalPrice",
-            "description": "<p>订单总价</p>"
+            "description": "<p>商品总价</p>"
           },
           {
             "group": "Success 200",
             "type": "Number",
             "optional": false,
             "field": "totalOtPrice",
+            "description": "<p>商品原价</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Number",
+            "optional": false,
+            "field": "orderPrice",
+            "description": "<p>订单总价</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Number",
+            "optional": false,
+            "field": "orderOtPrice",
             "description": "<p>订单原价</p>"
           },
           {
@@ -1387,7 +1387,7 @@
       "examples": [
         {
           "title": "Response:",
-          "content": "HTTP/1.1 200 OK\n{\n    \"status\": 200,\n    \"data\": {\n        \"sysTenancyId\": 1,\n        \"name\": \"宝安中心人民医院\",\n        \"Avatar\": \"\",\n        \"products\": [\n            {\n                \"id\": 6,\n                \"sysTenancyId\": 1,\n                \"specType\": 1,\n                \"productId\": 1,\n                \"storeName\": \"领立裁腰带短袖连衣裙\",\n                \"image\": \"http://127.0.0.1:8089/uploads/file/9a6a2e1231fb19517ed1de71206a0657.jpg\",\n                \"cartNum\": 6,\n                \"isFail\": 2,\n                \"productAttrUnique\": \"e2fe28308fd2\",\n                \"attrValue\": {\n                    \"productId\": 0,\n                    \"sku\": \"S\",\n                    \"stock\": 99,\n                    \"sales\": 1,\n                    \"image\": \"\\thttp://127.0.0.1:8089/uploads/file/9a6a2e1231fb19517ed1de71206a0657.jpg\",\n                    \"barCode\": \"123456\",\n                    \"cost\": 50,\n                    \"otPrice\": 180,\n                    \"price\": 160,\n                    \"volume\": 1,\n                    \"weight\": 1,\n                    \"extensionOne\": 0,\n                    \"extensionTwo\": 0,\n                    \"unique\": \"e2fe28308fd2\",\n                    \"detail\": {\n                        \"尺寸\": \"S\"\n                    },\n                    \"value0\": \"S\"\n                }\n            }\n        ],\n        \"finalPrice\": \"960\",\n        \"finalOtPrice\": \"1080\",\n        \"totalPrice\": \"960\",\n        \"totalOtPrice\": \"1080\",\n        \"postagePrice\": \"0\",\n        \"downPrice\": \"0\",\n        \"productPrices\": {\n            \"1\": {\n                \"otPrice\": \"1080\",\n                \"price\": \"960\"\n            }\n        },\n        \"totalNum\": 6,\n        \"orderType\": 2\n    },\n    \"message\": \"获取成功\"\n}",
+          "content": "HTTP/1.1 200 OK\n{\n    \"status\": 200,\n    \"data\": {\n        \"sysTenancyId\": 1,\n        \"name\": \"宝安中心人民医院\",\n        \"Avatar\": \"\",\n        \"products\": [\n            {\n                \"id\": 5,\n                \"sysTenancyId\": 1,\n                \"specType\": 2,\n                \"productId\": 1,\n                \"storeName\": \"领立裁腰带短袖连衣裙\",\n                \"image\": \"http://127.0.0.1:8089/uploads/file/9a6a2e1231fb19517ed1de71206a0657.jpg\",\n                \"cartNum\": 2,\n                \"isFail\": 2,\n                \"productAttrUnique\": \"e2fe28308fd2\",\n                \"attrValue\": {\n                    \"productId\": 0,\n                    \"sku\": \"S\",\n                    \"stock\": 99,\n                    \"sales\": 1,\n                    \"image\": \"\\thttp://127.0.0.1:8089/uploads/file/9a6a2e1231fb19517ed1de71206a0657.jpg\",\n                    \"barCode\": \"123456\",\n                    \"cost\": 50,\n                    \"otPrice\": 180,\n                    \"price\": 160,\n                    \"volume\": 1,\n                    \"weight\": 1,\n                    \"extensionOne\": 0,\n                    \"extensionTwo\": 0,\n                    \"unique\": \"e2fe28308fd2\",\n                    \"detail\": {\n                        \"尺寸\": \"S\"\n                    },\n                    \"value0\": \"S\"\n                }\n            }\n        ],\n        \"totalPrice\": \"320\",\n        \"totalOtPrice\": \"360\",\n        \"orderPrice\": \"320\",\n        \"orderOtPrice\": \"360\",\n        \"postagePrice\": \"0\",\n        \"downPrice\": \"0\",\n        \"productPrices\": {\n            \"1\": {\n                \"otPrice\": \"360\",\n                \"price\": \"320\"\n            }\n        },\n        \"totalNum\": 2,\n        \"orderType\": 2\n    },\n    \"message\": \"获取成功\"\n}",
           "type": "json"
         }
       ]

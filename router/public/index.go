@@ -11,6 +11,10 @@ func InitAuthRouter(Router *gin.RouterGroup) {
 	Router.GET("/clean", public.Clean)   //清空授权
 }
 
+func InitPayRouter(Router *gin.RouterGroup) {
+	Router.GET("/payOrder", public.PayOrder) // 扫码支付
+}
+
 // 数据库初始化检测
 func InitInitRouter(Router *gin.RouterGroup) {
 	ApiRouter := Router.Group("/init")

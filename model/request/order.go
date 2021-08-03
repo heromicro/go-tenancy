@@ -68,9 +68,7 @@ type CheckOrder struct {
 }
 
 type CreateOrder struct {
-	PatientId uint   `json:"patientId" form:"patientId"`
 	CartIds   []uint `json:"cartIds" form:"cartIds"`
-	OrderType int    `json:"orderType" form:"orderType"`
-	PayType   int    `json:"payType" form:"payType"`
-	Remark    string `json:"remark" form:"remark"`
+	OrderType int    `json:"orderType" form:"orderType"` // 点单类型
+	Remark    string `json:"remark" form:"remark"`       //订单备注
 }

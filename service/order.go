@@ -9,6 +9,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/shopspring/decimal"
+	"github.com/skip2/go-qrcode"
 	"github.com/snowlyg/go-tenancy/g"
 	"github.com/snowlyg/go-tenancy/model"
 	"github.com/snowlyg/go-tenancy/model/request"
@@ -189,6 +190,22 @@ func getOrderConditionByStatus(status string) response.OrderCondition {
 		}
 	}
 	return conditions[0]
+}
+
+func GetOrderByOrderIdUserIdAndTenancyId(orderId, tenancyId, userId uint, orderType int) (model.Order, error) {
+	var order model.Order
+	err := g.TENANCY_DB.Model(&model.Order{}).
+		Where("sys_tenancy_id = ?", tenancyId).
+		Where("id = ?", orderId).
+		Where("sys_user_id = ?", userId).
+		Where("order_type = ?", orderType).
+		Where("is_system_del = ?", g.StatusFalse).
+		Where("is_del = ?", g.StatusFalse).
+		First(&order).Error
+	if err != nil {
+		return order, err
+	}
+	return order, nil
 }
 
 func GetOrderById(id uint, ctx *gin.Context) (response.OrderDetail, error) {
@@ -557,40 +574,106 @@ func GetOrderInfoByCartId(tenancyId, userId uint, cartIds []uint) (response.Chec
 			res.TotalNum += product.CartNum
 		}
 	}
+	res.OrderPrice = res.TotalPrice.Add(res.PostagePrice).Sub(res.DownPrice)
+	res.OrderOtPrice = res.TotalOtPrice.Add(res.PostagePrice).Sub(res.DownPrice)
 	return res, nil
 }
 
-// CreateOrder 新建订单 减商品库存-》修改购物车商品支付状态-》生成订单组-》生成订单
-func CreateOrder(req request.CreateOrder, ctx *gin.Context) error {
-	orderInfo, err := GetOrderInfoByCartId(multi.GetTenancyId(ctx), multi.GetUserId(ctx), req.CartIds)
+// CreateOrder 新建订单 生成订单组-》生成订单, 二维码需要 data:image/png;base64,
+func CreateOrder(req request.CreateOrder, tenancyId, userId uint, tenancyName string) ([]byte, error) {
+	var orderId uint
+	var orderType int
+	patient, err := GetPatientById(userId, tenancyId)
+	if err != nil {
+		return nil, err
+	}
+	userAddress := fmt.Sprintf("%s-%s-%s床", tenancyName, patient.LocName, patient.BedNum)
+	orderInfo, err := GetOrderInfoByCartId(tenancyId, userId, req.CartIds)
+	if err != nil {
+		return nil, err
+	}
+
+	// 获取成本价
+	var cost decimal.Decimal
+	for _, product := range orderInfo.Products {
+		costPrice := decimal.NewFromFloat(product.AttrValue.Cost).Mul(decimal.NewFromInt(product.CartNum))
+		cost = cost.Add(costPrice)
+	}
+
 	totalPrice, _ := orderInfo.TotalPrice.Float64()
 	postagePrice, _ := orderInfo.PostagePrice.Float64()
-	order := model.Order{
-		BaseOrder: model.BaseOrder{
-			OrderSn:      g.CreateOrderSn(req.PayType),
-			OrderType:    req.OrderType,
-			PayType:      req.PayType,
-			Remark:       req.Remark,
-			TotalNum:     orderInfo.TotalNum,
-			TotalPrice:   totalPrice,
-			TotalPostage: postagePrice,
-			PayPostage:   postagePrice,
-		},
+	orderPrice, _ := orderInfo.OrderPrice.Float64()
+	orderCost, _ := cost.Float64()
+
+	groupOrder := model.GroupOrder{
+		GroupOrderSn: g.CreateOrderSn("G"),
+		RealName:     patient.Name,
+		UserPhone:    patient.Phone,
+		UserAddress:  userAddress,
+		TotalNum:     orderInfo.TotalNum,
+		TotalPrice:   totalPrice,
+		PayPrice:     orderPrice,
+		TotalPostage: postagePrice,
+		PayPostage:   postagePrice,
+		Paid:         g.StatusFalse,
+		SysUserID:    userId,
+		Cost:         orderCost,
 	}
 	if err != nil {
-		return err
+		return nil, err
 	}
 	err = g.TENANCY_DB.Transaction(func(tx *gorm.DB) error {
-		err := g.TENANCY_DB.Model(&model.Order{}).Create(&order).Error
+		err := g.TENANCY_DB.Model(&model.GroupOrder{}).Create(&groupOrder).Error
 		if err != nil {
 			return err
 		}
+		order := model.Order{
+			BaseOrder: model.BaseOrder{
+				OrderSn:      g.CreateOrderSn(orderType),
+				RealName:     patient.Name,
+				UserPhone:    patient.Phone,
+				UserAddress:  userAddress,
+				OrderType:    req.OrderType,
+				Remark:       req.Remark,
+				TotalNum:     orderInfo.TotalNum,
+				TotalPrice:   totalPrice,
+				PayPrice:     orderPrice,
+				TotalPostage: postagePrice,
+				PayPostage:   postagePrice,
+				Paid:         g.StatusFalse,
+				Cost:         orderCost,
+			},
+			SysUserID:    userId,
+			SysTenancyID: tenancyId,
+			GroupOrderID: groupOrder.ID,
+		}
+
+		err = g.TENANCY_DB.Model(&model.Order{}).Create(&order).Error
+		if err != nil {
+			return err
+		}
+		orderId = order.ID
+		orderType = order.OrderType
 		return nil
 	})
 	if err != nil {
-		return err
+		return nil, err
 	}
-	return nil
+	seitURL, err := GetSeitURL()
+	if err != nil {
+		return nil, err
+	}
+	// 生成支付地址二维码
+	payUrl := fmt.Sprintf("%s/v1/payOrder?orderId=%d&tenancyId=%d&userId=%d&orderType=%d", seitURL, orderId, tenancyId, userId, orderType)
+	q, err := qrcode.New(payUrl, qrcode.Medium)
+	if err != nil {
+		return nil, err
+	}
+	png, err := q.PNG(256)
+	if err != nil {
+		return nil, err
+	}
+	return png, nil
 }
 
 func GetThisMonthOrdersByUserId(userId uint) ([]model.Order, error) {

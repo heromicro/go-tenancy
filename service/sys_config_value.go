@@ -45,3 +45,6 @@ func GetConfigValueByKey(configKey string) (string, error) {
 func GetSeitURL() (string, error) {
 	return GetConfigValueByKey("site_url")
 }
+func GetSeitName() (string, error) {
+	return GetConfigValueByKey("site_name")
+}

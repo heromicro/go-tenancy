@@ -30,9 +30,14 @@ If you don't have a QQ account, you can into the [iris-go-tenancy/community](htt
 - 商品成本价 cost
   
 订单价格 
-- 订单总价 total_price 商品
+- 订单商品总价 total_price 
 - 订单邮费 total_postage
 - 订单支付总价 pay_price = total_price+total_postage
 - 订单支付邮费 pay_postage = total_postage
 - 订单平台手续费 commission_rate
 - 订单成本价 cost = 商品成本价
+
+###### 支付宝沙箱调试
+- 需要设置 is-prod 为 false
+- 下载 https://sandbox.alipaydev.com/user/downloadApp.htm 对应客户端
+- 登录沙箱提供的账号
