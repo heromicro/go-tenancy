@@ -66,7 +66,7 @@ func Routers(app *gin.Engine) {
 			admin.InitConfigRouter(AdminGroup)         // 注册系统配置路由
 			admin.InitConfigValueRouter(AdminGroup)    // 注册系统配置值路由
 			admin.InitMenuRouter(AdminGroup)           // 注册menu路由
-			admin.InitEmailRouter(AdminGroup)          // 邮件相关路由
+			admin.InitTestouter(AdminGroup)            // 邮件相关路由
 			admin.InitSystemRouter(AdminGroup)         // system相关路由
 			admin.InitCasbinRouter(AdminGroup)         // 权限相关路由
 			admin.InitAuthorityRouter(AdminGroup)      // 注册角色路由

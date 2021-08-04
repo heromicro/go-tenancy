@@ -21,10 +21,9 @@ var node *snowflake.Node
 // 订单组 G+20060102150405+随机数
 // 退款单 R+20060102150405+随机数
 func CreateOrderSn(orderType interface{}) string {
-	node := getNodeId()
-	id := node.Generate().Int64()
+	id := fmt.Sprintf("%d", getNodeId().Generate().Int64())
 	now := time.Now().Format("20060102150405")
-	return fmt.Sprintf("%v%s%d", orderType, now, id)
+	return fmt.Sprintf("%v%s%s", orderType, now, id[0:len(id)-2])
 }
 
 func getNodeId() *snowflake.Node {

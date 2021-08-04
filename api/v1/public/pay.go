@@ -1,6 +1,7 @@
 package public
 
 import (
+	"fmt"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -35,6 +36,7 @@ func PayOrder(ctx *gin.Context) {
 				"signType":  res.JSAPIPayParams.SignType, //微信签名方式：
 				"paySign":   res.JSAPIPayParams.PaySign,  //微信签名
 			}
+			fmt.Printf("wxRsp: %+v", jsapi)
 			ctx.HTML(200, "wechat-pay.tmpl", jsapi)
 		}
 	}

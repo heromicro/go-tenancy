@@ -131,10 +131,11 @@ func InitConfigRouter(Router *gin.RouterGroup) {
 }
 
 // 邮件测试
-func InitEmailRouter(Router *gin.RouterGroup) {
-	UserRouter := Router.Group("/email")
+func InitTestouter(Router *gin.RouterGroup) {
+	UserRouter := Router.Group("/test")
 	{
 		UserRouter.POST("/emailTest", admin.EmailTest) // 发送测试邮件
+		UserRouter.GET("/pay", admin.PayTest)          // 发送测试邮件
 	}
 }
 

@@ -587,6 +587,7 @@ func CreateOrder(req request.CreateOrder, tenancyId, userId uint, tenancyName st
 		return nil, err
 	}
 	var order model.Order
+	// 床旁用户登录，userId 为患者id
 	patient, err := GetPatientById(userId, tenancyId)
 	if err != nil {
 		return nil, err
@@ -746,6 +747,7 @@ func GetThisMonthOrderPriceByUserId(userId uint) (response.GeneralUserDetail, er
 	}
 	return user, nil
 }
+
 func GetNoPayOrders() ([]model.Order, error) {
 	var orders []model.Order
 	err := g.TENANCY_DB.Model(&model.Order{}).
@@ -758,4 +760,29 @@ func GetNoPayOrders() ([]model.Order, error) {
 		return orders, err
 	}
 	return orders, nil
+}
+
+func ChangeOrderStatusByOrderId(orderId, tenancyId, userId uint, orderType, status int, changeType, changeMessage string) error {
+	err := g.TENANCY_DB.Transaction(func(tx *gorm.DB) error {
+		err := tx.Model(&model.Order{}).Where("sys_tenancy_id = ?", tenancyId).
+			Where("id = ?", orderId).
+			Where("sys_user_id = ?", userId).
+			Where("order_type = ?", orderType).
+			Where("is_system_del = ?", g.StatusFalse).
+			Where("is_del = ?", g.StatusFalse).
+			Update("status", status).Error
+		if err != nil {
+			return err
+		}
+		orderStatus := model.OrderStatus{ChangeType: changeType, ChangeMessage: changeMessage, ChangeTime: time.Now(), OrderID: orderId}
+		err = tx.Create(&orderStatus).Error
+		if err != nil {
+			return err
+		}
+		return nil
+	})
+	if err != nil {
+		return err
+	}
+	return nil
 }

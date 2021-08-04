@@ -65,11 +65,12 @@ var menus = []model.SysBaseMenu{
 	// {TENANCY_MODEL: g.TENANCY_MODEL{ID: 106}, Pid: 0, Path: "/", Icon: "orange", MenuName: "营销", Route: "/merchant/marketing", Params: "", Sort: 97, Hidden: 2, IsTenancy: 1, IsMenu: 1},
 	// {TENANCY_MODEL: g.TENANCY_MODEL{ID: 107}, Pid: 106, Path: "/106/", Icon: "", MenuName: "优惠券", Route: "/merchant/marketing/coupon", Params: "", Sort: 0, Hidden: 2, IsTenancy: 1, IsMenu: 1},
 	{TENANCY_MODEL: g.TENANCY_MODEL{ID: 110}, Pid: 0, Path: "/", Icon: "s-tools", MenuName: "设置", Route: "/merchant/settings", Params: "", Sort: 92, Hidden: 2, IsTenancy: 2, IsMenu: 1},
+
 	// {TENANCY_MODEL: g.TENANCY_MODEL{ID: 111}, Pid: 110, Path: "/110/", Icon: "", MenuName: "短信设置", Route: "/sms", Params: "", Sort: 0, Hidden: 2, IsTenancy: 2, IsMenu: 1},
 	// {TENANCY_MODEL: g.TENANCY_MODEL{ID: 112}, Pid: 111, "/110/111/", "", "短信账户", "/sms/config", Params: "", Sort: 0, Hidden: 2, IsTenancy: 2, IsMenu: 1},
 	// {TENANCY_MODEL: g.TENANCY_MODEL{ID: 113}, Pid: 111, "/110/111/", "", "短信模板", "/sms/template", Params: "", Sort: 0, Hidden: 2, IsTenancy: 2, IsMenu: 1},
 	// {TENANCY_MODEL: g.TENANCY_MODEL{ID: 114}, Pid: 111, "/110/111/", "", "短信购买", "/sms/pay", Params: "", Sort: 0, Hidden: 2, IsTenancy: 2, IsMenu: 1},
-	{TENANCY_MODEL: g.TENANCY_MODEL{ID: 115}, Pid: 107, Path: "/106/107/", Icon: "", MenuName: "优惠券列表", Route: "/merchant/marketing/coupon/list", Params: "", Sort: 1, Hidden: 2, IsTenancy: 1, IsMenu: 1},
+	// {TENANCY_MODEL: g.TENANCY_MODEL{ID: 115}, Pid: 107, Path: "/106/107/", Icon: "", MenuName: "优惠券列表", Route: "/merchant/marketing/coupon/list", Params: "", Sort: 1, Hidden: 2, IsTenancy: 1, IsMenu: 1},
 	// {TENANCY_MODEL: g.TENANCY_MODEL{ID: 116}, Pid: 520, "/520/", "", "安全维护", "/maintain", "", 9,Hidden: 2, IsTenancy:2,IsMenu: 1},
 	// {TENANCY_MODEL: g.TENANCY_MODEL{ID: 117}, Pid: 116, "/520/116/", "", "数据备份", "/maintain/dataBackup", Params: "", Sort: 0, Hidden: 2, IsTenancy: 2, IsMenu: 1},
 	{TENANCY_MODEL: g.TENANCY_MODEL{ID: 118}, Pid: 110, Path: "/110/", Icon: "", MenuName: "物流管理", Route: "/admin/freight", Params: "", Sort: 0, Hidden: 2, IsTenancy: 2, IsMenu: 1},
@@ -77,7 +78,8 @@ var menus = []model.SysBaseMenu{
 	{TENANCY_MODEL: g.TENANCY_MODEL{ID: 120}, Pid: 526, Path: "/526/", Icon: "", MenuName: "客服管理", Route: "/merchant/config/service", Params: "", Sort: 0, Hidden: 2, IsTenancy: 1, IsMenu: 1},
 	{TENANCY_MODEL: g.TENANCY_MODEL{ID: 121}, Pid: 87, Path: "/87/", Icon: "", MenuName: "评论管理", Route: "/admin/product/comment", Params: "", Sort: 0, Hidden: 2, IsTenancy: 2, IsMenu: 1},
 	{TENANCY_MODEL: g.TENANCY_MODEL{ID: 122}, Pid: 107, Path: "/106/107/", Icon: "", MenuName: "会员领取记录", Route: "/merchant/marketing/coupon/user", Params: "", Sort: 0, Hidden: 2, IsTenancy: 1, IsMenu: 1},
-
+	{TENANCY_MODEL: g.TENANCY_MODEL{ID: 123}, Pid: 110, Path: "/110/", Icon: "", MenuName: "测试", Route: "/test", Params: "", Sort: 0, Hidden: 2, IsTenancy: 2, IsMenu: 1},
+	{TENANCY_MODEL: g.TENANCY_MODEL{ID: 124}, Pid: 123, Path: "/110/123/", Icon: "", MenuName: "支付测试", Route: "/admin/test/pay", Params: "", Sort: 0, Hidden: 2, IsTenancy: 2, IsMenu: 1},
 	// {TENANCY_MODEL: g.TENANCY_MODEL{ID: 466}, Pid: 101, Path: "/101/", Icon: "", MenuName: "用户反馈", Route: "/admin/feedback", Params: "", Sort: 0, Hidden: 2, IsTenancy: 2, IsMenu: 1},
 	// {TENANCY_MODEL: g.TENANCY_MODEL{ID: 467}, Pid: 466, Path: "/101/466/", Icon: "", MenuName: "反馈分类", Route: "/admin/feedback/classify", Params: "", Sort: 0, Hidden: 2, IsTenancy: 2, IsMenu: 1},
 	// {TENANCY_MODEL: g.TENANCY_MODEL{ID: 468}, Pid: 466, Path: "/101/466/", Icon: "", MenuName: "反馈列表", Route: "/admin/feedback/list", Params: "", Sort: 0, Hidden: 2, IsTenancy: 2, IsMenu: 1},

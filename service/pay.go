@@ -101,7 +101,7 @@ func WechatPay(order model.Order, tenancyName string) (response.PayOrder, error)
 		Set("time_expire", expire).
 		Set("notify_url", "https://www.fmm.ink").
 		SetBodyMap("amount", func(bm gopay.BodyMap) {
-			bm.Set("total", getOrderPrice(order.PayPrice)).
+			bm.Set("total", getOrderPrice(order.PayPrice)*100).
 				Set("currency", "CNY")
 		}).
 		SetBodyMap("payer", func(bm gopay.BodyMap) {
@@ -112,14 +112,14 @@ func WechatPay(order model.Order, tenancyName string) (response.PayOrder, error)
 	if err != nil {
 		return res, fmt.Errorf("transaction jsapi 错误 %w", err)
 	}
-	if wxRsp.Response.PrepayId == "" {
-		return res, fmt.Errorf("微信支付参数错误")
+	if wxRsp.Code > 0 {
+		return res, fmt.Errorf("%s", wxRsp.Error)
 	}
-
 	jsapi, err := client.PaySignOfJSAPI(wxRsp.Response.PrepayId)
 	if err != nil {
 		return res, fmt.Errorf("微信支付 jsapi 签名错误 %w", err)
 	}
+
 	res.JSAPIPayParams = jsapi
 	return res, nil
 }
