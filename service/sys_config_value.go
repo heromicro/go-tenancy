@@ -47,38 +47,108 @@ func GetSeitURL() (string, error) {
 	return GetConfigValueByKey("site_url")
 }
 
+func GetPayNotifyUrl() (string, error) {
+	seitUrl, err := GetSeitURL()
+	if err != nil {
+		return "", fmt.Errorf("获取站点url错误 %w", err)
+	}
+	return fmt.Sprintf("%s/%s", seitUrl, "v1/pay/payNotify"), nil
+}
+
 func GetSeitName() (string, error) {
 	return GetConfigValueByKey("site_name")
 }
 
-func GetAliPayConfig() (map[string]string, error) {
-	config := map[string]string{}
+func GetSeitMode() (string, error) {
+	return GetConfigValueByKey("site_open")
+}
+
+type AlipayConfig struct {
+	AlipayOpen       bool
+	AlipayEnv        bool
+	AlipayAppId      string
+	AlipayPrivateKey string
+}
+
+func GetAliPayConfig() (AlipayConfig, error) {
+	config := AlipayConfig{}
 	alipayConfigs, err := GetConfigByCateKey("alipay", 0)
 	if err != nil {
 		return config, err
 	}
 
 	for _, alipayConfig := range alipayConfigs {
-		config[alipayConfig.ConfigKey] = alipayConfig.Value
+		if alipayConfig.ConfigKey == "alipay_open" {
+			if alipayConfig.Value == "1" {
+				config.AlipayOpen = true
+			}
+		}
+		if alipayConfig.ConfigKey == "alipay_env" {
+			if alipayConfig.Value == "1" {
+				config.AlipayEnv = true
+			}
+		}
+		if alipayConfig.ConfigKey == "alipay_app_id" {
+			config.AlipayAppId = alipayConfig.Value
+		}
+		if alipayConfig.ConfigKey == "alipay_private_key" {
+			config.AlipayPrivateKey = alipayConfig.Value
+		}
 	}
-	if config["alipay_open"] == "0" {
+	if !config.AlipayOpen {
 		return config, fmt.Errorf("支付宝支付未开启")
 	}
 	return config, nil
 }
 
-func GetWechatPayConfig() (map[string]string, error) {
-	config := map[string]string{}
+type WechatConfig struct {
+	PayWeixinAppid      string
+	PayWeixinAppsecret  string
+	PayWeixinMchid      string
+	PayWeixinClientCert string
+	PayWeixinClientKey  string
+	PaySerialNo         string
+	PayWeixinKey        string
+	PayWeixinOpen       bool
+}
+
+func GetWechatPayConfig() (WechatConfig, error) {
+	config := WechatConfig{}
 	wechatConfigs, err := GetConfigByCateKey("wechat_payment", 0)
 	if err != nil {
-		return config, err
+		return config, fmt.Errorf("获取微信支付配置错误 %w", err)
 	}
 
 	for _, wechatConfig := range wechatConfigs {
-		config[wechatConfig.ConfigKey] = wechatConfig.Value
+		if wechatConfig.ConfigKey == "pay_weixin_open" {
+			if wechatConfig.Value == "1" {
+				config.PayWeixinOpen = true
+			}
+		}
+		if wechatConfig.ConfigKey == "pay_weixin_key" {
+			config.PayWeixinKey = wechatConfig.Value
+		}
+		if wechatConfig.ConfigKey == "pay_weixin_appid" {
+			config.PayWeixinAppid = wechatConfig.Value
+		}
+		if wechatConfig.ConfigKey == "pay_weixin_appsecret" {
+			config.PayWeixinAppsecret = wechatConfig.Value
+		}
+		if wechatConfig.ConfigKey == "pay_weixin_mchid" {
+			config.PayWeixinMchid = wechatConfig.Value
+		}
+		if wechatConfig.ConfigKey == "pay_weixin_client_cert" {
+			config.PayWeixinClientCert = wechatConfig.Value
+		}
+		if wechatConfig.ConfigKey == "pay_weixin_client_key" {
+			config.PayWeixinClientKey = wechatConfig.Value
+		}
+		if wechatConfig.ConfigKey == "pay_serial_no" {
+			config.PaySerialNo = wechatConfig.Value
+		}
 	}
 
-	if config["pay_weixin_open"] == "0" {
+	if !config.PayWeixinOpen {
 		return config, fmt.Errorf("微信支付未开启")
 	}
 

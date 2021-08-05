@@ -696,7 +696,7 @@ func CreateOrder(req request.CreateOrder, tenancyId, userId uint, tenancyName st
 		}
 
 		// 生成支付地址二维码
-		payUrl := fmt.Sprintf("%s/v1/payOrder?orderId=%d&tenancyId=%d&userId=%d&orderType=%d", seitURL, order.ID, tenancyId, userId, order.OrderType)
+		payUrl := fmt.Sprintf("%s/v1/pay/payOrder?orderId=%d&tenancyId=%d&userId=%d&orderType=%d", seitURL, order.ID, tenancyId, userId, order.OrderType)
 		q, err := qrcode.New(payUrl, qrcode.Medium)
 		if err != nil {
 			return err
@@ -785,4 +785,20 @@ func ChangeOrderStatusByOrderId(orderId, tenancyId, userId uint, orderType, stat
 		return err
 	}
 	return nil
+}
+
+func CancelNoPayOrders(orderIds []uint, orderStatues []model.OrderStatus) error {
+	return g.TENANCY_DB.Transaction(func(tx *gorm.DB) error {
+		err := tx.Model(&model.Order{}).
+			Where("id in ?", orderIds).
+			Update("status", model.OrderStatusCancel).Error
+		if err != nil {
+			return fmt.Errorf("更新订单状态 %w", err)
+		}
+		err = tx.Create(&orderStatues).Error
+		if err != nil {
+			return fmt.Errorf("生产订单操作记录 %w", err)
+		}
+		return nil
+	})
 }

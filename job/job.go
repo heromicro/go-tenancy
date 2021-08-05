@@ -13,7 +13,6 @@ import (
 	"github.com/snowlyg/go-tenancy/service"
 	"github.com/snowlyg/go-tenancy/utils"
 	"go.uber.org/zap"
-	"gorm.io/gorm"
 )
 
 const EveryMinute = "*/1 * * * *"    //每分钟
@@ -49,19 +48,7 @@ func Timer() {
 				orderStatus := model.OrderStatus{ChangeType: "cancel", ChangeMessage: "取消订单[自动]", ChangeTime: time.Now(), OrderID: order.ID}
 				orderStatues = append(orderStatues, orderStatus)
 			}
-			err = g.TENANCY_DB.Transaction(func(tx *gorm.DB) error {
-				err := tx.Model(&model.Order{}).
-					Where("id in ?", orderIds).
-					Update("status", model.OrderStatusCancel).Error
-				if err != nil {
-					return err
-				}
-				err = tx.Create(&orderStatues).Error
-				if err != nil {
-					return err
-				}
-				return nil
-			})
+			err = service.CancelNoPayOrders(orderIds, orderStatues)
 			if err != nil {
 				g.TENANCY_LOG.Info("订单过期自动取消", zap.String("订单状态更新错误", err.Error()))
 			}
@@ -75,13 +62,13 @@ func Timer() {
 				return
 			}
 
-			pKContent, err := file.ReadString(filepath.Join(g.TENANCY_CONFIG.Casbin.ModelPath, wechatConf["pay_weixin_client_key"]))
+			pKContent, err := file.ReadString(filepath.Join(g.TENANCY_CONFIG.Casbin.ModelPath, wechatConf.PayWeixinClientKey))
 			if err != nil {
 				g.TENANCY_LOG.Info("定时获取微信平台证书", zap.String("获取微信证书内容错误", err.Error()))
 				return
 			}
 
-			certs, err := wechat.GetPlatformCerts(wechatConf["pay_weixin_mchid"], wechatConf["pay_weixin_key"], "", pKContent)
+			certs, err := wechat.GetPlatformCerts(wechatConf.PayWeixinMchid, wechatConf.PayWeixinKey, "", pKContent)
 			if err != nil {
 				g.TENANCY_LOG.Info("定时获取微信平台证书", zap.String("定时获取微信平台证书错误", err.Error()))
 				return

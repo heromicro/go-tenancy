@@ -4,20 +4,23 @@ import (
 	"errors"
 	"fmt"
 	"path/filepath"
+	"strings"
 	"time"
 
 	"github.com/chindeo/pkg/file"
 	"github.com/go-pay/gopay"
 	"github.com/go-pay/gopay/alipay"
+	v2 "github.com/go-pay/gopay/wechat"
 	"github.com/go-pay/gopay/wechat/v3"
 	"github.com/snowlyg/go-tenancy/g"
 	"github.com/snowlyg/go-tenancy/model"
 	"github.com/snowlyg/go-tenancy/model/request"
 	"github.com/snowlyg/go-tenancy/model/response"
+	"github.com/snowlyg/go-tenancy/utils"
 	"gorm.io/gorm"
 )
 
-func PayOrder(req request.PayOrder, userAgent, tenancyName string) (response.PayOrder, error) {
+func PayOrder(req request.PayOrder) (response.PayOrder, error) {
 	var res response.PayOrder
 	tenancy, err := GetTenancyByID(req.TenancyId)
 	if err != nil {
@@ -42,16 +45,16 @@ func PayOrder(req request.PayOrder, userAgent, tenancyName string) (response.Pay
 		return res, fmt.Errorf("当前支付订单已超时，请重新下单")
 	}
 
-	// if strings.Contains(userAgent, "MicroMessenger") {
-	return WechatPay(order, tenancy.Name)
-	// } else if strings.Contains(userAgent, "Alipay") {
-	// 	return Alipay(order, tenancy.Name)
-	// } else {
-	// 	return res, fmt.Errorf("请使用微信或者支付宝扫描支付")
-	// }
+	if strings.Contains(req.UserAgent, "MicroMessenger") {
+		return WechatPay(order, tenancy.Name, req.OpenId)
+	} else if strings.Contains(req.UserAgent, "Alipay") {
+		return Alipay(order, tenancy.Name)
+	} else {
+		return res, fmt.Errorf("请使用微信或者支付宝扫描支付")
+	}
 }
 
-func WechatPay(order model.Order, tenancyName string) (response.PayOrder, error) {
+func WechatPay(order model.Order, tenancyName, openid string) (response.PayOrder, error) {
 	var res response.PayOrder
 	siteName, err := GetSeitName()
 	if err != nil {
@@ -59,16 +62,16 @@ func WechatPay(order model.Order, tenancyName string) (response.PayOrder, error)
 	}
 	wechatConf, err := GetWechatPayConfig()
 	if err != nil {
-		return res, fmt.Errorf("获取微信支付配置错误 %w", err)
+		return res, err
 	}
 
-	pKContent, err := file.ReadString(filepath.Join(g.TENANCY_CONFIG.Casbin.ModelPath, wechatConf["pay_weixin_client_key"]))
+	pKContent, err := file.ReadString(filepath.Join(g.TENANCY_CONFIG.Casbin.ModelPath, wechatConf.PayWeixinClientKey))
 	if err != nil {
 		return res, fmt.Errorf("获取支付 %w", err)
 	}
 
 	if g.TENANCY_CONFIG.WechatPay.WxPkContent == "" || g.TENANCY_CONFIG.WechatPay.WxPkSerialNo == "" {
-		certs, err := wechat.GetPlatformCerts(wechatConf["pay_weixin_mchid"], wechatConf["pay_weixin_key"], wechatConf["pay_serial_no"], pKContent)
+		certs, err := wechat.GetPlatformCerts(wechatConf.PayWeixinMchid, wechatConf.PayWeixinKey, wechatConf.PaySerialNo, pKContent)
 		if err != nil {
 			return res, fmt.Errorf("获取微信支付平台证书错误 %w", err)
 		}
@@ -81,7 +84,7 @@ func WechatPay(order model.Order, tenancyName string) (response.PayOrder, error)
 	// 	serialNo：商户证书的证书序列号
 	//	apiV3Key：apiV3Key，商户平台获取
 	//	pkContent：私钥 apiclient_key.pem 读取后的内容
-	client, err := wechat.NewClientV3(wechatConf["pay_weixin_appid"], wechatConf["pay_weixin_mchid"], wechatConf["pay_serial_no"], wechatConf["pay_weixin_key"], pKContent)
+	client, err := wechat.NewClientV3(wechatConf.PayWeixinAppid, wechatConf.PayWeixinMchid, wechatConf.PaySerialNo, wechatConf.PayWeixinKey, pKContent)
 	if err != nil {
 		return res, fmt.Errorf("初始化微信支付错误 %w", err)
 	}
@@ -93,18 +96,24 @@ func WechatPay(order model.Order, tenancyName string) (response.PayOrder, error)
 	// 打开Debug开关，输出日志，默认是关闭的
 	client.DebugSwitch = gopay.DebugOff
 	expire := time.Now().Add(10 * time.Minute).Format(time.RFC3339)
+
+	notifyUrl, err := GetPayNotifyUrl()
+	if err != nil {
+		return res, err
+	}
+
 	// 初始化 BodyMap
 	bm := make(gopay.BodyMap)
 	bm.Set("description", fmt.Sprintf("%s-%s", tenancyName, siteName)).
 		Set("out_trade_no", order.OrderSn).
 		Set("time_expire", expire).
-		Set("notify_url", "https://www.fmm.ink").
+		Set("notify_url", notifyUrl).
 		SetBodyMap("amount", func(bm gopay.BodyMap) {
 			bm.Set("total", getOrderPrice(order.PayPrice)*100).
 				Set("currency", "CNY")
 		}).
 		SetBodyMap("payer", func(bm gopay.BodyMap) {
-			bm.Set("openid", "oT98buJy-k2UrZ_9qKqQffuEf4tI")
+			bm.Set("openid", openid)
 		})
 
 	wxRsp, err := client.V3TransactionJsapi(bm)
@@ -124,7 +133,12 @@ func WechatPay(order model.Order, tenancyName string) (response.PayOrder, error)
 }
 
 func getOrderPrice(price float64) float64 {
-	if g.TENANCY_CONFIG.System.Env != "pro" {
+	seitMode, err := GetSeitMode()
+	if err != nil {
+		return price
+	}
+
+	if seitMode == "0" {
 		return 0.01
 	}
 
@@ -164,31 +178,53 @@ func AliPayClient() (*alipay.Client, error) {
 	if err != nil {
 		return nil, fmt.Errorf("获取支付宝配置错误 %w", err)
 	}
-	if alipayConf["alipay_open"] == "0" {
-		return nil, fmt.Errorf("支付宝支付未开启")
-	}
-	seitUrl, err := GetSeitURL()
+	notifyUrl, err := GetPayNotifyUrl()
 	if err != nil {
-		return nil, fmt.Errorf("获取站点url错误 %w", err)
+		return nil, err
 	}
-	var isProd bool
-	if alipayConf["alipay_env"] == "0" {
-		isProd = false
-	} else if alipayConf["alipay_env"] == "1" {
-		isProd = true
-	}
-	fmt.Println(alipayConf)
-	client := alipay.NewClient(alipayConf["alipay_app_id"], alipayConf["alipay_private_key"], isProd)
+
+	client := alipay.NewClient(alipayConf.AlipayAppId, alipayConf.AlipayPrivateKey, alipayConf.AlipayEnv)
 	//配置公共参数
 	client.SetCharset("utf-8").
 		SetSignType(alipay.RSA2).
 		SetPrivateKeyType(alipay.PKCS1).
+		SetNotifyUrl(notifyUrl)
 		//SetReturnUrl("https://www.fmm.ink").
-		SetNotifyUrl(fmt.Sprintf("%s/%s", seitUrl, ""))
 		// if !g.TENANCY_CONFIG.Alipay.IsProd {
 		// 	client.SetAliPayRootCertSN(filepath.Join(g.TENANCY_CONFIG.Casbin.ModelPath, "alipayRootCert.crt")).
 		// 		SetAppCertSN(filepath.Join(g.TENANCY_CONFIG.Casbin.ModelPath, "appCertPublicKey_2021000117637854.crt")).
 		// 		SetAliPayPublicCertSN(filepath.Join(g.TENANCY_CONFIG.Casbin.ModelPath, "alipayCertPublicKey_RSA2.crt"))
 		// }
 	return client, nil
+}
+
+func GetAutoCode(redirectUri string) (string, error) {
+	seitUrl, err := GetSeitURL()
+	if err != nil {
+		return "", fmt.Errorf("获取站点url错误 %w", err)
+	}
+	wechatConf, err := GetWechatPayConfig()
+	if err != nil {
+		return "", err
+	}
+	url := utils.GetAutoCode(wechatConf.PayWeixinAppid, seitUrl+redirectUri, "snsapi_base", g.TENANCY_CONFIG.WechatPay.State)
+	if err != nil {
+		return "", fmt.Errorf("微信网页授权失败 %w", err)
+	}
+	return url, nil
+}
+
+func GetOpenId(code string) (string, error) {
+	wechatConf, err := GetWechatPayConfig()
+	if err != nil {
+		return "", err
+	}
+	accessToken, err := v2.GetOauth2AccessToken(wechatConf.PayWeixinAppid, wechatConf.PayWeixinAppsecret, code)
+	if err != nil {
+		return "", fmt.Errorf("微信获取openid失败 %w", err)
+	}
+	if accessToken.Errcode > 0 {
+		return "", fmt.Errorf("%s", accessToken.Errmsg)
+	}
+	return accessToken.Openid, nil
 }

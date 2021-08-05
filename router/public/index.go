@@ -12,7 +12,11 @@ func InitAuthRouter(Router *gin.RouterGroup) {
 }
 
 func InitPayRouter(Router *gin.RouterGroup) {
-	Router.GET("/payOrder", public.PayOrder) // 扫码支付
+	payRouter := Router.Group("/pay")
+	{
+		payRouter.GET("/payOrder", public.PayOrder)  // 扫码支付
+		payRouter.Any("/payNotify", public.PayOrder) // 支付回调
+	}
 }
 
 // 数据库初始化检测

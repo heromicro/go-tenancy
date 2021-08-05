@@ -2,13 +2,13 @@ package public
 
 import (
 	"net/http"
+	"strings"
 
 	"github.com/gin-gonic/gin"
 	"github.com/snowlyg/go-tenancy/g"
 	"github.com/snowlyg/go-tenancy/model/request"
 	"github.com/snowlyg/go-tenancy/model/response"
 	"github.com/snowlyg/go-tenancy/service"
-	"github.com/snowlyg/multi"
 	"go.uber.org/zap"
 )
 
@@ -19,8 +19,35 @@ func PayOrder(ctx *gin.Context) {
 		response.FailWithMessage("参数校验不通过", ctx)
 		return
 	}
-	userAgent := ctx.Request.UserAgent()
-	if res, err := service.PayOrder(req, userAgent, multi.GetTenancyName(ctx)); err != nil {
+
+	req.UserAgent = ctx.Request.UserAgent()
+	if strings.Contains(req.UserAgent, "MicroMessenger") {
+		if req.Code == "" || req.State == "" {
+			url, err := service.GetAutoCode(ctx.Request.RequestURI)
+			if err != nil {
+				g.TENANCY_LOG.Error("操作失败!", zap.Any("err", err))
+				response.FailWithMessage("操作失败:"+err.Error(), ctx)
+				return
+			} else {
+				ctx.Redirect(302, url)
+				return
+			}
+		} else {
+			if req.State != g.TENANCY_CONFIG.WechatPay.State {
+				response.FailWithMessage("微信网页授权验证错误", ctx)
+				return
+			}
+			openid, err := service.GetOpenId(req.Code)
+			if err != nil {
+				g.TENANCY_LOG.Error("操作失败!", zap.Any("err", err))
+				response.FailWithMessage("操作失败:"+err.Error(), ctx)
+				return
+			}
+			req.OpenId = openid
+		}
+	}
+
+	if res, err := service.PayOrder(req); err != nil {
 		g.TENANCY_LOG.Error("操作失败!", zap.Any("err", err))
 		response.FailWithMessage("操作失败:"+err.Error(), ctx)
 	} else {

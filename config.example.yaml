@@ -4,6 +4,8 @@ captcha:
   img-height: 80
 casbin:
   model-path: D:/go/src/github.com/snowlyg/go-tenancy/resource/rbac_model.conf
+wechat-pay:
+  state: ""
 email:
   to: xxx@qq.com
   port: 465

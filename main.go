@@ -15,6 +15,7 @@ func main() {
 	g.TENANCY_DB = initialize.Gorm() // gorm连接数据库
 	job.Timer()
 	if g.TENANCY_DB != nil {
+		// 注释表迁移功能，加快项目编译速度
 		// initialize.MysqlTables(g.TENANCY_DB) // 初始化表
 		// 程序结束前关闭数据库链接
 		db, _ := g.TENANCY_DB.DB()
