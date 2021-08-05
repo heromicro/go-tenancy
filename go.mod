@@ -40,7 +40,7 @@ require (
 	github.com/sergi/go-diff v1.2.0 // indirect
 	github.com/shopspring/decimal v1.2.0
 	github.com/skip2/go-qrcode v0.0.0-20200617195104-da1b6568686e
-	github.com/snowlyg/multi v0.0.0-20210730074719-233c70c26dc9
+	github.com/snowlyg/multi v0.0.0-20210805064518-a4069221d034
 	github.com/spf13/cast v1.3.1 // indirect
 	github.com/spf13/pflag v1.0.5 // indirect
 	github.com/spf13/viper v1.7.1

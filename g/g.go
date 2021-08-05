@@ -5,6 +5,7 @@ import (
 	"go.uber.org/zap"
 	"gorm.io/gorm"
 
+	"github.com/go-redis/redis/v8"
 	"github.com/snowlyg/go-tenancy/config"
 	"github.com/snowlyg/go-tenancy/utils/timer"
 )
@@ -17,6 +18,7 @@ const (
 
 var (
 	TENANCY_DB     *gorm.DB
+	TENANCY_CACHE  redis.UniversalClient
 	TENANCY_CONFIG config.Server
 	TENANCY_VP     *viper.Viper
 	TENANCY_LOG    *zap.Logger

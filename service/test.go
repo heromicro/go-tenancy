@@ -1,9 +1,14 @@
 package service
 
 import (
+	"time"
+
+	"github.com/snowlyg/go-tenancy/initialize/cache"
 	"github.com/snowlyg/go-tenancy/model/request"
 	"github.com/snowlyg/go-tenancy/utils"
 )
+
+const payTestKey = "PAY_TEST_KEY:"
 
 // EmailTest 发送邮件测试
 func EmailTest() error {
@@ -18,9 +23,21 @@ func PayTest(req request.CreateCart, tenancyName string) ([]byte, error) {
 	if err != nil {
 		return nil, err
 	}
-	return CreateOrder(request.CreateOrder{
+	res := request.CreateOrder{
 		CartIds:   []uint{cart.ID},
 		OrderType: 1,
 		Remark:    "remark",
-	}, req.SysTenancyID, req.SysUserID, tenancyName)
+	}
+	qrcode, err := cache.GetCacheBytes(payTestKey)
+	if err != nil || qrcode == nil {
+		qrcode, err = CreateOrder(res, req.SysTenancyID, req.SysUserID, tenancyName)
+		if err != nil {
+			return nil, err
+		}
+		err = cache.SetCache(payTestKey, qrcode, 15*time.Minute)
+		if err != nil {
+			return nil, err
+		}
+	}
+	return qrcode, nil
 }

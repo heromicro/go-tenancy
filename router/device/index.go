@@ -58,6 +58,7 @@ func InitDeviceRouter(Router *gin.RouterGroup) {
 		OrderRouter.POST("/checkOrder", device.CheckOrder)
 		OrderRouter.GET("/getOrderById/:id", device.GetOrderById)
 		OrderRouter.POST("/createOrder", device.CreateOrder)
+		OrderRouter.GET("/payOrder/:id", device.PayOrder)
 	}
 	// 患者管理
 	PatientRouter := Router.Group("/patient")

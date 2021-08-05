@@ -53,3 +53,25 @@ func CreateOrder(ctx *gin.Context) {
 		response.OkWithDetailed(gin.H{"qrcode": qrcode}, "获取成功", ctx)
 	}
 }
+
+// PayOrder
+func PayOrder(ctx *gin.Context) {
+	var req request.GetById
+	if errs := ctx.ShouldBindUri(&req); errs != nil {
+		response.FailWithMessage(errs.Error(), ctx)
+		return
+	}
+	var payOrder request.PayOrder
+	if err := ctx.ShouldBind(&req); err != nil {
+		g.TENANCY_LOG.Error("参数校验不通过", zap.Any("err", err))
+		response.FailWithMessage("参数校验不通过", ctx)
+		return
+	}
+
+	if qrcode, err := service.GetQrCode(req.Id, multi.GetTenancyId(ctx), multi.GetUserId(ctx), payOrder.OrderType); err != nil {
+		g.TENANCY_LOG.Error("获取失败!", zap.Any("err", err))
+		response.FailWithMessage("获取失败:"+err.Error(), ctx)
+	} else {
+		response.OkWithDetailed(gin.H{"qrcode": qrcode}, "获取成功", ctx)
+	}
+}

@@ -582,10 +582,7 @@ func GetOrderInfoByCartId(tenancyId, userId uint, cartIds []uint) (response.Chec
 // CreateOrder 新建订单 生成订单组-》生成订单, 二维码需要 data:image/png;base64,
 func CreateOrder(req request.CreateOrder, tenancyId, userId uint, tenancyName string) ([]byte, error) {
 	var png []byte
-	seitURL, err := GetSeitURL()
-	if err != nil {
-		return nil, err
-	}
+
 	var order model.Order
 	// 床旁用户登录，userId 为患者id
 	patient, err := GetPatientById(userId, tenancyId)
@@ -695,13 +692,7 @@ func CreateOrder(req request.CreateOrder, tenancyId, userId uint, tenancyName st
 			}
 		}
 
-		// 生成支付地址二维码
-		payUrl := fmt.Sprintf("%s/v1/pay/payOrder?orderId=%d&tenancyId=%d&userId=%d&orderType=%d", seitURL, order.ID, tenancyId, userId, order.OrderType)
-		q, err := qrcode.New(payUrl, qrcode.Medium)
-		if err != nil {
-			return err
-		}
-		png, err = q.PNG(256)
+		png, err = GetQrCode(order.ID, tenancyId, userId, order.OrderType)
 		if err != nil {
 			return err
 		}
@@ -712,6 +703,24 @@ func CreateOrder(req request.CreateOrder, tenancyId, userId uint, tenancyName st
 		return nil, err
 	}
 
+	return png, nil
+}
+
+func GetQrCode(orderId, tenancyId, userId uint, orderType int) ([]byte, error) {
+	seitURL, err := GetSeitURL()
+	if err != nil {
+		return nil, err
+	}
+	// 生成支付地址二维码
+	payUrl := fmt.Sprintf("%s/v1/pay/payOrder?orderId=%d&tenancyId=%d&userId=%d&orderType=%d", seitURL, orderId, tenancyId, userId, orderType)
+	q, err := qrcode.New(payUrl, qrcode.Medium)
+	if err != nil {
+		return nil, err
+	}
+	png, err := q.PNG(256)
+	if err != nil {
+		return nil, err
+	}
 	return png, nil
 }
 
