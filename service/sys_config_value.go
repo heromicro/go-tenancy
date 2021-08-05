@@ -2,6 +2,7 @@ package service
 
 import (
 	"errors"
+	"fmt"
 	"reflect"
 	"strconv"
 
@@ -50,29 +51,36 @@ func GetSeitName() (string, error) {
 	return GetConfigValueByKey("site_name")
 }
 
-func GetAliPay() (map[string]string, error) {
-	conifg := map[string]string{}
+func GetAliPayConfig() (map[string]string, error) {
+	config := map[string]string{}
 	alipayConfigs, err := GetConfigByCateKey("alipay", 0)
 	if err != nil {
-		return conifg, err
+		return config, err
 	}
 
 	for _, alipayConfig := range alipayConfigs {
-		conifg[alipayConfig.ConfigKey] = alipayConfig.Value
+		config[alipayConfig.ConfigKey] = alipayConfig.Value
 	}
-	return conifg, nil
+	if config["alipay_open"] == "0" {
+		return config, fmt.Errorf("支付宝支付未开启")
+	}
+	return config, nil
 }
 
-func GetWechatPay() (map[string]string, error) {
-	conifg := map[string]string{}
+func GetWechatPayConfig() (map[string]string, error) {
+	config := map[string]string{}
 	wechatConfigs, err := GetConfigByCateKey("wechat_payment", 0)
 	if err != nil {
-		return conifg, err
+		return config, err
 	}
 
 	for _, wechatConfig := range wechatConfigs {
-		conifg[wechatConfig.ConfigKey] = wechatConfig.Value
+		config[wechatConfig.ConfigKey] = wechatConfig.Value
 	}
 
-	return conifg, nil
+	if config["pay_weixin_open"] == "0" {
+		return config, fmt.Errorf("微信支付未开启")
+	}
+
+	return config, nil
 }

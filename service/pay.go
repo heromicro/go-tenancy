@@ -4,7 +4,6 @@ import (
 	"errors"
 	"fmt"
 	"path/filepath"
-	"strings"
 	"time"
 
 	"github.com/chindeo/pkg/file"
@@ -43,13 +42,13 @@ func PayOrder(req request.PayOrder, userAgent, tenancyName string) (response.Pay
 		return res, fmt.Errorf("当前支付订单已超时，请重新下单")
 	}
 
-	if strings.Contains(userAgent, "MicroMessenger") {
-		return WechatPay(order, tenancy.Name)
-	} else if strings.Contains(userAgent, "Alipay") {
-		return Alipay(order, tenancy.Name)
-	} else {
-		return res, fmt.Errorf("请使用微信或者支付宝扫描支付")
-	}
+	// if strings.Contains(userAgent, "MicroMessenger") {
+	return WechatPay(order, tenancy.Name)
+	// } else if strings.Contains(userAgent, "Alipay") {
+	// 	return Alipay(order, tenancy.Name)
+	// } else {
+	// 	return res, fmt.Errorf("请使用微信或者支付宝扫描支付")
+	// }
 }
 
 func WechatPay(order model.Order, tenancyName string) (response.PayOrder, error) {
@@ -58,7 +57,7 @@ func WechatPay(order model.Order, tenancyName string) (response.PayOrder, error)
 	if err != nil {
 		return res, fmt.Errorf("获取商城名称 %w", err)
 	}
-	wechatConf, err := GetWechatPay()
+	wechatConf, err := GetWechatPayConfig()
 	if err != nil {
 		return res, fmt.Errorf("获取微信支付配置错误 %w", err)
 	}
@@ -161,7 +160,7 @@ func Alipay(order model.Order, tenancyName string) (response.PayOrder, error) {
 }
 
 func AliPayClient() (*alipay.Client, error) {
-	alipayConf, err := GetAliPay()
+	alipayConf, err := GetAliPayConfig()
 	if err != nil {
 		return nil, fmt.Errorf("获取支付宝配置错误 %w", err)
 	}

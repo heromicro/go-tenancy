@@ -20,7 +20,6 @@ import (
 func App() *gin.Engine {
 	gin.SetMode(g.TENANCY_CONFIG.System.Level)
 	App := gin.Default()
-	App.Use(static.Serve("/", static.LocalFile("resource/doc/apidoc", true)))
 	// 注册已定义验证方法
 	utils.RegisterValidation()
 	// 注册路由
@@ -30,7 +29,8 @@ func App() *gin.Engine {
 
 // Routers
 func Routers(app *gin.Engine) {
-	app.LoadHTMLFiles(filepath.Join(g.TENANCY_CONFIG.Casbin.ModelPath, "resource/template/wechat-pay.tmpl"))
+	app.Use(static.Serve("/", static.LocalFile("resource/doc/apidoc", true)))
+	app.LoadHTMLGlob(filepath.Join(g.TENANCY_CONFIG.Casbin.ModelPath, "resource/template/*"))
 	app.StaticFS(g.TENANCY_CONFIG.Local.Path, http.Dir(g.TENANCY_CONFIG.Local.Path)) // 为用户头像和文件提供静态地址
 	// Router.Use(middleware.LoadTls())  // 打开就能玩https了
 	g.TENANCY_LOG.Info("use middleware logger")

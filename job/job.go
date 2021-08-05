@@ -69,7 +69,7 @@ func Timer() {
 
 		// 定时获取微信平台证书
 		g.TENANCY_Timer.AddTaskByFunc("CheckOrdersPayStatus", EveryTeenHour, func() {
-			wechatConf, err := service.GetWechatPay()
+			wechatConf, err := service.GetWechatPayConfig()
 			if err != nil {
 				g.TENANCY_LOG.Info("定时获取微信平台证书", zap.String("获取微信支付配置错误", err.Error()))
 				return
