@@ -153,7 +153,7 @@ var configs = []model.SysConfig{
 	{SysConfigCategoryID: 15, ConfigName: "支付宝支付状态", ConfigKey: "alipay_open", ConfigType: "radio", ConfigRule: "0:关闭;1:开启", Required: 2, Info: "是否开启支付宝支付", Sort: 0, UserType: 2, Status: 1},
 	{SysConfigCategoryID: 15, ConfigName: "支付宝支付环境", ConfigKey: "alipay_env", ConfigType: "radio", ConfigRule: "0:沙箱;1:正式", Required: 2, Info: "支付宝支付环境，是否使用沙箱环境", Sort: 0, UserType: 2, Status: 1},
 	{SysConfigCategoryID: 15, ConfigName: "支付宝app_id", ConfigKey: "alipay_app_id", ConfigType: "input", ConfigRule: "", Required: 2, Info: "支付宝支付appid", Sort: 0, UserType: 2, Status: 1},
-	// {SysConfigCategoryID: 15, ConfigName: "支付宝公钥", ConfigKey: "alipay_public_key", ConfigType: "input", ConfigRule: "", Required: 2, Info: "支付宝支付应用公钥", Sort: 0, UserType: 2, Status: 1},
+	{SysConfigCategoryID: 15, ConfigName: "支付宝公钥", ConfigKey: "alipay_public_key", ConfigType: "input", ConfigRule: "", Required: 2, Info: "支付宝支付应用公钥", Sort: 0, UserType: 2, Status: 1},
 	{SysConfigCategoryID: 15, ConfigName: "支付密钥", ConfigKey: "alipay_private_key", ConfigType: "input", ConfigRule: "", Required: 2, Info: "支付宝支付应用密钥", Sort: 0, UserType: 2, Status: 1},
 
 	{SysConfigCategoryID: 5, ConfigName: "打印机开启", ConfigKey: "printing_status", ConfigType: "radio", ConfigRule: "0:关闭;1:开启", Required: 2, Info: "", Sort: 0, UserType: 1, Status: 1},

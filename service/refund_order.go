@@ -500,3 +500,33 @@ func AddRefundOrderStatus(id uint, cahngeType, changeMessage string) error {
 	}
 	return g.TENANCY_DB.Model(&model.RefundStatus{}).Create(&status).Error
 }
+
+func ChangeReturnOrderStatusByOrderSn(status int, orderSn, changeType, changeMessage string) error {
+	// orders, err := GetNoPayOrdersByOrderSn(orderSn)
+	// if err != nil {
+	// 	return err
+	// }
+	// if len(orders) != 1 {
+	// 	return fmt.Errorf("%s 订单号重复生产 %d 个订单", orderSn, len(orders))
+	// }
+	// err = ChangeOrderStatusByOrderId(orders[0].ID, status, changeType, changeMessage)
+	// if err != nil {
+	// 	return err
+	// }
+	return nil
+}
+
+func ChangeReturnOrderStatusByReturnOrderSn(status int, orderSn, changeType, changeMessage string) error {
+	// orders, err := GetNoPayOrdersByOrderSn(orderSn)
+	// if err != nil {
+	// 	return err
+	// }
+	// if len(orders) != 1 {
+	// 	return fmt.Errorf("%s 订单号重复生产 %d 个订单", orderSn, len(orders))
+	// }
+	// err = ChangeOrderStatusByOrderId(orders[0].ID, status, changeType, changeMessage)
+	// if err != nil {
+	// 	return err
+	// }
+	return nil
+}

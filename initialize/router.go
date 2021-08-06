@@ -79,6 +79,7 @@ func Routers(app *gin.Engine) {
 			admin.InitUserGroupRouter(AdminGroup)      // 用户分组路由
 			admin.InitUserLabelRouter(AdminGroup)      // 用户标签路由
 		}
+		
 		AdminLogGroup := V1Group.Group(g.TENANCY_CONFIG.System.AdminPreix, middleware.IsAdmin(), middleware.CasbinHandler())
 		{
 			admin.InitSysOperationRecordRouter(AdminLogGroup) // 操作记录

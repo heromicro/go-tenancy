@@ -5,6 +5,8 @@ import (
 	"strings"
 
 	"github.com/gin-gonic/gin"
+	"github.com/go-pay/gopay"
+	"github.com/go-pay/gopay/wechat/v3"
 	"github.com/snowlyg/go-tenancy/g"
 	"github.com/snowlyg/go-tenancy/model/request"
 	"github.com/snowlyg/go-tenancy/model/response"
@@ -29,7 +31,7 @@ func PayOrder(ctx *gin.Context) {
 				response.FailWithMessage("操作失败:"+err.Error(), ctx)
 				return
 			} else {
-				ctx.Redirect(302, url)
+				ctx.Redirect(http.StatusFound, url)
 				return
 			}
 		} else {
@@ -62,7 +64,25 @@ func PayOrder(ctx *gin.Context) {
 				"signType":  res.JSAPIPayParams.SignType, //微信签名方式：
 				"paySign":   res.JSAPIPayParams.PaySign,  //微信签名
 			}
-			ctx.HTML(200, "wechat_pay.tmpl", jsapi)
+			ctx.HTML(http.StatusOK, "wechat_pay.tmpl", jsapi)
 		}
+	}
+}
+
+func NotifyAliPay(ctx *gin.Context) {
+	if err := service.NotifyAliPay(ctx); err != nil {
+		g.TENANCY_LOG.Error("支付宝支付异步通知失败!", zap.Any("err", err))
+		response.FailWithMessage("支付宝支付异步通知失败:"+err.Error(), ctx)
+	} else {
+		ctx.String(http.StatusOK, "%s", "success")
+	}
+}
+
+func NotifyWechatPay(ctx *gin.Context) {
+	if err := service.NotifyWechatPay(ctx); err != nil {
+		g.TENANCY_LOG.Error("微信支付异步通知失败!", zap.Any("err", err))
+		response.FailWithMessage("微信支付异步通知失败:"+err.Error(), ctx)
+	} else {
+		ctx.JSON(http.StatusOK, &wechat.V3NotifyRsp{Code: gopay.SUCCESS, Message: "成功"})
 	}
 }

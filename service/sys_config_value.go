@@ -47,12 +47,12 @@ func GetSeitURL() (string, error) {
 	return GetConfigValueByKey("site_url")
 }
 
-func GetPayNotifyUrl() (string, error) {
+func GetPayNotifyUrl(notifyType string) (string, error) {
 	seitUrl, err := GetSeitURL()
 	if err != nil {
 		return "", fmt.Errorf("获取站点url错误 %w", err)
 	}
-	return fmt.Sprintf("%s/%s", seitUrl, "v1/pay/payNotify"), nil
+	return fmt.Sprintf("%s/%s/%s", seitUrl, "v1/pay/notify", notifyType), nil
 }
 
 func GetSeitName() (string, error) {
@@ -68,6 +68,7 @@ type AlipayConfig struct {
 	AlipayEnv        bool
 	AlipayAppId      string
 	AlipayPrivateKey string
+	AlipayPublicKey  string
 }
 
 func GetAliPayConfig() (AlipayConfig, error) {
@@ -93,6 +94,9 @@ func GetAliPayConfig() (AlipayConfig, error) {
 		}
 		if alipayConfig.ConfigKey == "alipay_private_key" {
 			config.AlipayPrivateKey = alipayConfig.Value
+		}
+		if alipayConfig.ConfigKey == "alipay_public_key" {
+			config.AlipayPublicKey = alipayConfig.Value
 		}
 	}
 	if !config.AlipayOpen {

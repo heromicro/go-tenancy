@@ -192,13 +192,10 @@ func getOrderConditionByStatus(status string) response.OrderCondition {
 	return conditions[0]
 }
 
-func GetOrderByOrderIdUserIdAndTenancyId(orderId, tenancyId, userId uint, orderType int) (model.Order, error) {
+func GetOrderByOrderId(orderId uint) (model.Order, error) {
 	var order model.Order
 	err := g.TENANCY_DB.Model(&model.Order{}).
-		Where("sys_tenancy_id = ?", tenancyId).
 		Where("id = ?", orderId).
-		Where("sys_user_id = ?", userId).
-		Where("order_type = ?", orderType).
 		Where("is_system_del = ?", g.StatusFalse).
 		Where("is_del = ?", g.StatusFalse).
 		First(&order).Error
@@ -656,7 +653,7 @@ func CreateOrder(req request.CreateOrder, tenancyId, userId uint, tenancyName st
 
 		// 订单状态
 		orderStatus := model.OrderStatus{ChangeType: "create", ChangeMessage: "生成订单", ChangeTime: time.Now(), OrderID: order.ID}
-		err = tx.Create(&orderStatus).Error
+		err = CreateOrderStatus(tx, orderStatus)
 		if err != nil {
 			return err
 		}
@@ -682,7 +679,6 @@ func CreateOrder(req request.CreateOrder, tenancyId, userId uint, tenancyName st
 		if err != nil {
 			return err
 		}
-
 		// 减库存
 		for _, cartProduct := range orderInfo.Products {
 			stock := cartProduct.AttrValue.Stock - cartProduct.CartNum
@@ -691,12 +687,10 @@ func CreateOrder(req request.CreateOrder, tenancyId, userId uint, tenancyName st
 				return err
 			}
 		}
-
 		png, err = GetQrCode(order.ID, tenancyId, userId, order.OrderType)
 		if err != nil {
 			return err
 		}
-
 		return nil
 	})
 	if err != nil {
@@ -771,25 +765,67 @@ func GetNoPayOrders() ([]model.Order, error) {
 	return orders, nil
 }
 
-func ChangeOrderStatusByOrderId(orderId, tenancyId, userId uint, orderType, status int, changeType, changeMessage string) error {
+func CreateOrderStatus(db *gorm.DB, orderStatus model.OrderStatus) error {
+	err := db.Create(&orderStatus).Error
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func UpdateOrderStatusByOrderId(db *gorm.DB, orderId uint, status int) error {
+	err := db.Model(&model.Order{}).
+		Where("id = ?", orderId).
+		Where("is_system_del = ?", g.StatusFalse).
+		Where("is_del = ?", g.StatusFalse).
+		Update("status", status).Error
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func ChangeOrderStatusByOrderId(orderId uint, status int, changeType, changeMessage string) error {
 	err := g.TENANCY_DB.Transaction(func(tx *gorm.DB) error {
-		err := tx.Model(&model.Order{}).Where("sys_tenancy_id = ?", tenancyId).
-			Where("id = ?", orderId).
-			Where("sys_user_id = ?", userId).
-			Where("order_type = ?", orderType).
-			Where("is_system_del = ?", g.StatusFalse).
-			Where("is_del = ?", g.StatusFalse).
-			Update("status", status).Error
+		err := UpdateOrderStatusByOrderId(tx, orderId, status)
 		if err != nil {
 			return err
 		}
 		orderStatus := model.OrderStatus{ChangeType: changeType, ChangeMessage: changeMessage, ChangeTime: time.Now(), OrderID: orderId}
-		err = tx.Create(&orderStatus).Error
+		err = CreateOrderStatus(tx, orderStatus)
 		if err != nil {
 			return err
 		}
 		return nil
 	})
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func GetNoPayOrdersByOrderSn(orderSn string) ([]model.Order, error) {
+	var orders []model.Order
+	err := g.TENANCY_DB.Model(&model.Order{}).Where("order_sn = ?", orderSn).
+		Where("is_system_del = ?", g.StatusFalse).
+		Where("is_del = ?", g.StatusFalse).
+		Where("status = ?", model.OrderStatusNoPay).
+		Find(&orders).Error
+	if err != nil {
+		return nil, err
+	}
+	return orders, nil
+}
+
+func ChangeOrderStatusByOrderSn(status int, orderSn, changeType, changeMessage string) error {
+	orders, err := GetNoPayOrdersByOrderSn(orderSn)
+	if err != nil {
+		return err
+	}
+	if len(orders) != 1 {
+		return fmt.Errorf("%s 订单号重复生产 %d 个订单", orderSn, len(orders))
+	}
+	err = ChangeOrderStatusByOrderId(orders[0].ID, status, changeType, changeMessage)
 	if err != nil {
 		return err
 	}

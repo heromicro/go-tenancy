@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"github.com/chindeo/pkg/file"
+	"github.com/gin-gonic/gin"
 	"github.com/go-pay/gopay"
 	"github.com/go-pay/gopay/alipay"
 	v2 "github.com/go-pay/gopay/wechat"
@@ -17,6 +18,7 @@ import (
 	"github.com/snowlyg/go-tenancy/model/request"
 	"github.com/snowlyg/go-tenancy/model/response"
 	"github.com/snowlyg/go-tenancy/utils"
+	"go.uber.org/zap"
 	"gorm.io/gorm"
 )
 
@@ -32,7 +34,7 @@ func PayOrder(req request.PayOrder) (response.PayOrder, error) {
 	if tenancy.State == g.StatusFalse {
 		return res, fmt.Errorf("当前商户已经停业")
 	}
-	order, err := GetOrderByOrderIdUserIdAndTenancyId(req.OrderId, req.TenancyId, req.UserId, req.OrderType)
+	order, err := GetOrderByOrderId(req.OrderId)
 	if errors.Is(err, gorm.ErrRecordNotFound) {
 		return res, fmt.Errorf("当前订单不存在")
 	} else if err != nil {
@@ -97,7 +99,7 @@ func WechatPay(order model.Order, tenancyName, openid string) (response.PayOrder
 	client.DebugSwitch = gopay.DebugOff
 	expire := time.Now().Add(10 * time.Minute).Format(time.RFC3339)
 
-	notifyUrl, err := GetPayNotifyUrl()
+	notifyUrl, err := GetPayNotifyUrl("wechat")
 	if err != nil {
 		return res, err
 	}
@@ -178,7 +180,7 @@ func AliPayClient() (*alipay.Client, error) {
 	if err != nil {
 		return nil, fmt.Errorf("获取支付宝配置错误 %w", err)
 	}
-	notifyUrl, err := GetPayNotifyUrl()
+	notifyUrl, err := GetPayNotifyUrl("ali")
 	if err != nil {
 		return nil, err
 	}
@@ -227,4 +229,63 @@ func GetOpenId(code string) (string, error) {
 		return "", fmt.Errorf("%s", accessToken.Errmsg)
 	}
 	return accessToken.Openid, nil
+}
+
+// NotifyAliPay
+// 支付宝异步通知回调 total_amount=2.00&buyer_id=20****7&body=大乐透2.1&trade_no=2016071921001003030200089909&refund_fee=0.00&notify_time=2016-07-19 14:10:49&subject=大乐透2.1&sign_type=RSA2&charset=utf-8&notify_type=trade_status_sync&out_trade_no=0719141034-6418&gmt_close=2016-07-19 14:10:46&gmt_payment=2016-07-19 14:10:47&trade_status=TRADE_SUCCESS&version=1.0&sign=kPbQIjX+xQc8F0/A6/AocELIjhhZnGbcBN6G4MM/HmfWL4ZiHM6fWl5NQhzXJusaklZ1LFuMo+lHQUELAYeugH8LYFvxnNajOvZhuxNFbN2LhF0l/KL8ANtj8oyPM4NN7Qft2kWJTDJUpQOzCzNnV9hDxh5AaT9FPqRS6ZKxnzM=&gmt_create=2016-07-19 14:10:44&app_id=20151*****3&seller_id=20881021****8&notify_id=4a91b7a78a503640467525113fb7d8bg8e
+func NotifyAliPay(ctx *gin.Context) error {
+	notifyReq, err := alipay.ParseNotifyToBodyMap(ctx.Request)
+	if err != nil {
+		return err
+	}
+	alipayConf, err := GetAliPayConfig()
+	if err != nil {
+		return err
+	}
+	// 支付宝异步通知验签（公钥模式）
+	ok, err := alipay.VerifySign(alipayConf.AlipayPublicKey, notifyReq)
+	if err != nil {
+		return err
+	}
+	if !ok {
+		return fmt.Errorf("支付宝异步通知回调验签失败 %w", err)
+	}
+	orderSn := notifyReq["out_trade_no"].(string)     //商户订单号。原支付请求的商户订单号。
+	outBizNo := notifyReq["out_biz_no"].(string)      //商户业务号。商户业务 ID，主要是退款通知中返回退款申请的流水号。
+	refundFee := notifyReq["refund_fee"].(float64)    //总退款金额
+	gmtRefund := notifyReq["gmt_refund"].(string)     //交易退款时间
+	tradeStatus := notifyReq["trade_status"].(string) //交易状态
+	// 退款
+	if outBizNo != "" && refundFee != 0 && gmtRefund != "" {
+		if tradeStatus != "TRADE_SUCCESS" && tradeStatus != "TRADE_CLOSED" {
+			return fmt.Errorf("退款: %s 支付宝异步通知回调返回状态: %s", orderSn, tradeStatus)
+		}
+
+		// 部分退款
+		if tradeStatus == "TRADE_SUCCESS" {
+			err := ChangeReturnOrderStatusByReturnOrderSn(model.RefundStatusEnd, outBizNo, "refund_success", "退款成功")
+			if err != nil {
+				g.TENANCY_LOG.Error("支付: 支付宝支付异步通知回调错误", zap.String(orderSn, err.Error()))
+			}
+		} else if tradeStatus == "TRADE_CLOSED" { // 全部退款
+			err := ChangeReturnOrderStatusByOrderSn(model.RefundStatusEnd, orderSn, "refund_success", "退款成功")
+			if err != nil {
+				g.TENANCY_LOG.Error("支付: 支付宝支付异步通知回调错误", zap.String(orderSn, err.Error()))
+			}
+		}
+	} else { // 支付
+		if tradeStatus != "TRADE_SUCCESS" && tradeStatus != "TRADE_FINISHED" {
+			return fmt.Errorf("支付: %s 支付宝异步通知回调返回状态: %s", orderSn, tradeStatus)
+		}
+		err := ChangeOrderStatusByOrderSn(model.OrderStatusNoDeliver, orderSn, "pay_success", "订单支付成功")
+		if err != nil {
+			g.TENANCY_LOG.Error("支付: 支付宝支付异步通知回调错误", zap.String(orderSn, err.Error()))
+		}
+	}
+
+	return nil
+}
+
+func NotifyWechatPay(ctx *gin.Context) error {
+	return nil
 }
