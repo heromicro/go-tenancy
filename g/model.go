@@ -23,7 +23,7 @@ var node *snowflake.Node
 func CreateOrderSn(orderType interface{}) string {
 	id := fmt.Sprintf("%d", getNodeId().Generate().Int64())
 	now := time.Now().Format("20060102150405")
-	return fmt.Sprintf("%v%s%s", orderType, now, id[0:len(id)-2])
+	return fmt.Sprintf("%v%s%s", orderType, now, id[2:])
 }
 
 func getNodeId() *snowflake.Node {
