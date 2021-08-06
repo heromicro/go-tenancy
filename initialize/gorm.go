@@ -82,6 +82,8 @@ func MysqlTables(db *gorm.DB) {
 		model.UserRecharge{},
 		model.UserRelation{},
 		model.UserVisit{},
+		model.Mqtt{},
+		model.MqttRecord{},
 	)
 	if err != nil {
 		g.TENANCY_LOG.Error("register table failed", zap.Any("err", err))

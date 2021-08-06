@@ -1,7 +1,6 @@
 package service
 
 import (
-	"encoding/json"
 	"errors"
 	"fmt"
 
@@ -9,60 +8,54 @@ import (
 	"github.com/snowlyg/go-tenancy/g"
 	"github.com/snowlyg/go-tenancy/model"
 	"github.com/snowlyg/go-tenancy/model/request"
+	"github.com/snowlyg/go-tenancy/utils"
 	"gorm.io/gorm"
 )
 
 // GetMqttMap
 func GetMqttMap(id uint, ctx *gin.Context) (Form, error) {
 	var form Form
-	var formStr string
+	validatorHost := map[string]interface{}{"message": "请输入host地址", "required": true, "type": "string", "trigger": "change"}
+	validatorPort := map[string]interface{}{"message": "请输入端口", "required": true, "type": "number", "trigger": "change"}
+	validatorUsername := map[string]interface{}{"message": "请输入用户名", "required": true, "type": "string", "trigger": "change"}
+	validatorPassword := map[string]interface{}{"message": "请输入密码", "required": true, "type": "string", "trigger": "change"}
 	if id > 0 {
 		mqtt, err := GetMqttByID(id)
 		if err != nil {
 			return form, err
 		}
-		formStr = fmt.Sprintf(`{"rule":[{"type":"input","field":"name","value":"%s","title":"快递公司名称","props":{"type":"text","placeholder":"请输入快递公司名称"},"validate":[{"message":"请输入快递公司名称","required":true,"type":"string","trigger":"change"}]},{"type":"input","field":"code","value":"%s","title":"快递公司编码","props":{"type":"text","placeholder":"请输入快递公司编码"},"validate":[{"message":"请输入快递公司编码","required":true,"type":"string","trigger":"change"}]},{"type":"switch","field":"status","value":%d,"title":"是否显示","props":{"activeValue":1,"inactiveValue":2,"inactiveText":"关闭","activeText":"开启"}},{"type":"inputNumber","field":"sort","value":%d,"title":"排序","props":{"placeholder":"请输入排序"}}],"action":"\/sys\/store\/mqtt\/create.html","method":"PUT","title":"添加快递公司","config":{}}`, mqtt.Name, mqtt.Code, mqtt.Status, mqtt.Sort)
 
+		form = Form{Method: "PUT", Title: "修改信息"}
+		form.AddRule(*NewInput("HOST", "host", "请输入host地址", mqtt.Host).AddValidator(validatorHost)).
+			AddRule(*NewInput("PORT", "port", "请输入端口", mqtt.Port).AddValidator(validatorPort)).
+			AddRule(*NewInput("用户名", "username", "请输入用户名", mqtt.Username).AddValidator(validatorUsername)).
+			AddRule(*NewInput("密码", "password", "请输入密码", mqtt.Password).AddValidator(validatorPassword)).
+			AddRule(*NewSwitch("是否显示", "status", mqtt.Status))
 	} else {
-		formStr = fmt.Sprintf(`{"rule":[{"type":"input","field":"name","value":"%s","title":"快递公司名称","props":{"type":"text","placeholder":"请输入快递公司名称"},"validate":[{"message":"请输入快递公司名称","required":true,"type":"string","trigger":"change"}]},{"type":"input","field":"code","value":"%s","title":"快递公司编码","props":{"type":"text","placeholder":"请输入快递公司编码"},"validate":[{"message":"请输入快递公司编码","required":true,"type":"string","trigger":"change"}]},{"type":"switch","field":"status","value":%d,"title":"是否显示","props":{"activeValue":1,"inactiveValue":2,"inactiveText":"关闭","activeText":"开启"}},{"type":"inputNumber","field":"sort","value":%d,"title":"排序","props":{"placeholder":"请输入排序"}}],"action":"\/sys\/store\/mqtt\/create.html","method":"POST","title":"添加快递公司","config":{}}`, "", "", 1, 0)
-	}
-	err := json.Unmarshal([]byte(formStr), &form)
-	if err != nil {
-		return form, err
+		form = Form{Method: "POST", Title: "添加信息"}
+		form.AddRule(*NewInput("HOST", "host", "请输入host地址", "").AddValidator(validatorHost)).
+			AddRule(*NewInput("PORT", "port", "请输入端口", 1883).AddValidator(validatorPort)).
+			AddRule(*NewInput("用户名", "username", "请输入用户名", "Chindeo").AddValidator(validatorUsername)).
+			AddRule(*NewInput("密码", "password", "请输入密码", "P@ssw0rd").AddValidator(validatorPassword)).
+			AddRule(*NewSwitch("是否显示", "status", 0))
 	}
 	if id > 0 {
 		form.SetAction(fmt.Sprintf("/mqtt/updateMqtt/%d", id), ctx)
 	} else {
 		form.SetAction("/mqtt/createMqtt", ctx)
 	}
-	return form, err
-}
-
-// GetMqttOptions
-func GetMqttOptions() ([]Option, error) {
-	var options []Option
-	var opts []StringOpt
-	err := g.TENANCY_DB.Model(&model.Mqtt{}).Select("code as value,name as label").Where("status = ?", g.StatusTrue).Find(&opts).Error
-	if err != nil {
-		return options, err
-	}
-	options = append(options, Option{Label: "请选择", Value: ""})
-
-	for _, opt := range opts {
-		options = append(options, Option{Label: opt.Label, Value: opt.Value})
-	}
-
-	return options, err
+	return form, nil
 }
 
 // CreateMqtt
-func CreateMqtt(mqtt model.Mqtt) (model.Mqtt, error) {
-	err := g.TENANCY_DB.Where("code = ?", mqtt.Code).First(&mqtt).Error
+func CreateMqtt(mqtt model.Mqtt) (uint, error) {
+	mqtt.ClientID = utils.UUIDV5().String()
+	err := g.TENANCY_DB.Where("host = ?", mqtt.Host).First(&mqtt).Error
 	if !errors.Is(err, gorm.ErrRecordNotFound) {
-		return mqtt, errors.New("物流代码已被注冊")
+		return 0, errors.New("mqtt地址已被注冊")
 	}
 	err = g.TENANCY_DB.Create(&mqtt).Error
-	return mqtt, err
+	return mqtt.ID, err
 }
 
 // GetMqttByID
@@ -72,26 +65,19 @@ func GetMqttByID(id uint) (model.Mqtt, error) {
 	return mqtt, err
 }
 
-// GetMqttByCode
-// TODO:根据单号获取物流信息，需要对接第三方平台
-func GetMqttByCode(code string) (model.Mqtt, error) {
-	var mqtt model.Mqtt
-	return mqtt, nil
-}
-
 // ChangeMqttStatus
 func ChangeMqttStatus(changeStatus request.ChangeStatus) error {
 	return g.TENANCY_DB.Model(&model.Mqtt{}).Where("id = ?", changeStatus.Id).Update("status", changeStatus.Status).Error
 }
 
 // UpdateMqtt
-func UpdateMqtt(mqtt model.Mqtt, id uint) (model.Mqtt, error) {
-	err := g.TENANCY_DB.Where("code = ?", mqtt.Code).Not("id = ?", id).First(&mqtt).Error
+func UpdateMqtt(mqtt model.Mqtt, id uint) error {
+	err := g.TENANCY_DB.Where("host = ?", mqtt.Host).Not("id = ?", id).First(&mqtt).Error
 	if !errors.Is(err, gorm.ErrRecordNotFound) {
-		return mqtt, errors.New("物流代码已被注冊")
+		return errors.New("mqtt地址已被注冊")
 	}
-	err = g.TENANCY_DB.Where("id = ?", id).Updates(mqtt).Error
-	return mqtt, err
+	err = g.TENANCY_DB.Where("id = ?", id).Omit("client_id").Updates(mqtt).Error
+	return err
 }
 
 // DeleteMqtt
@@ -100,14 +86,26 @@ func DeleteMqtt(id uint) error {
 }
 
 // GetMqttInfoList
-func GetMqttInfoList(info request.MqttPageInfo) ([]model.Mqtt, int64, error) {
+func GetMqttInfoList(info request.PageInfo) ([]model.Mqtt, int64, error) {
 	var mqttList []model.Mqtt
 	limit := info.PageSize
 	offset := info.PageSize * (info.Page - 1)
 	db := g.TENANCY_DB.Model(&model.Mqtt{})
-	if info.Name != "" {
-		db = db.Where(g.TENANCY_DB.Where("name like ?", info.Name+"%").Or("code like ?", info.Name+"%"))
+	var total int64
+	err := db.Count(&total).Error
+	if err != nil {
+		return mqttList, total, err
 	}
+	err = db.Limit(limit).Offset(offset).Find(&mqttList).Error
+	return mqttList, total, err
+}
+
+// GetMqttRecordList
+func GetMqttRecordList(info request.PageInfo) ([]model.MqttRecord, int64, error) {
+	var mqttList []model.MqttRecord
+	limit := info.PageSize
+	offset := info.PageSize * (info.Page - 1)
+	db := g.TENANCY_DB.Model(&model.MqttRecord{})
 	var total int64
 	err := db.Count(&total).Error
 	if err != nil {

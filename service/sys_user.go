@@ -24,40 +24,9 @@ func ChangeProfileMap(ctx *gin.Context) (Form, error) {
 	if err != nil {
 		return form, err
 	}
-	form = Form{
-		Rule: []Rule{
-			{
-				Title: "管理员姓名",
-				Type:  "input",
-				Field: "nickName",
-				Value: user.AdminInfo.NickName,
-				Props: map[string]interface{}{
-					"type":        "text",
-					"placeholder": "请输入管理员姓名"},
-				Validate: []map[string]interface{}{
-					{
-						"message":  "请输入管理员姓名",
-						"required": true,
-						"type":     "string",
-						"trigger":  "change",
-					},
-				},
-			},
-			{
-				Title: "联系电话",
-				Type:  "input",
-				Field: "phone",
-				Value: user.AdminInfo.Phone,
-				Props: map[string]interface{}{
-					"type":        "text",
-					"placeholder": "请输入联系电话",
-				},
-			},
-		},
-		Method: "POST",
-		Title:  "修改信息",
-	}
-
+	form = Form{Method: "POST", Title: "修改信息"}
+	form.AddRule(*NewInput("管理员姓名", "nickName", "请输入管理员姓名", user.AdminInfo.NickName)).
+		AddRule(*NewInput("联系电话", "phone", "请输入联系电话", user.AdminInfo.Phone))
 	form.SetAction("/user/changeProfile", ctx)
 	return form, nil
 }

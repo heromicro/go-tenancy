@@ -169,6 +169,8 @@ func InitDB(conf request.InitDB) error {
 		model.UserRecharge{},
 		model.UserRelation{},
 		model.UserVisit{},
+		model.Mqtt{},
+		model.MqttRecord{},
 	)
 	if err != nil {
 		_ = WriteConfig(g.TENANCY_VP, BaseMysql)
@@ -216,6 +218,7 @@ func InitDB(conf request.InitDB) error {
 		source.Address,
 		source.Receipt,
 		source.Patient,
+		source.Mqtt,
 	)
 	if err != nil {
 		_ = WriteConfig(g.TENANCY_VP, BaseMysql)

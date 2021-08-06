@@ -23,7 +23,6 @@ require (
 	github.com/go-playground/validator/v10 v10.6.1
 	github.com/go-redis/redis/v8 v8.8.2
 	github.com/go-sql-driver/mysql v1.6.0
-	github.com/gofrs/uuid v4.0.0+incompatible // indirect
 	github.com/google/uuid v1.2.0 // indirect
 	github.com/gookit/color v1.4.2
 	github.com/imkira/go-interpol v1.1.0 // indirect

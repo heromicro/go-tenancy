@@ -43,11 +43,11 @@ func CreateMqtt(ctx *gin.Context) {
 		return
 	}
 
-	if returnMqtt, err := service.CreateMqtt(brand); err != nil {
+	if id, err := service.CreateMqtt(brand); err != nil {
 		g.TENANCY_LOG.Error("创建失败!", zap.Any("err", err))
 		response.FailWithMessage("添加失败:"+err.Error(), ctx)
 	} else {
-		response.OkWithDetailed(returnMqtt, "创建成功", ctx)
+		response.OkWithDetailed(gin.H{"id": id}, "创建成功", ctx)
 	}
 }
 
@@ -63,11 +63,11 @@ func UpdateMqtt(ctx *gin.Context) {
 		response.FailWithMessage(errs.Error(), ctx)
 		return
 	}
-	if returnMqtt, err := service.UpdateMqtt(brand, req.Id); err != nil {
+	if err := service.UpdateMqtt(brand, req.Id); err != nil {
 		g.TENANCY_LOG.Error("更新失败!", zap.Any("err", err))
 		response.FailWithMessage("更新失败:"+err.Error(), ctx)
 	} else {
-		response.OkWithDetailed(returnMqtt, "更新成功", ctx)
+		response.OkWithMessage("更新成功", ctx)
 	}
 }
 
@@ -89,12 +89,32 @@ func ChangeMqttStatus(ctx *gin.Context) {
 
 // GetMqttList
 func GetMqttList(ctx *gin.Context) {
-	var pageInfo request.MqttPageInfo
+	var pageInfo request.PageInfo
 	if errs := ctx.ShouldBindJSON(&pageInfo); errs != nil {
 		response.FailWithMessage(errs.Error(), ctx)
 		return
 	}
 	if list, total, err := service.GetMqttInfoList(pageInfo); err != nil {
+		g.TENANCY_LOG.Error("获取失败!", zap.Any("err", err))
+		response.FailWithMessage("获取失败:"+err.Error(), ctx)
+	} else {
+		response.OkWithDetailed(response.PageResult{
+			List:     list,
+			Total:    total,
+			Page:     pageInfo.Page,
+			PageSize: pageInfo.PageSize,
+		}, "获取成功", ctx)
+	}
+}
+
+// GetMqttRecordList
+func GetMqttRecordList(ctx *gin.Context) {
+	var pageInfo request.PageInfo
+	if errs := ctx.ShouldBindJSON(&pageInfo); errs != nil {
+		response.FailWithMessage(errs.Error(), ctx)
+		return
+	}
+	if list, total, err := service.GetMqttRecordList(pageInfo); err != nil {
 		g.TENANCY_LOG.Error("获取失败!", zap.Any("err", err))
 		response.FailWithMessage("获取失败:"+err.Error(), ctx)
 	} else {

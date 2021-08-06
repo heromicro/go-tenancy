@@ -2,9 +2,9 @@ package source
 
 import (
 	"github.com/gookit/color"
-	uuid "github.com/satori/go.uuid"
 	"github.com/snowlyg/go-tenancy/g"
 	"github.com/snowlyg/go-tenancy/model"
+	"github.com/snowlyg/go-tenancy/utils"
 	"gorm.io/gorm"
 )
 
@@ -13,7 +13,7 @@ var Mini = new(mini)
 type mini struct{}
 
 var minis = []model.SysMini{
-	{UUID: uuid.NewV4(), Name: "中德澳上线护理商城", AppID: "YJ3s1abt7MAfT6gWVKoD", AppSecret: "tRE49zaf5NCm6PidFZoaFg3u4WCHDok7fxgL63yV0pF4AM", Remark: "中德澳上线护理商城"},
+	{UUID: utils.UUIDV5(), Name: "中德澳上线护理商城", AppID: "YJ3s1abt7MAfT6gWVKoD", AppSecret: "tRE49zaf5NCm6PidFZoaFg3u4WCHDok7fxgL63yV0pF4AM", Remark: "中德澳上线护理商城"},
 }
 
 func (m *mini) Init() error {

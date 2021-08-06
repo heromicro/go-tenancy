@@ -293,11 +293,12 @@ func InitOrderRouter(Router *gin.RouterGroup) {
 	}
 }
 
-// mqtt 管理
+// MQTT 管理
 func InitMqttRouter(Router *gin.RouterGroup) {
 	MqttRouter := Router.Group("/mqtt")
 	{
 		MqttRouter.POST("/getMqttList", admin.GetMqttList)
+		MqttRouter.POST("/getMqttRecordList", admin.GetMqttRecordList)
 		MqttRouter.GET("/getCreateMqttMap", admin.GetCreateMqttMap)
 		MqttRouter.GET("/getUpdateMqttMap/:id", admin.GetUpdateMqttMap)
 		MqttRouter.POST("/createMqtt", admin.CreateMqtt)

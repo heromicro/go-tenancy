@@ -18,6 +18,48 @@ type Form struct {
 	Headers []map[string]interface{} `json:"headers,omitempty"`
 }
 
+func (rule *Rule) AddValidator(validator map[string]interface{}) *Rule {
+	rule.Validate = append(rule.Validate, validator)
+	return rule
+}
+func (rule *Rule) AddProps(props map[string]interface{}) *Rule {
+	rule.Props = props
+	return rule
+}
+
+func NewInput(title, field, placeholder string, value interface{}) *Rule {
+	return &Rule{
+		Title: title,
+		Type:  "input",
+		Field: field,
+		Value: value,
+		Props: map[string]interface{}{
+			"type":        "text",
+			"placeholder": placeholder,
+		},
+	}
+}
+
+func NewSwitch(title, field string, value interface{}) *Rule {
+	return &Rule{
+		Title: title,
+		Type:  "switch",
+		Field: field,
+		Value: value,
+		Props: map[string]interface{}{
+			"activeValue":   1,
+			"inactiveValue": 2,
+			"inactiveText":  "关闭",
+			"activeText":    "开启",
+		},
+	}
+}
+
+func (form *Form) AddRule(rule Rule) *Form {
+	form.Rule = append(form.Rule, rule)
+	return form
+}
+
 func (form *Form) SetAction(uri string, ctx *gin.Context) {
 	form.Action = SetUrl(uri, ctx)
 }
@@ -31,8 +73,7 @@ func SetUrl(uri string, ctx *gin.Context) string {
 	return ""
 }
 
-type Config struct {
-}
+type Config struct{}
 
 type Rule struct {
 	Title    string                   `json:"title"`

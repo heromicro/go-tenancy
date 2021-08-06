@@ -3,11 +3,11 @@ package service
 import (
 	"errors"
 
-	uuid "github.com/satori/go.uuid"
 	"github.com/snowlyg/go-tenancy/g"
 	"github.com/snowlyg/go-tenancy/model"
 	"github.com/snowlyg/go-tenancy/model/request"
 	"github.com/snowlyg/go-tenancy/model/response"
+	"github.com/snowlyg/go-tenancy/utils"
 	"gorm.io/gorm"
 )
 
@@ -18,7 +18,7 @@ func CreateMini(m request.CreateSysMini) (model.SysMini, error) {
 	if !errors.Is(err, gorm.ErrRecordNotFound) {
 		return mini, errors.New("商户名称已被注冊")
 	}
-	mini.UUID = uuid.NewV4()
+	mini.UUID = utils.UUIDV5()
 	mini.Name = m.Name
 	mini.AppID = m.AppID
 	mini.AppSecret = m.AppSecret

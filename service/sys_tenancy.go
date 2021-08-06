@@ -8,7 +8,6 @@ import (
 	"time"
 
 	"github.com/gin-gonic/gin"
-	uuid "github.com/satori/go.uuid"
 	"github.com/snowlyg/go-tenancy/g"
 	"github.com/snowlyg/go-tenancy/model"
 	"github.com/snowlyg/go-tenancy/model/request"
@@ -101,7 +100,7 @@ func CreateTenancy(req request.CreateTenancy) (uint, error) {
 	}
 
 	err = g.TENANCY_DB.Transaction(func(tx *gorm.DB) error {
-		req.SysTenancy.UUID = uuid.NewV4()
+		req.SysTenancy.UUID = utils.UUIDV5()
 		req.SysTenancy.Status = g.StatusTrue
 		req.SysTenancy.State = g.StatusTrue
 		err = tx.Model(&model.SysTenancy{}).Create(&req.SysTenancy).Error
