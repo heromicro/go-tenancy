@@ -293,6 +293,21 @@ func InitOrderRouter(Router *gin.RouterGroup) {
 	}
 }
 
+// mqtt 管理
+func InitMqttRouter(Router *gin.RouterGroup) {
+	MqttRouter := Router.Group("/mqtt")
+	{
+		MqttRouter.POST("/getMqttList", admin.GetMqttList)
+		MqttRouter.GET("/getCreateMqttMap", admin.GetCreateMqttMap)
+		MqttRouter.GET("/getUpdateMqttMap/:id", admin.GetUpdateMqttMap)
+		MqttRouter.POST("/createMqtt", admin.CreateMqtt)
+		MqttRouter.GET("/getMqttById/:id", admin.GetMqttById)
+		MqttRouter.POST("/changeMqttStatus", admin.ChangeMqttStatus)
+		MqttRouter.PUT("/updateMqtt/:id", admin.UpdateMqtt)
+		MqttRouter.DELETE("/deleteMqtt/:id", admin.DeleteMqtt)
+	}
+}
+
 // 物流信息
 func InitExpressRouter(Router *gin.RouterGroup) {
 	ExpressRouter := Router.Group("/express")

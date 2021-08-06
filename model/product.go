@@ -1,6 +1,8 @@
 package model
 
 import (
+	"time"
+
 	"github.com/snowlyg/go-tenancy/g"
 )
 
@@ -71,5 +73,73 @@ type BaseProduct struct {
 	SysBrandID   uint `gorm:"column:sys_brand_id;type:int" json:"sysBrandId"`                                   // 品牌 id
 
 	ProductCategoryID uint `gorm:"index:product_category_id;column:product_category_id;type:int;not null" json:"productCategoryId"` // 平台分类
+}
 
+// ProductReply 商品评论表
+type ProductReply struct {
+	g.TENANCY_MODEL
+	BaseProductReply
+	SysUserID      uint   `gorm:"index:sys_user_id;column:sys_user_id;type:int;not null" json:"sysUserId"`          // 用户ID
+	SysTenancyID   uint   `gorm:"index:sys_tenancy_id;column:sys_tenancy_id;type:int;not null" json:"sysTenancyId"` // 商户 id
+	ProductID      uint   `gorm:"index:product_id;column:product_id;type:int;not null" json:"productId"`            // 商品id  // 商品id
+	OrderProductID uint   `gorm:"index:order_id;column:order_product_id;type:int;not null" json:"orderProductId"`   // 订单商品ID
+	Unique         string `gorm:"uniqueIndex:order_id;column:unique;type:char(12)" json:"unique"`                   // 商品 sku
+	ProductType    int32  `gorm:"column:product_type;type:tinyint;not null;default:1" json:"productType"`           // 1=普通商品
+}
+
+type BaseProductReply struct {
+	ProductScore         int       `gorm:"column:product_score;type:tinyint(1);not null" json:"productScore"`           // 商品分数
+	ServiceScore         int       `gorm:"column:service_score;type:tinyint(1);not null" json:"serviceScore"`           // 服务分数
+	PostageScore         int       `gorm:"column:postage_score;type:tinyint(1);not null" json:"postageScore"`           // 物流分数
+	Rate                 float64   `gorm:"column:rate;type:float(2,1);default:5.0" json:"rate"`                         // 平均值
+	Comment              string    `gorm:"column:comment;type:varchar(512);not null" json:"comment"`                    // 评论内容
+	Pics                 string    `gorm:"column:pics;type:text;not null" json:"pics"`                                  // 评论图片
+	MerchantReplyContent string    `gorm:"column:merchant_reply_content;type:varchar(300)" json:"merchantReplyContent"` // 管理员回复内容
+	MerchantReplyTime    time.Time `gorm:"column:merchant_reply_time;type:timestamp" json:"merchantReplyTime"`          // 管理员回复时间
+	IsReply              int       `gorm:"column:is_reply;type:tinyint(1);not null;default:1" json:"isReply"`           // 2未回复1已回复
+	IsVirtual            int       `gorm:"column:is_virtual;type:tinyint(1);not null;default:1" json:"isVirtual"`       // 2不是虚拟评价1是虚拟评价
+	Nickname             string    `gorm:"column:nickname;type:varchar(64);not null" json:"nickname"`                   // 用户名称
+	Avatar               string    `gorm:"column:avatar;type:varchar(255);not null" json:"avatar"`                      // 用户头像
+}
+
+// ProductCate 商品商户分类关联表
+type ProductProductCate struct {
+	ProductID         uint `gorm:"column:product_id;type:int" json:"productId"`
+	ProductCategoryID uint `gorm:"index:product_category_id;column:product_category_id;type:int;not null" json:"productCategoryId"` // 分类id
+	SysTenancyID      uint `gorm:"index:sys_tenancy_id;column:sys_tenancy_id;type:int;not null" json:"sysTenancyId"`                // 商户 id
+}
+
+// ProductContent 商品详情表
+type ProductContent struct {
+	Content string `gorm:"column:content;type:longtext;not null" json:"content"`       // 商品详情
+	Type    int32  `gorm:"column:type;type:tinyint(1);not null;default:1" json:"type"` // 商品类型 1=普通
+
+	ProductID uint `gorm:"product_contents:product_id;column:product_id;type:int;not null" json:"productId"` // 商品id
+}
+
+// ProductAttrValue 商品属性值表
+type ProductAttrValue struct {
+	g.TENANCY_MODEL
+
+	Detail string `gorm:"column:detail;type:varchar(1000);not null;default:''" json:"detail"`
+	BaseProductAttrValue
+	Type      int32 `gorm:"column:type;type:tinyint(1);default:1" json:"type"`                     // 活动类型 1=商品
+	ProductID uint  `gorm:"index:product_id;column:product_id;type:int;not null" json:"productId"` // 商品id
+}
+
+type BaseProductAttrValue struct {
+	Sku     string  `gorm:"index:sku;column:sku;type:varchar(128);not null" json:"sku"`             // 商品属性索引值 (attr_value|attr_value[|....])
+	Stock   int64   `gorm:"column:stock;type:int unsigned;not null" json:"stock"`                   // 属性对应的库存
+	Sales   uint    `gorm:"column:sales;type:int unsigned;not null;default:0" json:"sales"`         // 销量
+	Image   string  `gorm:"column:image;type:varchar(128)" json:"image"`                            // 图片
+	BarCode string  `gorm:"column:bar_code;type:varchar(50);not null;default:''" json:"barCode"`    // 产品条码
+	Cost    float64 `gorm:"column:cost;type:decimal(8,2) unsigned;not null" json:"cost"`            // 成本价
+	OtPrice float64 `gorm:"column:ot_price;type:decimal(8,2);not null;default:0.00" json:"otPrice"` // 原价
+	Price   float64 `gorm:"column:price;type:decimal(8,2) unsigned;not null" json:"price"`          // 价格
+	Volume  float64 `gorm:"column:volume;type:decimal(8,2);not null;default:0.00" json:"volume"`    // 体积
+	Weight  float64 `gorm:"column:weight;type:decimal(8,2);not null;default:0.00" json:"weight"`    // 重量
+
+	ExtensionOne float64 `gorm:"column:extension_one;type:decimal(8,2);default:0.00" json:"extensionOne"` // 一级佣金
+	ExtensionTwo float64 `gorm:"column:extension_two;type:decimal(8,2);default:0.00" json:"extensionTwo"` // 二级佣金
+	Unique       string  `gorm:"index;column:unique;type:char(12);not null;default:''" json:"unique"`     // 唯一值
 }

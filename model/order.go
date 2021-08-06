@@ -81,3 +81,58 @@ type BaseOrder struct {
 	IsDel          int       `gorm:"column:is_del;type:tinyint unsigned;not null;default:2" json:"isDel"`                             // 是否删除
 	IsSystemDel    int       `gorm:"column:is_system_del;type:tinyint(1);default:2" json:"isSystemDel"`                               // 后台是否删除
 }
+
+// OrderStatus 订单操作记录表
+type OrderStatus struct {
+	g.TENANCY_MODEL
+
+	ChangeType    string    `gorm:"index:change_type;column:change_type;type:varchar(32);not null" json:"changeType"`       // 操作类型
+	ChangeMessage string    `gorm:"column:change_message;type:varchar(256);not null" json:"changeMessage"`                  // 操作备注
+	ChangeTime    time.Time `gorm:"column:change_time;type:timestamp;not null;default:CURRENT_TIMESTAMP" json:"changeTime"` // 操作时间
+
+	OrderID uint `gorm:"index:order_id;column:order_id;type:int unsigned;not null" json:"orderId"` // 订单id
+}
+
+// OrderReceipt 订单发票信息
+type OrderReceipt struct {
+	g.TENANCY_MODEL
+
+	ReceiptInfo  string    `gorm:"column:receipt_info;type:varchar(500);default:''" json:"receiptInfo"` // 发票类型：1.普通发票，2.增值税发票
+	Status       int8      `gorm:"column:status;type:tinyint;default:0" json:"status"`                  // 开票状态：1.已出票,10.已寄出
+	ReceiptSn    string    `gorm:"column:receipt_sn;type:varchar(255);default:''" json:"receiptSn"`     // 发票单号
+	ReceiptNo    string    `gorm:"column:receipt_no;type:varchar(255)" json:"receiptNo"`                // 发票编号
+	DeliveryInfo string    `gorm:"column:delivery_info;type:varchar(255)" json:"deliveryInfo"`          // 收票联系信息
+	Mark         string    `gorm:"column:mark;type:varchar(255)" json:"mark"`                           // 用户备注
+	ReceiptPrice float64   `gorm:"column:receipt_price;type:decimal(10,2)" json:"receiptPrice"`         // 开票金额
+	OrderPrice   float64   `gorm:"column:order_price;type:decimal(10,2)" json:"orderPrice"`             // 订单金额
+	StatusTime   time.Time `gorm:"column:status_time;type:datetime;not null" json:"statusTime"`         // 状态变更时间
+	MerMark      string    `gorm:"column:mer_mark;type:varchar(255)" json:"merMark"`                    // 备注
+
+	OrderID      string `gorm:"column:order_id;type:varchar(255);not null;default:0" json:"orderId"` // 订单ID
+	SysUserID    uint   `json:"sysUserId" form:"sysUserId" gorm:"column:sys_user_id;comment:关联标记"`
+	SysTenancyID uint   `gorm:"index:sys_tenancy_id;column:sys_tenancy_id;type:int;not null" json:"sysTenancyId"` // 商户 id
+}
+
+// OrderProduct 订单购物详情表
+type OrderProduct struct {
+	g.TENANCY_MODEL
+
+	BaseOrderProduct
+
+	CartInfo  string `gorm:"column:cart_info;type:text;not null" json:"cartInfo"`                 // 购买东西的详细信息
+	OrderID   uint   `gorm:"index:oid;column:order_id;type:int unsigned;not null" json:"orderId"` // 订单id
+	SysUserID uint   `json:"sysUserId" form:"sysUserId" gorm:"column:sys_user_id;comment:关联标记"`
+	CartID    uint   `gorm:"column:cart_id;type:int unsigned;not null;default:0" json:"cartId"`                        // 购物车id
+	ProductID uint   `gorm:"index:product_id;column:product_id;type:int unsigned;not null;default:0" json:"productId"` // 商品ID
+}
+
+type BaseOrderProduct struct {
+	ProductSku   string  `gorm:"column:product_sku;type:char(12);not null" json:"productSku"`                   // 商品 sku
+	IsRefund     uint8   `gorm:"column:is_refund;type:tinyint unsigned;not null;default:0" json:"isRefund"`     // 是否退款   0:未退款 1:退款中 2:部分退款 3=全退
+	ProductNum   int64   `gorm:"column:product_num;type:int unsigned;not null;default:0" json:"productNum"`     // 购买数量
+	ProductType  int32   `gorm:"column:product_type;type:int;not null;default:0" json:"productType"`            // 1.普通商品 2.秒杀商品,3.预售商品
+	RefundNum    int64   `gorm:"column:refund_num;type:int unsigned;not null;default:0" json:"refundNum"`       // 可申请退货数量
+	IsReply      int     `gorm:"column:is_reply;type:tinyint unsigned;not null;default:2" json:"isReply"`       // 是否评价
+	ProductPrice float64 `gorm:"column:product_price;type:decimal(10,2) unsigned;not null" json:"productPrice"` // 商品金额
+
+}

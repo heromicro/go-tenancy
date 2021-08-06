@@ -76,10 +76,11 @@ func Routers(app *gin.Engine) {
 			admin.InitOrderRouter(AdminGroup)          // 订单路由
 			admin.InitRefundOrderRouter(AdminGroup)    // 退款订单路由
 			admin.InitExpressRouter(AdminGroup)        // 物流公司路由
+			admin.InitMqttRouter(AdminGroup)           // MQTT路由
 			admin.InitUserGroupRouter(AdminGroup)      // 用户分组路由
 			admin.InitUserLabelRouter(AdminGroup)      // 用户标签路由
 		}
-		
+
 		AdminLogGroup := V1Group.Group(g.TENANCY_CONFIG.System.AdminPreix, middleware.IsAdmin(), middleware.CasbinHandler())
 		{
 			admin.InitSysOperationRecordRouter(AdminLogGroup) // 操作记录

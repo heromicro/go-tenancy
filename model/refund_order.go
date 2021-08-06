@@ -57,3 +57,22 @@ type BaseRefundOrder struct {
 	IsDel       int `gorm:"column:is_del;type:tinyint unsigned;not null;default:2" json:"isDel"`
 	IsSystemDel int `gorm:"column:is_system_del;type:tinyint(1);default:2" json:"isSystemDel"` // 商户删除
 }
+
+// RefundProduct 退款单产品表
+type RefundProduct struct {
+	g.TENANCY_MODEL
+
+	RefundOrderID  uint `gorm:"index:refund_order_id;column:refund_order_id;type:int unsigned;not null" json:"refundOrderId"` // 退款单
+	OrderProductID uint `gorm:"column:order_product_id;type:int unsigned;not null" json:"orderProductId"`                     // 订单产品id
+	RefundNum      uint `gorm:"column:refund_num;type:int unsigned;not null;default:0" json:"refundNum"`                      // 退货数
+}
+
+// RefundStatus 订单操作记录表
+type RefundStatus struct {
+	g.TENANCY_MODEL
+
+	RefundOrderID uint      `gorm:"index:refund_order_id;column:refund_order_id;type:int unsigned;not null" json:"refundOrderId"` // 退款单订单id
+	ChangeType    string    `gorm:"index:change_type;column:change_type;type:varchar(32);not null" json:"changeType"`             // 操作类型
+	ChangeMessage string    `gorm:"column:change_message;type:varchar(256);not null" json:"changeMessage"`                        // 操作备注
+	ChangeTime    time.Time `gorm:"column:change_time;type:timestamp;not null;default:CURRENT_TIMESTAMP" json:"changeTime"`       // 操作时间
+}
