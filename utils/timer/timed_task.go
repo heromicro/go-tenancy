@@ -45,7 +45,7 @@ func (t *timer) AddTaskByFunc(taskName string, spec string, task func()) (cron.E
 			return 0, fmt.Errorf("任务 %s 已经存在", taskName)
 		}
 	}
-	timeTask := timeTask{Name: taskName, Spec: spec, Corn: cron.New(), CreatedAt: time.Now()}
+	timeTask := timeTask{Name: taskName, Spec: spec, Corn: cron.New(cron.WithSeconds()), CreatedAt: time.Now()}
 	id, err := timeTask.Corn.AddFunc(spec, task)
 	timeTask.Corn.Start()
 	timeTask.Id = id
@@ -63,7 +63,7 @@ func (t *timer) AddTaskByJob(taskName string, spec string, job interface{ Run() 
 			return 0, fmt.Errorf("任务 %s 已经存在", taskName)
 		}
 	}
-	timeTask := timeTask{Name: taskName, Spec: spec, Corn: cron.New(), CreatedAt: time.Now()}
+	timeTask := timeTask{Name: taskName, Spec: spec, Corn: cron.New(cron.WithSeconds()), CreatedAt: time.Now()}
 	id, err := timeTask.Corn.AddJob(spec, job)
 	timeTask.Corn.Start()
 	timeTask.Id = id
@@ -154,8 +154,7 @@ func (t *timer) Close() {
 func (t *timer) GetTasks() []timeTask {
 	var tl []timeTask
 	for _, ttsk := range t.taskList {
-		if ttsk.Corn != nil {
-			ttsk.EntriyLen = len(ttsk.Corn.Entries())
+		if ttsk.Id > 0 {
 			tl = append(tl, ttsk)
 		}
 	}
@@ -163,5 +162,5 @@ func (t *timer) GetTasks() []timeTask {
 }
 
 func NewTimerTask() Timer {
-	return &timer{taskList: make([]timeTask, 100)}
+	return &timer{taskList: []timeTask{}}
 }

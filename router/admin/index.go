@@ -136,6 +136,7 @@ func InitTestouter(Router *gin.RouterGroup) {
 	{
 		UserRouter.POST("/emailTest", admin.EmailTest) // 发送测试邮件
 		UserRouter.GET("/pay", admin.PayTest)          // 发送测试邮件
+		UserRouter.GET("/mqtt", admin.MqttTest)        // 发送测试邮件
 	}
 }
 

@@ -15,8 +15,8 @@ import (
 	"go.uber.org/zap"
 )
 
-const EveryMinute = "*/1 * * * *"    //每分钟
-const EveryTeenHour = "0 */10 * * *" //每个11小时
+const EveryMinute = "0 */1 * * * *"    //每分钟
+const EveryTeenHour = "0 0 */10 * * *" //每个11小时
 
 func Timer() {
 	if g.TENANCY_CONFIG.Timer.Start {

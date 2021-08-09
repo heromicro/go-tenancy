@@ -1,6 +1,8 @@
 package admin
 
 import (
+	"time"
+
 	"github.com/gin-gonic/gin"
 	"github.com/snowlyg/go-tenancy/g"
 	"github.com/snowlyg/go-tenancy/model"
@@ -33,11 +35,29 @@ func PayTest(ctx *gin.Context) {
 		SysTenancyID: 1,
 	}
 	if qrcode, err := service.PayTest(req, "宝安中心人民医院"); err != nil {
-		g.TENANCY_LOG.Error("操作失败!", zap.Any("err", err))
-		response.FailWithMessage("操作失败", ctx)
+		g.TENANCY_LOG.Error("测试失败!", zap.Any("err", err))
+		response.FailWithMessage("测试失败", ctx)
 	} else {
 		response.OkWithDetailed(gin.H{
 			"qrcode": qrcode,
-		}, "操作成功", ctx)
+		}, "测试成功", ctx)
+	}
+}
+
+// MqttTest 发送测试消息
+func MqttTest(ctx *gin.Context) {
+	payload := model.Payload{
+		OrderId:       1,
+		TenancyId:     1,
+		UserId:        1,
+		PayType:       1,
+		PayNotifyType: "test",
+		CreatedAt:     time.Now(),
+	}
+	if err := service.SendMqttMsgs("tenancy_notify_test", payload, 2); err != nil {
+		g.TENANCY_LOG.Error("测试失败!", zap.Any("err", err))
+		response.FailWithMessage("测试失败", ctx)
+	} else {
+		response.OkWithMessage("测试成功", ctx)
 	}
 }

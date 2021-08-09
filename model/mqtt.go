@@ -50,7 +50,7 @@ func NewMqttClient(mq Mqtt) mqtt.Client {
 
 }
 
-func (mq *Mqtt) MqttPublish(topic string, payload interface{}, qos byte) error {
+func (mq *Mqtt) MqttPublish(topic, payload string, qos byte) error {
 	c := NewMqttClient(*mq)
 	token := c.Connect()
 	if !token.Wait() {
@@ -61,9 +61,12 @@ func (mq *Mqtt) MqttPublish(topic string, payload interface{}, qos byte) error {
 	}
 	defer c.Disconnect(250)
 
-	token = c.Publish(topic, 2, false, payload)
+	token = c.Publish(topic, qos, false, payload)
 	if !token.Wait() {
 		return fmt.Errorf("mqtt token wait %w", token.Error())
+	}
+	if token.Error() != nil {
+		return fmt.Errorf("主题:%s 发送失败 %w", topic, token.Error())
 	}
 	return nil
 }

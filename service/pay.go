@@ -289,7 +289,7 @@ func NotifyAliPay(ctx *gin.Context) error {
 		if err != nil {
 			g.TENANCY_LOG.Error("支付: 支付宝支付异步通知回调错误", zap.String(orderSn, err.Error()))
 		}
-		SendMqttMsgs("tenancy_pay_notify", payload, 2)
+		SendMqttMsgs("tenancy_notify_pay", payload, 2)
 	}
 
 	return nil

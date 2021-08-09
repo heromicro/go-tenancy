@@ -9,7 +9,7 @@ import (
 	"go.uber.org/zap"
 )
 
-// 添加订单定时任务
+// CheckOrderPayStatus 暂时未使用
 type CheckOrderPayStatus struct {
 	OrderId   uint `json:"orderId" form:"orderId"`
 	TenancyId uint `json:"tenancyId" form:"tenancyId"`

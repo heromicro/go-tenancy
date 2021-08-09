@@ -142,12 +142,12 @@ func SendMqttMsgs(topic string, payload model.Payload, qos byte) error {
 		return err
 	}
 	for _, mqtt := range mqtts {
-		err := mqtt.MqttPublish(topic, payload, qos)
+		content, _ := json.Marshal(payload)
+		err := mqtt.MqttPublish(topic, string(content), qos)
 		if err != nil {
 			g.TENANCY_LOG.Error(fmt.Sprintf("主题：%s 消息发送失败", topic), zap.String("错误", err.Error()))
 		}
 
-		content, _ := json.Marshal(payload)
 		mqttRecords = append(mqttRecords, model.MqttRecord{Host: mqtt.Host, Port: mqtt.Port, Qos: qos, Topic: topic, Content: string(content)})
 	}
 
