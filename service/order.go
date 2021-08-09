@@ -684,9 +684,15 @@ func CreateOrder(req request.CreateOrder, tenancyId, userId uint, tenancyName st
 			stock := cartProduct.AttrValue.Stock - cartProduct.CartNum
 			err = tx.Model(&model.ProductAttrValue{}).Where("`unique` = ?", cartProduct.AttrValue.Unique).Update("stock", stock).Error
 			if err != nil {
-				return err
+				return fmt.Errorf("生成订单-减库存错误 %w", err)
 			}
 		}
+
+		err = ChangeIsPayByIds(tx, req.CartIds)
+		if err != nil {
+			return fmt.Errorf("生成订单-修改购物车isPay属性错误 %w", err)
+		}
+		// 生成二维码
 		png, err = GetQrCode(order.ID, tenancyId, userId, order.OrderType)
 		if err != nil {
 			return err
@@ -765,6 +771,21 @@ func GetNoPayOrders() ([]model.Order, error) {
 	return orders, nil
 }
 
+func GetNoPayOver15MinuteOrders() ([]model.Order, error) {
+	var orders []model.Order
+	err := g.TENANCY_DB.Model(&model.Order{}).
+		Where("paid = ?", g.StatusFalse).
+		Where("status = ?", model.OrderStatusNoPay).
+		Where("now() > SUBDATE(created_at,interval -15 minute)").
+		Where("is_del = ?", g.StatusFalse).
+		Where("is_system_del = ?", g.StatusFalse).
+		Find(&orders).Error
+	if err != nil {
+		return orders, err
+	}
+	return orders, nil
+}
+
 func CreateOrderStatus(db *gorm.DB, orderStatus model.OrderStatus) error {
 	err := db.Create(&orderStatus).Error
 	if err != nil {
@@ -773,21 +794,21 @@ func CreateOrderStatus(db *gorm.DB, orderStatus model.OrderStatus) error {
 	return nil
 }
 
-func UpdateOrderStatusByOrderId(db *gorm.DB, orderId uint, status int) error {
+func UpdateOrderStatusByOrderId(db *gorm.DB, orderId uint, changeData map[string]interface{}) error {
 	err := db.Model(&model.Order{}).
 		Where("id = ?", orderId).
 		Where("is_system_del = ?", g.StatusFalse).
 		Where("is_del = ?", g.StatusFalse).
-		Update("status", status).Error
+		Updates(changeData).Error
 	if err != nil {
 		return err
 	}
 	return nil
 }
 
-func ChangeOrderStatusByOrderId(orderId uint, status int, changeType, changeMessage string) error {
+func ChangeOrderStatusByOrderId(orderId uint, changeData map[string]interface{}, changeType, changeMessage string) error {
 	err := g.TENANCY_DB.Transaction(func(tx *gorm.DB) error {
-		err := UpdateOrderStatusByOrderId(tx, orderId, status)
+		err := UpdateOrderStatusByOrderId(tx, orderId, changeData)
 		if err != nil {
 			return err
 		}
@@ -817,19 +838,29 @@ func GetNoPayOrdersByOrderSn(orderSn string) ([]model.Order, error) {
 	return orders, nil
 }
 
-func ChangeOrderStatusByOrderSn(status int, orderSn, changeType, changeMessage string) error {
+func ChangeOrderPayNotifyByOrderSn(changeData map[string]interface{}, orderSn, changeType, changeMessage string) (model.Payload, error) {
+	var palyload model.Payload
 	orders, err := GetNoPayOrdersByOrderSn(orderSn)
 	if err != nil {
-		return err
+		return palyload, err
 	}
 	if len(orders) != 1 {
-		return fmt.Errorf("%s 订单号重复生产 %d 个订单", orderSn, len(orders))
+		return palyload, fmt.Errorf("%s 订单号重复生产 %d 个订单", orderSn, len(orders))
 	}
-	err = ChangeOrderStatusByOrderId(orders[0].ID, status, changeType, changeMessage)
+	err = ChangeOrderStatusByOrderId(orders[0].ID, changeData, changeType, changeMessage)
 	if err != nil {
-		return err
+		return palyload, err
 	}
-	return nil
+
+	palyload = model.Payload{
+		OrderId:   orders[0].ID,
+		TenancyId: orders[0].SysTenancyID,
+		UserId:    orders[0].SysUserID,
+		OrderType: orders[0].OrderType,
+		PayType:   orders[0].PayType,
+		CreatedAt: time.Now(),
+	}
+	return palyload, nil
 }
 
 func CancelNoPayOrders(orderIds []uint, orderStatues []model.OrderStatus) error {

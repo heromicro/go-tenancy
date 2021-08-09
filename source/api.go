@@ -137,6 +137,21 @@ var baseApis = []model.SysApi{
 	{Path: "/v1/admin/tenancy/getTenancyById/:id", Description: "获取商户详细信息", ApiGroup: "tenancy", Method: "GET"},
 	{Path: "/v1/admin/tenancy/updateTenancy/:id", Description: "更新商户", ApiGroup: "tenancy", Method: "PUT"},
 	{Path: "/v1/admin/tenancy/deleteTenancy/:id", Description: "删除商户", ApiGroup: "tenancy", Method: "DELETE"},
+	// MQTT
+	{Path: "/v1/admin/mqtt/getCreateMqttMap", Description: "添加mqtt客户端表单", ApiGroup: "mqtt", Method: "GET"},
+	{Path: "/v1/admin/mqtt/getUpdateMqttMap/:id", Description: "编辑mqtt客户端表单", ApiGroup: "mqtt", Method: "GET"},
+	{Path: "/v1/admin/mqtt/getMqttList", Description: "mqtt客户端列表", ApiGroup: "mqtt", Method: "POST"},
+	{Path: "/v1/admin/mqtt/getMqttRecordList", Description: "mqtt消息记录", ApiGroup: "mqtt", Method: "POST"},
+	{Path: "/v1/admin/mqtt/createMqtt", Description: "添加mqtt客户端", ApiGroup: "mqtt", Method: "POST"},
+	{Path: "/v1/admin/mqtt/getMqttById/:id", Description: "获取mqtt客户端详情", ApiGroup: "mqtt", Method: "GET"},
+	{Path: "/v1/admin/mqtt/changeMqttStatus", Description: "修改mqtt客户端状态", ApiGroup: "mqtt", Method: "POST"},
+	{Path: "/v1/admin/mqtt/updateMqtt/:id", Description: "更新mqtt客户端", ApiGroup: "mqtt", Method: "PUT"},
+	{Path: "/v1/admin/mqtt/deleteMqtt/:id", Description: "删除mqtt客户端", ApiGroup: "mqtt", Method: "DELETE"},
+	// 定时任务
+	{Path: "/v1/admin/job/getJobList", Description: "定时任务列表", ApiGroup: "job", Method: "GET"},
+	{Path: "/v1/admin/job/startJob/:name", Description: "启动定时任务", ApiGroup: "job", Method: "GET"},
+	{Path: "/v1/admin/job/stopJob/:name", Description: "停止定时任务", ApiGroup: "job", Method: "GET"},
+	{Path: "/v1/admin/job/deleteJob/:name", Description: "移除定时任务", ApiGroup: "job", Method: "GET"},
 
 	//商品分类
 	{Path: "/v1/admin/productCategory/getCreateProductCategoryMap", Description: "获取商品分类添加表单", ApiGroup: "category", Method: "POST"},

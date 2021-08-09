@@ -47,12 +47,17 @@ func CreateCart(req request.CreateCart) (model.Cart, error) {
 }
 
 // ChangeCartNum
-func ChangeCartNum(cartNum int64, id, sysUserID, sysTenancyID uint) error {
+func ChangeCartNum(cartNum int64, id uint) error {
 	return g.TENANCY_DB.Model(&model.Cart{}).
-		Where("sys_user_id = ?", sysUserID).
-		Where("sys_tenancy_id = ?", sysTenancyID).
 		Where("id = ?", id).
 		Update("cart_num", cartNum).Error
+}
+
+// ChangeIsPayByIds
+func ChangeIsPayByIds(tx *gorm.DB, ids []uint) error {
+	return tx.Model(&model.Cart{}).
+		Where("id in ?", ids).
+		Update("is_pay", g.StatusTrue).Error
 }
 
 // DeleteCart

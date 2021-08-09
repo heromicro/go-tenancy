@@ -28,6 +28,5 @@ func main() {
 	// 初始化认证服务
 	initialize.Auth()
 	defer multi.AuthDriver.Close()
-
 	core.RunServer()
 }

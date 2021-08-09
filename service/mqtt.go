@@ -1,6 +1,7 @@
 package service
 
 import (
+	"encoding/json"
 	"errors"
 	"fmt"
 
@@ -9,6 +10,7 @@ import (
 	"github.com/snowlyg/go-tenancy/model"
 	"github.com/snowlyg/go-tenancy/model/request"
 	"github.com/snowlyg/go-tenancy/utils"
+	"go.uber.org/zap"
 	"gorm.io/gorm"
 )
 
@@ -122,4 +124,39 @@ func GetStatusMqtts() ([]model.Mqtt, error) {
 		return mqtts, err
 	}
 	return mqtts, nil
+}
+
+// CreateMqttRecords
+func CreateMqttRecords(mqttRecords []model.MqttRecord) error {
+	err := g.TENANCY_DB.Create(&mqttRecords).Error
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func SendMqttMsgs(topic string, payload model.Payload, qos byte) error {
+	var mqttRecords []model.MqttRecord
+	mqtts, err := GetStatusMqtts()
+	if err != nil {
+		return err
+	}
+	for _, mqtt := range mqtts {
+		err := mqtt.MqttPublish(topic, payload, qos)
+		if err != nil {
+			g.TENANCY_LOG.Error(fmt.Sprintf("主题：%s 消息发送失败", topic), zap.String("错误", err.Error()))
+		}
+
+		content, _ := json.Marshal(payload)
+		mqttRecords = append(mqttRecords, model.MqttRecord{Host: mqtt.Host, Port: mqtt.Port, Qos: qos, Topic: topic, Content: string(content)})
+	}
+
+	if len(mqttRecords) > 0 {
+		err := CreateMqttRecords(mqttRecords)
+		if err != nil {
+			g.TENANCY_LOG.Error("消息记录保持失败", zap.String("错误", err.Error()))
+			return err
+		}
+	}
+	return nil
 }

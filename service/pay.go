@@ -278,11 +278,18 @@ func NotifyAliPay(ctx *gin.Context) error {
 			return fmt.Errorf("支付: %s 支付宝异步通知回调返回状态: %s", orderSn, tradeStatus)
 		}
 
-		err := ChangeOrderStatusByOrderSn(model.OrderStatusNoDeliver, orderSn, "pay_success", "订单支付成功")
+		// 发送 mqtt
+		changeData := map[string]interface{}{
+			"status":   model.OrderStatusNoDeliver,
+			"pay_type": model.PayTypeAlipay,
+			"pay_time": time.Now(),
+			"paid":     g.StatusTrue,
+		}
+		payload, err := ChangeOrderPayNotifyByOrderSn(changeData, orderSn, "pay_success", "订单支付成功")
 		if err != nil {
 			g.TENANCY_LOG.Error("支付: 支付宝支付异步通知回调错误", zap.String(orderSn, err.Error()))
 		}
-		
+		SendMqttMsgs("tenancy_pay_notify", payload, 2)
 	}
 
 	return nil

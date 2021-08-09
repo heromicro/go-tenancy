@@ -33,7 +33,7 @@ func Timer() {
 
 		// 订单过期自动取消
 		g.TENANCY_Timer.AddTaskByFunc("CheckOrdersPayStatus", EveryMinute, func() {
-			orders, err := service.GetNoPayOrders()
+			orders, err := service.GetNoPayOver15MinuteOrders()
 			if err != nil {
 				g.TENANCY_LOG.Info("订单过期自动取消", zap.String("获取订单错误", err.Error()))
 				return
@@ -78,4 +78,5 @@ func Timer() {
 			}
 		})
 	}
+
 }

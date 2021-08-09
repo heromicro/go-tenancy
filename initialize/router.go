@@ -77,6 +77,7 @@ func Routers(app *gin.Engine) {
 			admin.InitRefundOrderRouter(AdminGroup)    // 退款订单路由
 			admin.InitExpressRouter(AdminGroup)        // 物流公司路由
 			admin.InitMqttRouter(AdminGroup)           // MQTT路由
+			admin.InitJobRouter(AdminGroup)            // 定时任务管理路由
 			admin.InitUserGroupRouter(AdminGroup)      // 用户分组路由
 			admin.InitUserLabelRouter(AdminGroup)      // 用户标签路由
 		}

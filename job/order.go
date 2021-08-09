@@ -20,7 +20,8 @@ type CheckOrderPayStatus struct {
 
 func (d CheckOrderPayStatus) Run() {
 	if time.Since(d.CreatedAt).Minutes() >= 15 {
-		err := service.ChangeOrderStatusByOrderId(d.OrderId, model.OrderStatusCancel, "cancel", "取消订单[自动]")
+		changeData := map[string]interface{}{"status": model.OrderStatusCancel}
+		err := service.ChangeOrderStatusByOrderId(d.OrderId, changeData, "cancel", "取消订单[自动]")
 		if err != nil {
 			g.TENANCY_LOG.Error("定时自动取消任务错误", zap.String("自动取消订单任务", err.Error()))
 		}

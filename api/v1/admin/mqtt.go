@@ -37,13 +37,13 @@ func GetUpdateMqttMap(ctx *gin.Context) {
 
 // CreateMqtt
 func CreateMqtt(ctx *gin.Context) {
-	var brand model.Mqtt
-	if errs := ctx.ShouldBindJSON(&brand); errs != nil {
+	var mqtt model.Mqtt
+	if errs := ctx.ShouldBindJSON(&mqtt); errs != nil {
 		response.FailWithMessage(errs.Error(), ctx)
 		return
 	}
 
-	if id, err := service.CreateMqtt(brand); err != nil {
+	if id, err := service.CreateMqtt(mqtt); err != nil {
 		g.TENANCY_LOG.Error("创建失败!", zap.Any("err", err))
 		response.FailWithMessage("添加失败:"+err.Error(), ctx)
 	} else {
@@ -58,12 +58,12 @@ func UpdateMqtt(ctx *gin.Context) {
 		response.FailWithMessage(errs.Error(), ctx)
 		return
 	}
-	var brand model.Mqtt
-	if errs := ctx.ShouldBindJSON(&brand); errs != nil {
+	var mqtt model.Mqtt
+	if errs := ctx.ShouldBindJSON(&mqtt); errs != nil {
 		response.FailWithMessage(errs.Error(), ctx)
 		return
 	}
-	if err := service.UpdateMqtt(brand, req.Id); err != nil {
+	if err := service.UpdateMqtt(mqtt, req.Id); err != nil {
 		g.TENANCY_LOG.Error("更新失败!", zap.Any("err", err))
 		response.FailWithMessage("更新失败:"+err.Error(), ctx)
 	} else {
@@ -134,12 +134,12 @@ func GetMqttById(ctx *gin.Context) {
 		response.FailWithMessage(errs.Error(), ctx)
 		return
 	}
-	brand, err := service.GetMqttByID(req.Id)
+	mqtt, err := service.GetMqttByID(req.Id)
 	if err != nil {
 		g.TENANCY_LOG.Error("获取失败!", zap.Any("err", err))
 		response.FailWithMessage("获取失败:"+err.Error(), ctx)
 	} else {
-		response.OkWithData(brand, ctx)
+		response.OkWithData(mqtt, ctx)
 	}
 }
 

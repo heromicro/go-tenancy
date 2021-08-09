@@ -309,6 +309,17 @@ func InitMqttRouter(Router *gin.RouterGroup) {
 	}
 }
 
+// 定时任务管理
+func InitJobRouter(Router *gin.RouterGroup) {
+	JobRouter := Router.Group("/job")
+	{
+		JobRouter.GET("/getJobList", admin.GetJobList)
+		JobRouter.GET("/startJob/:name", admin.StartJob)
+		JobRouter.GET("/stopJob/:name", admin.StopJob)
+		JobRouter.DELETE("/deleteJob/:name", admin.DeleteJob)
+	}
+}
+
 // 物流信息
 func InitExpressRouter(Router *gin.RouterGroup) {
 	ExpressRouter := Router.Group("/express")

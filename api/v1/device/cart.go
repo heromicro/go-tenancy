@@ -76,7 +76,7 @@ func ChangeCartNum(ctx *gin.Context) {
 		response.FailWithMessage(errs.Error(), ctx)
 		return
 	}
-	if err := service.ChangeCartNum(cartNum.CartNum, req.Id, multi.GetUserId(ctx), multi.GetTenancyId(ctx)); err != nil {
+	if err := service.ChangeCartNum(cartNum.CartNum, req.Id); err != nil {
 		g.TENANCY_LOG.Error("操作失败!", zap.Any("err", err))
 		response.FailWithMessage("操作失败:"+err.Error(), ctx)
 	} else {
