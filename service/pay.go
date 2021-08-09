@@ -277,10 +277,12 @@ func NotifyAliPay(ctx *gin.Context) error {
 		if tradeStatus != "TRADE_SUCCESS" && tradeStatus != "TRADE_FINISHED" {
 			return fmt.Errorf("支付: %s 支付宝异步通知回调返回状态: %s", orderSn, tradeStatus)
 		}
+
 		err := ChangeOrderStatusByOrderSn(model.OrderStatusNoDeliver, orderSn, "pay_success", "订单支付成功")
 		if err != nil {
 			g.TENANCY_LOG.Error("支付: 支付宝支付异步通知回调错误", zap.String(orderSn, err.Error()))
 		}
+		
 	}
 
 	return nil

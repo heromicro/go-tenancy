@@ -35,8 +35,8 @@ func GetMqttMap(id uint, ctx *gin.Context) (Form, error) {
 		form = Form{Method: "POST", Title: "添加信息"}
 		form.AddRule(*NewInput("HOST", "host", "请输入host地址", "").AddValidator(validatorHost)).
 			AddRule(*NewInput("PORT", "port", "请输入端口", 1883).AddValidator(validatorPort)).
-			AddRule(*NewInput("用户名", "username", "请输入用户名", "Chindeo").AddValidator(validatorUsername)).
-			AddRule(*NewInput("密码", "password", "请输入密码", "P@ssw0rd").AddValidator(validatorPassword)).
+			AddRule(*NewInput("用户名", "username", "请输入用户名", "").AddValidator(validatorUsername)).
+			AddRule(*NewInput("密码", "password", "请输入密码", "").AddValidator(validatorPassword)).
 			AddRule(*NewSwitch("是否显示", "status", 0))
 	}
 	if id > 0 {
@@ -113,4 +113,13 @@ func GetMqttRecordList(info request.PageInfo) ([]model.MqttRecord, int64, error)
 	}
 	err = db.Limit(limit).Offset(offset).Find(&mqttList).Error
 	return mqttList, total, err
+}
+
+func GetStatusMqtts() ([]model.Mqtt, error) {
+	var mqtts []model.Mqtt
+	err := g.TENANCY_DB.Model(&model.Mqtt{}).Where("status = ?", g.StatusTrue).Find(&mqtts).Error
+	if err != nil {
+		return mqtts, err
+	}
+	return mqtts, nil
 }

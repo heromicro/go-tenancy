@@ -22,7 +22,7 @@ func TestMqttList(t *testing.T) {
 	data.Keys().ContainsOnly("list", "total", "page", "pageSize")
 	data.Value("pageSize").Number().Equal(10)
 	data.Value("page").Number().Equal(1)
-	data.Value("total").Number().Equal(3)
+	data.Value("total").Number().Ge(3)
 
 	list := data.Value("list").Array()
 	list.Length().Ge(0)
@@ -75,10 +75,11 @@ func TestMqttProcess(t *testing.T) {
 		mqtt = obj.Value("data").Object()
 
 		mqtt.Value("id").Number().Ge(0)
-		mqtt.Value("name").String().Equal(update["name"].(string))
+		mqtt.Value("username").String().Equal(update["username"].(string))
+		mqtt.Value("port").Number().Equal(update["port"].(int))
+		mqtt.Value("password").String().Equal(update["password"].(string))
+		mqtt.Value("host").String().Equal(update["host"].(string))
 		mqtt.Value("status").Number().Equal(update["status"].(int))
-		mqtt.Value("code").String().Equal(update["code"].(string))
-		mqtt.Value("sort").Number().Equal(update["sort"].(int))
 
 		obj = auth.POST("v1/admin/mqtt/changeMqttStatus").
 			WithJSON(map[string]interface{}{

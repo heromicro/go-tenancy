@@ -218,7 +218,6 @@ func InitDB(conf request.InitDB) error {
 		source.Address,
 		source.Receipt,
 		source.Patient,
-		source.Mqtt,
 	)
 	if err != nil {
 		_ = WriteConfig(g.TENANCY_VP, BaseMysql)
