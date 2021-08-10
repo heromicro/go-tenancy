@@ -2,7 +2,7 @@
 log/
 cmd/
 tmp/
-model/old/
+old/
 uploads/
 .history/
 

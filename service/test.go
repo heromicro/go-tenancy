@@ -30,7 +30,7 @@ func PayTest(req request.CreateCart, tenancyName string) ([]byte, error) {
 	}
 	qrcode, err := cache.GetCacheBytes(payTestKey)
 	if err != nil || qrcode == nil {
-		qrcode, err = CreateOrder(res, req.SysTenancyID, req.SysUserID, tenancyName)
+		qrcode, _, err = CreateOrder(res, req.SysTenancyID, req.SysUserID, tenancyName)
 		if err != nil {
 			return nil, err
 		}

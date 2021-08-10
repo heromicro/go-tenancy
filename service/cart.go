@@ -18,6 +18,9 @@ func CreateCart(req request.CreateCart) (model.Cart, error) {
 		Where("sys_user_id = ?", req.SysUserID).
 		Where("sys_tenancy_id = ?", req.SysTenancyID).
 		Where("product_id = ?", req.ProductID).
+		Where("is_pay = ?", g.StatusFalse).
+		Where("is_fail = ?", g.StatusFalse).
+		Where("is_new = ?", g.StatusFalse).
 		Where("product_attr_unique = ?", req.ProductAttrUnique).
 		First(&cart).Error
 	if errors.Is(err, gorm.ErrRecordNotFound) { // 没有商品直接新建

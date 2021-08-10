@@ -41,3 +41,15 @@ If you don't have a QQ account, you can into the [iris-go-tenancy/community](htt
 - 需要设置 is-prod 为 false
 - 下载 https://sandbox.alipaydev.com/user/downloadApp.htm 对应客户端
 - 登录沙箱提供的账号
+- 
+###### 使用第三发库
+- 聚合支付 [gopay](https://github.com/go-pay/gopay)
+- 雪花算法 [snowflake](https://github.com/bwmarrin/snowflake)
+- 缓存 [redis](https://github.com/go-redis/redis/v8)
+- 定时任务 [cron](https://github.com/robfig/cron/v3)
+- 浮点计算 [decimal](https://github.com/shopspring/decimal)
+- 二维码 [go-qrcode](https://github.com/skip2/go-qrcode)
+- 认证 [multi](https://github.com/snowlyg/multi)
+- 授权 [casbin](https://github.com/casbin/casbin/v2)
+- 辅助 [pkg](https://github.com/chindeo/pkg) 
+

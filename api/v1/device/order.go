@@ -46,11 +46,11 @@ func CreateOrder(ctx *gin.Context) {
 		response.FailWithMessage(errs.Error(), ctx)
 		return
 	}
-	if qrcode, err := service.CreateOrder(req, multi.GetTenancyId(ctx), multi.GetUserId(ctx), multi.GetTenancyName(ctx)); err != nil {
+	if qrcode, orderId, err := service.CreateOrder(req, multi.GetTenancyId(ctx), multi.GetUserId(ctx), multi.GetTenancyName(ctx)); err != nil {
 		g.TENANCY_LOG.Error("获取失败!", zap.Any("err", err))
 		response.FailWithMessage("获取失败:"+err.Error(), ctx)
 	} else {
-		response.OkWithDetailed(gin.H{"qrcode": qrcode}, "获取成功", ctx)
+		response.OkWithDetailed(gin.H{"qrcode": qrcode, "orderId": orderId}, "获取成功", ctx)
 	}
 }
 
@@ -68,9 +68,17 @@ func PayOrder(ctx *gin.Context) {
 		return
 	}
 
+	err := service.CheckOrderStatusBeforeAction(req.Id)
+	if err != nil {
+		g.TENANCY_LOG.Error("获取失败!", zap.Any("err", err))
+		response.FailWithMessage("获取失败:"+err.Error(), ctx)
+		return
+	}
+
 	if qrcode, err := service.GetQrCode(req.Id, multi.GetTenancyId(ctx), multi.GetUserId(ctx), payOrder.OrderType); err != nil {
 		g.TENANCY_LOG.Error("获取失败!", zap.Any("err", err))
 		response.FailWithMessage("获取失败:"+err.Error(), ctx)
+		return
 	} else {
 		response.OkWithDetailed(gin.H{"qrcode": qrcode}, "获取成功", ctx)
 	}

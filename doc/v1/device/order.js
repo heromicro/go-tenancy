@@ -111,7 +111,7 @@
  *     "Authorization: Bearer 5f048fe"
  *
  * @apiExample {bash} Curl example
- * curl -H "Authorization: Bearer 5f048fe" -i http://127.0.0.1:8089/v1/device/order/checkOrder
+ * curl -H "Authorization: Bearer 5f048fe" -i http://127.0.0.1:8089/v1/device/order/createOrder
  *
  * @apiUse TokenError
  *         
@@ -137,7 +137,7 @@
  * @apiGroup 订单管理管理
  * @apiPermission device
  *
- * @apiDescription 根据id获取订单详情，用户通过支付宝或者微信扫码支付
+ * @apiDescription 根据id获取订单详情
  *   
  * 
  * @apiHeader {String} Authorization 接口需要带上此头信息
@@ -145,7 +145,7 @@
  *     "Authorization: Bearer 5f048fe"
  *
  * @apiExample {bash} Curl example
- * curl -H "Authorization: Bearer 5f048fe" -i http://127.0.0.1:8089/v1/device/order/checkOrder
+ * curl -H "Authorization: Bearer 5f048fe" -i http://127.0.0.1:8089/v1/device/order/getOrderById/1
  *
  * @apiUse TokenError
  *         
@@ -256,7 +256,7 @@
  *     "Authorization: Bearer 5f048fe"
  *
  * @apiExample {bash} Curl example
- * curl -H "Authorization: Bearer 5f048fe" -i http://127.0.0.1:8089/v1/device/order/checkOrder
+ * curl -H "Authorization: Bearer 5f048fe" -i http://127.0.0.1:8089/v1/device/order/payOrder/1?orderType=1
  *
  * @apiUse TokenError
  *         
@@ -271,5 +271,35 @@
           "qrcode": "iVBORw0KGgoAAAANSUhEUgAAAQAAAAEAAQMAAABmvDolAAAABlBMVEX///8AAABVwtN+AAACWklEQVR42uyYMbLjIBBEW0VAyBF0FF3sl5BqL8ZROAIhAaXe6sH+9l9vbtg1gUuFnoMR0zM94LM+679cC0leno4nEzMAn4FNu2kioALYfXJlqXDa9nkpG4AwFbCy7J4s8MR6BzzbcIA+/uVTQywgD8wJKMwdW1tPAWeZD1BGYbNkapIJ8JeUezPQxZtaOOvm8h5SXc/yqu6xgdvaHC9sWC9sPsfyWk/HBpYKhUSEw7P1CE9JPD4K6QDA6ngogS6l/RHoeQFWkyYCmJvedQXnXWdhPw9dTAAAvXI2xKowgSqxW2OYB7iH6cpCCtiqalTFn9/hrUBdVX3geHg6cwarZdTxLd4JAPR2hQb4xG5y9sD6OKwZgIXUOaUWyNR1jkXtt4WBgG5yYD2rlyC54oqvyQDrWXYqN8nu2vl6pNz4gA0k3ar5BKnbdFHX415IBwB0FtKtnrpB0z9UO+cC0A2xnpp26nqp/bYnkzM+wGy2p4WThN7ZYTF/DQUQgQog3rx9RSzbU0bNAABwMmWOJ8mMQCDq6ckajw8s2tTpFEjddljUnOUeJuf9QF2tp7o+N9kwqOE7PxXSCQB13t0T4ZI90Nydo8KMz/ZgeEBWzVyxpVVvBzI5LUwFADJAt54AbMw2rI8E3NpvQk+rs1+aWT/GPMD9lpUlKlYWhVk2z+PnTc7gQL9llTjMr8lwRoXpvif3EYB+s2cKNldcrdrz14yATiVZJ+iN6zFGzQPALqVSg72TOH440vcDdssKK5a0CWq1p8iZgLt49YPvO5CXu+Kxgc/6rH9s/Q4AAP//PZzXiSo38ugAAAAASUVORK5CYII="
       },
       "message": "获取成功"
+ *     }
+ */
+
+ /**
+ * @api {GET} /v1/device/order/cancelOrder/1 取消订单
+ * @apiVersion 0.0.1
+ * @apiName 取消订单
+ * @apiGroup 订单管理管理
+ * @apiPermission device
+ *
+ * @apiDescription 用户取消未支付的订单，其他订单无法取消
+ *   
+ * 
+ * @apiHeader {String} Authorization 接口需要带上此头信息
+ * @apiHeaderExample {Header} Header-Example
+ *     "Authorization: Bearer 5f048fe"
+ *
+ * @apiExample {bash} Curl example
+ * curl -H "Authorization: Bearer 5f048fe" -i http://127.0.0.1:8089/v1/device/order/cancelOrder/1
+ *
+ * @apiUse TokenError
+ *         
+ * 
+ *
+ * @apiSuccessExample Response:
+ *     HTTP/1.1 200 OK
+ *     {
+        "status": 200,
+        "data": {},
+        "message": "操作成功" 
  *     }
  */

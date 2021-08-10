@@ -577,19 +577,19 @@ func GetOrderInfoByCartId(tenancyId, userId uint, cartIds []uint) (response.Chec
 }
 
 // CreateOrder 新建订单 生成订单组-》生成订单, 二维码需要 data:image/png;base64,
-func CreateOrder(req request.CreateOrder, tenancyId, userId uint, tenancyName string) ([]byte, error) {
+func CreateOrder(req request.CreateOrder, tenancyId, userId uint, tenancyName string) ([]byte, uint, error) {
 	var png []byte
 
 	var order model.Order
 	// 床旁用户登录，userId 为患者id
 	patient, err := GetPatientById(userId, tenancyId)
 	if err != nil {
-		return nil, err
+		return nil, order.ID, err
 	}
 	userAddress := fmt.Sprintf("%s-%s-%s床", tenancyName, patient.LocName, patient.BedNum)
 	orderInfo, err := GetOrderInfoByCartId(tenancyId, userId, req.CartIds)
 	if err != nil {
-		return nil, err
+		return nil, order.ID, err
 	}
 
 	// 获取成本价
@@ -700,10 +700,27 @@ func CreateOrder(req request.CreateOrder, tenancyId, userId uint, tenancyName st
 		return nil
 	})
 	if err != nil {
-		return nil, err
+		return nil, order.ID, err
 	}
 
-	return png, nil
+	return png, order.ID, nil
+}
+
+func CheckOrderStatusBeforeAction(orderId uint) error {
+	order, err := GetOrderByOrderId(orderId)
+	if errors.Is(err, gorm.ErrRecordNotFound) {
+		return fmt.Errorf("订单不存在或者已被删除")
+	}
+	if err != nil {
+		return err
+	}
+	if order.Status == model.OrderStatusCancel {
+		return fmt.Errorf("订单已经取消，请勿重复操作")
+	}
+	if order.Status != model.OrderStatusNoPay {
+		return fmt.Errorf("订单已付款,请勿重复操作")
+	}
+	return nil
 }
 
 func GetQrCode(orderId, tenancyId, userId uint, orderType int) ([]byte, error) {
@@ -826,8 +843,12 @@ func ChangeOrderStatusByOrderId(orderId uint, changeData map[string]interface{},
 }
 
 func CancelOrder(orderId uint) error {
+	err := CheckOrderStatusBeforeAction(orderId)
+	if err != nil {
+		return err
+	}
 	changeData := map[string]interface{}{"status": model.OrderStatusCancel}
-	err := ChangeOrderStatusByOrderId(orderId, changeData, "cancel", "取消订单")
+	err = ChangeOrderStatusByOrderId(orderId, changeData, "cancel", "取消订单")
 	if err != nil {
 		return err
 	}

@@ -1260,10 +1260,10 @@ define({ "api": [
   },
   {
     "type": "GET",
-    "url": "/v1/device/order/getOrderById/1",
-    "title": "根据id获取订单详情",
+    "url": "/v1/device/order/cancelOrder/1",
+    "title": "取消订单",
     "version": "0.0.1",
-    "name": "根据id获取订单详情",
+    "name": "取消订单",
     "group": "订单管理管理",
     "permission": [
       {
@@ -1272,7 +1272,7 @@ define({ "api": [
         "description": "<p>床旁设备授权，区分设备所在医院</p> <p>床旁设备请求平台接口之前都需要获取授权，并将授权凭证放置在头部信息中。</p>"
       }
     ],
-    "description": "<p>根据id获取订单详情，用户通过支付宝或者微信扫码支付</p>",
+    "description": "<p>用户取消未支付的订单，其他订单无法取消</p>",
     "header": {
       "fields": {
         "Header": [
@@ -1296,7 +1296,91 @@ define({ "api": [
     "examples": [
       {
         "title": "Curl example",
-        "content": "curl -H \"Authorization: Bearer 5f048fe\" -i http://127.0.0.1:8089/v1/device/order/checkOrder",
+        "content": "curl -H \"Authorization: Bearer 5f048fe\" -i http://127.0.0.1:8089/v1/device/order/cancelOrder/1",
+        "type": "bash"
+      }
+    ],
+    "success": {
+      "examples": [
+        {
+          "title": "Response:",
+          "content": "HTTP/1.1 200 OK\n{\n    \"status\": 200,\n    \"data\": {},\n    \"message\": \"操作成功\" \n}",
+          "type": "json"
+        }
+      ]
+    },
+    "filename": "v1/device/order.js",
+    "groupTitle": "订单管理管理",
+    "sampleRequest": [
+      {
+        "url": "http://127.0.0.1:8089/v1/device/order/cancelOrder/1"
+      }
+    ],
+    "error": {
+      "fields": {
+        "Error 4xx": [
+          {
+            "group": "Error 4xx",
+            "optional": false,
+            "field": "status",
+            "description": "<p>4001 授权错误时返回的状态码，得到次状态码需要重新授权。</p>"
+          },
+          {
+            "group": "Error 4xx",
+            "optional": false,
+            "field": "message",
+            "description": "<p>授权失败的具体描述信息</p>"
+          }
+        ]
+      },
+      "examples": [
+        {
+          "title": "Response (example):",
+          "content": "HTTP/1.1 200 OK\n{\n      \"status\": 4001,\n      \"data\": {},\n      \"message\": \"mutil: invalid token\"\n}",
+          "type": "json"
+        }
+      ]
+    }
+  },
+  {
+    "type": "GET",
+    "url": "/v1/device/order/getOrderById/1",
+    "title": "根据id获取订单详情",
+    "version": "0.0.1",
+    "name": "根据id获取订单详情",
+    "group": "订单管理管理",
+    "permission": [
+      {
+        "name": "device",
+        "title": "床旁设备授权",
+        "description": "<p>床旁设备授权，区分设备所在医院</p> <p>床旁设备请求平台接口之前都需要获取授权，并将授权凭证放置在头部信息中。</p>"
+      }
+    ],
+    "description": "<p>根据id获取订单详情</p>",
+    "header": {
+      "fields": {
+        "Header": [
+          {
+            "group": "Header",
+            "type": "String",
+            "optional": false,
+            "field": "Authorization",
+            "description": "<p>接口需要带上此头信息</p>"
+          }
+        ]
+      },
+      "examples": [
+        {
+          "title": "Header-Example",
+          "content": "\"Authorization: Bearer 5f048fe\"",
+          "type": "Header"
+        }
+      ]
+    },
+    "examples": [
+      {
+        "title": "Curl example",
+        "content": "curl -H \"Authorization: Bearer 5f048fe\" -i http://127.0.0.1:8089/v1/device/order/getOrderById/1",
         "type": "bash"
       }
     ],
@@ -1819,7 +1903,7 @@ define({ "api": [
     "examples": [
       {
         "title": "Curl example",
-        "content": "curl -H \"Authorization: Bearer 5f048fe\" -i http://127.0.0.1:8089/v1/device/order/checkOrder",
+        "content": "curl -H \"Authorization: Bearer 5f048fe\" -i http://127.0.0.1:8089/v1/device/order/createOrder",
         "type": "bash"
       }
     ],
@@ -1923,7 +2007,7 @@ define({ "api": [
     "examples": [
       {
         "title": "Curl example",
-        "content": "curl -H \"Authorization: Bearer 5f048fe\" -i http://127.0.0.1:8089/v1/device/order/checkOrder",
+        "content": "curl -H \"Authorization: Bearer 5f048fe\" -i http://127.0.0.1:8089/v1/device/order/payOrder/1?orderType=1",
         "type": "bash"
       }
     ],
