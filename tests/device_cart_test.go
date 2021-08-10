@@ -27,6 +27,7 @@ func TestDeviceCartList(t *testing.T) {
 func TestDeviceCreateCart(t *testing.T) {
 	auth := deviceWithLoginTester(t)
 	defer baseLogOut(auth)
+	
 	obj := auth.POST("v1/device/cart/createCart").
 		WithJSON(map[string]interface{}{"cartNum": 2, "isNew": 2, "productAttrUnique": "e2fe28308fd2", "productId": 1, "productType": 1}).
 		Expect().Status(http.StatusOK).JSON().Object()
