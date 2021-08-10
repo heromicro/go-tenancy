@@ -825,6 +825,15 @@ func ChangeOrderStatusByOrderId(orderId uint, changeData map[string]interface{},
 	return nil
 }
 
+func CancelOrder(orderId uint) error {
+	changeData := map[string]interface{}{"status": model.OrderStatusCancel}
+	err := ChangeOrderStatusByOrderId(orderId, changeData, "cancel", "取消订单")
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
 func GetNoPayOrdersByOrderSn(orderSn string) ([]model.Order, error) {
 	var orders []model.Order
 	err := g.TENANCY_DB.Model(&model.Order{}).Where("order_sn = ?", orderSn).

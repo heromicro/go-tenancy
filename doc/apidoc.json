@@ -1,4 +1,4 @@
-define({
+{
   "name": "GO-TENANCY多商户商城平台",
   "version": "0.0.1",
   "description": "多商户商城平台接口文档",
@@ -10,12 +10,8 @@ define({
     "withGenerator": true,
     "aloneDisplay": false
   },
-  "defaultVersion": "0.0.0",
-  "apidoc": "0.3.0",
-  "generator": {
-    "name": "apidoc",
-    "time": "2021-08-05T07:45:26.805Z",
-    "url": "https://apidocjs.com",
-    "version": "0.29.0"
+  "header": {
+    "title": "文档说明",
+    "filename": "header.md"
   }
-});
+}

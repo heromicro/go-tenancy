@@ -1890,7 +1890,7 @@ define({ "api": [
         "description": "<p>床旁设备授权，区分设备所在医院</p> <p>床旁设备请求平台接口之前都需要获取授权，并将授权凭证放置在头部信息中。</p>"
       }
     ],
-    "description": "<p>重新获取支付二维码，用户通过支付宝或者微信扫码支付</p>",
+    "description": "<p>重新获取支付二维码，用户通过支付宝或者微信扫码支付 扫码支付后，后台会通过 mqtt 发送主题为 tenancy_notify_pay 的消息体: { &quot;orderId&quot;: 2, // 订单 &quot;tenancyId&quot;: 2, // 商户 &quot;userId&quot;: 2, //用户 &quot;orderType&quot;: 2, // 订单类型 &quot;payType&quot;: 2, // 支付类型 &quot;createdAt&quot;: 2, //回调时间 }</p>",
     "query": [
       {
         "group": "Query",

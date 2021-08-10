@@ -239,6 +239,15 @@
  * @apiPermission device
  *
  * @apiDescription 重新获取支付二维码，用户通过支付宝或者微信扫码支付
+ * 扫码支付后，后台会通过 mqtt 发送主题为 tenancy_notify_pay 的消息体:
+ * {
+ *   "orderId": 2, // 订单
+ *   "tenancyId": 2, // 商户
+ *   "userId": 2, //用户
+ *   "orderType": 2, // 订单类型
+ *   "payType": 2, // 支付类型
+ *   "createdAt": 2, //回调时间
+ * }
  *   
  * @apiQuery {Number} orderType 订单类型
  * 

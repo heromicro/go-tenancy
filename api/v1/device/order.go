@@ -75,3 +75,18 @@ func PayOrder(ctx *gin.Context) {
 		response.OkWithDetailed(gin.H{"qrcode": qrcode}, "获取成功", ctx)
 	}
 }
+
+// CancelOrder
+func CancelOrder(ctx *gin.Context) {
+	var req request.GetById
+	if errs := ctx.ShouldBindUri(&req); errs != nil {
+		response.FailWithMessage(errs.Error(), ctx)
+		return
+	}
+	if err := service.CancelOrder(req.Id); err != nil {
+		g.TENANCY_LOG.Error("操作失败!", zap.Any("err", err))
+		response.FailWithMessage("操作失败:"+err.Error(), ctx)
+	} else {
+		response.OkWithMessage("操作成功", ctx)
+	}
+}
