@@ -303,3 +303,148 @@
         "message": "操作成功" 
  *     }
  */
+
+ /**
+ * @api {post} /v1/device/order/getOrderList 我的订单
+ * @apiVersion 0.0.1
+ * @apiName 我的订单
+ * @apiGroup 订单管理管理
+ * @apiPermission device
+ *
+ * @apiDescription 床旁用户的列表
+ *   
+ * 
+ * @apiHeader {String} Authorization 接口需要带上此头信息
+ * @apiHeaderExample {Header} Header-Example
+ *     "Authorization: Bearer 5f048fe"
+ *
+ * @apiExample {bash} Curl example
+ * curl -H "Authorization: Bearer 5f048fe" -i http://127.0.0.1:8089/v1/device/order/getOrderList
+ *
+ * @apiUse TokenError
+ *         
+ * 
+ *
+ * @apiSuccessExample Response:
+ *     HTTP/1.1 200 OK
+ *     {
+          "status": 200,
+          "data": {
+              "list": [
+                  {
+                      "id": 7,
+                      "createdAt": "2021-08-09T16:53:49+08:00",
+                      "updatedAt": "2021-08-09T17:09:00+08:00",
+                      "orderSn": "12021080916534924655141100851200",
+                      "realName": "八两金",
+                      "userPhone": "13845687419",
+                      "userAddress": "宝安中心人民医院-泌尿科一区-15床",
+                      "totalNum": 20,
+                      "totalPrice": 3200,
+                      "totalPostage": 0,
+                      "payPrice": 3200,
+                      "payPostage": 0,
+                      "commissionRate": 0,
+                      "orderType": 1,
+                      "paid": 2,
+                      "payTime": "0001-01-01T00:00:00Z",
+                      "payType": 0,
+                      "status": 6,
+                      "deliveryType": 0,
+                      "deliveryName": "",
+                      "deliveryId": "",
+                      "mark": "",
+                      "remark": "remark",
+                      "adminMark": "",
+                      "verifyCode": "",
+                      "verifyTime": "0001-01-01T00:00:00Z",
+                      "activityType": 1,
+                      "cost": 1000,
+                      "isDel": 2,
+                      "isSystemDel": 2,
+                      "groupOrderSn": "G2021080916534924655141088268288",
+                      "tenancyName": "宝安中心人民医院",
+                      "isTrader": 2,
+                      "sysUserId": 1,
+                      "sysTenancyId": 1,
+                      "groupOrderId": 6,
+                      "reconciliationId": 0,
+                      "orderProduct": [
+                          {
+                              "id": 7,
+                              "cartInfo": {
+                                  "product": {
+                                      "image": "\thttp://127.0.0.1:8089/uploads/file/9a6a2e1231fb19517ed1de71206a0657.jpg",
+                                      "storeName": "领立裁腰带短袖连衣裙",
+                                      "temp": {
+                                          "name": "",
+                                          "type": 0,
+                                          "appoint": 0,
+                                          "undelivery": 0,
+                                          "isDefault": 0,
+                                          "sort": 0
+                                      }
+                                  },
+                                  "productAttr": {
+                                      "price": 160,
+                                      "sku": "S"
+                                  }
+                              },
+                              "productSku": "S",
+                              "isRefund": 0,
+                              "productNum": 20,
+                              "productType": 1,
+                              "refundNum": 0,
+                              "isReply": 2,
+                              "productPrice": 160,
+                              "orderID": 7,
+                              "productId": 1
+                          }
+                      ]
+                  }
+              ],
+              "page": 1,
+              "pageSize": 20,
+              "stat": [
+                  {
+                      "className": "el-icon-s-goods",
+                      "count": 5,
+                      "field": "件",
+                      "name": "已支付订单数量"
+                  },
+                  {
+                      "className": "el-icon-s-order",
+                      "count": 673,
+                      "field": "元",
+                      "name": "实际支付金额"
+                  },
+                  {
+                      "className": "el-icon-s-cooperation",
+                      "count": 0,
+                      "field": "元",
+                      "name": "已退款金额"
+                  },
+                  {
+                      "className": "el-icon-s-cooperation",
+                      "count": 673,
+                      "field": "元",
+                      "name": "微信支付金额"
+                  },
+                  {
+                      "className": "el-icon-s-finance",
+                      "count": 0,
+                      "field": "元",
+                      "name": "余额支付金额"
+                  },
+                  {
+                      "className": "el-icon-s-cooperation",
+                      "count": 0,
+                      "field": "元",
+                      "name": "支付宝支付金额"
+                  }
+              ],
+              "total": 12
+          },
+          "message": "获取成功"
+ *     }
+ */

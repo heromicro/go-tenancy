@@ -10,6 +10,29 @@ import (
 	"go.uber.org/zap"
 )
 
+// GetOrderList
+func GetOrderList(ctx *gin.Context) {
+	var pageInfo request.OrderPageInfo
+	if errs := ctx.ShouldBindJSON(&pageInfo); errs != nil {
+		response.FailWithMessage(errs.Error(), ctx)
+		return
+	}
+	pageInfo.SysUserId = multi.GetUserId(ctx)
+	pageInfo.SysTenancyId = multi.GetTenancyId(ctx)
+	if list, stat, total, err := service.GetOrderInfoList(pageInfo, ctx); err != nil {
+		g.TENANCY_LOG.Error("获取失败!", zap.Any("err", err))
+		response.FailWithMessage("获取失败:"+err.Error(), ctx)
+	} else {
+		response.OkWithDetailed(gin.H{
+			"stat":     stat,
+			"list":     list,
+			"total":    total,
+			"page":     pageInfo.Page,
+			"pageSize": pageInfo.PageSize,
+		}, "获取成功", ctx)
+	}
+}
+
 func CheckOrder(ctx *gin.Context) {
 	var req request.CheckOrder
 	if errs := ctx.ShouldBindJSON(&req); errs != nil {

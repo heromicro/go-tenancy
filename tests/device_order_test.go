@@ -6,6 +6,17 @@ import (
 	"testing"
 )
 
+func TestDeviceOrderList(t *testing.T) {
+	auth := deviceWithLoginTester(t)
+	defer baseLogOut(auth)
+	obj := auth.POST("v1/device/order/getOrderList").
+		WithJSON(map[string]interface{}{"page": 1, "pageSize": 20}).
+		Expect().Status(http.StatusOK).JSON().Object()
+	obj.Keys().ContainsOnly("status", "data", "message")
+	obj.Value("status").Number().Equal(200)
+	obj.Value("message").String().Equal("获取成功")
+}
+
 func TestDeviceCheckOrder(t *testing.T) {
 	auth := deviceWithLoginTester(t)
 	defer baseLogOut(auth)
@@ -24,8 +35,8 @@ func TestDeviceCheckOrder(t *testing.T) {
 		obj.Value("status").Number().Equal(200)
 		obj.Value("message").String().Equal("获取成功")
 	}
-
 }
+
 func TestDeviceCreateOrder(t *testing.T) {
 	auth := deviceWithLoginTester(t)
 	defer baseLogOut(auth)

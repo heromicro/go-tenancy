@@ -1343,6 +1343,90 @@ define({ "api": [
     }
   },
   {
+    "type": "post",
+    "url": "/v1/device/order/getOrderList",
+    "title": "我的订单",
+    "version": "0.0.1",
+    "name": "我的订单",
+    "group": "订单管理管理",
+    "permission": [
+      {
+        "name": "device",
+        "title": "床旁设备授权",
+        "description": "<p>床旁设备授权，区分设备所在医院</p> <p>床旁设备请求平台接口之前都需要获取授权，并将授权凭证放置在头部信息中。</p>"
+      }
+    ],
+    "description": "<p>床旁用户的列表</p>",
+    "header": {
+      "fields": {
+        "Header": [
+          {
+            "group": "Header",
+            "type": "String",
+            "optional": false,
+            "field": "Authorization",
+            "description": "<p>接口需要带上此头信息</p>"
+          }
+        ]
+      },
+      "examples": [
+        {
+          "title": "Header-Example",
+          "content": "\"Authorization: Bearer 5f048fe\"",
+          "type": "Header"
+        }
+      ]
+    },
+    "examples": [
+      {
+        "title": "Curl example",
+        "content": "curl -H \"Authorization: Bearer 5f048fe\" -i http://127.0.0.1:8089/v1/device/order/getOrderList",
+        "type": "bash"
+      }
+    ],
+    "success": {
+      "examples": [
+        {
+          "title": "Response:",
+          "content": "HTTP/1.1 200 OK\n{\n      \"status\": 200,\n      \"data\": {\n          \"list\": [\n              {\n                  \"id\": 7,\n                  \"createdAt\": \"2021-08-09T16:53:49+08:00\",\n                  \"updatedAt\": \"2021-08-09T17:09:00+08:00\",\n                  \"orderSn\": \"12021080916534924655141100851200\",\n                  \"realName\": \"八两金\",\n                  \"userPhone\": \"13845687419\",\n                  \"userAddress\": \"宝安中心人民医院-泌尿科一区-15床\",\n                  \"totalNum\": 20,\n                  \"totalPrice\": 3200,\n                  \"totalPostage\": 0,\n                  \"payPrice\": 3200,\n                  \"payPostage\": 0,\n                  \"commissionRate\": 0,\n                  \"orderType\": 1,\n                  \"paid\": 2,\n                  \"payTime\": \"0001-01-01T00:00:00Z\",\n                  \"payType\": 0,\n                  \"status\": 6,\n                  \"deliveryType\": 0,\n                  \"deliveryName\": \"\",\n                  \"deliveryId\": \"\",\n                  \"mark\": \"\",\n                  \"remark\": \"remark\",\n                  \"adminMark\": \"\",\n                  \"verifyCode\": \"\",\n                  \"verifyTime\": \"0001-01-01T00:00:00Z\",\n                  \"activityType\": 1,\n                  \"cost\": 1000,\n                  \"isDel\": 2,\n                  \"isSystemDel\": 2,\n                  \"groupOrderSn\": \"G2021080916534924655141088268288\",\n                  \"tenancyName\": \"宝安中心人民医院\",\n                  \"isTrader\": 2,\n                  \"sysUserId\": 1,\n                  \"sysTenancyId\": 1,\n                  \"groupOrderId\": 6,\n                  \"reconciliationId\": 0,\n                  \"orderProduct\": [\n                      {\n                          \"id\": 7,\n                          \"cartInfo\": {\n                              \"product\": {\n                                  \"image\": \"\\thttp://127.0.0.1:8089/uploads/file/9a6a2e1231fb19517ed1de71206a0657.jpg\",\n                                  \"storeName\": \"领立裁腰带短袖连衣裙\",\n                                  \"temp\": {\n                                      \"name\": \"\",\n                                      \"type\": 0,\n                                      \"appoint\": 0,\n                                      \"undelivery\": 0,\n                                      \"isDefault\": 0,\n                                      \"sort\": 0\n                                  }\n                              },\n                              \"productAttr\": {\n                                  \"price\": 160,\n                                  \"sku\": \"S\"\n                              }\n                          },\n                          \"productSku\": \"S\",\n                          \"isRefund\": 0,\n                          \"productNum\": 20,\n                          \"productType\": 1,\n                          \"refundNum\": 0,\n                          \"isReply\": 2,\n                          \"productPrice\": 160,\n                          \"orderID\": 7,\n                          \"productId\": 1\n                      }\n                  ]\n              }\n          ],\n          \"page\": 1,\n          \"pageSize\": 20,\n          \"stat\": [\n              {\n                  \"className\": \"el-icon-s-goods\",\n                  \"count\": 5,\n                  \"field\": \"件\",\n                  \"name\": \"已支付订单数量\"\n              },\n              {\n                  \"className\": \"el-icon-s-order\",\n                  \"count\": 673,\n                  \"field\": \"元\",\n                  \"name\": \"实际支付金额\"\n              },\n              {\n                  \"className\": \"el-icon-s-cooperation\",\n                  \"count\": 0,\n                  \"field\": \"元\",\n                  \"name\": \"已退款金额\"\n              },\n              {\n                  \"className\": \"el-icon-s-cooperation\",\n                  \"count\": 673,\n                  \"field\": \"元\",\n                  \"name\": \"微信支付金额\"\n              },\n              {\n                  \"className\": \"el-icon-s-finance\",\n                  \"count\": 0,\n                  \"field\": \"元\",\n                  \"name\": \"余额支付金额\"\n              },\n              {\n                  \"className\": \"el-icon-s-cooperation\",\n                  \"count\": 0,\n                  \"field\": \"元\",\n                  \"name\": \"支付宝支付金额\"\n              }\n          ],\n          \"total\": 12\n      },\n      \"message\": \"获取成功\"\n}",
+          "type": "json"
+        }
+      ]
+    },
+    "filename": "v1/device/order.js",
+    "groupTitle": "订单管理管理",
+    "sampleRequest": [
+      {
+        "url": "http://127.0.0.1:8089/v1/device/order/getOrderList"
+      }
+    ],
+    "error": {
+      "fields": {
+        "Error 4xx": [
+          {
+            "group": "Error 4xx",
+            "optional": false,
+            "field": "status",
+            "description": "<p>4001 授权错误时返回的状态码，得到次状态码需要重新授权。</p>"
+          },
+          {
+            "group": "Error 4xx",
+            "optional": false,
+            "field": "message",
+            "description": "<p>授权失败的具体描述信息</p>"
+          }
+        ]
+      },
+      "examples": [
+        {
+          "title": "Response (example):",
+          "content": "HTTP/1.1 200 OK\n{\n      \"status\": 4001,\n      \"data\": {},\n      \"message\": \"mutil: invalid token\"\n}",
+          "type": "json"
+        }
+      ]
+    }
+  },
+  {
     "type": "GET",
     "url": "/v1/device/order/getOrderById/1",
     "title": "根据id获取订单详情",
