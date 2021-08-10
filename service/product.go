@@ -65,6 +65,10 @@ func GetProductFilter(tenancyId uint, isTenancy bool) ([]response.ProductFilter,
 			}
 		}
 
+		if isTenancy {
+			db = CheckTenancyId(db, tenancyId, "")
+		}
+
 		err := db.Count(&filter.Count).Error
 		if err != nil {
 			return filters, err
@@ -571,6 +575,7 @@ func ForceDeleteProduct(id uint) error {
 
 // GetProductInfoList
 func GetProductInfoList(info request.ProductPageInfo, ctx *gin.Context) ([]response.ProductList, int64, error) {
+	isTenancy := multi.IsTenancy(ctx)
 	tenancyId := multi.GetTenancyId(ctx)
 	var productList []response.ProductList
 	var total int64
@@ -591,7 +596,7 @@ func GetProductInfoList(info request.ProductPageInfo, ctx *gin.Context) ([]respo
 			if err != nil {
 				return productList, total, err
 			}
-			cond := getProductConditionByType(multi.GetTenancyId(ctx), multi.IsTenancy(ctx), t)
+			cond := getProductConditionByType(multi.GetTenancyId(ctx), isTenancy, t)
 			if cond.IsDeleted {
 				db = db.Unscoped()
 			}
@@ -605,7 +610,7 @@ func GetProductInfoList(info request.ProductPageInfo, ctx *gin.Context) ([]respo
 		}
 	}
 
-	if multi.IsTenancy(ctx) {
+	if isTenancy {
 		db = db.Where("products.sys_tenancy_id = ?", tenancyId)
 	}
 

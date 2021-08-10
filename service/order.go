@@ -102,6 +102,10 @@ func getOrderCount(name string, ctx *gin.Context) (int64, error) {
 				db = db.Where(isDelField, g.StatusFalse)
 			}
 
+			if multi.IsTenancy(ctx) {
+				db = CheckTenancyId(db, multi.GetTenancyId(ctx), "")
+			}
+
 			err := db.Count(&count).Error
 			if err != nil {
 				return count, err
@@ -129,6 +133,10 @@ func GetFilter(ctx *gin.Context) ([]map[string]interface{}, error) {
 		if isDelField != "" {
 			db = db.Where(isDelField, g.StatusFalse)
 		}
+		if multi.IsTenancy(ctx) {
+			db = CheckTenancyId(db, multi.GetTenancyId(ctx), "")
+		}
+
 		err := db.Where("order_type = ?", chart["orderType"]).Count(&count).Error
 		if err != nil {
 			return nil, err
