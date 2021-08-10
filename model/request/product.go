@@ -6,7 +6,7 @@ type ProductPageInfo struct {
 	Page              int    `json:"page" form:"page" binding:"required"`
 	PageSize          int    `json:"pageSize" form:"pageSize" binding:"required"`
 	ProductCategoryId uint   `json:"tenancyCategoryId" form:"tenancyCategoryId"`
-	Type              string `json:"type" form:"type"  binding:"required"`
+	Type              string `json:"type" form:"type"`
 	CateId            int    `json:"cateId" form:"cateId"`
 	Keyword           string `json:"keyword" form:"keyword"`
 	IsGiftBag         string `json:"isGiftBag" form:"isGiftBag"`

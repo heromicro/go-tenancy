@@ -102,9 +102,7 @@ func getProductCategoryMap(tenancyId uint, isCuser bool) (map[int32][]response.P
 	var productCategoryList []response.ProductCategory
 	treeMap := make(map[int32][]response.ProductCategory)
 	db := g.TENANCY_DB.Model(&model.ProductCategory{})
-	if int(tenancyId) >= 0 {
-		db = db.Where("sys_tenancy_id = ?", tenancyId)
-	}
+	db = CheckTenancyId(db, tenancyId, "")
 	if isCuser {
 		db = db.Where("status = ?", g.StatusTrue)
 		db = db.Select("id,pid,cate_name,pic")
@@ -167,9 +165,9 @@ func getProductCatesByProductId(productId, tenancyId uint) ([]response.ProductCa
 
 func getProductIdsByProductCategoryId(productCategoryId, tenancyId uint) ([]uint, error) {
 	var productIds []uint
-	err := g.TENANCY_DB.Model(&model.ProductProductCate{}).Select("product_id").
-		Where("product_category_id = ?", productCategoryId).
-		Where("sys_tenancy_id = ?", tenancyId).
+	db := g.TENANCY_DB.Model(&model.ProductProductCate{}).Select("product_id").Where("product_category_id = ?", productCategoryId)
+	db = CheckTenancyId(db, tenancyId, "")
+	err := db.
 		Find(&productIds).Error
 
 	return productIds, err

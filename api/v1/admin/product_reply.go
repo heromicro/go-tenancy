@@ -1,4 +1,4 @@
-package client
+package admin
 
 import (
 	"github.com/gin-gonic/gin"
@@ -11,12 +11,7 @@ import (
 )
 
 func GetReplyMap(ctx *gin.Context) {
-	var req request.GetById
-	if errs := ctx.ShouldBindUri(&req); errs != nil {
-		response.FailWithMessage(errs.Error(), ctx)
-		return
-	}
-	if replyMap, err := service.GetReplyMap(req.Id, ctx); err != nil {
+	if replyMap, err := service.GetAdminReplyMap(ctx); err != nil {
 		g.TENANCY_LOG.Error("获取失败!", zap.Any("err", err))
 		response.FailWithMessage("获取失败:"+err.Error(), ctx)
 	} else {
@@ -25,17 +20,26 @@ func GetReplyMap(ctx *gin.Context) {
 }
 
 func AddReply(ctx *gin.Context) {
+	var reply request.AddFictiReply
+	if errs := ctx.ShouldBindJSON(&reply); errs != nil {
+		response.FailWithMessage(errs.Error(), ctx)
+		return
+	}
+	if id, err := service.AddFictiReply(reply); err != nil {
+		g.TENANCY_LOG.Error("操作失败!", zap.Any("err", err))
+		response.FailWithMessage("操作失败:"+err.Error(), ctx)
+	} else {
+		response.OkWithDetailed(gin.H{"id": id}, "操作成功", ctx)
+	}
+}
+
+func DeleteProductReply(ctx *gin.Context) {
 	var req request.GetById
 	if errs := ctx.ShouldBindUri(&req); errs != nil {
 		response.FailWithMessage(errs.Error(), ctx)
 		return
 	}
-	var reply request.ProductReply
-	if errs := ctx.ShouldBindJSON(&reply); errs != nil {
-		response.FailWithMessage(errs.Error(), ctx)
-		return
-	}
-	if err := service.AddReply(req.Id, reply.Content); err != nil {
+	if err := service.DeleteProductReply(req.Id); err != nil {
 		g.TENANCY_LOG.Error("操作失败!", zap.Any("err", err))
 		response.FailWithMessage("操作失败:"+err.Error(), ctx)
 	} else {

@@ -18,61 +18,6 @@ type Form struct {
 	Headers []map[string]interface{} `json:"headers,omitempty"`
 }
 
-func (rule *Rule) AddValidator(validator map[string]interface{}) *Rule {
-	rule.Validate = append(rule.Validate, validator)
-	return rule
-}
-func (rule *Rule) AddProps(props map[string]interface{}) *Rule {
-	rule.Props = props
-	return rule
-}
-
-func NewInput(title, field, placeholder string, value interface{}) *Rule {
-	return &Rule{
-		Title: title,
-		Type:  "input",
-		Field: field,
-		Value: value,
-		Props: map[string]interface{}{
-			"type":        "text",
-			"placeholder": placeholder,
-		},
-	}
-}
-
-func NewSwitch(title, field string, value interface{}) *Rule {
-	return &Rule{
-		Title: title,
-		Type:  "switch",
-		Field: field,
-		Value: value,
-		Props: map[string]interface{}{
-			"activeValue":   1,
-			"inactiveValue": 2,
-			"inactiveText":  "关闭",
-			"activeText":    "开启",
-		},
-	}
-}
-
-func (form *Form) AddRule(rule Rule) *Form {
-	form.Rule = append(form.Rule, rule)
-	return form
-}
-
-func (form *Form) SetAction(uri string, ctx *gin.Context) {
-	form.Action = SetUrl(uri, ctx)
-}
-
-func SetUrl(uri string, ctx *gin.Context) string {
-	if multi.IsAdmin(ctx) {
-		return g.TENANCY_CONFIG.System.AdminPreix + uri
-	} else if multi.IsTenancy(ctx) {
-		return g.TENANCY_CONFIG.System.ClientPreix + uri
-	}
-	return ""
-}
-
 type Config struct{}
 
 type Rule struct {
@@ -82,6 +27,7 @@ type Rule struct {
 	Info     string                   `json:"info"`
 	Value    interface{}              `json:"value"`
 	Props    map[string]interface{}   `json:"props"`
+	Col      map[string]interface{}   `json:"col,omitempty"`
 	Options  []Option                 `json:"options,omitempty"`
 	Control  []Control                `json:"control,omitempty"`
 	Validate []map[string]interface{} `json:"validate,omitempty"`
@@ -156,4 +102,83 @@ func (r *Rule) TransData(rule string, token []byte) {
 		r.Type = "frame"
 	}
 
+}
+
+func (rule *Rule) AddValidator(validator map[string]interface{}) *Rule {
+	rule.Validate = append(rule.Validate, validator)
+	return rule
+}
+func (rule *Rule) AddProps(props map[string]interface{}) *Rule {
+	rule.Props = props
+	return rule
+}
+
+func NewInput(title, field, placeholder string, value interface{}) *Rule {
+	return &Rule{
+		Title: title,
+		Type:  "input",
+		Field: field,
+		Value: value,
+		Props: map[string]interface{}{
+			"type":        "text",
+			"placeholder": placeholder,
+		},
+	}
+}
+
+func NewFrame(title, field, placeholder string, value interface{}) *Rule {
+	return &Rule{
+		Title: title,
+		Type:  "frame",
+		Field: field,
+		Value: value,
+	}
+}
+
+func NewRate(title, field string, span int64, value interface{}) *Rule {
+	return &Rule{
+		Title: title,
+		Type:  "rate",
+		Field: field,
+		Value: value,
+		Col: map[string]interface{}{
+			"span": 8,
+		},
+		Props: map[string]interface{}{
+			"max": 5,
+		},
+	}
+}
+
+func NewSwitch(title, field string, value interface{}) *Rule {
+	return &Rule{
+		Title: title,
+		Type:  "switch",
+		Field: field,
+		Value: value,
+		Props: map[string]interface{}{
+			"activeValue":   1,
+			"inactiveValue": 2,
+			"inactiveText":  "关闭",
+			"activeText":    "开启",
+		},
+	}
+}
+
+func (form *Form) AddRule(rule Rule) *Form {
+	form.Rule = append(form.Rule, rule)
+	return form
+}
+
+func (form *Form) SetAction(uri string, ctx *gin.Context) {
+	form.Action = SetUrl(uri, ctx)
+}
+
+func SetUrl(uri string, ctx *gin.Context) string {
+	if multi.IsAdmin(ctx) {
+		return g.TENANCY_CONFIG.System.AdminPreix + uri
+	} else if multi.IsTenancy(ctx) {
+		return g.TENANCY_CONFIG.System.ClientPreix + uri
+	}
+	return ""
 }

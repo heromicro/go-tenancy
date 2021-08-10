@@ -55,7 +55,7 @@
                         "sku": "S",
                         "stock": 99,
                         "sales": 1,
-                        "image": "\thttp://127.0.0.1:8089/uploads/file/9a6a2e1231fb19517ed1de71206a0657.jpg",
+                        "image": "http://127.0.0.1:8089/uploads/file/9a6a2e1231fb19517ed1de71206a0657.jpg",
                         "barCode": "123456",
                         "cost": 50,
                         "otPrice": 180,
@@ -311,8 +311,13 @@
  * @apiGroup 订单管理管理
  * @apiPermission device
  *
- * @apiDescription 床旁用户的列表
+ * @apiDescription 床旁用户的订单列表
  *   
+ * @apiBody {Number} pageSize 页数
+ * @apiBody {Number} page 页码
+ * @apiBody {String} status 订单状态0：待付款 1:待发货 2：待收货 3：待评价 4：已完成 5：已退款 6：已取消 
+ * @apiBody {String} date 日期：today，yesterday，lately7，lately30，month，year或者日期范围:2021/08/01-2021/08/05 
+ * @apiBody {String} orderType 订单类型 
  * 
  * @apiHeader {String} Authorization 接口需要带上此头信息
  * @apiHeaderExample {Header} Header-Example
@@ -374,7 +379,7 @@
                               "id": 7,
                               "cartInfo": {
                                   "product": {
-                                      "image": "\thttp://127.0.0.1:8089/uploads/file/9a6a2e1231fb19517ed1de71206a0657.jpg",
+                                      "image": "http://127.0.0.1:8089/uploads/file/9a6a2e1231fb19517ed1de71206a0657.jpg",
                                       "storeName": "领立裁腰带短袖连衣裙",
                                       "temp": {
                                           "name": "",

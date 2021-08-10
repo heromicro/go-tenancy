@@ -86,12 +86,12 @@ func InitProductRouter(Router *gin.RouterGroup) {
 	}
 }
 
-// 患者管理
+// 商品评论管理
 func InitProductReplyRouter(Router *gin.RouterGroup) {
 	ProductReplyRouter := Router.Group("/productReply")
 	{
 		ProductReplyRouter.GET("/replyMap/:id", client.GetReplyMap)
-		ProductReplyRouter.POST("/reply/:id", client.AddReply)
+		ProductReplyRouter.POST("/reply", client.AddReply)
 		ProductReplyRouter.POST("/getProductReplyList", client.GetProductReplyList)
 	}
 }

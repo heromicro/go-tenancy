@@ -342,10 +342,9 @@ func SetProductCategory(tx *gorm.DB, id, tenancyId uint, reqIds []uint) error {
 
 func GetProductForReplysByIds(ids []uint, tenancyId uint) ([]response.ProductForReply, error) {
 	var productForReplies []response.ProductForReply
-	err := g.TENANCY_DB.Model(&model.Product{}).
-		Select("id,store_name,image").
-		Where("sys_tenancy_id = ?", tenancyId).
-		Where("id in ?", ids).
+	db := g.TENANCY_DB.Model(&model.Product{}).Select("id,store_name,image")
+	db = CheckTenancyId(db, tenancyId, "")
+	err := db.Where("id in ?", ids).
 		Find(&productForReplies).Error
 	if err != nil {
 		return productForReplies, err
@@ -355,10 +354,9 @@ func GetProductForReplysByIds(ids []uint, tenancyId uint) ([]response.ProductFor
 
 func GetProductIdsByKeyword(keyword string, tenancyId uint) ([]uint, error) {
 	var ids []uint
-	err := g.TENANCY_DB.Model(&model.Product{}).
-		Select("id").
-		Where("sys_tenancy_id = ?", tenancyId).
-		Where(g.TENANCY_DB.Where("id like ?", keyword+"%").Or("store_name like ?", keyword+"%").Or("store_info like ?", keyword+"%").Or("keyword like ?", keyword+"%")).
+	db := g.TENANCY_DB.Model(&model.Product{}).Select("id")
+	db = CheckTenancyId(db, tenancyId, "")
+	err := db.Where(g.TENANCY_DB.Where("id like ?", keyword+"%").Or("store_name like ?", keyword+"%").Or("store_info like ?", keyword+"%").Or("keyword like ?", keyword+"%")).
 		Find(&ids).Error
 	if err != nil {
 		return ids, err
@@ -370,9 +368,9 @@ func GetProductIdsByKeyword(keyword string, tenancyId uint) ([]uint, error) {
 func GetCartProducts(sysTenancyID, sysUserID uint, cartIds []uint) ([]response.CartProduct, error) {
 	var cartProducts []response.CartProduct
 	db := g.TENANCY_DB.Model(&model.Product{}).Where("products.is_show = ?", g.StatusTrue).Where("products.status = ?", model.SuccessProductStatus).Select("products.id as product_id,products.store_name,products.image,products.spec_type,products.price,carts.id,carts.cart_num,carts.sys_tenancy_id as sys_tenancy_id,carts.product_attr_unique,carts.is_fail").
-		Joins("left join carts on products.id = carts.product_id").
-		Where("carts.sys_tenancy_id = ?", sysTenancyID).
-		Where("carts.sys_user_id = ?", sysUserID).
+		Joins("left join carts on products.id = carts.product_id")
+	db = CheckTenancyId(db, sysTenancyID, "carts.")
+	db.Where("carts.sys_user_id = ?", sysUserID).
 		Where("carts.is_pay = ?", g.StatusFalse).
 		Where("carts.deleted_at is null")
 
@@ -606,6 +604,7 @@ func GetProductInfoList(info request.ProductPageInfo, ctx *gin.Context) ([]respo
 			}
 		}
 	}
+
 	if multi.IsTenancy(ctx) {
 		db = db.Where("products.sys_tenancy_id = ?", tenancyId)
 	}

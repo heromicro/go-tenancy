@@ -68,7 +68,7 @@ func productReplyClientlist(t *testing.T, params map[string]interface{}, length 
 	}
 }
 
-func TestProductReply(t *testing.T) {
+func TestClientProductReply(t *testing.T) {
 	auth := tenancyWithLoginTester(t)
 	defer baseLogOut(auth)
 	obj := auth.GET("v1/merchant/productReply/replyMap/1").

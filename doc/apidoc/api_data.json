@@ -1356,7 +1356,44 @@
         "description": "<p>床旁设备授权，区分设备所在医院</p> <p>床旁设备请求平台接口之前都需要获取授权，并将授权凭证放置在头部信息中。</p>"
       }
     ],
-    "description": "<p>床旁用户的列表</p>",
+    "description": "<p>床旁用户的订单列表</p>",
+    "body": [
+      {
+        "group": "Body",
+        "type": "Number",
+        "optional": false,
+        "field": "pageSize",
+        "description": "<p>页数</p>"
+      },
+      {
+        "group": "Body",
+        "type": "Number",
+        "optional": false,
+        "field": "page",
+        "description": "<p>页码</p>"
+      },
+      {
+        "group": "Body",
+        "type": "String",
+        "optional": false,
+        "field": "status",
+        "description": "<p>订单状态0：待付款 1:待发货 2：待收货 3：待评价 4：已完成 5：已退款 6：已取消</p>"
+      },
+      {
+        "group": "Body",
+        "type": "String",
+        "optional": false,
+        "field": "date",
+        "description": "<p>日期：today，yesterday，lately7，lately30，month，year或者日期范围:2021/08/01-2021/08/05</p>"
+      },
+      {
+        "group": "Body",
+        "type": "String",
+        "optional": false,
+        "field": "orderType",
+        "description": "<p>订单类型</p>"
+      }
+    ],
     "header": {
       "fields": {
         "Header": [

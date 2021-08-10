@@ -73,6 +73,7 @@ func Routers(app *gin.Engine) {
 			admin.InitMediaRouter(AdminGroup)          // 媒体库路由
 			admin.InitCategoryRouter(AdminGroup)       // 商品分类路由
 			admin.InitProductRouter(AdminGroup)        // 商品路由
+			admin.InitProductReplyRouter(AdminGroup)   // 商品评价路由
 			admin.InitOrderRouter(AdminGroup)          // 订单路由
 			admin.InitRefundOrderRouter(AdminGroup)    // 退款订单路由
 			admin.InitExpressRouter(AdminGroup)        // 物流公司路由
@@ -100,7 +101,7 @@ func Routers(app *gin.Engine) {
 			client.InitCategoryRouter(ClientGroup)         // 商品分类路由
 			client.InitAttrTemplateRouter(ClientGroup)     // 规格模板路由
 			client.InitProductRouter(ClientGroup)          // 商品路由
-			client.InitProductReplyRouter(ClientGroup)     // 商品路由
+			client.InitProductReplyRouter(ClientGroup)     // 商品评价路由
 			client.InitShippingTemplateRouter(ClientGroup) // 运费模板路由
 			client.InitOrderRouter(ClientGroup)            // 订单路由
 			client.InitRefundOrderRouter(ClientGroup)      // 退款订单路由

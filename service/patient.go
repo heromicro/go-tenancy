@@ -29,8 +29,8 @@ func GetPatientInfoList(info request.PageInfo, tenancyId uint) ([]response.Patie
 	offset := info.PageSize * (info.Page - 1)
 	db := g.TENANCY_DB.Model(&model.Patient{}).
 		Select("patients.*,sys_tenancies.name as hospital_name").
-		Joins("left join sys_tenancies on patients.sys_tenancy_id = sys_tenancies.id").
-		Where("patients.sys_tenancy_id = ?", tenancyId)
+		Joins("left join sys_tenancies on patients.sys_tenancy_id = sys_tenancies.id")
+	db = CheckTenancyId(db, tenancyId, "patients.")
 	err := db.Count(&total).Error
 	if err != nil {
 		return patientList, total, err
@@ -42,7 +42,9 @@ func GetPatientInfoList(info request.PageInfo, tenancyId uint) ([]response.Patie
 
 func GetPatientById(patientId, tenancyId uint) (model.Patient, error) {
 	var patient model.Patient
-	err := g.TENANCY_DB.Model(&model.Patient{}).Where("id =?", patientId).Where("sys_tenancy_id = ?", tenancyId).First(&patient).Error
+	db := g.TENANCY_DB.Model(&model.Patient{}).Where("id =?", patientId)
+	db = CheckTenancyId(db, tenancyId, "")
+	err := db.First(&patient).Error
 	if err != nil {
 		return patient, err
 	}

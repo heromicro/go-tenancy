@@ -79,12 +79,12 @@ type BaseProduct struct {
 type ProductReply struct {
 	g.TENANCY_MODEL
 	BaseProductReply
-	SysUserID      uint   `gorm:"index:sys_user_id;column:sys_user_id;type:int;not null" json:"sysUserId"`          // 用户ID
-	SysTenancyID   uint   `gorm:"index:sys_tenancy_id;column:sys_tenancy_id;type:int;not null" json:"sysTenancyId"` // 商户 id
-	ProductID      uint   `gorm:"index:product_id;column:product_id;type:int;not null" json:"productId"`            // 商品id  // 商品id
-	OrderProductID uint   `gorm:"index:order_id;column:order_product_id;type:int;not null" json:"orderProductId"`   // 订单商品ID
-	Unique         string `gorm:"uniqueIndex:order_id;column:unique;type:char(12)" json:"unique"`                   // 商品 sku
-	ProductType    int32  `gorm:"column:product_type;type:tinyint;not null;default:1" json:"productType"`           // 1=普通商品
+	SysUserID      uint   `gorm:"index:sys_user_id;column:sys_user_id;type:int;not null" json:"sysUserId"`                // 用户ID
+	SysTenancyID   uint   `gorm:"index:sys_tenancy_id;column:sys_tenancy_id;type:int;not null" json:"sysTenancyId"`       // 商户 id
+	ProductID      uint   `gorm:"index:product_id;column:product_id;type:int;not null" json:"productId"`                  // 商品id  // 商品id
+	OrderProductID uint   `gorm:"index:order_product_id;column:order_product_id;type:int;not null" json:"orderProductId"` // 订单商品ID
+	Unique         string `gorm:"index:order_product_id;column:unique;type:char(12)" json:"unique"`                       // 商品 sku
+	ProductType    int32  `gorm:"column:product_type;type:tinyint;not null;default:1" json:"productType"`                 // 1=普通商品
 }
 
 type BaseProductReply struct {

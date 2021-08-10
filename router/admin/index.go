@@ -211,6 +211,17 @@ func InitProductRouter(Router *gin.RouterGroup) {
 	}
 }
 
+// 商品评论管理
+func InitProductReplyRouter(Router *gin.RouterGroup) {
+	ProductReplyRouter := Router.Group("/productReply")
+	{
+		ProductReplyRouter.GET("/replyMap", admin.GetReplyMap)
+		ProductReplyRouter.POST("/reply", admin.AddReply)
+		ProductReplyRouter.DELETE("/deleteProductReply/:id", admin.DeleteProductReply)
+		ProductReplyRouter.POST("/getProductReplyList", admin.GetProductReplyList)
+	}
+}
+
 // 系统设置
 func InitSystemRouter(Router *gin.RouterGroup) {
 	SystemRouter := Router.Group("/system")

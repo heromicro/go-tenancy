@@ -97,7 +97,9 @@ func SetNowMoney(id, tenancyId uint, req request.SetNowMoney) error {
 
 func GetUserLabelIdsByUserId(id, tenancyId uint) ([]uint, error) {
 	var labelIds []uint
-	err := g.TENANCY_DB.Model(&model.UserUserLabel{}).Select("user_label_id").Where("sys_user_id = ?", id).Where("sys_tenancy_id =?", tenancyId).Find(&labelIds).Error
+	db := g.TENANCY_DB.Model(&model.UserUserLabel{}).Select("user_label_id").Where("sys_user_id = ?", id)
+	db = CheckTenancyId(db, tenancyId, "")
+	err := db.Find(&labelIds).Error
 	if err != nil {
 		return labelIds, fmt.Errorf("get label ids %w", err)
 	}
@@ -230,7 +232,10 @@ func SetUserLabel(id, tenancyId uint, reqlabelIds []uint) error {
 	}
 
 	if len(delIds) > 0 {
-		if err = g.TENANCY_DB.Where("sys_user_id = ?", id).Where("sys_tenancy_id = ?", tenancyId).Where("user_label_id in ?", delIds).Delete(&model.UserUserLabel{}).Error; err != nil {
+		db := g.TENANCY_DB.Where("sys_user_id = ?", id)
+		db = CheckTenancyId(db, tenancyId, "")
+		err := db.Where("user_label_id in ?", delIds).Delete(&model.UserUserLabel{}).Error
+		if err != nil {
 			return fmt.Errorf("delete user_user_labels %w", err)
 		}
 	}
@@ -408,9 +413,11 @@ func getCuserLabels(userList []response.GeneralUser, tenancyId uint) ([]response
 	return userList, nil
 }
 
-func GetUserIdsByLabelId(labelId string, tenanacyId uint) ([]uint, error) {
+func GetUserIdsByLabelId(labelId string, tenancyId uint) ([]uint, error) {
 	var userIds []uint
-	err := g.TENANCY_DB.Model(&model.UserUserLabel{}).Select("sys_user_id").Where("user_label_id = ?", labelId).Where("sys_tenancy_id = ?", tenanacyId).Find(&userIds).Error
+	db := g.TENANCY_DB.Model(&model.UserUserLabel{}).Select("sys_user_id").Where("user_label_id = ?", labelId)
+	db = CheckTenancyId(db, tenancyId, "")
+	err := db.Find(&userIds).Error
 	if err != nil {
 		return userIds, fmt.Errorf("get user ids by label id %w", err)
 	}

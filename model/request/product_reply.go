@@ -1,5 +1,7 @@
 package request
 
+import "github.com/snowlyg/go-tenancy/model"
+
 type ProductReplyPageInfo struct {
 	Page     int    `json:"page" form:"page" binding:"required"`
 	PageSize int    `json:"pageSize" form:"pageSize" binding:"required"`
@@ -12,4 +14,14 @@ type ProductReplyPageInfo struct {
 
 type ProductReply struct {
 	Content string `json:"content" form:"content"`
+}
+
+type AddFictiReply struct {
+	model.BaseProductReply
+	ProductID ProductID `json:"productId"  form:"productId"`
+	Pic       []string  `json:"pic"  form:"pic"`
+}
+type ProductID struct {
+	Id  uint   `json:"id"  form:"id"`
+	Src string `json:"src"  form:"src"`
 }

@@ -103,3 +103,10 @@ func IsCuser(ctx *gin.Context) bool {
 	}
 	return true
 }
+
+func CheckTenancyId(db *gorm.DB, tenancyId uint, perfix string) *gorm.DB {
+	if tenancyId == 0 {
+		return db
+	}
+	return db.Where(perfix+"sys_tenancy_id", tenancyId)
+}

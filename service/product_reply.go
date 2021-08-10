@@ -13,6 +13,61 @@ import (
 	"github.com/snowlyg/go-tenancy/model/response"
 )
 
+func GetAdminReplyMap(ctx *gin.Context) (Form, error) {
+	var form Form
+	productIdProps := map[string]interface{}{
+		"type":      "image",
+		"maxLength": 1,
+		"title":     "请选择商品",
+		"src":       "/admin/setting/storeProduct?field=productId",
+		"width":     "60%",
+		"height":    "536px",
+		"srcKey":    "src",
+		"modal": map[string]interface{}{
+			"modal": false,
+		},
+	}
+	avatarProps := map[string]interface{}{
+		"type":      "image",
+		"maxLength": 1,
+		"title":     "请选择用户头像",
+		"src":       "/admin/setting/uploadPicture?field=avatar&type=1",
+		"width":     "896px",
+		"height":    "480px",
+		"footer":    false,
+		"modal": map[string]interface{}{
+			"modal": false,
+		},
+	}
+	picsProps := map[string]interface{}{
+		"type":      "image",
+		"maxLength": 6,
+		"title":     "请选择评价图片",
+		"src":       "/admin/setting/uploadPicture?field=pic&type=2",
+		"width":     "896px",
+		"height":    "480px",
+		"spin":      false,
+		"modal": map[string]interface{}{
+			"modal": false,
+		},
+	}
+	commentProps := map[string]interface{}{
+		"type":        "textarea",
+		"placeholder": "请输入评价文字",
+	}
+	form = Form{Method: "POST", Title: "添加虚拟评价"}
+	form.AddRule(*NewFrame("商品", "productId", "", "").AddProps(productIdProps)).
+		AddRule(*NewInput("用户名称", "nickname", "请输入用户名称", "")).
+		AddRule(*NewInput("评价文字", "comment", "", "").AddProps(commentProps)).
+		AddRule(*NewRate("商品分数", "productScore", 8, 5)).
+		AddRule(*NewRate("物流分数", "postageScore", 8, 5)).
+		AddRule(*NewRate("服务分数", "serviceScore", 8, 5)).
+		AddRule(*NewFrame("用户头像", "avatar", "", "").AddProps(avatarProps)).
+		AddRule(*NewFrame("评价图片", "pic", "", []string{}).AddProps(picsProps))
+	form.SetAction("/productReply/reply", ctx)
+	return form, nil
+}
+
 func GetReplyMap(id uint, ctx *gin.Context) (Form, error) {
 	var form Form
 	formStr := `{"rule":[{"type":"input","field":"content","value":"","title":"回复内容","props":{"type":"textarea","placeholder":"请输入回复内容"},"validate":[{"message":"请输入回复内容","required":true,"type":"string","trigger":"change"}]}],"action":"","method":"POST","title":"评价回复","config":{}}`
@@ -31,15 +86,27 @@ func AddReply(id uint, content string) error {
 	}
 	return nil
 }
+func AddFictiReply(req request.AddFictiReply) (uint, error) {
+	reply := model.ProductReply{BaseProductReply: req.BaseProductReply, ProductID: req.ProductID.Id}
+	reply.Pics = strings.Join(req.Pic, ",")
+	err := g.TENANCY_DB.Model(&model.ProductReply{}).Create(&reply).Error
+	if err != nil {
+		return reply.ID, err
+	}
+	return reply.ID, nil
+}
 
 // GetProductReplyInfoList
-func GetProductReplyInfoList(info request.ProductReplyPageInfo, tenancyId uint) ([]response.ProductReplyList, int64, error) {
+func GetProductReplyInfoList(info request.ProductReplyPageInfo, tenancyId uint, isAdmin bool) ([]response.ProductReplyList, int64, error) {
 	var productReplyList []response.ProductReplyList
 	var total int64
 	limit := info.PageSize
 	offset := info.PageSize * (info.Page - 1)
-	db := g.TENANCY_DB.Model(&model.ProductReply{}).
-		Where("sys_tenancy_id = ?", tenancyId)
+	db := g.TENANCY_DB.Model(&model.ProductReply{})
+	if isAdmin {
+		db = db.Where("order_product_id = ?", 0).Where("sys_user_id = ?", 0).Where("sys_tenancy_id =?", 0)
+	}
+
 	if info.Date != "" {
 		db = filterDate(db, info.Date, "")
 	}
@@ -97,4 +164,12 @@ func GetProductReplyInfoList(info request.ProductReplyPageInfo, tenancyId uint) 
 	}
 
 	return productReplyList, total, err
+}
+
+func DeleteProductReply(id uint) error {
+	err := g.TENANCY_DB.Where("id = ?", id).Delete(&model.ProductReply{}).Error
+	if err != nil {
+		return err
+	}
+	return nil
 }
