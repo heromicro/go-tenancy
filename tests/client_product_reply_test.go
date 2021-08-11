@@ -3,6 +3,8 @@ package tests
 import (
 	"net/http"
 	"testing"
+
+	"github.com/snowlyg/go-tenancy/tests/base"
 )
 
 func TestClientProductReplyList(t *testing.T) {
@@ -23,8 +25,8 @@ func TestClientProductReplyList(t *testing.T) {
 }
 
 func productReplyClientlist(t *testing.T, params map[string]interface{}, length int) {
-	auth := tenancyWithLoginTester(t)
-	defer baseLogOut(auth)
+	auth := base.TenancyWithLoginTester(t)
+	defer base.BaseLogOut(auth)
 	obj := auth.POST("v1/merchant/productReply/getProductReplyList").
 		WithJSON(params).
 		Expect().Status(http.StatusOK).JSON().Object()
@@ -69,8 +71,8 @@ func productReplyClientlist(t *testing.T, params map[string]interface{}, length 
 }
 
 func TestClientProductReply(t *testing.T) {
-	auth := tenancyWithLoginTester(t)
-	defer baseLogOut(auth)
+	auth := base.TenancyWithLoginTester(t)
+	defer base.BaseLogOut(auth)
 	obj := auth.GET("v1/merchant/productReply/replyMap/1").
 		Expect().Status(http.StatusOK).JSON().Object()
 	obj.Keys().ContainsOnly("status", "data", "message")

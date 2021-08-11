@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"net/http"
 	"testing"
+
+	"github.com/snowlyg/go-tenancy/tests/base"
 )
 
 func TestClientOrderList(t *testing.T) {
@@ -33,8 +35,8 @@ func TestClientOrderList(t *testing.T) {
 }
 
 func orderClientlist(t *testing.T, params map[string]interface{}, length int) {
-	auth := tenancyWithLoginTester(t)
-	defer baseLogOut(auth)
+	auth := base.TenancyWithLoginTester(t)
+	defer base.BaseLogOut(auth)
 	obj := auth.POST("v1/merchant/order/getOrderList").
 		WithJSON(params).
 		Expect().Status(http.StatusOK).JSON().Object()
@@ -98,8 +100,8 @@ func orderClientlist(t *testing.T, params map[string]interface{}, length int) {
 }
 
 func TestGetClientOrderChart(t *testing.T) {
-	auth := tenancyWithLoginTester(t)
-	defer baseLogOut(auth)
+	auth := base.TenancyWithLoginTester(t)
+	defer base.BaseLogOut(auth)
 	obj := auth.GET("v1/merchant/order/getOrderChart").
 		Expect().Status(http.StatusOK).JSON().Object()
 	obj.Keys().ContainsOnly("status", "data", "message")
@@ -108,8 +110,8 @@ func TestGetClientOrderChart(t *testing.T) {
 }
 
 func TestGetClientOrderFilter(t *testing.T) {
-	auth := tenancyWithLoginTester(t)
-	defer baseLogOut(auth)
+	auth := base.TenancyWithLoginTester(t)
+	defer base.BaseLogOut(auth)
 	obj := auth.GET("v1/merchant/order/getOrderFilter").
 		Expect().Status(http.StatusOK).JSON().Object()
 	obj.Keys().ContainsOnly("status", "data", "message")
@@ -119,8 +121,8 @@ func TestGetClientOrderFilter(t *testing.T) {
 
 func TestClientOrderDetail(t *testing.T) {
 	orderId := 1
-	auth := tenancyWithLoginTester(t)
-	defer baseLogOut(auth)
+	auth := base.TenancyWithLoginTester(t)
+	defer base.BaseLogOut(auth)
 	obj := auth.GET(fmt.Sprintf("v1/merchant/order/getOrderById/%d", orderId)).
 		Expect().Status(http.StatusOK).JSON().Object()
 	obj.Keys().ContainsOnly("status", "data", "message")
@@ -129,8 +131,8 @@ func TestClientOrderDetail(t *testing.T) {
 }
 func TestClientOrderRecord(t *testing.T) {
 	orderId := 1
-	auth := tenancyWithLoginTester(t)
-	defer baseLogOut(auth)
+	auth := base.TenancyWithLoginTester(t)
+	defer base.BaseLogOut(auth)
 	obj := auth.POST(fmt.Sprintf("v1/merchant/order/getOrderRecord/%d", orderId)).
 		WithJSON(map[string]interface{}{
 			"page":     1,
@@ -147,8 +149,8 @@ func TestClientOrderRecord(t *testing.T) {
 }
 func TestClientOrderDelivery(t *testing.T) {
 	orderId := 1
-	auth := tenancyWithLoginTester(t)
-	defer baseLogOut(auth)
+	auth := base.TenancyWithLoginTester(t)
+	defer base.BaseLogOut(auth)
 	obj := auth.GET(fmt.Sprintf("v1/merchant/order/deliveryOrderMap/%d", orderId)).
 		Expect().Status(http.StatusOK).JSON().Object()
 	obj.Keys().ContainsOnly("status", "data", "message")
@@ -168,8 +170,8 @@ func TestClientOrderDelivery(t *testing.T) {
 }
 func TestClientOrderRemark(t *testing.T) {
 	orderId := 1
-	auth := tenancyWithLoginTester(t)
-	defer baseLogOut(auth)
+	auth := base.TenancyWithLoginTester(t)
+	defer base.BaseLogOut(auth)
 	obj := auth.GET(fmt.Sprintf("v1/merchant/order/getOrderRemarkMap/%d", orderId)).
 		Expect().Status(http.StatusOK).JSON().Object()
 	obj.Keys().ContainsOnly("status", "data", "message")
@@ -186,8 +188,8 @@ func TestClientOrderRemark(t *testing.T) {
 
 func TestClientOrderEdit(t *testing.T) {
 	orderId := 1
-	auth := tenancyWithLoginTester(t)
-	defer baseLogOut(auth)
+	auth := base.TenancyWithLoginTester(t)
+	defer base.BaseLogOut(auth)
 	obj := auth.GET(fmt.Sprintf("v1/merchant/order/getEditOrderMap/%d", orderId)).
 		WithJSON(map[string]interface{}{"remark": "remark"}).
 		Expect().Status(http.StatusOK).JSON().Object()

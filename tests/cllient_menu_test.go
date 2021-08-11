@@ -3,11 +3,13 @@ package tests
 import (
 	"net/http"
 	"testing"
+
+	"github.com/snowlyg/go-tenancy/tests/base"
 )
 
 func TestClientMenu(t *testing.T) {
-	auth := tenancyWithLoginTester(t)
-	defer baseLogOut(auth)
+	auth := base.TenancyWithLoginTester(t)
+	defer base.BaseLogOut(auth)
 	obj := auth.GET("v1/merchant/menu/getMenu").
 		Expect().Status(http.StatusOK).JSON().Object()
 	obj.Keys().ContainsOnly("status", "data", "message")

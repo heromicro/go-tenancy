@@ -6,11 +6,12 @@ import (
 	"testing"
 
 	"github.com/snowlyg/go-tenancy/g"
+	"github.com/snowlyg/go-tenancy/tests/base"
 )
 
 func TestCategoryList(t *testing.T) {
-	auth := baseWithLoginTester(t)
-	defer baseLogOut(auth)
+	auth := base.BaseWithLoginTester(t)
+	defer base.BaseLogOut(auth)
 	obj := auth.GET("v1/admin/productCategory/getProductCategoryList").
 		Expect().Status(http.StatusOK).JSON().Object()
 	obj.Keys().ContainsOnly("status", "data", "message")
@@ -24,8 +25,8 @@ func TestCategoryList(t *testing.T) {
 }
 
 func TestCategorySelect(t *testing.T) {
-	auth := baseWithLoginTester(t)
-	defer baseLogOut(auth)
+	auth := base.BaseWithLoginTester(t)
+	defer base.BaseLogOut(auth)
 	obj := auth.GET("v1/admin/productCategory/getProductCategorySelect").
 		Expect().Status(http.StatusOK).JSON().Object()
 	obj.Keys().ContainsOnly("status", "data", "message")
@@ -43,8 +44,8 @@ func TestCategoryProcess(t *testing.T) {
 		"pid":      1,
 		"pic":      "http://qmplusimg.henrongyi.top/head.png",
 	}
-	auth := baseWithLoginTester(t)
-	defer baseLogOut(auth)
+	auth := base.BaseWithLoginTester(t)
+	defer base.BaseLogOut(auth)
 
 	obj := auth.POST("v1/admin/productCategory/createProductCategory").
 		WithJSON(data).
@@ -149,8 +150,8 @@ func TestCategoryRegisterError(t *testing.T) {
 		"pid":      1,
 		"pic":      "http://qmplusimg.henrongyi.top/head.png",
 	}
-	auth := baseWithLoginTester(t)
-	defer baseLogOut(auth)
+	auth := base.BaseWithLoginTester(t)
+	defer base.BaseLogOut(auth)
 	obj := auth.POST("v1/admin/productCategory/createProductCategory").
 		WithJSON(data).
 		Expect().Status(http.StatusOK).JSON().Object()

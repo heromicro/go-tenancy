@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"net/http"
 	"testing"
+
+	"github.com/snowlyg/go-tenancy/tests/base"
 )
 
 var cuserClientId = 3
@@ -31,8 +33,8 @@ func TestClientGeneralUserList(t *testing.T) {
 }
 
 func userClientGeneralTest(t *testing.T, params map[string]interface{}, length int) {
-	auth := tenancyWithLoginTester(t)
-	defer baseLogOut(auth)
+	auth := base.TenancyWithLoginTester(t)
+	defer base.BaseLogOut(auth)
 	obj := auth.POST("v1/merchant/cuser/getGeneralList").
 		WithJSON(params).
 		Expect().Status(http.StatusOK).JSON().Object()
@@ -93,8 +95,8 @@ func userClientGeneralTest(t *testing.T, params map[string]interface{}, length i
 }
 
 func TestClientUserGetOrderList(t *testing.T) {
-	auth := tenancyWithLoginTester(t)
-	defer baseLogOut(auth)
+	auth := base.TenancyWithLoginTester(t)
+	defer base.BaseLogOut(auth)
 	obj := auth.POST(fmt.Sprintf("v1/merchant/cuser/getOrderList/%d", cuserClientId)).
 		WithJSON(map[string]interface{}{
 			"page":     1,
@@ -113,8 +115,8 @@ func TestClientUserGetOrderList(t *testing.T) {
 }
 
 func TestClientUserSetUserLabel(t *testing.T) {
-	auth := tenancyWithLoginTester(t)
-	defer baseLogOut(auth)
+	auth := base.TenancyWithLoginTester(t)
+	defer base.BaseLogOut(auth)
 	obj := auth.GET(fmt.Sprintf("v1/merchant/cuser/setUserLabelMap/%d", cuserClientId)).
 		Expect().Status(http.StatusOK).JSON().Object()
 	obj.Keys().ContainsOnly("status", "data", "message")

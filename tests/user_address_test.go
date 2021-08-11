@@ -3,11 +3,13 @@ package tests
 import (
 	"net/http"
 	"testing"
+
+	"github.com/snowlyg/go-tenancy/tests/base"
 )
 
 func TestAddressList(t *testing.T) {
-	auth := deviceWithLoginTester(t)
-	defer baseLogOut(auth)
+	auth := base.DeviceWithLoginTester(t)
+	defer base.BaseLogOut(auth)
 	obj := auth.POST("v1/user/address/getAddressList").
 		WithJSON(map[string]interface{}{"page": 1, "pageSize": 10}).
 		Expect().Status(http.StatusOK).JSON().Object()
@@ -48,8 +50,8 @@ func TestAddressProcess(t *testing.T) {
 		"hospitalNo":   "88956655",
 		"disease":      "不孕不育",
 	}
-	auth := deviceWithLoginTester(t)
-	defer baseLogOut(auth)
+	auth := base.DeviceWithLoginTester(t)
+	defer base.BaseLogOut(auth)
 	obj := auth.POST("v1/user/address/createAddress").
 		WithJSON(data).
 		Expect().Status(http.StatusOK).JSON().Object()
@@ -180,8 +182,8 @@ func TestAddressRegisterError(t *testing.T) {
 		"hospitalNo":   "88956655",
 		"disease":      "不孕不育",
 	}
-	auth := deviceWithLoginTester(t)
-	defer baseLogOut(auth)
+	auth := base.DeviceWithLoginTester(t)
+	defer base.BaseLogOut(auth)
 	obj := auth.POST("v1/user/address/createAddress").
 		WithJSON(data).
 		Expect().Status(http.StatusOK).JSON().Object()

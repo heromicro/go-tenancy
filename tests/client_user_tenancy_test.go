@@ -6,11 +6,12 @@ import (
 	"testing"
 
 	"github.com/snowlyg/go-tenancy/source"
+	"github.com/snowlyg/go-tenancy/tests/base"
 )
 
 func TestTenancyUserList(t *testing.T) {
-	auth := tenancyWithLoginTester(t)
-	defer baseLogOut(auth)
+	auth := base.TenancyWithLoginTester(t)
+	defer base.BaseLogOut(auth)
 	obj := auth.POST("v1/merchant/user/getAdminList").
 		WithJSON(map[string]interface{}{"page": 1, "pageSize": 10}).
 		Expect().Status(http.StatusOK).JSON().Object()
@@ -26,8 +27,8 @@ func TestTenancyUserList(t *testing.T) {
 }
 
 func TestTenancyLoginUser(t *testing.T) {
-	auth := tenancyWithLoginTester(t)
-	defer baseLogOut(auth)
+	auth := base.TenancyWithLoginTester(t)
+	defer base.BaseLogOut(auth)
 	// changePassword success
 	obj := auth.POST("v1/merchant/user/changePassword").
 		WithJSON(map[string]interface{}{"username": "admin", "password": "123456", "newPassword": "456789", "confirmPassword": "456789"}).
@@ -70,8 +71,8 @@ func TestTenancyLoginUser(t *testing.T) {
 }
 
 func TestTenancyUserProcess(t *testing.T) {
-	auth := tenancyWithLoginTester(t)
-	defer baseLogOut(auth)
+	auth := base.TenancyWithLoginTester(t)
+	defer base.BaseLogOut(auth)
 	obj := auth.POST("v1/merchant/user/registerAdmin").
 		WithJSON(map[string]interface{}{"username": "admin1111", "password": "123456", "ConfirmPassword": "123456", "authorityId": []string{source.TenancyAuthorityId}}).
 		Expect().Status(http.StatusOK).JSON().Object()

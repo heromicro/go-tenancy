@@ -3,11 +3,13 @@ package tests
 import (
 	"net/http"
 	"testing"
+
+	"github.com/snowlyg/go-tenancy/tests/base"
 )
 
 func TestDevicePatientList(t *testing.T) {
-	auth := deviceWithLoginTester(t)
-	defer baseLogOut(auth)
+	auth := base.DeviceWithLoginTester(t)
+	defer base.BaseLogOut(auth)
 	obj := auth.GET("v1/device/patient/getPatientList").
 		Expect().Status(http.StatusOK).JSON().Object()
 	obj.Keys().ContainsOnly("status", "data", "message")

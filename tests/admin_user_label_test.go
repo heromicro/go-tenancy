@@ -4,11 +4,13 @@ import (
 	"fmt"
 	"net/http"
 	"testing"
+
+	"github.com/snowlyg/go-tenancy/tests/base"
 )
 
 func TestUserLabelList(t *testing.T) {
-	auth := baseWithLoginTester(t)
-	defer baseLogOut(auth)
+	auth := base.BaseWithLoginTester(t)
+	defer base.BaseLogOut(auth)
 	obj := auth.POST("v1/admin/userLabel/getUserLabelList").
 		WithJSON(map[string]interface{}{"page": 1, "pageSize": 10}).
 		Expect().Status(http.StatusOK).JSON().Object()
@@ -32,8 +34,8 @@ func TestUserLabelProcess(t *testing.T) {
 	data := map[string]interface{}{
 		"labelName": "sdfsdfs34234",
 	}
-	auth := baseWithLoginTester(t)
-	defer baseLogOut(auth)
+	auth := base.BaseWithLoginTester(t)
+	defer base.BaseLogOut(auth)
 	obj := auth.POST("v1/admin/userLabel/createUserLabel").
 		WithJSON(data).
 		Expect().Status(http.StatusOK).JSON().Object()

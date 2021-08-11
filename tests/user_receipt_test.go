@@ -3,11 +3,13 @@ package tests
 import (
 	"net/http"
 	"testing"
+
+	"github.com/snowlyg/go-tenancy/tests/base"
 )
 
 func TestReceiptList(t *testing.T) {
-	auth := deviceWithLoginTester(t)
-	defer baseLogOut(auth)
+	auth := base.DeviceWithLoginTester(t)
+	defer base.BaseLogOut(auth)
 	obj := auth.POST("v1/user/receipt/getReceiptList").
 		WithJSON(map[string]interface{}{"page": 1, "pageSize": 10}).
 		Expect().Status(http.StatusOK).JSON().Object()
@@ -41,8 +43,8 @@ func TestReceiptProcess(t *testing.T) {
 		"tel":              "13845687419",
 		"isDefault":        true,
 	}
-	auth := deviceWithLoginTester(t)
-	defer baseLogOut(auth)
+	auth := base.DeviceWithLoginTester(t)
+	defer base.BaseLogOut(auth)
 	obj := auth.POST("v1/user/receipt/createReceipt").
 		WithJSON(data).
 		Expect().Status(http.StatusOK).JSON().Object()
@@ -141,8 +143,8 @@ func TestReceiptRegisterReceiptTitleError(t *testing.T) {
 		"tel":              "13845687419",
 		"isDefault":        true,
 	}
-	auth := deviceWithLoginTester(t)
-	defer baseLogOut(auth)
+	auth := base.DeviceWithLoginTester(t)
+	defer base.BaseLogOut(auth)
 	obj := auth.POST("v1/user/receipt/createReceipt").
 		WithJSON(data).
 		Expect().Status(http.StatusOK).JSON().Object()
@@ -163,8 +165,8 @@ func TestReceiptRegisterReceiptTypeError(t *testing.T) {
 		"tel":              "13845687419",
 		"isDefault":        true,
 	}
-	auth := deviceWithLoginTester(t)
-	defer baseLogOut(auth)
+	auth := base.DeviceWithLoginTester(t)
+	defer base.BaseLogOut(auth)
 	obj := auth.POST("v1/user/receipt/createReceipt").
 		WithJSON(data).
 		Expect().Status(http.StatusOK).JSON().Object()
@@ -186,8 +188,8 @@ func TestReceiptRegisterEmaileError(t *testing.T) {
 		"tel":              "13845687419",
 		"isDefault":        true,
 	}
-	auth := deviceWithLoginTester(t)
-	defer baseLogOut(auth)
+	auth := base.DeviceWithLoginTester(t)
+	defer base.BaseLogOut(auth)
 	obj := auth.POST("v1/user/receipt/createReceipt").
 		WithJSON(data).
 		Expect().Status(http.StatusOK).JSON().Object()

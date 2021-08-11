@@ -91,7 +91,7 @@ func PayOrder(ctx *gin.Context) {
 		return
 	}
 
-	err := service.CheckOrderStatusBeforeAction(req.Id, multi.GetTenancyId(ctx), multi.GetUserId(ctx))
+	err := service.CheckOrderStatusBeforePay(req.Id, multi.GetTenancyId(ctx), multi.GetUserId(ctx))
 	if err != nil {
 		g.TENANCY_LOG.Error("获取失败!", zap.Any("err", err))
 		response.FailWithMessage("获取失败:"+err.Error(), ctx)

@@ -3,11 +3,13 @@ package tests
 import (
 	"net/http"
 	"testing"
+
+	"github.com/snowlyg/go-tenancy/tests/base"
 )
 
 func TestMiniList(t *testing.T) {
-	auth := baseWithLoginTester(t)
-	defer baseLogOut(auth)
+	auth := base.BaseWithLoginTester(t)
+	defer base.BaseLogOut(auth)
 	obj := auth.POST("v1/admin/mini/getMiniList").
 		WithJSON(map[string]interface{}{"page": 1, "pageSize": 10}).
 		Expect().Status(http.StatusOK).JSON().Object()
@@ -36,8 +38,8 @@ func TestMiniProcess(t *testing.T) {
 		"appSecret": "tRE49zaf5NCm6PidFZoaFg3u4WCHDok7fxgL63yV0pF4AMsdfsdfsdfssa",
 		"remark":    "中德澳线上点餐商城",
 	}
-	auth := baseWithLoginTester(t)
-	defer baseLogOut(auth)
+	auth := base.BaseWithLoginTester(t)
+	defer base.BaseLogOut(auth)
 	obj := auth.POST("v1/admin/mini/createMini").
 		WithJSON(data).
 		Expect().Status(http.StatusOK).JSON().Object()
@@ -110,8 +112,8 @@ func TestMiniRegisterError(t *testing.T) {
 		"appSecret": "tRE49zaf5NCm6PidFZoaFg3u4WCHDok7fxgL63yV0pF4AM",
 		"remark":    "中德澳上线护理商城",
 	}
-	auth := baseWithLoginTester(t)
-	defer baseLogOut(auth)
+	auth := base.BaseWithLoginTester(t)
+	defer base.BaseLogOut(auth)
 	obj := auth.POST("v1/admin/mini/createMini").
 		WithJSON(data).
 		Expect().Status(http.StatusOK).JSON().Object()

@@ -4,11 +4,13 @@ import (
 	"fmt"
 	"net/http"
 	"testing"
+
+	"github.com/snowlyg/go-tenancy/tests/base"
 )
 
 func TestConfigList(t *testing.T) {
-	auth := baseWithLoginTester(t)
-	defer baseLogOut(auth)
+	auth := base.BaseWithLoginTester(t)
+	defer base.BaseLogOut(auth)
 	obj := auth.POST("v1/admin/config/getConfigList").
 		WithJSON(map[string]interface{}{"page": 1, "pageSize": 10}).
 		Expect().Status(http.StatusOK).JSON().Object()
@@ -41,8 +43,8 @@ func TestConfigList(t *testing.T) {
 }
 
 func TestGetConfigMap(t *testing.T) {
-	auth := baseWithLoginTester(t)
-	defer baseLogOut(auth)
+	auth := base.BaseWithLoginTester(t)
+	defer base.BaseLogOut(auth)
 	obj := auth.GET("v1/admin/config/getConfigMap/alipay").
 		Expect().Status(http.StatusOK).JSON().Object()
 	obj.Keys().ContainsOnly("status", "data", "message")
@@ -63,8 +65,8 @@ func TestConfigProcess(t *testing.T) {
 		"sysConfigCategoryId": 2,
 		"userType":            2,
 	}
-	auth := baseWithLoginTester(t)
-	defer baseLogOut(auth)
+	auth := base.BaseWithLoginTester(t)
+	defer base.BaseLogOut(auth)
 	obj := auth.POST("v1/admin/config/createConfig").
 		WithJSON(data).
 		Expect().Status(http.StatusOK).JSON().Object()
@@ -207,8 +209,8 @@ func TestConfigRegisterError(t *testing.T) {
 		"sysConfigCategoryId": 2,
 		"userType":            2,
 	}
-	auth := baseWithLoginTester(t)
-	defer baseLogOut(auth)
+	auth := base.BaseWithLoginTester(t)
+	defer base.BaseLogOut(auth)
 	obj := auth.POST("v1/admin/config/createConfig").
 		WithJSON(data).
 		Expect().Status(http.StatusOK).JSON().Object()

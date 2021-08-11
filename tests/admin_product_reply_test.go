@@ -4,11 +4,13 @@ import (
 	"fmt"
 	"net/http"
 	"testing"
+
+	"github.com/snowlyg/go-tenancy/tests/base"
 )
 
 func TestProductReplyList(t *testing.T) {
-	auth := baseWithLoginTester(t)
-	defer baseLogOut(auth)
+	auth := base.BaseWithLoginTester(t)
+	defer base.BaseLogOut(auth)
 	obj := auth.POST("v1/admin/productReply/getProductReplyList").
 		WithJSON(map[string]interface{}{"page": 1, "pageSize": 10, "date": "", "isReply": 0, "keyword": "", "nickname": ""}).
 		Expect().Status(http.StatusOK).JSON().Object()
@@ -24,8 +26,8 @@ func TestProductReplyList(t *testing.T) {
 }
 
 func TestProductReply(t *testing.T) {
-	auth := baseWithLoginTester(t)
-	defer baseLogOut(auth)
+	auth := base.BaseWithLoginTester(t)
+	defer base.BaseLogOut(auth)
 	obj := auth.GET("v1/admin/productReply/replyMap").
 		Expect().Status(http.StatusOK).JSON().Object()
 	obj.Keys().ContainsOnly("status", "data", "message")

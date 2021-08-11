@@ -3,11 +3,13 @@ package tests
 import (
 	"net/http"
 	"testing"
+
+	"github.com/snowlyg/go-tenancy/tests/base"
 )
 
 func TestDeviceCartList(t *testing.T) {
-	auth := deviceWithLoginTester(t)
-	defer baseLogOut(auth)
+	auth := base.DeviceWithLoginTester(t)
+	defer base.BaseLogOut(auth)
 	obj := auth.GET("v1/device/cart/getCartList").
 		Expect().Status(http.StatusOK).JSON().Object()
 	obj.Keys().ContainsOnly("status", "data", "message")
@@ -25,9 +27,9 @@ func TestDeviceCartList(t *testing.T) {
 }
 
 func TestDeviceCreateCart(t *testing.T) {
-	auth := deviceWithLoginTester(t)
-	defer baseLogOut(auth)
-	
+	auth := base.DeviceWithLoginTester(t)
+	defer base.BaseLogOut(auth)
+
 	obj := auth.POST("v1/device/cart/createCart").
 		WithJSON(map[string]interface{}{"cartNum": 2, "isNew": 2, "productAttrUnique": "e2fe28308fd2", "productId": 1, "productType": 1}).
 		Expect().Status(http.StatusOK).JSON().Object()
@@ -37,8 +39,8 @@ func TestDeviceCreateCart(t *testing.T) {
 }
 
 func TestDeviceGetProductCount(t *testing.T) {
-	auth := deviceWithLoginTester(t)
-	defer baseLogOut(auth)
+	auth := base.DeviceWithLoginTester(t)
+	defer base.BaseLogOut(auth)
 	obj := auth.GET("v1/device/cart/getProductCount").
 		Expect().Status(http.StatusOK).JSON().Object()
 	obj.Keys().ContainsOnly("status", "data", "message")
@@ -47,8 +49,8 @@ func TestDeviceGetProductCount(t *testing.T) {
 }
 
 func TestDeviceChangeCartNum(t *testing.T) {
-	auth := deviceWithLoginTester(t)
-	defer baseLogOut(auth)
+	auth := base.DeviceWithLoginTester(t)
+	defer base.BaseLogOut(auth)
 	obj := auth.POST("v1/device/cart/changeCartNum/1").
 		WithJSON(map[string]interface{}{"cartNum": 2}).
 		Expect().Status(http.StatusOK).JSON().Object()
@@ -58,8 +60,8 @@ func TestDeviceChangeCartNum(t *testing.T) {
 }
 
 func TestDeviceDeleteCart(t *testing.T) {
-	auth := deviceWithLoginTester(t)
-	defer baseLogOut(auth)
+	auth := base.DeviceWithLoginTester(t)
+	defer base.BaseLogOut(auth)
 	obj := auth.DELETE("v1/device/cart/deleteCart").
 		WithJSON(map[string]interface{}{"ids": []uint{1}}).
 		Expect().Status(http.StatusOK).JSON().Object()

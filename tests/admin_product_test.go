@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"net/http"
 	"testing"
+
+	"github.com/snowlyg/go-tenancy/tests/base"
 )
 
 func TestProductList(t *testing.T) {
@@ -19,8 +21,8 @@ func TestProductList(t *testing.T) {
 }
 
 func productlist(t *testing.T, params map[string]interface{}, length int) {
-	auth := baseWithLoginTester(t)
-	defer baseLogOut(auth)
+	auth := base.BaseWithLoginTester(t)
+	defer base.BaseLogOut(auth)
 	obj := auth.POST("v1/admin/product/getProductList").
 		WithJSON(params).
 		Expect().Status(http.StatusOK).JSON().Object()
@@ -87,8 +89,8 @@ func productlist(t *testing.T, params map[string]interface{}, length int) {
 }
 
 func TestGetProductFilter(t *testing.T) {
-	auth := baseWithLoginTester(t)
-	defer baseLogOut(auth)
+	auth := base.BaseWithLoginTester(t)
+	defer base.BaseLogOut(auth)
 	obj := auth.GET("v1/admin/product/getProductFilter").
 		Expect().Status(http.StatusOK).JSON().Object()
 	obj.Keys().ContainsOnly("status", "data", "message")
@@ -99,8 +101,8 @@ func TestGetProductFilter(t *testing.T) {
 
 func TestProductProcess(t *testing.T) {
 	productId := 1
-	auth := baseWithLoginTester(t)
-	defer baseLogOut(auth)
+	auth := base.BaseWithLoginTester(t)
+	defer base.BaseLogOut(auth)
 
 	update := map[string]interface{}{
 		"storeName": "领立裁腰带短袖连衣裙",

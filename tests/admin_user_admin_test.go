@@ -6,11 +6,12 @@ import (
 	"testing"
 
 	"github.com/snowlyg/go-tenancy/source"
+	"github.com/snowlyg/go-tenancy/tests/base"
 )
 
 func TestAdminUserList(t *testing.T) {
-	auth := baseWithLoginTester(t)
-	defer baseLogOut(auth)
+	auth := base.BaseWithLoginTester(t)
+	defer base.BaseLogOut(auth)
 	obj := auth.POST("v1/admin/user/getAdminList").
 		WithJSON(map[string]interface{}{"page": 1, "pageSize": 10}).
 		Expect().Status(http.StatusOK).JSON().Object()
@@ -25,8 +26,8 @@ func TestAdminUserList(t *testing.T) {
 }
 
 func TestAdminLoginUser(t *testing.T) {
-	auth := baseWithLoginTester(t)
-	defer baseLogOut(auth)
+	auth := base.BaseWithLoginTester(t)
+	defer base.BaseLogOut(auth)
 	// changePassword success
 	obj := auth.POST("v1/admin/user/changePassword").
 		WithJSON(map[string]interface{}{"username": "admin", "password": "123456", "newPassword": "456789", "confirmPassword": "456789"}).
@@ -69,8 +70,8 @@ func TestAdminLoginUser(t *testing.T) {
 }
 
 func TestAdminUserProcess(t *testing.T) {
-	auth := baseWithLoginTester(t)
-	defer baseLogOut(auth)
+	auth := base.BaseWithLoginTester(t)
+	defer base.BaseLogOut(auth)
 
 	// registerAdminMap
 	obj := auth.GET("v1/admin/user/registerAdminMap").
@@ -149,8 +150,8 @@ func TestAdminUserProcess(t *testing.T) {
 }
 
 func TestAdminUserRegisterError(t *testing.T) {
-	auth := baseWithLoginTester(t)
-	defer baseLogOut(auth)
+	auth := base.BaseWithLoginTester(t)
+	defer base.BaseLogOut(auth)
 	obj := auth.POST("v1/admin/user/registerAdmin").
 		WithJSON(map[string]interface{}{"username": "admin", "password": "123456", "ConfirmPassword": "123456", "authorityId": []string{source.AdminAuthorityId}}).
 		Expect().Status(http.StatusOK).JSON().Object()
@@ -161,8 +162,8 @@ func TestAdminUserRegisterError(t *testing.T) {
 }
 
 func TestAdminUserRegisterAuthorityIdEmpty(t *testing.T) {
-	auth := baseWithLoginTester(t)
-	defer baseLogOut(auth)
+	auth := base.BaseWithLoginTester(t)
+	defer base.BaseLogOut(auth)
 	obj := auth.POST("v1/admin/user/registerAdmin").
 		WithJSON(map[string]interface{}{"username": "admin_authrity_id_empty", "password": "123456", "ConfirmPassword": "123456", "authorityId": nil}).
 		Expect().Status(http.StatusOK).JSON().Object()

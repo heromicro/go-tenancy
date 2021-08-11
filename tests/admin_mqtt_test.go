@@ -6,11 +6,12 @@ import (
 	"testing"
 
 	"github.com/snowlyg/go-tenancy/g"
+	"github.com/snowlyg/go-tenancy/tests/base"
 )
 
 func TestMqttList(t *testing.T) {
-	auth := baseWithLoginTester(t)
-	defer baseLogOut(auth)
+	auth := base.BaseWithLoginTester(t)
+	defer base.BaseLogOut(auth)
 	obj := auth.POST("v1/admin/mqtt/getMqttList").
 		WithJSON(map[string]interface{}{"page": 1, "pageSize": 10}).
 		Expect().Status(http.StatusOK).JSON().Object()
@@ -38,8 +39,8 @@ func TestMqttProcess(t *testing.T) {
 		"password": "1",
 		"status":   1,
 	}
-	auth := baseWithLoginTester(t)
-	defer baseLogOut(auth)
+	auth := base.BaseWithLoginTester(t)
+	defer base.BaseLogOut(auth)
 	obj := auth.POST("v1/admin/mqtt/createMqtt").
 		WithJSON(data).
 		Expect().Status(http.StatusOK).JSON().Object()

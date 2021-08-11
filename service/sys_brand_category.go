@@ -45,13 +45,13 @@ func GetBrandCategoryMap(id uint, ctx *gin.Context) (Form, error) {
 }
 
 // CreateBrandCategory
-func CreateBrandCategory(brandCategory model.SysBrandCategory) (model.SysBrandCategory, error) {
+func CreateBrandCategory(brandCategory model.SysBrandCategory) (uint, error) {
 	err := g.TENANCY_DB.Where("cate_name = ?", brandCategory.CateName).First(&brandCategory).Error
 	if !errors.Is(err, gorm.ErrRecordNotFound) {
-		return brandCategory, errors.New("名称已被注冊")
+		return brandCategory.ID, errors.New("名称已被注冊")
 	}
 	err = g.TENANCY_DB.Create(&brandCategory).Error
-	return brandCategory, err
+	return brandCategory.ID, err
 }
 
 // GetBrandCategoryByID
@@ -67,13 +67,13 @@ func ChangeBrandCategoryStatus(changeStatus request.ChangeStatus) error {
 }
 
 // UpdateBrandCategory
-func UpdateBrandCategory(brandCategory model.SysBrandCategory, id uint) (model.SysBrandCategory, error) {
+func UpdateBrandCategory(brandCategory model.SysBrandCategory, id uint) error {
 	err := g.TENANCY_DB.Where("cate_name = ?", brandCategory.CateName).Not("id = ?", id).First(&brandCategory).Error
 	if !errors.Is(err, gorm.ErrRecordNotFound) {
-		return brandCategory, errors.New("名称已被注冊")
+		return errors.New("名称已被注冊")
 	}
 	err = g.TENANCY_DB.Model(&brandCategory).Where("id = ?", id).Updates(brandCategory).Error
-	return brandCategory, err
+	return err
 }
 
 // DeleteBrandCategory

@@ -6,6 +6,7 @@ import (
 	"testing"
 
 	"github.com/snowlyg/go-tenancy/g"
+	"github.com/snowlyg/go-tenancy/tests/base"
 )
 
 func TestExpressList(t *testing.T) {
@@ -20,8 +21,8 @@ func TestExpressList(t *testing.T) {
 }
 
 func expressList(t *testing.T, params map[string]interface{}, length int) {
-	auth := baseWithLoginTester(t)
-	defer baseLogOut(auth)
+	auth := base.BaseWithLoginTester(t)
+	defer base.BaseLogOut(auth)
 	obj := auth.POST("v1/admin/express/getExpressList").
 		WithJSON(params).
 		Expect().Status(http.StatusOK).JSON().Object()
@@ -48,8 +49,8 @@ func TestExpressProcess(t *testing.T) {
 		"sort":   1,
 		"status": 1,
 	}
-	auth := baseWithLoginTester(t)
-	defer baseLogOut(auth)
+	auth := base.BaseWithLoginTester(t)
+	defer base.BaseLogOut(auth)
 	obj := auth.POST("v1/admin/express/createExpress").
 		WithJSON(data).
 		Expect().Status(http.StatusOK).JSON().Object()

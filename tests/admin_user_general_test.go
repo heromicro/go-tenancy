@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"net/http"
 	"testing"
+
+	"github.com/snowlyg/go-tenancy/tests/base"
 )
 
 var cuserId = 7
@@ -34,8 +36,8 @@ func TestGeneralUserList(t *testing.T) {
 }
 
 func userGeneralTest(t *testing.T, params map[string]interface{}, length int) {
-	auth := baseWithLoginTester(t)
-	defer baseLogOut(auth)
+	auth := base.BaseWithLoginTester(t)
+	defer base.BaseLogOut(auth)
 	obj := auth.POST("v1/admin/cuser/getGeneralList").
 		WithJSON(params).
 		Expect().Status(http.StatusOK).JSON().Object()
@@ -96,8 +98,8 @@ func userGeneralTest(t *testing.T, params map[string]interface{}, length int) {
 }
 
 func TestUserGetOrderList(t *testing.T) {
-	auth := baseWithLoginTester(t)
-	defer baseLogOut(auth)
+	auth := base.BaseWithLoginTester(t)
+	defer base.BaseLogOut(auth)
 	obj := auth.POST(fmt.Sprintf("v1/admin/cuser/getOrderList/%d", cuserId)).
 		WithJSON(map[string]interface{}{
 			"page":     1,
@@ -116,8 +118,8 @@ func TestUserGetOrderList(t *testing.T) {
 }
 
 func TestUserGetBillList(t *testing.T) {
-	auth := baseWithLoginTester(t)
-	defer baseLogOut(auth)
+	auth := base.BaseWithLoginTester(t)
+	defer base.BaseLogOut(auth)
 	obj := auth.POST(fmt.Sprintf("v1/admin/cuser/getBillList/%d", cuserId)).
 		WithJSON(map[string]interface{}{
 			"page":     1,
@@ -136,8 +138,8 @@ func TestUserGetBillList(t *testing.T) {
 }
 
 func TestUserGetGeneralDetail(t *testing.T) {
-	auth := baseWithLoginTester(t)
-	defer baseLogOut(auth)
+	auth := base.BaseWithLoginTester(t)
+	defer base.BaseLogOut(auth)
 	obj := auth.GET(fmt.Sprintf("v1/admin/cuser/getGeneralDetail/%d", cuserId)).
 		Expect().Status(http.StatusOK).JSON().Object()
 	obj.Keys().ContainsOnly("status", "data", "message")
@@ -163,8 +165,8 @@ func TestUserGetGeneralDetail(t *testing.T) {
 }
 
 func TestUserEditUsers(t *testing.T) {
-	auth := baseWithLoginTester(t)
-	defer baseLogOut(auth)
+	auth := base.BaseWithLoginTester(t)
+	defer base.BaseLogOut(auth)
 	obj := auth.GET(fmt.Sprintf("v1/admin/cuser/editUserMap/%d", cuserId)).
 		Expect().Status(http.StatusOK).JSON().Object()
 	obj.Keys().ContainsOnly("status", "data", "message")
@@ -190,8 +192,8 @@ func TestUserEditUsers(t *testing.T) {
 	obj.Value("message").String().Equal("操作成功")
 }
 func TestUserSetNowMoney(t *testing.T) {
-	auth := baseWithLoginTester(t)
-	defer baseLogOut(auth)
+	auth := base.BaseWithLoginTester(t)
+	defer base.BaseLogOut(auth)
 	obj := auth.GET(fmt.Sprintf("v1/admin/cuser/setNowMoneyMap/%d", cuserId)).
 		Expect().Status(http.StatusOK).JSON().Object()
 	obj.Keys().ContainsOnly("status", "data", "message")
@@ -210,8 +212,8 @@ func TestUserSetNowMoney(t *testing.T) {
 	obj.Value("message").String().Equal("操作成功")
 }
 func TestUserSetUserGroup(t *testing.T) {
-	auth := baseWithLoginTester(t)
-	defer baseLogOut(auth)
+	auth := base.BaseWithLoginTester(t)
+	defer base.BaseLogOut(auth)
 	obj := auth.GET(fmt.Sprintf("v1/admin/cuser/setUserGroupMap/%d", cuserId)).
 		Expect().Status(http.StatusOK).JSON().Object()
 	obj.Keys().ContainsOnly("status", "data", "message")
@@ -230,8 +232,8 @@ func TestUserSetUserGroup(t *testing.T) {
 	obj.Value("message").String().Equal("操作成功")
 }
 func TestUserSetUserLabel(t *testing.T) {
-	auth := baseWithLoginTester(t)
-	defer baseLogOut(auth)
+	auth := base.BaseWithLoginTester(t)
+	defer base.BaseLogOut(auth)
 	obj := auth.GET(fmt.Sprintf("v1/admin/cuser/setUserLabelMap/%d", cuserId)).
 		Expect().Status(http.StatusOK).JSON().Object()
 	obj.Keys().ContainsOnly("status", "data", "message")
@@ -250,8 +252,8 @@ func TestUserSetUserLabel(t *testing.T) {
 	obj.Value("message").String().Equal("操作成功")
 }
 func TestUserBatchSetUserLabel(t *testing.T) {
-	auth := baseWithLoginTester(t)
-	defer baseLogOut(auth)
+	auth := base.BaseWithLoginTester(t)
+	defer base.BaseLogOut(auth)
 	obj := auth.POST("v1/admin/cuser/batchSetUserLabelMap").
 		WithJSON(map[string]interface{}{
 			"ids": "1,2",
@@ -273,8 +275,8 @@ func TestUserBatchSetUserLabel(t *testing.T) {
 	obj.Value("message").String().Equal("设置成功")
 }
 func TestUserBatchSetUserGroup(t *testing.T) {
-	auth := baseWithLoginTester(t)
-	defer baseLogOut(auth)
+	auth := base.BaseWithLoginTester(t)
+	defer base.BaseLogOut(auth)
 	obj := auth.POST("v1/admin/cuser/batchSetUserGroupMap").
 		WithJSON(map[string]interface{}{
 			"ids": "1,2",

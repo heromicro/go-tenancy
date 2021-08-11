@@ -3,10 +3,12 @@ package tests
 import (
 	"net/http"
 	"testing"
+
+	"github.com/snowlyg/go-tenancy/tests/base"
 )
 
 func TestParentRegion(t *testing.T) {
-	e := baseTester(t)
+	e := base.BaseTester(t)
 	obj := e.GET("v1/public/region/0").
 		Expect().Status(http.StatusOK).JSON().Object()
 	obj.Keys().ContainsOnly("status", "data", "message")
@@ -16,7 +18,7 @@ func TestParentRegion(t *testing.T) {
 }
 
 func TestSubRegion1(t *testing.T) {
-	e := baseTester(t)
+	e := base.BaseTester(t)
 	obj := e.GET("v1/public/region/19").
 		Expect().Status(http.StatusOK).JSON().Object()
 	obj.Keys().ContainsOnly("status", "data", "message")
@@ -26,7 +28,7 @@ func TestSubRegion1(t *testing.T) {
 }
 
 func TestSubRegion2(t *testing.T) {
-	e := baseTester(t)
+	e := base.BaseTester(t)
 	obj := e.GET("v1/public/region/20").
 		Expect().Status(http.StatusOK).JSON().Object()
 	obj.Keys().ContainsOnly("status", "data", "message")
@@ -36,7 +38,7 @@ func TestSubRegion2(t *testing.T) {
 }
 
 func TestSubRegionList(t *testing.T) {
-	e := baseTester(t)
+	e := base.BaseTester(t)
 	obj := e.GET("v1/public/getRegionList").
 		Expect().Status(http.StatusOK).JSON().Object()
 	obj.Keys().ContainsOnly("status", "data", "message")

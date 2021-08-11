@@ -4,11 +4,13 @@ import (
 	"fmt"
 	"net/http"
 	"testing"
+
+	"github.com/snowlyg/go-tenancy/tests/base"
 )
 
 func TestConfigCategoryList(t *testing.T) {
-	auth := baseWithLoginTester(t)
-	defer baseLogOut(auth)
+	auth := base.BaseWithLoginTester(t)
+	defer base.BaseLogOut(auth)
 	obj := auth.GET("v1/admin/configCategory/getConfigCategoryList").
 		Expect().Status(http.StatusOK).JSON().Object()
 	obj.Keys().ContainsOnly("status", "data", "message")
@@ -30,8 +32,8 @@ func TestConfigCategoryList(t *testing.T) {
 }
 
 func TestCreateConfigCategoryMap(t *testing.T) {
-	auth := baseWithLoginTester(t)
-	defer baseLogOut(auth)
+	auth := base.BaseWithLoginTester(t)
+	defer base.BaseLogOut(auth)
 	obj := auth.GET("v1/admin/configCategory/getCreateConfigCategoryMap").
 		Expect().Status(http.StatusOK).JSON().Object()
 	obj.Keys().ContainsOnly("status", "data", "message")
@@ -48,8 +50,8 @@ func TestConfigCategoryProcess(t *testing.T) {
 		"info":   "箱包",
 		"status": 1,
 	}
-	auth := baseWithLoginTester(t)
-	defer baseLogOut(auth)
+	auth := base.BaseWithLoginTester(t)
+	defer base.BaseLogOut(auth)
 	obj := auth.POST("v1/admin/configCategory/createConfigCategory").
 		WithJSON(data).
 		Expect().Status(http.StatusOK).JSON().Object()
@@ -144,8 +146,8 @@ func TestConfigCategoryRegisterError(t *testing.T) {
 		"info":   "箱包",
 		"status": 2,
 	}
-	auth := baseWithLoginTester(t)
-	defer baseLogOut(auth)
+	auth := base.BaseWithLoginTester(t)
+	defer base.BaseLogOut(auth)
 	obj := auth.POST("v1/admin/configCategory/createConfigCategory").
 		WithJSON(data).
 		Expect().Status(http.StatusOK).JSON().Object()

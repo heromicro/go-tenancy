@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"github.com/snowlyg/go-tenancy/g"
+	"github.com/snowlyg/go-tenancy/tests/base"
 )
 
 type param struct {
@@ -43,8 +44,8 @@ func TestTenancyList(t *testing.T) {
 }
 
 func list(t *testing.T, params map[string]interface{}, length int) {
-	auth := baseWithLoginTester(t)
-	defer baseLogOut(auth)
+	auth := base.BaseWithLoginTester(t)
+	defer base.BaseLogOut(auth)
 	obj := auth.POST("v1/admin/tenancy/getTenancyList").
 		WithJSON(params).
 		Expect().Status(http.StatusOK).JSON().Object()
@@ -94,8 +95,8 @@ func list(t *testing.T, params map[string]interface{}, length int) {
 }
 
 func TestTenancyByRegion(t *testing.T) {
-	auth := baseWithLoginTester(t)
-	defer baseLogOut(auth)
+	auth := base.BaseWithLoginTester(t)
+	defer base.BaseLogOut(auth)
 	obj := auth.GET("v1/admin/tenancy/getTenancies/1").
 		Expect().Status(http.StatusOK).JSON().Object()
 	obj.Keys().ContainsOnly("status", "data", "message")
@@ -105,8 +106,8 @@ func TestTenancyByRegion(t *testing.T) {
 }
 
 func TestLoginTenancy(t *testing.T) {
-	auth := baseWithLoginTester(t)
-	defer baseLogOut(auth)
+	auth := base.BaseWithLoginTester(t)
+	defer base.BaseLogOut(auth)
 	obj := auth.POST("v1/admin/tenancy/loginTenancy/1").
 		Expect().Status(http.StatusOK).JSON().Object()
 	obj.Keys().ContainsOnly("status", "data", "message")
@@ -118,8 +119,8 @@ func TestLoginTenancy(t *testing.T) {
 }
 
 func TestGetTenancyCount(t *testing.T) {
-	auth := baseWithLoginTester(t)
-	defer baseLogOut(auth)
+	auth := base.BaseWithLoginTester(t)
+	defer base.BaseLogOut(auth)
 	obj := auth.GET("v1/admin/tenancy/getTenancyCount").
 		Expect().Status(http.StatusOK).JSON().Object()
 	obj.Keys().ContainsOnly("status", "data", "message")
@@ -139,8 +140,8 @@ func TestTenancyProcess(t *testing.T) {
 		"status":        g.StatusTrue,
 		"sysRegionCode": 1,
 	}
-	auth := baseWithLoginTester(t)
-	defer baseLogOut(auth)
+	auth := base.BaseWithLoginTester(t)
+	defer base.BaseLogOut(auth)
 	obj := auth.POST("v1/admin/tenancy/createTenancy").
 		WithJSON(data).
 		Expect().Status(http.StatusOK).JSON().Object()
@@ -260,8 +261,8 @@ func TestTenancyRegisterError(t *testing.T) {
 		"status":        g.StatusTrue,
 		"sysRegionCode": 1,
 	}
-	auth := baseWithLoginTester(t)
-	defer baseLogOut(auth)
+	auth := base.BaseWithLoginTester(t)
+	defer base.BaseLogOut(auth)
 	obj := auth.POST("v1/admin/tenancy/createTenancy").
 		WithJSON(data).
 		Expect().Status(http.StatusOK).JSON().Object()
@@ -272,8 +273,8 @@ func TestTenancyRegisterError(t *testing.T) {
 }
 
 func TestTenancySelect(t *testing.T) {
-	auth := baseWithLoginTester(t)
-	defer baseLogOut(auth)
+	auth := base.BaseWithLoginTester(t)
+	defer base.BaseLogOut(auth)
 	obj := auth.GET("v1/admin/tenancy/getTenancySelect").
 		Expect().Status(http.StatusOK).JSON().Object()
 	obj.Keys().ContainsOnly("status", "data", "message")

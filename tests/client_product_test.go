@@ -7,6 +7,7 @@ import (
 
 	"github.com/snowlyg/go-tenancy/g"
 	"github.com/snowlyg/go-tenancy/model"
+	"github.com/snowlyg/go-tenancy/tests/base"
 )
 
 func TestClinetProductList(t *testing.T) {
@@ -29,8 +30,8 @@ func TestClinetProductList(t *testing.T) {
 }
 
 func clinetProductList(t *testing.T, params map[string]interface{}, length int) {
-	auth := tenancyWithLoginTester(t)
-	defer baseLogOut(auth)
+	auth := base.TenancyWithLoginTester(t)
+	defer base.BaseLogOut(auth)
 	obj := auth.POST("v1/merchant/product/getProductList").
 		WithJSON(params).
 		Expect().Status(http.StatusOK).JSON().Object()
@@ -98,8 +99,8 @@ func clinetProductList(t *testing.T, params map[string]interface{}, length int) 
 }
 
 func TestGetClientProductFilter(t *testing.T) {
-	auth := tenancyWithLoginTester(t)
-	defer baseLogOut(auth)
+	auth := base.TenancyWithLoginTester(t)
+	defer base.BaseLogOut(auth)
 	obj := auth.GET("v1/merchant/product/getProductFilter").
 		Expect().Status(http.StatusOK).JSON().Object()
 	obj.Keys().ContainsOnly("status", "data", "message")
@@ -149,8 +150,8 @@ func TestClinetProductProcess(t *testing.T) {
 		"videoLink":         "sdfsdfsd",
 		"barCode":           "sdfsdfsd",
 	}
-	auth := tenancyWithLoginTester(t)
-	defer baseLogOut(auth)
+	auth := base.TenancyWithLoginTester(t)
+	defer base.BaseLogOut(auth)
 	obj := auth.POST("v1/merchant/product/createProduct").
 		WithJSON(data).
 		Expect().Status(http.StatusOK).JSON().Object()

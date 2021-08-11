@@ -381,17 +381,18 @@ func GetOrderInfoList(info request.OrderPageInfo, ctx *gin.Context) ([]response.
 	return orderList, stat, total, nil
 }
 
-func GetOrderProductById(orderId, orderProductId, tenancyId, userId uint) (response.OrderProduct, error) {
-	var orderProduct response.OrderProduct
+func GetReturnOrdersProductById(orderProductIds []uint, orderId, tenancyId, userId uint) ([]response.OrderProduct, error) {
+	var orderProducts []response.OrderProduct
 	db := g.TENANCY_DB.Model(&model.OrderProduct{}).
 		Where("order_id = ?", orderId).
-		Where("id =?", orderProductId)
+		Where("refund_num > 0").
+		Where("id in ?", orderProductIds)
 	db = CheckTenancyIdAndUserId(db, tenancyId, userId, "")
-	err := db.Find(&orderProduct).Error
+	err := db.Find(&orderProducts).Error
 	if err != nil {
-		return orderProduct, err
+		return orderProducts, err
 	}
-	return orderProduct, nil
+	return orderProducts, nil
 }
 
 func GetOrderProductsByOrderIds(orderIds []uint) ([]response.OrderProduct, error) {
@@ -737,7 +738,7 @@ func CreateOrder(req request.CreateOrder, tenancyId, userId uint, tenancyName st
 	return png, order.ID, nil
 }
 
-func CheckOrderStatusBeforeAction(orderId, tenancyId, userId uint) error {
+func CheckOrderStatusBeforePay(orderId, tenancyId, userId uint) error {
 	order, err := GetOrderByOrderId(orderId, tenancyId, userId)
 	if errors.Is(err, gorm.ErrRecordNotFound) {
 		return fmt.Errorf("订单不存在或者已被删除")
@@ -746,7 +747,7 @@ func CheckOrderStatusBeforeAction(orderId, tenancyId, userId uint) error {
 		return err
 	}
 	if order.Status == model.OrderStatusCancel {
-		return fmt.Errorf("订单已经取消，请勿重复操作")
+		return fmt.Errorf("订单已经取消")
 	}
 	if order.Status != model.OrderStatusNoPay {
 		return fmt.Errorf("订单已付款,请勿重复操作")
@@ -873,10 +874,19 @@ func ChangeOrderStatusByOrderId(orderId uint, changeData map[string]interface{},
 	return nil
 }
 
-func CancelOrder(orderId, tenancyId, UserId uint) error {
-	err := CheckOrderStatusBeforeAction(orderId, tenancyId, UserId)
+func CancelOrder(orderId, tenancyId, userId uint) error {
+	order, err := GetOrderByOrderId(orderId, tenancyId, userId)
+	if errors.Is(err, gorm.ErrRecordNotFound) {
+		return fmt.Errorf("订单不存在或者已被删除")
+	}
 	if err != nil {
 		return err
+	}
+	if order.Status == model.OrderStatusCancel {
+		return fmt.Errorf("订单已经取消，请勿重复操作")
+	}
+	if order.Status != model.OrderStatusNoPay {
+		return fmt.Errorf("订单已付款,请执行退款操作")
 	}
 	changeData := map[string]interface{}{"status": model.OrderStatusCancel}
 	err = ChangeOrderStatusByOrderId(orderId, changeData, "cancel", "取消订单")

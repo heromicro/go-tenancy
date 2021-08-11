@@ -6,11 +6,12 @@ import (
 	"testing"
 
 	"github.com/snowlyg/go-tenancy/g"
+	"github.com/snowlyg/go-tenancy/tests/base"
 )
 
 func TestMenu(t *testing.T) {
-	auth := baseWithLoginTester(t)
-	defer baseLogOut(auth)
+	auth := base.BaseWithLoginTester(t)
+	defer base.BaseLogOut(auth)
 	obj := auth.GET("v1/admin/menu/getMenu").
 		Expect().Status(http.StatusOK).JSON().Object()
 	obj.Keys().ContainsOnly("status", "data", "message")
@@ -42,8 +43,8 @@ func TestMenu(t *testing.T) {
 }
 
 func TestBaseMenu(t *testing.T) {
-	auth := baseWithLoginTester(t)
-	defer baseLogOut(auth)
+	auth := base.BaseWithLoginTester(t)
+	defer base.BaseLogOut(auth)
 	obj := auth.POST("v1/admin/menu/getBaseMenuTree").
 		WithJSON(map[string]interface{}{"page": 1, "pageSize": 10}).
 		Expect().Status(http.StatusOK).JSON().Object()
@@ -75,8 +76,8 @@ func TestBaseMenu(t *testing.T) {
 }
 
 func TestClientMenuList(t *testing.T) {
-	auth := baseWithLoginTester(t)
-	defer baseLogOut(auth)
+	auth := base.BaseWithLoginTester(t)
+	defer base.BaseLogOut(auth)
 	obj := auth.GET("v1/admin/menu/merchant/getClientMenuList").
 		WithJSON(map[string]interface{}{"page": 1, "pageSize": 10}).
 		Expect().Status(http.StatusOK).JSON().Object()
@@ -108,8 +109,8 @@ func TestClientMenuList(t *testing.T) {
 }
 
 func TestMenuList(t *testing.T) {
-	auth := baseWithLoginTester(t)
-	defer baseLogOut(auth)
+	auth := base.BaseWithLoginTester(t)
+	defer base.BaseLogOut(auth)
 	obj := auth.GET("v1/admin/menu/getMenuList").
 		Expect().Status(http.StatusOK).JSON().Object()
 	obj.Keys().ContainsOnly("status", "data", "message")
@@ -155,8 +156,8 @@ func TestMenuProcess(t *testing.T) {
 		"route":     "test_menu_process",
 		"sort":      111,
 	}
-	auth := baseWithLoginTester(t)
-	defer baseLogOut(auth)
+	auth := base.BaseWithLoginTester(t)
+	defer base.BaseLogOut(auth)
 	obj := auth.GET("v1/admin/menu/getAddMenuMap").
 		WithJSON(data).
 		Expect().Status(http.StatusOK).JSON().Object()
@@ -253,8 +254,8 @@ func TestMenuAddError(t *testing.T) {
 		"route":     "/admin/dashboard",
 		"sort":      111,
 	}
-	auth := baseWithLoginTester(t)
-	defer baseLogOut(auth)
+	auth := base.BaseWithLoginTester(t)
+	defer base.BaseLogOut(auth)
 	obj := auth.POST("v1/admin/menu/addBaseMenu").
 		WithJSON(data).
 		Expect().Status(http.StatusOK).JSON().Object()

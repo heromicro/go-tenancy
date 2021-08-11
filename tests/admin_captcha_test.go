@@ -3,10 +3,12 @@ package tests
 import (
 	"net/http"
 	"testing"
+
+	"github.com/snowlyg/go-tenancy/tests/base"
 )
 
 func TestCaptcha(t *testing.T) {
-	e := baseTester(t)
+	e := base.BaseTester(t)
 	obj := e.GET("v1/public/captcha").
 		Expect().Status(http.StatusOK).JSON().Object()
 

@@ -3,6 +3,8 @@ package tests
 import (
 	"net/http"
 	"testing"
+
+	"github.com/snowlyg/go-tenancy/tests/base"
 )
 
 func TestRefundOrderList(t *testing.T) {
@@ -30,8 +32,8 @@ func TestRefundOrderList(t *testing.T) {
 }
 
 func refundOrderlist(t *testing.T, params map[string]interface{}, length int) {
-	auth := baseWithLoginTester(t)
-	defer baseLogOut(auth)
+	auth := base.BaseWithLoginTester(t)
+	defer base.BaseLogOut(auth)
 	obj := auth.POST("v1/admin/refundOrder/getRefundOrderList").
 		WithJSON(params).
 		Expect().Status(http.StatusOK).JSON().Object()

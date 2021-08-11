@@ -4,12 +4,14 @@ import (
 	"fmt"
 	"net/http"
 	"testing"
+
+	"github.com/snowlyg/go-tenancy/tests/base"
 )
 
 func TestUserGroupList(t *testing.T) {
 
-	auth := baseWithLoginTester(t)
-	defer baseLogOut(auth)
+	auth := base.BaseWithLoginTester(t)
+	defer base.BaseLogOut(auth)
 	obj := auth.POST("v1/admin/userGroup/getUserGroupList").
 		WithJSON(map[string]interface{}{"page": 1, "pageSize": 10}).
 		Expect().Status(http.StatusOK).JSON().Object()
@@ -33,8 +35,8 @@ func TestUserGroupProcess(t *testing.T) {
 	data := map[string]interface{}{
 		"groupName": "sdfsdfs34234",
 	}
-	auth := baseWithLoginTester(t)
-	defer baseLogOut(auth)
+	auth := base.BaseWithLoginTester(t)
+	defer base.BaseLogOut(auth)
 	obj := auth.POST("v1/admin/userGroup/createUserGroup").
 		WithJSON(data).
 		Expect().Status(http.StatusOK).JSON().Object()

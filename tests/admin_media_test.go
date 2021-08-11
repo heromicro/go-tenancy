@@ -5,11 +5,13 @@ import (
 	"net/http"
 	"os"
 	"testing"
+
+	"github.com/snowlyg/go-tenancy/tests/base"
 )
 
 func TestMediaList(t *testing.T) {
-	auth := baseWithLoginTester(t)
-	defer baseLogOut(auth)
+	auth := base.BaseWithLoginTester(t)
+	defer base.BaseLogOut(auth)
 	obj := auth.POST("v1/admin/media/getFileList").
 		WithJSON(map[string]interface{}{"page": 1, "pageSize": 10}).
 		Expect().Status(http.StatusOK).JSON().Object()
@@ -29,8 +31,8 @@ func TestMediaProcess(t *testing.T) {
 	path := "/api"
 	fh, _ := os.Open("./" + name)
 	defer fh.Close()
-	auth := baseWithLoginTester(t)
-	defer baseLogOut(auth)
+	auth := base.BaseWithLoginTester(t)
+	defer base.BaseLogOut(auth)
 	obj := auth.POST("v1/admin/media/upload").
 		WithMultipart().
 		WithFile("file", name, fh).

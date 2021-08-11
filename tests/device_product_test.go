@@ -4,11 +4,13 @@ import (
 	"fmt"
 	"net/http"
 	"testing"
+
+	"github.com/snowlyg/go-tenancy/tests/base"
 )
 
 func TestDeviceProductList(t *testing.T) {
-	auth := deviceWithLoginTester(t)
-	defer baseLogOut(auth)
+	auth := base.DeviceWithLoginTester(t)
+	defer base.BaseLogOut(auth)
 	obj := auth.POST("v1/device/product/getProductList").
 		WithJSON(map[string]interface{}{"page": 1, "pageSize": 10, "type": "0", "cateId": 0, "isGiftBag": "", "keyword": "", "tenancyCategoryId": 0}).
 		Expect().Status(http.StatusOK).JSON().Object()
@@ -72,8 +74,8 @@ func TestDeviceProductList(t *testing.T) {
 }
 
 func TestDeviceProductDetail(t *testing.T) {
-	auth := deviceWithLoginTester(t)
-	defer baseLogOut(auth)
+	auth := base.DeviceWithLoginTester(t)
+	defer base.BaseLogOut(auth)
 	obj := auth.GET(fmt.Sprintf("v1/device/product/getProductById/%d", 1)).
 		Expect().Status(http.StatusOK).JSON().Object()
 	obj.Keys().ContainsOnly("status", "data", "message")

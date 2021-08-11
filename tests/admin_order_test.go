@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"net/http"
 	"testing"
+
+	"github.com/snowlyg/go-tenancy/tests/base"
 )
 
 func TestOrderList(t *testing.T) {
@@ -34,8 +36,8 @@ func TestOrderList(t *testing.T) {
 }
 
 func orderlist(t *testing.T, params map[string]interface{}, length int) {
-	auth := baseWithLoginTester(t)
-	defer baseLogOut(auth)
+	auth := base.BaseWithLoginTester(t)
+	defer base.BaseLogOut(auth)
 	obj := auth.POST("v1/admin/order/getOrderList").
 		WithJSON(params).
 		Expect().Status(http.StatusOK).JSON().Object()
@@ -99,8 +101,8 @@ func orderlist(t *testing.T, params map[string]interface{}, length int) {
 }
 
 func TestGetOrderFilter(t *testing.T) {
-	auth := baseWithLoginTester(t)
-	defer baseLogOut(auth)
+	auth := base.BaseWithLoginTester(t)
+	defer base.BaseLogOut(auth)
 	obj := auth.GET("v1/admin/order/getOrderChart").
 		Expect().Status(http.StatusOK).JSON().Object()
 	obj.Keys().ContainsOnly("status", "data", "message")
@@ -111,8 +113,8 @@ func TestGetOrderFilter(t *testing.T) {
 
 func TestOrderDetail(t *testing.T) {
 	orderId := 1
-	auth := baseWithLoginTester(t)
-	defer baseLogOut(auth)
+	auth := base.BaseWithLoginTester(t)
+	defer base.BaseLogOut(auth)
 	obj := auth.GET(fmt.Sprintf("v1/admin/order/getOrderById/%d", orderId)).
 		Expect().Status(http.StatusOK).JSON().Object()
 	obj.Keys().ContainsOnly("status", "data", "message")

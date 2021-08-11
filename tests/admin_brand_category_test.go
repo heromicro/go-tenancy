@@ -6,22 +6,17 @@ import (
 	"testing"
 
 	"github.com/snowlyg/go-tenancy/g"
+	"github.com/snowlyg/go-tenancy/tests/base"
 )
 
 func TestBrandCategoryList(t *testing.T) {
-	auth := baseWithLoginTester(t)
-	defer baseLogOut(auth)
+	auth := base.BaseWithLoginTester(t)
+	defer base.BaseLogOut(auth)
 	obj := auth.GET("v1/admin/brandCategory/getBrandCategoryList").
 		Expect().Status(http.StatusOK).JSON().Object()
 	obj.Keys().ContainsOnly("status", "data", "message")
 	obj.Value("status").Number().Equal(200)
 	obj.Value("message").String().Equal("获取成功")
-	data := obj.Value("data").Array()
-	data.Length().Ge(0)
-	first := data.First().Object()
-	first.Keys().ContainsOnly("id", "pid", "cateName", "status", "path", "sort", "level", "children", "createdAt", "updatedAt")
-	first.Value("id").Number().Ge(0)
-
 }
 
 func TestBrandCategoryProcess(t *testing.T) {
@@ -31,29 +26,35 @@ func TestBrandCategoryProcess(t *testing.T) {
 		"path":     "http://qmplusimg.henrongyi.top/head.png",
 		"sort":     1,
 		"level":    1,
-		"pid":      1,
+		"pid":      0,
 	}
-	auth := baseWithLoginTester(t)
-	defer baseLogOut(auth)
+	auth := base.BaseWithLoginTester(t)
+	defer base.BaseLogOut(auth)
 	obj := auth.POST("v1/admin/brandCategory/createBrandCategory").
 		WithJSON(data).
 		Expect().Status(http.StatusOK).JSON().Object()
 	obj.Keys().ContainsOnly("status", "data", "message")
 	obj.Value("status").Number().Equal(200)
 	obj.Value("message").String().Equal("创建成功")
+	brandCategoryId := obj.Value("data").Object().Value("id").Number().Raw()
 
-	brandCategory := obj.Value("data").Object()
-	brandCategory.Value("id").Number().Ge(0)
-	brandCategory.Value("cateName").String().Equal(data["cateName"].(string))
-	brandCategory.Value("status").Number().Equal(data["status"].(int))
-	brandCategory.Value("path").String().Equal(data["path"].(string))
-	brandCategory.Value("sort").Number().Equal(data["sort"].(int))
-	brandCategory.Value("pid").Number().Equal(data["pid"].(int))
-	brandCategory.Value("level").Number().Equal(data["level"].(int))
-	brandCategoryId := brandCategory.Value("id").Number().Raw()
+	obj = auth.GET("v1/admin/brandCategory/getBrandCategoryList").
+		Expect().Status(http.StatusOK).JSON().Object()
+	obj.Keys().ContainsOnly("status", "data", "message")
+	obj.Value("status").Number().Equal(200)
+	obj.Value("message").String().Equal("获取成功")
+	obj.Value("data").Array().Length().Equal(1)
+	first := obj.Value("data").Array().First().Object()
+	first.Keys().ContainsOnly("id", "pid", "cateName", "status", "path", "sort", "level", "children", "createdAt", "updatedAt")
+	first.Value("id").Number().Equal(brandCategoryId)
+	first.Value("cateName").String().Equal(data["cateName"].(string))
+	first.Value("status").Number().Equal(data["status"].(int))
+	first.Value("path").String().Equal(data["path"].(string))
+	first.Value("sort").Number().Equal(data["sort"].(int))
+	first.Value("pid").Number().Equal(data["pid"].(int))
+	first.Value("level").Number().Equal(data["level"].(int))
 
 	if brandCategoryId > 0 {
-
 		update := map[string]interface{}{
 			"cateName": "家电",
 			"status":   g.StatusTrue,
@@ -69,22 +70,13 @@ func TestBrandCategoryProcess(t *testing.T) {
 		obj.Keys().ContainsOnly("status", "data", "message")
 		obj.Value("status").Number().Equal(200)
 		obj.Value("message").String().Equal("更新成功")
-		brandCategory = obj.Value("data").Object()
-
-		brandCategory.Value("id").Number().Ge(0)
-		brandCategory.Value("cateName").String().Equal(update["cateName"].(string))
-		brandCategory.Value("status").Number().Equal(update["status"].(int))
-		brandCategory.Value("path").String().Equal(update["path"].(string))
-		brandCategory.Value("sort").Number().Equal(update["sort"].(int))
-		brandCategory.Value("pid").Number().Equal(update["pid"].(int))
-		brandCategory.Value("level").Number().Equal(update["level"].(int))
 
 		obj = auth.GET(fmt.Sprintf("v1/admin/brandCategory/getBrandCategoryById/%d", int(brandCategoryId))).
 			Expect().Status(http.StatusOK).JSON().Object()
 		obj.Keys().ContainsOnly("status", "data", "message")
 		obj.Value("status").Number().Equal(200)
 		obj.Value("message").String().Equal("操作成功")
-		brandCategory = obj.Value("data").Object()
+		brandCategory := obj.Value("data").Object()
 
 		brandCategory.Value("id").Number().Ge(0)
 		brandCategory.Value("cateName").String().Equal(update["cateName"].(string))
@@ -134,8 +126,8 @@ func TestBrandCategoryRegisterError(t *testing.T) {
 		"level":    1,
 		"pid":      1,
 	}
-	auth := baseWithLoginTester(t)
-	defer baseLogOut(auth)
+	auth := base.BaseWithLoginTester(t)
+	defer base.BaseLogOut(auth)
 	obj := auth.POST("v1/admin/brandCategory/createBrandCategory").
 		WithJSON(data).
 		Expect().Status(http.StatusOK).JSON().Object()

@@ -3,11 +3,13 @@ package tests
 import (
 	"net/http"
 	"testing"
+
+	"github.com/snowlyg/go-tenancy/tests/base"
 )
 
 func TestApiList(t *testing.T) {
-	auth := baseWithLoginTester(t)
-	defer baseLogOut(auth)
+	auth := base.BaseWithLoginTester(t)
+	defer base.BaseLogOut(auth)
 	obj := auth.POST("v1/admin/api/getApiList").
 		WithJSON(map[string]interface{}{"page": 1, "pageSize": 10}).
 		Expect().Status(http.StatusOK).JSON().Object()
@@ -29,8 +31,8 @@ func TestApiList(t *testing.T) {
 
 }
 func TestAllApi(t *testing.T) {
-	auth := baseWithLoginTester(t)
-	defer baseLogOut(auth)
+	auth := base.BaseWithLoginTester(t)
+	defer base.BaseLogOut(auth)
 	obj := auth.POST("v1/admin/api/getAllApis").
 		WithJSON(map[string]interface{}{"page": 1, "pageSize": 10}).
 		Expect().Status(http.StatusOK).JSON().Object()
@@ -60,8 +62,8 @@ func TestApiProcess(t *testing.T) {
 		"method":      "POST",
 		"path":        "test_api_process",
 	}
-	auth := baseWithLoginTester(t)
-	defer baseLogOut(auth)
+	auth := base.BaseWithLoginTester(t)
+	defer base.BaseLogOut(auth)
 	obj := auth.POST("v1/admin/api/createApi").
 		WithJSON(data).
 		Expect().Status(http.StatusOK).JSON().Object()
@@ -128,13 +130,13 @@ func TestApiProcess(t *testing.T) {
 
 func TestApiRegisterError(t *testing.T) {
 	data := map[string]interface{}{
-		"apiGroup":    "user",
+		"apiGroup":    "auth",
 		"description": "用户注册",
-		"method":      "POST",
-		"path":        "/v1/admin/user/register",
+		"method":      "GET",
+		"path":        "/v1/auth/logout",
 	}
-	auth := baseWithLoginTester(t)
-	defer baseLogOut(auth)
+	auth := base.BaseWithLoginTester(t)
+	defer base.BaseLogOut(auth)
 	obj := auth.POST("v1/admin/api/createApi").
 		WithJSON(data).
 		Expect().Status(http.StatusOK).JSON().Object()

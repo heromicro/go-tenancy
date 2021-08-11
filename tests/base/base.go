@@ -1,41 +1,17 @@
-package tests
+package base
 
 import (
 	"net/http"
-	"os"
 	"testing"
 
 	"github.com/gavv/httpexpect"
-	"github.com/snowlyg/go-tenancy/core"
 	"github.com/snowlyg/go-tenancy/g"
 	"github.com/snowlyg/go-tenancy/initialize"
-	"github.com/snowlyg/go-tenancy/initialize/cache"
 	"github.com/snowlyg/go-tenancy/model"
 	"github.com/snowlyg/multi"
 )
 
-func TestMain(m *testing.M) {
-	g.TENANCY_VP = core.Viper()      // 初始化Viper
-	g.TENANCY_LOG = core.Zap()       // 初始化zap日志库
-	g.TENANCY_DB = initialize.Gorm() // gorm连接数据库
-	g.TENANCY_CACHE = cache.Cache()  // redis缓存
-	// initialize.Timer()
-	if g.TENANCY_DB != nil {
-		initialize.MysqlTables(g.TENANCY_DB) // 初始化表
-	}
-	// 初始化认证服务
-	initialize.Auth()
-
-	// call flag.Parse() here if TestMain uses flags
-	// 如果 TestMain 使用了 flags，这里应该加上 flag.Parse()
-	os.Exit(m.Run())
-
-	db, _ := g.TENANCY_DB.DB()
-	db.Close()
-	multi.AuthDriver.Close()
-}
-
-func baseTester(t *testing.T) *httpexpect.Expect {
+func BaseTester(t *testing.T) *httpexpect.Expect {
 	handler := initialize.App()
 	return httpexpect.WithConfig(httpexpect.Config{
 		BaseURL: "http://127.0.0.1:8089/",
@@ -50,8 +26,8 @@ func baseTester(t *testing.T) *httpexpect.Expect {
 	})
 }
 
-func baseWithLoginTester(t *testing.T) *httpexpect.Expect {
-	e := baseTester(t)
+func BaseWithLoginTester(t *testing.T) *httpexpect.Expect {
+	e := BaseTester(t)
 	obj := e.POST("v1/public/admin/login").
 		WithJSON(map[string]interface{}{"username": "admin", "password": "123456", "captcha": "", "captchaId": ""}).
 		Expect().Status(http.StatusOK).JSON().Object()
@@ -77,8 +53,8 @@ func baseWithLoginTester(t *testing.T) *httpexpect.Expect {
 	})
 }
 
-func tenancyWithLoginTester(t *testing.T) *httpexpect.Expect {
-	e := baseTester(t)
+func TenancyWithLoginTester(t *testing.T) *httpexpect.Expect {
+	e := BaseTester(t)
 	obj := e.POST("v1/public/merchant/login").
 		WithJSON(map[string]interface{}{"username": "a303176530", "password": "123456", "captcha": "", "captchaId": ""}).
 		Expect().Status(http.StatusOK).JSON().Object()
@@ -106,13 +82,13 @@ func tenancyWithLoginTester(t *testing.T) *httpexpect.Expect {
 	})
 }
 
-func deviceWithLoginTester(t *testing.T) *httpexpect.Expect {
+func DeviceWithLoginTester(t *testing.T) *httpexpect.Expect {
 	var tenancy model.SysTenancy
 	err := g.TENANCY_DB.Model(&model.SysTenancy{}).First(&tenancy).Error
 	if err != nil {
 		t.Fatal(err)
 	}
-	e := baseTester(t)
+	e := BaseTester(t)
 	obj := e.POST("v1/public/device/login").
 		WithJSON(map[string]interface{}{
 			"uuid":       tenancy.UUID,
@@ -139,7 +115,7 @@ func deviceWithLoginTester(t *testing.T) *httpexpect.Expect {
 	})
 }
 
-func baseLogOut(auth *httpexpect.Expect) {
+func BaseLogOut(auth *httpexpect.Expect) {
 	obj := auth.GET("v1/auth/logout").
 		Expect().Status(http.StatusOK).JSON().Object()
 	obj.Keys().ContainsOnly("status", "data", "message")

@@ -3,11 +3,13 @@ package tests
 import (
 	"net/http"
 	"testing"
+
+	"github.com/snowlyg/go-tenancy/tests/base"
 )
 
 func TestGetTenancyInfo(t *testing.T) {
-	auth := tenancyWithLoginTester(t)
-	defer baseLogOut(auth)
+	auth := base.TenancyWithLoginTester(t)
+	defer base.BaseLogOut(auth)
 	obj := auth.GET("v1/merchant/tenancy/getTenancyInfo").
 		Expect().Status(http.StatusOK).JSON().Object()
 	obj.Keys().ContainsOnly("status", "data", "message")
@@ -16,8 +18,8 @@ func TestGetTenancyInfo(t *testing.T) {
 }
 
 func TestUpdateClientTenancy(t *testing.T) {
-	auth := tenancyWithLoginTester(t)
-	defer baseLogOut(auth)
+	auth := base.TenancyWithLoginTester(t)
+	defer base.BaseLogOut(auth)
 	data := map[string]interface{}{
 		"avatar": "http://127.0.0.1:8089/uploads/file/49989c75324ef71956c91e79ae49b10d.jpg",
 		"banner": "http://127.0.0.1:8089/uploads/def/20200908/c7837d662fd8bd31a8461f7f32e138ce.jpg",

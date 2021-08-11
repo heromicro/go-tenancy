@@ -4,12 +4,13 @@ import (
 	"net/http"
 	"testing"
 
+	"github.com/snowlyg/go-tenancy/tests/base"
 	"github.com/snowlyg/multi"
 )
 
 func TestAuthorityList(t *testing.T) {
-	auth := baseWithLoginTester(t)
-	defer baseLogOut(auth)
+	auth := base.BaseWithLoginTester(t)
+	defer base.BaseLogOut(auth)
 	obj := auth.POST("v1/admin/authority/getAuthorityList").
 		WithJSON(map[string]interface{}{"page": 1, "pageSize": 10}).
 		Expect().Status(http.StatusOK).JSON().Object()
@@ -41,8 +42,8 @@ func TestAuthorityList(t *testing.T) {
 
 }
 func TestAdminAuthority(t *testing.T) {
-	auth := baseWithLoginTester(t)
-	defer baseLogOut(auth)
+	auth := base.BaseWithLoginTester(t)
+	defer base.BaseLogOut(auth)
 	obj := auth.POST("v1/admin/authority/getAdminAuthorityList").
 		WithJSON(map[string]interface{}{"page": 1, "pageSize": 10}).
 		Expect().Status(http.StatusOK).JSON().Object()
@@ -66,11 +67,11 @@ func TestAdminAuthority(t *testing.T) {
 		"createdAt",
 		"updatedAt",
 	)
-
 }
+
 func TestTenancyAuthority(t *testing.T) {
-	auth := baseWithLoginTester(t)
-	defer baseLogOut(auth)
+	auth := base.BaseWithLoginTester(t)
+	defer base.BaseLogOut(auth)
 	obj := auth.POST("v1/admin/authority/getTenancyAuthorityList").
 		WithJSON(map[string]interface{}{"page": 1, "pageSize": 10}).
 		Expect().Status(http.StatusOK).JSON().Object()
@@ -94,11 +95,11 @@ func TestTenancyAuthority(t *testing.T) {
 		"createdAt",
 		"updatedAt",
 	)
-
 }
+
 func TestGeneralAuthority(t *testing.T) {
-	auth := baseWithLoginTester(t)
-	defer baseLogOut(auth)
+	auth := base.BaseWithLoginTester(t)
+	defer base.BaseLogOut(auth)
 	obj := auth.POST("v1/admin/authority/getGeneralAuthorityList").
 		WithJSON(map[string]interface{}{"page": 1, "pageSize": 10}).
 		Expect().Status(http.StatusOK).JSON().Object()
@@ -135,8 +136,8 @@ func TestAuthorityProcess(t *testing.T) {
 			{"authorityId": "8881"},
 		},
 	}
-	auth := baseWithLoginTester(t)
-	defer baseLogOut(auth)
+	auth := base.BaseWithLoginTester(t)
+	defer base.BaseLogOut(auth)
 	obj := auth.POST("v1/admin/authority/createAuthority").
 		WithJSON(data).
 		Expect().Status(http.StatusOK).JSON().Object()
@@ -262,8 +263,8 @@ func TestAuthorityRegisterError(t *testing.T) {
 		"authorityType":   multi.AdminAuthority,
 		"dataAuthorityId": nil,
 	}
-	auth := baseWithLoginTester(t)
-	defer baseLogOut(auth)
+	auth := base.BaseWithLoginTester(t)
+	defer base.BaseLogOut(auth)
 	obj := auth.POST("v1/admin/authority/createAuthority").
 		WithJSON(data).
 		Expect().Status(http.StatusOK).JSON().Object()

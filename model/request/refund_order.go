@@ -16,11 +16,11 @@ type OrderAudit struct {
 }
 
 type CheckRefundOrder struct {
-	Id uint `json:"id"  form:"id"  binding:"required"`
+	Ids []uint `json:"ids"  form:"ids"  binding:"required"`
 }
 
 type CreateRefundOrder struct {
-	Id            uint    `json:"id"  form:"id"  binding:"required"`
+	Ids           []uint  `json:"ids"  form:"ids"  binding:"required"`
 	RefundMessage string  `json:"refundMessage"  binding:"required"`
 	RefundPrice   float64 `json:"refundPrice"  binding:"required"`
 	RefundType    int     `json:"refundType"  binding:"required"`

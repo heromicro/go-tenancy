@@ -6,11 +6,12 @@ import (
 	"testing"
 
 	"github.com/snowlyg/go-tenancy/g"
+	"github.com/snowlyg/go-tenancy/tests/base"
 )
 
 func TestClientCategoryList(t *testing.T) {
-	auth := tenancyWithLoginTester(t)
-	defer baseLogOut(auth)
+	auth := base.TenancyWithLoginTester(t)
+	defer base.BaseLogOut(auth)
 	obj := auth.GET("v1/merchant/productCategory/getProductCategoryList").
 		Expect().Status(http.StatusOK).JSON().Object()
 	obj.Keys().ContainsOnly("status", "data", "message")
@@ -26,8 +27,8 @@ func TestClientCategoryList(t *testing.T) {
 }
 
 func TestClientCategorySelect(t *testing.T) {
-	auth := tenancyWithLoginTester(t)
-	defer baseLogOut(auth)
+	auth := base.TenancyWithLoginTester(t)
+	defer base.BaseLogOut(auth)
 	obj := auth.GET("v1/merchant/productCategory/getProductCategorySelect").
 		Expect().Status(http.StatusOK).JSON().Object()
 	obj.Keys().ContainsOnly("status", "data", "message")
@@ -36,8 +37,8 @@ func TestClientCategorySelect(t *testing.T) {
 }
 
 func TestGetAdminCategorySelect(t *testing.T) {
-	auth := tenancyWithLoginTester(t)
-	defer baseLogOut(auth)
+	auth := base.TenancyWithLoginTester(t)
+	defer base.BaseLogOut(auth)
 	obj := auth.GET("v1/merchant/productCategory/getAdminProductCategorySelect").
 		Expect().Status(http.StatusOK).JSON().Object()
 	obj.Keys().ContainsOnly("status", "data", "message")
@@ -55,8 +56,8 @@ func TestClientCategoryProcess(t *testing.T) {
 		"pid":      1,
 		"pic":      "http://qmplusimg.henrongyi.top/head.png",
 	}
-	auth := tenancyWithLoginTester(t)
-	defer baseLogOut(auth)
+	auth := base.TenancyWithLoginTester(t)
+	defer base.BaseLogOut(auth)
 
 	obj := auth.POST("v1/merchant/productCategory/createProductCategory").
 		WithJSON(data).
@@ -161,8 +162,8 @@ func TestClientCategoryRegisterError(t *testing.T) {
 		"pid":      1,
 		"pic":      "http://qmplusimg.henrongyi.top/head.png",
 	}
-	auth := tenancyWithLoginTester(t)
-	defer baseLogOut(auth)
+	auth := base.TenancyWithLoginTester(t)
+	defer base.BaseLogOut(auth)
 	obj := auth.POST("v1/merchant/productCategory/createProductCategory").
 		WithJSON(data).
 		Expect().Status(http.StatusOK).JSON().Object()

@@ -7,11 +7,11 @@ import (
 	"github.com/snowlyg/go-tenancy/config"
 	"github.com/snowlyg/go-tenancy/g"
 	"github.com/snowlyg/go-tenancy/service"
+	"github.com/snowlyg/go-tenancy/tests/base"
 )
 
 func TestInitDB(t *testing.T) {
-	e := baseTester(t)
-
+	e := base.BaseTester(t)
 	// 删除表和视图
 	var sqls []string
 	if err := g.TENANCY_DB.Raw("select CASE table_type WHEN 'VIEW' THEN concat('drop view ', table_name, ';') ELSE concat('drop table ', table_name, ';') END  from information_schema.tables where table_schema='tenancy';").Scan(&sqls).Error; err != nil {
@@ -35,7 +35,9 @@ func TestInitDB(t *testing.T) {
 	if err := service.WriteConfig(g.TENANCY_VP, MysqlConfig); err != nil {
 		t.Fatalf("write config err %v\n", err)
 	}
+
 	g.TENANCY_DB = nil
+
 	obj := e.GET("v1/init/checkdb").
 		Expect().Status(http.StatusOK).JSON().Object()
 
@@ -45,7 +47,7 @@ func TestInitDB(t *testing.T) {
 	obj.Value("data").Object().Value("needInit").Boolean().True()
 
 	obj = e.POST("v1/init/initdb").
-		WithJSON(map[string]interface{}{"host": "127.0.0.1", "port": "3306", "userName": "root", "password": "Chindeo", "dbName": "tenancy"}).
+		WithJSON(map[string]interface{}{"host": "127.0.0.1", "port": "3306", "userName": "root", "password": "Chindeo", "dbName": "tenancy_test"}).
 		Expect().Status(http.StatusOK).JSON().Object()
 
 	obj.Keys().ContainsOnly("status", "data", "message")

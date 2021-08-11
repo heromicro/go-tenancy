@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"net/http"
 	"testing"
+
+	"github.com/snowlyg/go-tenancy/tests/base"
 )
 
 func TestClientRefundOrderList(t *testing.T) {
@@ -29,8 +31,8 @@ func TestClientRefundOrderList(t *testing.T) {
 }
 
 func refundOrderClientlist(t *testing.T, params map[string]interface{}, length int) {
-	auth := tenancyWithLoginTester(t)
-	defer baseLogOut(auth)
+	auth := base.TenancyWithLoginTester(t)
+	defer base.BaseLogOut(auth)
 	obj := auth.POST("v1/merchant/refundOrder/getRefundOrderList").
 		WithJSON(params).
 		Expect().Status(http.StatusOK).JSON().Object()
@@ -91,8 +93,8 @@ func refundOrderClientlist(t *testing.T, params map[string]interface{}, length i
 
 func TestClientRefundOrderRecord(t *testing.T) {
 	orderId := 1
-	auth := tenancyWithLoginTester(t)
-	defer baseLogOut(auth)
+	auth := base.TenancyWithLoginTester(t)
+	defer base.BaseLogOut(auth)
 	obj := auth.POST(fmt.Sprintf("v1/merchant/refundOrder/getRefundOrderRecord/%d", orderId)).
 		WithJSON(map[string]interface{}{
 			"page":     1,
@@ -110,8 +112,8 @@ func TestClientRefundOrderRecord(t *testing.T) {
 
 func TestClientRefundOrderRemark(t *testing.T) {
 	orderId := 1
-	auth := tenancyWithLoginTester(t)
-	defer baseLogOut(auth)
+	auth := base.TenancyWithLoginTester(t)
+	defer base.BaseLogOut(auth)
 	obj := auth.GET(fmt.Sprintf("v1/merchant/refundOrder/getRefundOrderRemarkMap/%d", orderId)).
 		Expect().Status(http.StatusOK).JSON().Object()
 	obj.Keys().ContainsOnly("status", "data", "message")
@@ -128,8 +130,8 @@ func TestClientRefundOrderRemark(t *testing.T) {
 
 func TestClientRefundOrderAudit(t *testing.T) {
 	orderId := 1
-	auth := tenancyWithLoginTester(t)
-	defer baseLogOut(auth)
+	auth := base.TenancyWithLoginTester(t)
+	defer base.BaseLogOut(auth)
 	obj := auth.GET(fmt.Sprintf("v1/merchant/refundOrder/getRefundOrderMap/%d", orderId)).
 		Expect().Status(http.StatusOK).JSON().Object()
 	obj.Keys().ContainsOnly("status", "data", "message")
