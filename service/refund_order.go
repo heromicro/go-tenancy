@@ -246,7 +246,7 @@ func GetRefundOrderRecord(id uint, info request.PageInfo) ([]model.RefundStatus,
 func GetRefundOrderRemarkMap(id uint, ctx *gin.Context) (Form, error) {
 	var form Form
 	var formStr string
-	refundOrder, err := GetRefundOrderByID(id, ctx)
+	refundOrder, err := GetRefundOrderByID(id, GetIsDelField(ctx))
 	if err != nil {
 		return Form{}, err
 	}
@@ -272,10 +272,9 @@ func GetRefundOrderMap(id uint, ctx *gin.Context) (Form, error) {
 	return form, err
 }
 
-func GetRefundOrderByID(id uint, ctx *gin.Context) (model.RefundOrder, error) {
+func GetRefundOrderByID(id uint, isDelField string) (model.RefundOrder, error) {
 	var refundOrder model.RefundOrder
 	db := g.TENANCY_DB.Model(&model.RefundOrder{}).Where("id = ?", id)
-	isDelField := GetIsDelField(ctx)
 	if isDelField != "" {
 		db = db.Where(isDelField, g.StatusFalse)
 	}
@@ -283,9 +282,8 @@ func GetRefundOrderByID(id uint, ctx *gin.Context) (model.RefundOrder, error) {
 	return refundOrder, err
 }
 
-func RemarkRefundOrder(id uint, merMark map[string]interface{}, ctx *gin.Context) error {
+func RemarkRefundOrder(id uint, merMark map[string]interface{}, isDelField string) error {
 	db := g.TENANCY_DB.Model(&model.RefundOrder{})
-	isDelField := GetIsDelField(ctx)
 	if isDelField != "" {
 		db = db.Where(isDelField, g.StatusFalse)
 	}
@@ -307,12 +305,12 @@ func GetRefundPriceByOrderIds(ids []uint, isDelField string) (float64, error) {
 	return wxPayPrice.Count, nil
 }
 
-func checkRefundPrice(refundOrder model.RefundOrder, ctx *gin.Context) (float64, error) {
-	order, err := GetOrderById(refundOrder.OrderID, ctx)
+func checkRefundPrice(refundOrder model.RefundOrder, isDelField string) (float64, error) {
+	order, err := GetOrderByOrderId(refundOrder.OrderID, refundOrder.SysTenancyID, refundOrder.SysUserID)
 	if err != nil {
 		return 0, fmt.Errorf("get order %w", err)
 	}
-	refundPrice, err := GetRefundPriceByOrderIds([]uint{refundOrder.OrderID}, GetIsDelField(ctx))
+	refundPrice, err := GetRefundPriceByOrderIds([]uint{refundOrder.OrderID}, isDelField)
 	if err != nil {
 		return 0, fmt.Errorf("get refund order price %w", err)
 	}
@@ -336,19 +334,19 @@ func GetOtherRefundOrderIds(orderId, refundOrderId uint) ([]uint, error) {
 	return ids, nil
 }
 
-func AuditRefundOrder(id uint, audit request.OrderAudit, ctx *gin.Context) error {
-	refundOrder, err := GetRefundOrderByID(id, ctx)
+func AuditRefundOrder(id uint, audit request.OrderAudit, isDelField string) error {
+	refundOrder, err := GetRefundOrderByID(id, isDelField)
 	if err != nil {
 		return fmt.Errorf("get refund order %w", err)
 	}
 
 	if audit.Status == model.RefundStatusAgree {
-		err := agreeRefundOrder(refundOrder, ctx)
+		err := agreeRefundOrder(refundOrder, isDelField)
 		if err != nil {
 			return err
 		}
 	} else if audit.Status == model.RefundStatusRefuse {
-		err := refuseRefundOrder(refundOrder, audit.FailMessage, ctx)
+		err := refuseRefundOrder(refundOrder, audit.FailMessage)
 		if err != nil {
 			return err
 		}
@@ -361,7 +359,7 @@ func AuditRefundOrder(id uint, audit request.OrderAudit, ctx *gin.Context) error
 //    2.1 如果退款数量 等于 购买数量 返还可退款数 is_refund = 0
 //    2.2 商品总数小于可退数量 返还可退数 以商品数为准
 //    2.3 是否存在其他图款单,是 ,退款中 ,否, 部分退款
-func refuseRefundOrder(refundOrder model.RefundOrder, failMessage string, ctx *gin.Context) error {
+func refuseRefundOrder(refundOrder model.RefundOrder, failMessage string) error {
 	status := refundOrder.Status
 	refundOrderIds, err := GetOtherRefundOrderIds(refundOrder.OrderID, refundOrder.ID)
 	if err != nil {
@@ -400,7 +398,7 @@ func refuseRefundOrder(refundOrder model.RefundOrder, failMessage string, ctx *g
 			}
 		}
 		status = model.RefundStatusRefuse
-		err := g.TENANCY_DB.Model(&model.RefundOrder{}).Where("id = ?", refundOrder.ID).Updates(map[string]interface{}{"status": status, "status_time": time.Now(), "fail_message": failMessage}).Error
+		err := tx.Model(&model.RefundOrder{}).Where("id = ?", refundOrder.ID).Updates(map[string]interface{}{"status": status, "status_time": time.Now(), "fail_message": failMessage}).Error
 		if err != nil {
 			return fmt.Errorf("update refund order status %w", err)
 		}
@@ -414,19 +412,28 @@ func refuseRefundOrder(refundOrder model.RefundOrder, failMessage string, ctx *g
 	return nil
 }
 
+func GetRefundProductCountByRefundOrderIds(refundOrderIds []uint, refundProductId uint) (int64, error) {
+	var count int64
+	err := g.TENANCY_DB.Model(&model.RefundProduct{}).Where("refund_order_id in ?", refundOrderIds).Where("order_product_id = ?", refundProductId).Count(&count).Error
+	if err != nil {
+		return count, fmt.Errorf("get check refund product %w", err)
+	}
+	return count, nil
+}
+
 // agreeRefundOrder
 //  1.同意退款
 //    1.1 仅退款
 //       1.1.1 是 , 如果退款数量 等于 购买数量 is_refund = 3 全退退款 不等于 is_refund = 2 部分退款
 //       1.1.2 否, is_refund = 1 退款中
 //    1.2 退款退货 is_refund = 1
-func agreeRefundOrder(refundOrder model.RefundOrder, ctx *gin.Context) error {
+func agreeRefundOrder(refundOrder model.RefundOrder, isDelField string) error {
 	status := refundOrder.Status
 	refundOrderIds, err := GetOtherRefundOrderIds(refundOrder.OrderID, refundOrder.ID)
 	if err != nil {
 		return err
 	}
-	refundPrice, err := checkRefundPrice(refundOrder, ctx)
+	refundPrice, err := checkRefundPrice(refundOrder, isDelField)
 	if err != nil {
 		return err
 	}
@@ -446,8 +453,7 @@ func agreeRefundOrder(refundOrder model.RefundOrder, ctx *gin.Context) error {
 				}
 			}
 			if len(refundOrderIds) > 0 {
-				var count int64
-				err := g.TENANCY_DB.Model(&model.RefundProduct{}).Where("refund_order_id in ?", refundOrderIds).Where("order_product_id = ?", refundProduct.ProductID).Count(&count).Error
+				count, err := GetRefundProductCountByRefundOrderIds(refundOrderIds, refundProduct.ProductID)
 				if err != nil {
 					return fmt.Errorf("get check refund product %w", err)
 				}
@@ -456,7 +462,7 @@ func agreeRefundOrder(refundOrder model.RefundOrder, ctx *gin.Context) error {
 				}
 			}
 			refundProduct.OrderProduct.IsRefund = isRefund
-			err := tx.Model(&model.OrderProduct{}).Where("id = ?", refundProduct.OrderProduct.ID).Update("is_refund", isRefund).Error
+			err := UpdateOrderProductIsRefund(tx, refundProduct.OrderProduct.ID, isRefund)
 			if err != nil {
 				return fmt.Errorf("update refund product is_refund %w", err)
 			}
@@ -469,12 +475,12 @@ func agreeRefundOrder(refundOrder model.RefundOrder, ctx *gin.Context) error {
 			fmt.Printf("refundPrice %f", refundPrice)
 		} else if refundOrder.RefundType == model.RefundTypeAll {
 			status = model.RefundStatusAgree
-			err := AddRefundOrderStatus(refundOrder.ID, "refund_agree", "退款申请已通过，请将商品寄回")
+			err := AddRefundOrderStatus(tx, refundOrder.ID, "refund_agree", "退款申请已通过，请将商品寄回")
 			if err != nil {
 				return fmt.Errorf("add refund order status %w", err)
 			}
 		}
-		err := g.TENANCY_DB.Model(&model.RefundOrder{}).Where("id = ?", refundOrder.ID).Updates(map[string]interface{}{"status": status, "status_time": time.Now()}).Error
+		err := tx.Model(&model.RefundOrder{}).Where("id = ?", refundOrder.ID).Updates(map[string]interface{}{"status": status, "status_time": time.Now()}).Error
 		if err != nil {
 			return fmt.Errorf("update refund order status %w", err)
 		}
@@ -486,19 +492,74 @@ func agreeRefundOrder(refundOrder model.RefundOrder, ctx *gin.Context) error {
 	return nil
 }
 
+func UpdateRefundOrderById(db *gorm.DB, refundOrderId uint, data map[string]interface{}) error {
+	err := db.Model(&model.RefundOrder{}).Where("id = ?", refundOrderId).Updates(data).Error
+	if err != nil {
+		return fmt.Errorf("update refund order status %w", err)
+	}
+	return nil
+}
+
+func CheckRefundOrder(orderId, tenancyId, userId uint, req request.CheckRefundOrder) (response.OrderProduct, error) {
+	orderProduct, err := GetOrderProductById(orderId, req.Id, tenancyId, userId)
+	if err != nil {
+		return orderProduct, err
+	}
+	return orderProduct, nil
+}
+
+func CreateRefundOrder(orderId, tenancyId, userId uint, req request.CreateRefundOrder) (uint, error) {
+	// order, err := GetOrderByOrderId(orderId, tenancyId, userId)
+	// if err != nil {
+	// 	return 0, err
+	// }
+	refundOrder := model.RefundOrder{
+		OrderID:      orderId,
+		SysUserID:    tenancyId,
+		SysTenancyID: tenancyId,
+		BaseRefundOrder: model.BaseRefundOrder{
+			RefundOrderSn: g.CreateOrderSn("R"),
+			// DeliveryType:       order.DeliveryType,
+			// DeliveryID:         order.DeliveryID,
+			// DeliveryMark:       order.DeliveryMark,
+			// DeliveryPics:       order.DeliveryPics,
+			// DeliveryPhone:      order.DeliveryPhone,
+			// MerDeliveryUser:    order.MerDeliveryUser,
+			// MerDeliveryAddress: order.MerDeliveryAddress,
+			// Phone:              order.Phone,
+			Mark:      req.Mark,
+			MerMark:   "",
+			AdminMark: "",
+			// Pics:               pics, // 图片
+			RefundType:    req.RefundType,
+			RefundMessage: req.RefundMessage,
+			RefundPrice:   req.RefundPrice,
+			RefundNum:     req.Num,
+			FailMessage:   "",
+			Status:        model.RefundStatusAudit,
+			StatusTime:    time.Now(),
+		},
+	}
+	err := g.TENANCY_DB.Model(&model.RefundOrder{}).Create(&refundOrder).Error
+	if err != nil {
+		return refundOrder.ID, err
+	}
+	return refundOrder.ID, nil
+}
+
 // DeleteRefundOrder
 func DeleteRefundOrder(id uint) error {
 	return g.TENANCY_DB.Model(&model.RefundOrder{}).Where("id = ?", id).Update("is_system_del", g.StatusTrue).Error
 }
 
-func AddRefundOrderStatus(id uint, cahngeType, changeMessage string) error {
+func AddRefundOrderStatus(db *gorm.DB, id uint, cahngeType, changeMessage string) error {
 	status := model.RefundStatus{
 		RefundOrderID: id,
 		ChangeType:    cahngeType,
 		ChangeMessage: changeMessage,
 		ChangeTime:    time.Now(),
 	}
-	return g.TENANCY_DB.Model(&model.RefundStatus{}).Create(&status).Error
+	return db.Model(&model.RefundStatus{}).Create(&status).Error
 }
 
 func ChangeReturnOrderStatusByOrderSn(status int, orderSn, changeType, changeMessage string) error {

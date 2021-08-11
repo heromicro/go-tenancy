@@ -228,6 +228,22 @@ func UpdateProduct(req request.UpdateProduct, id uint, ctx *gin.Context) error {
 	return err
 }
 
+func GetProductAttrValues(productIds []uint, uniques []string) ([]model.ProductAttrValue, error) {
+	var attrValues []model.ProductAttrValue
+	db := g.TENANCY_DB.Model(&model.ProductAttrValue{})
+	if len(productIds) > 0 {
+		db = db.Where("product_id in ?", productIds)
+	}
+	if len(uniques) > 0 {
+		db = db.Where("`unique` in ?", uniques)
+	}
+	err := db.Find(&attrValues).Error
+	if err != nil {
+		return attrValues, fmt.Errorf("get product attr value %w", err)
+	}
+	return attrValues, nil
+}
+
 func SetProductAttrValue(tx *gorm.DB, isUpdate bool, productId uint, productType int32, reqAttrValue []request.ProductAttrValue) error {
 	if isUpdate {
 		err := tx.Where("product_id = ?", productId).Delete(&model.ProductAttrValue{}).Error
@@ -399,11 +415,7 @@ func GetCartProducts(sysTenancyID, sysUserID uint, cartIds []uint) ([]response.C
 		uniques = append(uniques, cartProduct.ProductAttrUnique)
 	}
 
-	var attrValues []model.ProductAttrValue
-	err = g.TENANCY_DB.Model(&model.ProductAttrValue{}).
-		Where("product_id in ?", productIds).
-		Where("`unique` in ?", uniques).
-		Find(&attrValues).Error
+	attrValues, err := GetProductAttrValues(productIds, uniques)
 	if err != nil {
 		return cartProducts, fmt.Errorf("get product attr value %w", err)
 	}
@@ -430,7 +442,7 @@ func GetCartProducts(sysTenancyID, sysUserID uint, cartIds []uint) ([]response.C
 }
 
 // GetProductByID
-func GetProductByID(id uint, isCuser bool) (response.ProductDetail, error) {
+func GetProductByID(id, tenancyId uint, isCuser bool) (response.ProductDetail, error) {
 	var product response.ProductDetail
 	db := g.TENANCY_DB.Model(&model.Product{})
 	if isCuser {
@@ -440,21 +452,20 @@ func GetProductByID(id uint, isCuser bool) (response.ProductDetail, error) {
 		db = db.Select("products.*,sys_tenancies.name as sys_tenancy_name,sys_brands.brand_name as brand_name,product_categories.cate_name as cate_name,product_contents.content as content,shipping_templates.name as temp_name")
 	}
 
-	err := db.Joins("left join sys_tenancies on products.sys_tenancy_id = sys_tenancies.id").
+	db = db.Joins("left join sys_tenancies on products.sys_tenancy_id = sys_tenancies.id").
 		Joins("left join sys_brands on products.sys_brand_id = sys_brands.id").
 		Joins("left join product_categories on products.product_category_id = product_categories.id").
 		Joins("left join product_contents on product_contents.product_id = products.id").
 		Joins("left join shipping_templates on products.temp_id = shipping_templates.id").
-		Where("products.id = ?", id).
-		First(&product).Error
+		Where("products.id = ?", id)
+	db = CheckTenancyId(db, tenancyId, "products.")
+	err := db.First(&product).Error
 	if err != nil {
 		return product, err
 	}
 	product.SliderImages = strings.Split(product.SliderImage, ",")
 
-	var attrValues []model.ProductAttrValue
-	err = g.TENANCY_DB.Model(&model.ProductAttrValue{}).Where("product_id = ?", id).
-		Find(&attrValues).Error
+	attrValues, err := GetProductAttrValues([]uint{id}, nil)
 	if err != nil {
 		return product, err
 	}
@@ -477,7 +488,7 @@ func GetProductByID(id uint, isCuser bool) (response.ProductDetail, error) {
 	product.CateId = product.ProductCategoryID
 	product.SliderImages = strings.Split(product.SliderImage, ",")
 
-	productCates, err := getProductCatesByProductId(product.ID, product.SysTenancyID)
+	productCates, err := getProductCatesByProductId(product.ID, tenancyId)
 	if err != nil {
 		return product, err
 	}
@@ -574,9 +585,7 @@ func ForceDeleteProduct(id uint) error {
 }
 
 // GetProductInfoList
-func GetProductInfoList(info request.ProductPageInfo, ctx *gin.Context) ([]response.ProductList, int64, error) {
-	isTenancy := multi.IsTenancy(ctx)
-	tenancyId := multi.GetTenancyId(ctx)
+func GetProductInfoList(info request.ProductPageInfo, tenancyId uint, isTenancy, isCuser bool) ([]response.ProductList, int64, error) {
 	var productList []response.ProductList
 	var total int64
 	limit := info.PageSize
@@ -586,7 +595,7 @@ func GetProductInfoList(info request.ProductPageInfo, ctx *gin.Context) ([]respo
 		Joins("left join sys_brands on products.sys_brand_id = sys_brands.id").
 		Joins("left join product_categories on products.product_category_id = product_categories.id")
 
-	if IsCuser(ctx) {
+	if isCuser {
 		db = db.Select("products.id,products.store_name,products.price,products.image,products.sales").
 			Where("products.is_show = ?", g.StatusTrue).Where("products.status = ?", model.SuccessProductStatus)
 	} else {
@@ -596,7 +605,7 @@ func GetProductInfoList(info request.ProductPageInfo, ctx *gin.Context) ([]respo
 			if err != nil {
 				return productList, total, err
 			}
-			cond := getProductConditionByType(multi.GetTenancyId(ctx), isTenancy, t)
+			cond := getProductConditionByType(tenancyId, isTenancy, t)
 			if cond.IsDeleted {
 				db = db.Unscoped()
 			}
@@ -610,9 +619,7 @@ func GetProductInfoList(info request.ProductPageInfo, ctx *gin.Context) ([]respo
 		}
 	}
 
-	if isTenancy {
-		db = db.Where("products.sys_tenancy_id = ?", tenancyId)
-	}
+	db = CheckTenancyId(db, tenancyId, "products.")
 
 	if info.Keyword != "" {
 		db = db.Where(g.TENANCY_DB.Where("products.store_name like ?", info.Keyword+"%").Or("products.store_info like ?", info.Keyword+"%").Or("products.keyword like ?", info.Keyword+"%").Or("products.bar_code like ?", info.Keyword+"%"))
@@ -651,4 +658,12 @@ func GetProductInfoList(info request.ProductPageInfo, ctx *gin.Context) ([]respo
 	}
 
 	return productList, total, err
+}
+
+func UpdateOrderProductIsRefund(db *gorm.DB, orderProductId uint, isRefund uint8) error {
+	err := db.Model(&model.OrderProduct{}).Where("id = ?", orderProductId).Update("is_refund", isRefund).Error
+	if err != nil {
+		return fmt.Errorf("update order product is_refund %w", err)
+	}
+	return nil
 }

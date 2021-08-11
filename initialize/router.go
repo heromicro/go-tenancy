@@ -52,7 +52,7 @@ func Routers(app *gin.Engine) {
 			public.InitAuthRouter(Auth) // 注册用户路由
 		}
 
-		// 商户和员工
+		// 管理员
 		AdminGroup := V1Group.Group(g.TENANCY_CONFIG.System.AdminPreix, middleware.IsAdmin(), middleware.CasbinHandler(), middleware.OperationRecord())
 		{
 			admin.InitApiRouter(AdminGroup)            // 注册功能api路由
@@ -88,8 +88,8 @@ func Routers(app *gin.Engine) {
 			admin.InitSysOperationRecordRouter(AdminLogGroup) // 操作记录
 		}
 
-		// 商户和员工
-		ClientGroup := V1Group.Group(g.TENANCY_CONFIG.System.ClientPreix, middleware.IsTenancy(), middleware.CasbinHandler(), middleware.OperationRecord())
+		// 商户员工
+		ClientGroup := V1Group.Group(g.TENANCY_CONFIG.System.ClientPreix, middleware.IsTenancy(), middleware.CheckTenancy(), middleware.CasbinHandler(), middleware.OperationRecord())
 		{
 			client.InitUserRouter(ClientGroup)             // 注册用户路由
 			client.InitTenancyRouter(ClientGroup)          // 注册商户路由
@@ -120,7 +120,7 @@ func Routers(app *gin.Engine) {
 		// 	user.InitDeviceRouter(GeneralGroup)
 		// }
 
-		DeviceGroup := V1Group.Group("/device", middleware.IsDevice(), middleware.OperationRecord())
+		DeviceGroup := V1Group.Group("/device", middleware.IsDevice(), middleware.CheckTenancy(), middleware.OperationRecord())
 		{
 			device.InitDeviceRouter(DeviceGroup)
 		}

@@ -50,9 +50,11 @@ func CreateCart(req request.CreateCart) (model.Cart, error) {
 }
 
 // ChangeCartNum
-func ChangeCartNum(cartNum int64, id uint) error {
+func ChangeCartNum(cartNum int64, id, userId, tenancyId uint) error {
 	return g.TENANCY_DB.Model(&model.Cart{}).
 		Where("id = ?", id).
+		Where("sys_user_id = ?", userId).
+		Where("sys_tenancy_id = ?", tenancyId).
 		Update("cart_num", cartNum).Error
 }
 
@@ -64,20 +66,20 @@ func ChangeIsPayByIds(tx *gorm.DB, ids []uint) error {
 }
 
 // DeleteCart
-func DeleteCart(ids []int, sysUserID, sysTenancyID uint) error {
+func DeleteCart(ids []int, userId, tenancyId uint) error {
 	return g.TENANCY_DB.Model(&model.Cart{}).
-		Where("sys_user_id = ?", sysUserID).
-		Where("sys_tenancy_id = ?", sysTenancyID).
+		Where("sys_user_id = ?", userId).
+		Where("sys_tenancy_id = ?", tenancyId).
 		Where("id in ?", ids).
 		Delete(&model.Cart{}).Error
 }
 
 // GetProductCount
-func GetProductCount(sysUserID, sysTenancyID uint) (int64, error) {
+func GetProductCount(userId, tenancyId uint) (int64, error) {
 	var count int64
 	err := g.TENANCY_DB.Model(&model.Cart{}).
-		Where("sys_user_id = ?", sysUserID).
-		Where("sys_tenancy_id = ?", sysTenancyID).
+		Where("sys_user_id = ?", userId).
+		Where("sys_tenancy_id = ?", tenancyId).
 		Count(&count).Error
 	if err != nil {
 		return count, err

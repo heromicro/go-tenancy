@@ -110,3 +110,23 @@ func CheckTenancyId(db *gorm.DB, tenancyId uint, perfix string) *gorm.DB {
 	}
 	return db.Where(perfix+"sys_tenancy_id", tenancyId)
 }
+
+func CheckUserId(db *gorm.DB, userId uint, perfix string) *gorm.DB {
+	if userId == 0 {
+		return db
+	}
+	return db.Where(perfix+"sys_user_id", userId)
+}
+
+func CheckTenancyIdAndUserId(db *gorm.DB, tenancyId, userId uint, perfix string) *gorm.DB {
+	if tenancyId == 0 && userId == 0 {
+		return db
+	}
+	if tenancyId > 0 {
+		db = db.Where(perfix+"sys_tenancy_id", tenancyId)
+	}
+	if userId > 0 {
+		db = db.Where(perfix+"sys_user_id", userId)
+	}
+	return db
+}

@@ -34,7 +34,7 @@ func PayOrder(req request.PayOrder) (response.PayOrder, error) {
 	if tenancy.State == g.StatusFalse {
 		return res, fmt.Errorf("当前商户已经停业")
 	}
-	order, err := GetOrderByOrderId(req.OrderId)
+	order, err := GetOrderByOrderId(req.OrderId, req.TenancyId, req.UserId)
 	if errors.Is(err, gorm.ErrRecordNotFound) {
 		return res, fmt.Errorf("当前订单不存在")
 	} else if err != nil {

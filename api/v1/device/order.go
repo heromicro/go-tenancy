@@ -39,7 +39,7 @@ func CheckOrder(ctx *gin.Context) {
 		response.FailWithMessage(errs.Error(), ctx)
 		return
 	}
-	if order, err := service.CheckOrder(req, ctx); err != nil {
+	if order, err := service.CheckOrder(req, multi.GetTenancyId(ctx), multi.GetUserId(ctx)); err != nil {
 		g.TENANCY_LOG.Error("获取失败!", zap.Any("err", err))
 		response.FailWithMessage("获取失败:"+err.Error(), ctx)
 	} else {
@@ -54,7 +54,7 @@ func GetOrderById(ctx *gin.Context) {
 		response.FailWithMessage(errs.Error(), ctx)
 		return
 	}
-	if order, err := service.GetOrderById(req.Id, ctx); err != nil {
+	if order, err := service.GetOrderDetailById(req.Id, multi.GetTenancyId(ctx), multi.GetUserId(ctx), service.GetIsDelField(ctx)); err != nil {
 		g.TENANCY_LOG.Error("获取失败!", zap.Any("err", err))
 		response.FailWithMessage("获取失败:"+err.Error(), ctx)
 	} else {
@@ -85,13 +85,13 @@ func PayOrder(ctx *gin.Context) {
 		return
 	}
 	var payOrder request.PayOrder
-	if err := ctx.ShouldBind(&req); err != nil {
+	if err := ctx.ShouldBind(&payOrder); err != nil {
 		g.TENANCY_LOG.Error("参数校验不通过", zap.Any("err", err))
 		response.FailWithMessage("参数校验不通过", ctx)
 		return
 	}
 
-	err := service.CheckOrderStatusBeforeAction(req.Id)
+	err := service.CheckOrderStatusBeforeAction(req.Id, multi.GetTenancyId(ctx), multi.GetUserId(ctx))
 	if err != nil {
 		g.TENANCY_LOG.Error("获取失败!", zap.Any("err", err))
 		response.FailWithMessage("获取失败:"+err.Error(), ctx)
@@ -114,10 +114,53 @@ func CancelOrder(ctx *gin.Context) {
 		response.FailWithMessage(errs.Error(), ctx)
 		return
 	}
-	if err := service.CancelOrder(req.Id); err != nil {
+	if err := service.CancelOrder(req.Id, multi.GetTenancyId(ctx), multi.GetUserId(ctx)); err != nil {
 		g.TENANCY_LOG.Error("操作失败!", zap.Any("err", err))
 		response.FailWithMessage("操作失败:"+err.Error(), ctx)
 	} else {
 		response.OkWithMessage("操作成功", ctx)
+	}
+}
+
+// CheckRefundOrder
+func CheckRefundOrder(ctx *gin.Context) {
+	var req request.GetById
+	if errs := ctx.ShouldBindUri(&req); errs != nil {
+		response.FailWithMessage(errs.Error(), ctx)
+		return
+	}
+	var checkRefundOrder request.CheckRefundOrder
+	if err := ctx.ShouldBind(&checkRefundOrder); err != nil {
+		g.TENANCY_LOG.Error("参数校验不通过", zap.Any("err", err))
+		response.FailWithMessage("参数校验不通过", ctx)
+		return
+	}
+
+	if refundOrder, err := service.CheckRefundOrder(req.Id, multi.GetTenancyId(ctx), multi.GetUserId(ctx), checkRefundOrder); err != nil {
+		g.TENANCY_LOG.Error("操作失败!", zap.Any("err", err))
+		response.FailWithMessage("操作失败:"+err.Error(), ctx)
+	} else {
+		response.OkWithDetailed(refundOrder, "操作成功", ctx)
+	}
+}
+
+// RefundOrder
+func RefundOrder(ctx *gin.Context) {
+	var req request.GetById
+	if errs := ctx.ShouldBindUri(&req); errs != nil {
+		response.FailWithMessage(errs.Error(), ctx)
+		return
+	}
+	var createRefundOrder request.CreateRefundOrder
+	if err := ctx.ShouldBind(&createRefundOrder); err != nil {
+		g.TENANCY_LOG.Error("参数校验不通过", zap.Any("err", err))
+		response.FailWithMessage("参数校验不通过", ctx)
+		return
+	}
+	if id, err := service.CreateRefundOrder(req.Id, multi.GetTenancyId(ctx), multi.GetUserId(ctx), createRefundOrder); err != nil {
+		g.TENANCY_LOG.Error("操作失败!", zap.Any("err", err))
+		response.FailWithMessage("操作失败:"+err.Error(), ctx)
+	} else {
+		response.OkWithDetailed(gin.H{"id": id}, "操作成功", ctx)
 	}
 }

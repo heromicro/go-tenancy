@@ -6,6 +6,7 @@ import (
 	"github.com/snowlyg/go-tenancy/model/request"
 	"github.com/snowlyg/go-tenancy/model/response"
 	"github.com/snowlyg/go-tenancy/service"
+	"github.com/snowlyg/multi"
 	"go.uber.org/zap"
 )
 
@@ -16,7 +17,7 @@ func GetProductList(ctx *gin.Context) {
 		response.FailWithMessage(errs.Error(), ctx)
 		return
 	}
-	if list, total, err := service.GetProductInfoList(pageInfo, ctx); err != nil {
+	if list, total, err := service.GetProductInfoList(pageInfo, multi.GetTenancyId(ctx), multi.IsTenancy(ctx), service.IsCuser(ctx)); err != nil {
 		g.TENANCY_LOG.Error("获取失败!", zap.Any("err", err))
 		response.FailWithMessage("获取失败:"+err.Error(), ctx)
 	} else {
@@ -36,7 +37,7 @@ func GetProductById(ctx *gin.Context) {
 		response.FailWithMessage(errs.Error(), ctx)
 		return
 	}
-	product, err := service.GetProductByID(req.Id, service.IsCuser(ctx))
+	product, err := service.GetProductByID(req.Id, multi.GetTenancyId(ctx), service.IsCuser(ctx))
 	if err != nil {
 		g.TENANCY_LOG.Error("获取失败!", zap.Any("err", err))
 		response.FailWithMessage("获取失败:"+err.Error(), ctx)
