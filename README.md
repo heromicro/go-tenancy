@@ -68,7 +68,7 @@ GO TEST
 - `apidoc` 更新接口文档
 
 
-###### 使用第三发库
+###### 使用第三方库
 - 聚合支付 [gopay](https://github.com/go-pay/gopay)
 - 雪花算法 [snowflake](https://github.com/bwmarrin/snowflake)
 - 缓存 [redis](https://github.com/go-redis/redis/v8)
