@@ -143,9 +143,7 @@ func InitDB(conf request.InitDB) error {
 		model.ShippingTemplateUndelivery{},
 
 		model.Cart{},
-
 		model.Express{},
-
 		model.Order{},
 		model.OrderStatus{},
 		model.OrderReceipt{},

@@ -12,7 +12,9 @@ type authorityMenu struct{}
 
 //@description: authority_menu 视图数据初始化
 func (a *authorityMenu) Init() error {
-	if g.TENANCY_DB.Find(&[]model.SysMenu{}).RowsAffected > 0 {
+	db := g.TENANCY_DB.Find(&[]model.SysMenu{})
+	err := db.Error
+	if err == nil && db.RowsAffected > 0 {
 		color.Danger.Println("\n[Mysql] --> authority_menu 视图已存在!")
 		return nil
 	}

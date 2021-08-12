@@ -5,6 +5,7 @@ import (
 	"net/http"
 	"testing"
 
+	"github.com/gavv/httpexpect"
 	"github.com/snowlyg/go-tenancy/g"
 	"github.com/snowlyg/go-tenancy/model/response"
 	"github.com/snowlyg/go-tenancy/tests/base"
@@ -14,10 +15,12 @@ func TestBrandCategoryList(t *testing.T) {
 	auth := base.BaseWithLoginTester(t)
 	defer base.BaseLogOut(auth)
 	url := "v1/admin/brandCategory/getBrandCategoryList"
-	base.GetList(auth, url, 0, nil, nil, http.StatusOK, "获取成功")
+	base.GetList(auth, url, 0, nil, http.StatusOK, "获取成功")
 }
 
 func TestBrandCategoryProcess(t *testing.T) {
+	auth := base.BaseWithLoginTester(t)
+	defer base.BaseLogOut(auth)
 	create := map[string]interface{}{
 		"cateName": "数码产品",
 		"status":   g.StatusFalse,
@@ -26,69 +29,76 @@ func TestBrandCategoryProcess(t *testing.T) {
 		"level":    1,
 		"pid":      0,
 	}
-	auth := base.BaseWithLoginTester(t)
-	defer base.BaseLogOut(auth)
 
-	url := "v1/admin/brandCategory/createBrandCategory"
-	brandCategoryId := base.Create(auth, url, create, http.StatusOK, "创建成功")
-
-	rkeys := base.ResponseKeys{
-		"id":        "number",
-		"pid":       "number",
-		"cateName":  "string",
-		"status":    "number",
-		"path":      "number",
-		"sort":      "number",
-		"level":     "number",
-		"children":  "object",
-		"createdAt": "string",
-		"updatedAt": "string",
-	}
-	{
-		url := "v1/admin/brandCategory/getBrandCategoryList"
-		base.GetList(auth, url, brandCategoryId, create, rkeys, http.StatusOK, "获取成功")
-	}
-
+	brandCategoryId := CreateBrandCategory(auth, create, http.StatusOK, "创建成功")
 	if brandCategoryId > 0 {
-		update := map[string]interface{}{
-			"cateName": "家电",
-			"status":   g.StatusTrue,
-			"path":     "http://qmplusimg.henrongyi.top/head.png",
-			"sort":     2,
-			"level":    1,
-			"pid":      1,
-		}
+		defer DeleteBrandCategory(auth, brandCategoryId)
 		{
-			url := fmt.Sprintf("v1/admin/brandCategory/updateBrandCategory/%d", brandCategoryId)
-			base.Update(auth, url, update, brandCategoryId, http.StatusOK, "更新成功")
-		}
-
-		{
-			url := fmt.Sprintf("v1/admin/brandCategory/getBrandCategoryById/%d", brandCategoryId)
-			base.Get(auth, url, update, brandCategoryId, rkeys, http.StatusOK, "操作成功")
-		}
-
-		{
-			update := map[string]interface{}{"id": brandCategoryId, "status": g.StatusTrue}
-			url := "v1/admin/brandCategory/changeBrandCategoryStatus"
-			base.Post(auth, url, update, rkeys, http.StatusOK, "设置成功")
+			rkeys := base.ResponseKeys{
+				{Type: "number", Key: "id", Value: brandCategoryId},
+				{Type: "number", Key: "pid", Value: create["pid"]},
+				{Type: "number", Key: "status", Value: create["status"]},
+				{Type: "number", Key: "sort", Value: create["sort"]},
+				{Type: "number", Key: "level", Value: create["level"]},
+				{Type: "string", Key: "cateName", Value: create["cateName"]},
+				{Type: "string", Key: "path", Value: create["path"]},
+				{Type: "string", Key: "createdAt", Value: create["createdAt"]},
+				{Type: "string", Key: "updatedAt", Value: create["updatedAt"]},
+				{Type: "object", Key: "children", Value: nil},
+			}
+			url := "v1/admin/brandCategory/getBrandCategoryList"
+			base.GetList(auth, url, brandCategoryId, rkeys, http.StatusOK, "获取成功")
 		}
 
-		{
-			url := "v1/admin/brandCategory/getCreateBrandCategoryMap"
-			base.Get(auth, url, update, 0, rkeys, http.StatusOK, "获取成功")
-		}
+		if brandCategoryId > 0 {
+			update := map[string]interface{}{
+				"cateName": "家电",
+				"status":   g.StatusTrue,
+				"path":     "http://qmplusimg.henrongyi.top/head.png",
+				"sort":     2,
+				"level":    1,
+				"pid":      1,
+			}
+			rkeys := base.ResponseKeys{
+				{Type: "number", Key: "id", Value: brandCategoryId},
+				{Type: "number", Key: "pid", Value: update["pid"]},
+				{Type: "number", Key: "status", Value: update["status"]},
+				{Type: "number", Key: "sort", Value: update["sort"]},
+				{Type: "number", Key: "level", Value: update["level"]},
+				{Type: "string", Key: "cateName", Value: update["cateName"]},
+				{Type: "string", Key: "path", Value: update["path"]},
+				{Type: "string", Key: "createdAt", Value: update["createdAt"]},
+				{Type: "string", Key: "updatedAt", Value: update["updatedAt"]},
+				{Type: "object", Key: "children", Value: nil},
+			}
+			{
+				url := fmt.Sprintf("v1/admin/brandCategory/updateBrandCategory/%d", brandCategoryId)
+				base.Update(auth, url, update, http.StatusOK, "更新成功")
+			}
 
-		{
-			url := fmt.Sprintf("v1/admin/brandCategory/getUpdateBrandCategoryMap/%d", int(brandCategoryId))
-			base.Get(auth, url, update, 0, rkeys, http.StatusOK, "获取成功")
-		}
+			{
+				url := fmt.Sprintf("v1/admin/brandCategory/getBrandCategoryById/%d", brandCategoryId)
+				base.Get(auth, url, brandCategoryId, rkeys, http.StatusOK, "操作成功")
+			}
 
-		{
-			url := fmt.Sprintf("v1/admin/brandCategory/deleteBrandCategory/%d", int(brandCategoryId))
-			base.Delete(auth, url, update, rkeys, http.StatusOK, "删除成功")
+			{
+				update := map[string]interface{}{"id": brandCategoryId, "status": g.StatusTrue}
+				url := "v1/admin/brandCategory/changeBrandCategoryStatus"
+				base.Post(auth, url, update, http.StatusOK, "设置成功")
+			}
+
+			{
+				url := "v1/admin/brandCategory/getCreateBrandCategoryMap"
+				base.Get(auth, url, 0, rkeys, http.StatusOK, "获取成功")
+			}
+
+			{
+				url := fmt.Sprintf("v1/admin/brandCategory/getUpdateBrandCategoryMap/%d", int(brandCategoryId))
+				base.Get(auth, url, 0, rkeys, http.StatusOK, "获取成功")
+			}
 		}
 	}
+
 }
 
 func TestBrandCategoryRegisterError(t *testing.T) {
@@ -102,8 +112,23 @@ func TestBrandCategoryRegisterError(t *testing.T) {
 	}
 	auth := base.BaseWithLoginTester(t)
 	defer base.BaseLogOut(auth)
-
-	url := "v1/admin/brandCategory/createBrandCategory"
 	messge := "Key: 'SysBrandCategory.BaseBrandCategory.CateName' Error:Field validation for 'CateName' failed on the 'required' tag"
-	base.Create(auth, url, create, response.BAD_REQUEST_ERROR, messge)
+	brandCategoryId := CreateBrandCategory(auth, create, response.BAD_REQUEST_ERROR, messge)
+	if brandCategoryId > 0 {
+		defer DeleteBrandCategory(auth, brandCategoryId)
+	}
+}
+
+func CreateBrandCategory(auth *httpexpect.Expect, create map[string]interface{}, status int, message string) uint {
+	url := "v1/admin/brandCategory/createBrandCategory"
+	res := base.ResponseKeys{
+		{Type: "number", Key: "id", Value: 0},
+	}
+	base.Create(auth, url, create, res, status, message)
+	return res.GetUintValue("id")
+}
+
+func DeleteBrandCategory(auth *httpexpect.Expect, id uint) {
+	url := fmt.Sprintf("v1/admin/brandCategory/deleteBrandCategory/%d", id)
+	defer base.Delete(auth, url, http.StatusOK, "删除成功")
 }

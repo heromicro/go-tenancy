@@ -55,7 +55,7 @@ var baseApis = []model.SysApi{
 	{Path: "/v1/admin/api/getApiById", Description: "获取api详细信息", ApiGroup: "api", Method: "POST"},
 	{Path: "/v1/admin/api/deleteApi", Description: "删除Api", ApiGroup: "api", Method: "POST"},
 	{Path: "/v1/admin/api/updateApi", Description: "更新Api", ApiGroup: "api", Method: "POST"},
-	{Path: "/v1/admin/api/getAllApis", Description: "获取所有api", ApiGroup: "api", Method: "POST"},
+	{Path: "/v1/admin/api/getAllApis", Description: "获取所有api", ApiGroup: "api", Method: "GET"},
 
 	// 角色管理
 	{Path: "/v1/admin/authority/createAuthority", Description: "创建角色", ApiGroup: "authority", Method: "POST"},

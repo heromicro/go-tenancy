@@ -11,13 +11,20 @@ import (
 func TestApiList(t *testing.T) {
 	auth := base.BaseWithLoginTester(t)
 	defer base.BaseLogOut(auth)
-	base.ApiList(auth)
-
+	url := "v1/admin/api/getApiList"
+	pageKeys := base.ResponseKeys{
+		{Type: "number", Key: "pageSize", Value: 10},
+		{Type: "number", Key: "page", Value: 1},
+		{Type: "array", Key: "list", Value: nil},
+		{Type: "number", Key: "total", Value: 289},
+	}
+	base.PostList(auth, url, 0, base.PageRes, pageKeys, http.StatusOK, "获取成功")
 }
 func TestAllApi(t *testing.T) {
 	auth := base.BaseWithLoginTester(t)
 	defer base.BaseLogOut(auth)
-	base.AllApi(auth)
+	url := "v1/admin/api/getAllApis"
+	base.GetList(auth, url, 0, nil, http.StatusOK, "获取成功")
 }
 
 func TestApiProcess(t *testing.T) {
@@ -31,7 +38,6 @@ func TestApiProcess(t *testing.T) {
 	defer base.BaseLogOut(auth)
 	apiId, apiPath, apiMethod := base.CreateApi(auth, create, http.StatusOK, "创建成功")
 	if apiId > 0 {
-
 		update := map[string]interface{}{
 			"id":          apiId,
 			"apiGroup":    "update_test_api_process",

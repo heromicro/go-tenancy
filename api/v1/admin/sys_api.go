@@ -102,7 +102,7 @@ func GetAllApis(ctx *gin.Context) {
 		g.TENANCY_LOG.Error("获取失败!", zap.Any("err", err))
 		response.FailWithMessage("获取失败:"+err.Error(), ctx)
 	} else {
-		response.OkWithDetailed(response.SysAPIListResponse{Apis: apis}, "获取成功", ctx)
+		response.OkWithDetailed(apis, "获取成功", ctx)
 	}
 }
 
