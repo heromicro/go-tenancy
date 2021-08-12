@@ -202,9 +202,9 @@ var baseApis = []model.SysApi{
 	// 小程序
 	{Path: "/v1/admin/mini/getMiniList", Description: "获取小程序列表", ApiGroup: "mini", Method: "POST"},
 	{Path: "/v1/admin/mini/createMini", Description: "添加小程序", ApiGroup: "mini", Method: "POST"},
-	{Path: "/v1/admin/mini/getMiniById", Description: "获取小程序详细信息", ApiGroup: "mini", Method: "POST"},
-	{Path: "/v1/admin/mini/updateMini", Description: "更新小程序", ApiGroup: "mini", Method: "PUT"},
-	{Path: "/v1/admin/mini/deleteMini", Description: "删除小程序", ApiGroup: "mini", Method: "DELETE"},
+	{Path: "/v1/admin/mini/getMiniById/:id", Description: "获取小程序详细信息", ApiGroup: "mini", Method: "GET"},
+	{Path: "/v1/admin/mini/updateMini/:id", Description: "更新小程序", ApiGroup: "mini", Method: "PUT"},
+	{Path: "/v1/admin/mini/deleteMini/:id", Description: "删除小程序", ApiGroup: "mini", Method: "DELETE"},
 
 	// 角色管理
 	{Path: "/v1/admin/authority/getAdminAuthorityList", Description: "获取员工角色列表", ApiGroup: "authority", Method: "POST"},

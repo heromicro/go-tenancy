@@ -30,5 +30,4 @@ func TestDeviceProductCategoryList(t *testing.T) {
 		"cateName",
 		"level")
 	first.Value("id").Number().Ge(0)
-
 }

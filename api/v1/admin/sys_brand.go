@@ -43,11 +43,11 @@ func CreateBrand(ctx *gin.Context) {
 		return
 	}
 
-	if returnBrand, err := service.CreateBrand(brand); err != nil {
+	if id, err := service.CreateBrand(brand); err != nil {
 		g.TENANCY_LOG.Error("创建失败!", zap.Any("err", err))
 		response.FailWithMessage("添加失败:"+err.Error(), ctx)
 	} else {
-		response.OkWithDetailed(returnBrand, "创建成功", ctx)
+		response.OkWithDetailed(gin.H{"id": id}, "创建成功", ctx)
 	}
 }
 
@@ -63,11 +63,11 @@ func UpdateBrand(ctx *gin.Context) {
 		response.FailWithMessage(errs.Error(), ctx)
 		return
 	}
-	if returnBrand, err := service.UpdateBrand(brand, req.Id); err != nil {
+	if err := service.UpdateBrand(brand, req.Id); err != nil {
 		g.TENANCY_LOG.Error("更新失败!", zap.Any("err", err))
 		response.FailWithMessage("更新失败:"+err.Error(), ctx)
 	} else {
-		response.OkWithDetailed(returnBrand, "更新成功", ctx)
+		response.OkWithMessage( "更新成功", ctx)
 	}
 }
 

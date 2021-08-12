@@ -35,15 +35,13 @@ func TestBrandCategoryProcess(t *testing.T) {
 		defer DeleteBrandCategory(auth, brandCategoryId)
 		{
 			rkeys := base.ResponseKeys{
-				{Type: "number", Key: "id", Value: brandCategoryId},
-				{Type: "number", Key: "pid", Value: create["pid"]},
-				{Type: "number", Key: "status", Value: create["status"]},
-				{Type: "number", Key: "sort", Value: create["sort"]},
-				{Type: "number", Key: "level", Value: create["level"]},
+				{Type: "uint", Key: "id", Value: brandCategoryId},
+				{Type: "int", Key: "pid", Value: create["pid"]},
+				{Type: "int", Key: "status", Value: create["status"]},
+				{Type: "int", Key: "sort", Value: create["sort"]},
+				{Type: "int", Key: "level", Value: create["level"]},
 				{Type: "string", Key: "cateName", Value: create["cateName"]},
 				{Type: "string", Key: "path", Value: create["path"]},
-				{Type: "string", Key: "createdAt", Value: create["createdAt"]},
-				{Type: "string", Key: "updatedAt", Value: create["updatedAt"]},
 				{Type: "object", Key: "children", Value: nil},
 			}
 			url := "v1/admin/brandCategory/getBrandCategoryList"
@@ -60,11 +58,11 @@ func TestBrandCategoryProcess(t *testing.T) {
 				"pid":      1,
 			}
 			rkeys := base.ResponseKeys{
-				{Type: "number", Key: "id", Value: brandCategoryId},
-				{Type: "number", Key: "pid", Value: update["pid"]},
-				{Type: "number", Key: "status", Value: update["status"]},
-				{Type: "number", Key: "sort", Value: update["sort"]},
-				{Type: "number", Key: "level", Value: update["level"]},
+				{Type: "uint", Key: "id", Value: brandCategoryId},
+				{Type: "int", Key: "pid", Value: update["pid"]},
+				{Type: "int", Key: "status", Value: update["status"]},
+				{Type: "int", Key: "sort", Value: update["sort"]},
+				{Type: "int", Key: "level", Value: update["level"]},
 				{Type: "string", Key: "cateName", Value: update["cateName"]},
 				{Type: "string", Key: "path", Value: update["path"]},
 				{Type: "string", Key: "createdAt", Value: update["createdAt"]},
@@ -78,7 +76,7 @@ func TestBrandCategoryProcess(t *testing.T) {
 
 			{
 				url := fmt.Sprintf("v1/admin/brandCategory/getBrandCategoryById/%d", brandCategoryId)
-				base.Get(auth, url, brandCategoryId, rkeys, http.StatusOK, "操作成功")
+				base.GetById(auth, url, brandCategoryId, rkeys, http.StatusOK, "操作成功")
 			}
 
 			{
@@ -89,12 +87,12 @@ func TestBrandCategoryProcess(t *testing.T) {
 
 			{
 				url := "v1/admin/brandCategory/getCreateBrandCategoryMap"
-				base.Get(auth, url, 0, rkeys, http.StatusOK, "获取成功")
+				base.Get(auth, url, http.StatusOK, "获取成功")
 			}
 
 			{
 				url := fmt.Sprintf("v1/admin/brandCategory/getUpdateBrandCategoryMap/%d", int(brandCategoryId))
-				base.Get(auth, url, 0, rkeys, http.StatusOK, "获取成功")
+				base.Get(auth, url, http.StatusOK, "获取成功")
 			}
 		}
 	}
@@ -122,10 +120,10 @@ func TestBrandCategoryRegisterError(t *testing.T) {
 func CreateBrandCategory(auth *httpexpect.Expect, create map[string]interface{}, status int, message string) uint {
 	url := "v1/admin/brandCategory/createBrandCategory"
 	res := base.ResponseKeys{
-		{Type: "number", Key: "id", Value: 0},
+		{Type: "uint", Key: "id", Value: uint(0)},
 	}
 	base.Create(auth, url, create, res, status, message)
-	return res.GetUintValue("id")
+	return res.GetId()
 }
 
 func DeleteBrandCategory(auth *httpexpect.Expect, id uint) {

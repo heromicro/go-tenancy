@@ -13,10 +13,10 @@ func TestApiList(t *testing.T) {
 	defer base.BaseLogOut(auth)
 	url := "v1/admin/api/getApiList"
 	pageKeys := base.ResponseKeys{
-		{Type: "number", Key: "pageSize", Value: 10},
-		{Type: "number", Key: "page", Value: 1},
+		{Type: "int", Key: "pageSize", Value: 10},
+		{Type: "int", Key: "page", Value: 1},
 		{Type: "array", Key: "list", Value: nil},
-		{Type: "number", Key: "total", Value: 289},
+		{Type: "int", Key: "total", Value: 289},
 	}
 	base.PostList(auth, url, 0, base.PageRes, pageKeys, http.StatusOK, "获取成功")
 }

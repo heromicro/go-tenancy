@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"github.com/snowlyg/go-tenancy/g"
+	"github.com/snowlyg/go-tenancy/model/response"
 	"github.com/snowlyg/go-tenancy/tests/base"
 )
 
@@ -38,7 +39,6 @@ func TestTenancyList(t *testing.T) {
 	}
 
 	for _, param := range params {
-		fmt.Println(param.name)
 		list(t, param.args, param.length)
 	}
 }
@@ -263,22 +263,25 @@ func TestTenancyRegisterError(t *testing.T) {
 	}
 	auth := base.BaseWithLoginTester(t)
 	defer base.BaseLogOut(auth)
-	obj := auth.POST("v1/admin/tenancy/createTenancy").
-		WithJSON(data).
-		Expect().Status(http.StatusOK).JSON().Object()
-	obj.Keys().ContainsOnly("status", "data", "message")
-	obj.Value("status").Number().Equal(4000)
-	obj.Value("message").String().Equal("添加失败:商户名称已被注冊")
-
+	{
+		tenancyId, _, _ := base.CreateTenancy(auth, data, http.StatusOK, "创建成功")
+		if tenancyId == 0 {
+			t.Fatal("创建失败")
+		}
+		defer base.DeleteTenancy(auth, tenancyId)
+	}
+	{
+		tenancyId, _, _ := base.CreateTenancy(auth, data, response.BAD_REQUEST_ERROR, "添加失败:商户名称已被注冊")
+		if tenancyId == 0 {
+			t.Fatal("创建失败")
+		}
+		defer base.DeleteTenancy(auth, tenancyId)
+	}
 }
 
 func TestTenancySelect(t *testing.T) {
 	auth := base.BaseWithLoginTester(t)
 	defer base.BaseLogOut(auth)
-	obj := auth.GET("v1/admin/tenancy/getTenancySelect").
-		Expect().Status(http.StatusOK).JSON().Object()
-	obj.Keys().ContainsOnly("status", "data", "message")
-	obj.Value("status").Number().Equal(200)
-	obj.Value("message").String().Equal("获取成功")
-
+	url := "v1/admin/tenancy/getTenancySelect"
+	base.Get(auth, url, http.StatusOK, "获取成功")
 }

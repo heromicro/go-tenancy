@@ -8,8 +8,8 @@ import (
 
 var PageRes = map[string]interface{}{"page": 1, "pageSize": 10}
 var PageKeys = ResponseKeys{
-	{Type: "number", Key: "pageSize", Value: 10},
-	{Type: "number", Key: "page", Value: 1},
+	{Type: "int", Key: "pageSize", Value: 10},
+	{Type: "int", Key: "page", Value: 1},
 }
 
 func PostList(auth *httpexpect.Expect, url string, id uint, res map[string]interface{}, pageKeys ResponseKeys, status int, message string) {
@@ -59,7 +59,15 @@ func Update(auth *httpexpect.Expect, url string, update map[string]interface{}, 
 	obj.Value("message").String().Equal(message)
 }
 
-func Get(auth *httpexpect.Expect, url string, id uint, keys ResponseKeys, status int, message string) {
+func Get(auth *httpexpect.Expect, url string, status int, message string) {
+	obj := auth.GET(url).
+		Expect().Status(http.StatusOK).JSON().Object()
+	obj.Keys().ContainsOnly("status", "data", "message")
+	obj.Value("status").Number().Equal(status)
+	obj.Value("message").String().Equal(message)
+}
+
+func GetById(auth *httpexpect.Expect, url string, id uint, keys ResponseKeys, status int, message string) {
 	obj := auth.GET(url).
 		Expect().Status(http.StatusOK).JSON().Object()
 	obj.Keys().ContainsOnly("status", "data", "message")
@@ -70,9 +78,9 @@ func Get(auth *httpexpect.Expect, url string, id uint, keys ResponseKeys, status
 	}
 }
 
-func Post(auth *httpexpect.Expect, url string, update map[string]interface{}, status int, message string) {
+func Post(auth *httpexpect.Expect, url string, data map[string]interface{}, status int, message string) {
 	obj := auth.POST(url).
-		WithJSON(update).
+		WithJSON(data).
 		Expect().Status(http.StatusOK).JSON().Object()
 	obj.Keys().ContainsOnly("status", "data", "message")
 	obj.Value("status").Number().Equal(status)
@@ -81,6 +89,15 @@ func Post(auth *httpexpect.Expect, url string, update map[string]interface{}, st
 
 func Delete(auth *httpexpect.Expect, url string, status int, message string) {
 	obj := auth.DELETE(url).
+		Expect().Status(http.StatusOK).JSON().Object()
+	obj.Keys().ContainsOnly("status", "data", "message")
+	obj.Value("status").Number().Equal(status)
+	obj.Value("message").String().Equal(message)
+}
+
+func DeleteMutil(auth *httpexpect.Expect, url string, data map[string]interface{}, status int, message string) {
+	obj := auth.DELETE(url).
+		WithJSON(data).
 		Expect().Status(http.StatusOK).JSON().Object()
 	obj.Keys().ContainsOnly("status", "data", "message")
 	obj.Value("status").Number().Equal(status)

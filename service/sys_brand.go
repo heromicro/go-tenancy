@@ -44,13 +44,13 @@ func GetBrandMap(id uint, ctx *gin.Context) (Form, error) {
 }
 
 // CreateBrand
-func CreateBrand(brand model.SysBrand) (model.SysBrand, error) {
+func CreateBrand(brand model.SysBrand) (uint, error) {
 	err := g.TENANCY_DB.Where("brand_name = ?", brand.BrandName).First(&brand).Error
 	if !errors.Is(err, gorm.ErrRecordNotFound) {
-		return brand, errors.New("名称已被注冊")
+		return brand.ID, errors.New("名称已被注冊")
 	}
 	err = g.TENANCY_DB.Create(&brand).Error
-	return brand, err
+	return brand.ID, err
 }
 
 // GetBrandByID
@@ -66,13 +66,13 @@ func ChangeBrandStatus(changeStatus request.ChangeStatus) error {
 }
 
 // UpdateBrand
-func UpdateBrand(brand model.SysBrand, id uint) (model.SysBrand, error) {
+func UpdateBrand(brand model.SysBrand, id uint) error {
 	err := g.TENANCY_DB.Where("brand_name = ?", brand.BrandName).Not("id = ?", id).First(&brand).Error
 	if !errors.Is(err, gorm.ErrRecordNotFound) {
-		return brand, errors.New("名称已被注冊")
+		return errors.New("名称已被注冊")
 	}
 	err = g.TENANCY_DB.Where("id = ?", id).Updates(brand).Error
-	return brand, err
+	return err
 }
 
 // DeleteBrand

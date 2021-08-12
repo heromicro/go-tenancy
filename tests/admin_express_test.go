@@ -10,36 +10,11 @@ import (
 )
 
 func TestExpressList(t *testing.T) {
-	params := []param{
-		{args: map[string]interface{}{"page": 1, "pageSize": 10, "name": ""}, length: 33},
-		{args: map[string]interface{}{"page": 1, "pageSize": 10, "name": "汤氏物流"}, length: 1},
-	}
-	for _, param := range params {
-		expressList(t, param.args, param.length)
-	}
-
-}
-
-func expressList(t *testing.T, params map[string]interface{}, length int) {
 	auth := base.BaseWithLoginTester(t)
 	defer base.BaseLogOut(auth)
-	obj := auth.POST("v1/admin/express/getExpressList").
-		WithJSON(params).
-		Expect().Status(http.StatusOK).JSON().Object()
-	obj.Keys().ContainsOnly("status", "data", "message")
-	obj.Value("status").Number().Equal(200)
-	obj.Value("message").String().Equal("获取成功")
 
-	data := obj.Value("data").Object()
-	data.Keys().ContainsOnly("list", "total", "page", "pageSize")
-	data.Value("pageSize").Number().Equal(10)
-	data.Value("page").Number().Equal(1)
-	data.Value("total").Number().Equal(length)
-
-	list := data.Value("list").Array()
-	list.Length().Ge(0)
-	first := list.First().Object()
-	first.Keys().ContainsOnly("id", "name", "status", "code", "sort", "createdAt", "updatedAt")
+	url := "v1/admin/express/getExpressList"
+	base.PostList(auth, url, 0, base.PageRes, nil, http.StatusOK, "获取成功")
 }
 
 func TestExpressProcess(t *testing.T) {

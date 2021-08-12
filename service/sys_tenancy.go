@@ -85,10 +85,10 @@ func LoginTenancy(id uint) (response.LoginTenancy, error) {
 }
 
 // CreateTenancy
-func CreateTenancy(req request.CreateTenancy) (uint, error) {
+func CreateTenancy(req request.CreateTenancy) (uint, string, string, error) {
 	err := g.TENANCY_DB.Where("name = ?", req.Name).First(&model.SysTenancy{}).Error
 	if !errors.Is(err, gorm.ErrRecordNotFound) {
-		return 0, errors.New("商户名称已被注冊")
+		return 0, "", "", errors.New("商户名称已被注冊")
 	}
 	err = g.TENANCY_DB.
 		Where("sys_users.username = ?", req.Username).
@@ -96,7 +96,7 @@ func CreateTenancy(req request.CreateTenancy) (uint, error) {
 		Joins("left join sys_authorities on sys_authorities.authority_id = sys_users.authority_id").
 		First(&model.SysUser{}).Error
 	if !errors.Is(err, gorm.ErrRecordNotFound) { // 判断用户名是否注册
-		return 0, errors.New("管理员用户名已注册")
+		return 0, "", "", errors.New("管理员用户名已注册")
 	}
 
 	err = g.TENANCY_DB.Transaction(func(tx *gorm.DB) error {
@@ -120,7 +120,7 @@ func CreateTenancy(req request.CreateTenancy) (uint, error) {
 		return nil
 	})
 
-	return req.SysTenancy.ID, err
+	return req.SysTenancy.ID, req.SysTenancy.UUID.String(), req.Username, err
 }
 
 // GetTenancyByID

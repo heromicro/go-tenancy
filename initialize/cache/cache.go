@@ -42,6 +42,10 @@ func GetCacheString(key string) (string, error) {
 	return g.TENANCY_CACHE.Get(context.Background(), key).Result()
 }
 
+func DeleteCache(key string) (int64, error) {
+	return g.TENANCY_CACHE.Del(context.Background(), key).Result()
+}
+
 func GetCacheBytes(key string) ([]byte, error) {
 	return g.TENANCY_CACHE.Get(context.Background(), key).Bytes()
 }

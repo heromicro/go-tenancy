@@ -1,13 +1,14 @@
 package base
 
 import (
+	"fmt"
 	"net/http"
 	"testing"
 
 	"github.com/gavv/httpexpect"
 	"github.com/snowlyg/go-tenancy/g"
 	"github.com/snowlyg/go-tenancy/initialize"
-	"github.com/snowlyg/go-tenancy/model"
+	"github.com/snowlyg/go-tenancy/initialize/cache"
 	"github.com/snowlyg/multi"
 )
 
@@ -33,7 +34,7 @@ func BaseWithLoginTester(t *testing.T) *httpexpect.Expect {
 		Expect().Status(http.StatusOK).JSON().Object()
 
 	obj.Keys().ContainsOnly("status", "data", "message")
-	obj.Value("status").Number().Equal(200)
+	obj.Value("status").Number().Equal(http.StatusOK)
 	obj.Value("message").String().Equal("登录成功")
 	data := obj.Value("data").Object()
 	user := data.Value("user").Object()
@@ -54,25 +55,44 @@ func BaseWithLoginTester(t *testing.T) *httpexpect.Expect {
 }
 
 func TenancyWithLoginTester(t *testing.T) *httpexpect.Expect {
+	username, _ := cache.GetCacheString(g.TENANCY_CONFIG.Mysql.Dbname + ":username")
+	if username == "" {
+		data := map[string]interface{}{
+			"username":      "tenancy_hospital",
+			"name":          "多商户平台直营医院",
+			"tele":          "0755-23568911",
+			"address":       "xxx街道666号",
+			"businessTime":  "08:30-17:30",
+			"status":        g.StatusTrue,
+			"sysRegionCode": 1,
+		}
+		auth := BaseWithLoginTester(t)
+		defer BaseLogOut(auth)
+
+		_, username, _ = CreateTenancy(auth, data, http.StatusOK, "创建成功")
+		cache.SetCache(g.TENANCY_CONFIG.Mysql.Dbname+":username", username, 0)
+	}
+
+	if username == "" {
+		t.Fatal("创建商户失败")
+	}
 	e := BaseTester(t)
 	obj := e.POST("v1/public/merchant/login").
-		WithJSON(map[string]interface{}{"username": "a303176530", "password": "123456", "captcha": "", "captchaId": ""}).
+		WithJSON(map[string]interface{}{"username": username, "password": "123456", "captcha": "", "captchaId": ""}).
 		Expect().Status(http.StatusOK).JSON().Object()
 
 	obj.Keys().ContainsOnly("status", "data", "message")
-	obj.Value("status").Number().Equal(200)
+	obj.Value("status").Number().Equal(http.StatusOK)
 	obj.Value("message").String().Equal("登录成功")
 	data := obj.Value("data").Object()
 	user := data.Value("user").Object()
 	user.Value("id").Number().Equal(2)
-	user.Value("userName").String().Equal("a303176530")
-	user.Value("email").String().Equal("a303176530@admin.com")
-	user.Value("nickName").String().Equal("商户管理员")
+	user.Value("userName").String().Equal(username)
 	user.Value("authorityName").String().Equal("商户管理员")
 	user.Value("authorityType").Number().Equal(multi.TenancyAuthority)
 	user.Value("authorityId").String().Equal("998")
 	user.Value("defaultRouter").String().Equal("dashboard")
-	user.Value("tenancyName").String().Equal("宝安中心人民医院")
+	user.Value("tenancyName").String().Equal("多商户平台直营医院")
 	user.Value("tenancyId").Number().Equal(1)
 	data.Value("AccessToken").NotNull()
 
@@ -83,15 +103,35 @@ func TenancyWithLoginTester(t *testing.T) *httpexpect.Expect {
 }
 
 func DeviceWithLoginTester(t *testing.T) *httpexpect.Expect {
-	var tenancy model.SysTenancy
-	err := g.TENANCY_DB.Model(&model.SysTenancy{}).First(&tenancy).Error
-	if err != nil {
-		t.Fatal(err)
+
+	uuid, _ := cache.GetCacheString(g.TENANCY_CONFIG.Mysql.Dbname + ":uuid")
+	username, _ := cache.GetCacheString(g.TENANCY_CONFIG.Mysql.Dbname + ":username")
+	if uuid == "" {
+		data := map[string]interface{}{
+			"username":      "tenancy_hospital",
+			"name":          "多商户平台直营医院",
+			"tele":          "0755-23568911",
+			"address":       "xxx街道666号",
+			"businessTime":  "08:30-17:30",
+			"status":        g.StatusTrue,
+			"sysRegionCode": 1,
+		}
+		auth := BaseWithLoginTester(t)
+		defer BaseLogOut(auth)
+
+		_, username, uuid = CreateTenancy(auth, data, http.StatusOK, "创建成功")
+		cache.SetCache(g.TENANCY_CONFIG.Mysql.Dbname+":uuid", uuid, 0)
+		cache.SetCache(g.TENANCY_CONFIG.Mysql.Dbname+":username", username, 0)
 	}
+
+	if uuid == "" {
+		t.Fatal("创建商户失败")
+	}
+
 	e := BaseTester(t)
 	obj := e.POST("v1/public/device/login").
 		WithJSON(map[string]interface{}{
-			"uuid":       tenancy.UUID,
+			"uuid":       uuid,
 			"name":       "八两金",
 			"phone":      "13845687419",
 			"sex":        2,
@@ -103,13 +143,12 @@ func DeviceWithLoginTester(t *testing.T) *httpexpect.Expect {
 		Expect().Status(http.StatusOK).JSON().Object()
 
 	obj.Keys().ContainsOnly("status", "data", "message")
-	obj.Value("status").Number().Equal(200)
+	obj.Value("status").Number().Equal(http.StatusOK)
 	obj.Value("message").String().Equal("登录成功")
-	data := obj.Value("data").Object()
-	data.Value("user").NotNull()
-	data.Value("AccessToken").NotNull()
+	obj.Value("data").Object().Value("user").NotNull()
+	obj.Value("data").Object().Value("AccessToken").NotNull()
 
-	token := data.Value("AccessToken").String().Raw()
+	token := obj.Value("data").Object().Value("AccessToken").String().Raw()
 	return e.Builder(func(req *httpexpect.Request) {
 		req.WithHeader("Authorization", "Bearer "+token)
 	})
@@ -119,6 +158,22 @@ func BaseLogOut(auth *httpexpect.Expect) {
 	obj := auth.GET("v1/auth/logout").
 		Expect().Status(http.StatusOK).JSON().Object()
 	obj.Keys().ContainsOnly("status", "data", "message")
-	obj.Value("status").Number().Equal(200)
+	obj.Value("status").Number().Equal(http.StatusOK)
 	obj.Value("message").String().Equal("退出登录")
+}
+
+func CreateTenancy(auth *httpexpect.Expect, create map[string]interface{}, status int, message string) (uint, string, string) {
+	url := "v1/admin/tenancy/createTenancy"
+	res := ResponseKeys{
+		{Type: "uint", Key: "id", Value: uint(0)},
+		{Type: "string", Key: "uuid", Value: ""},
+		{Type: "string", Key: "username", Value: ""},
+	}
+	Create(auth, url, create, res, status, message)
+	return res.GetId(), res.GetStringValue("username"), res.GetStringValue("uuid")
+}
+
+func DeleteTenancy(auth *httpexpect.Expect, id uint) {
+	url := fmt.Sprintf("v1/admin/tenancy/deleteTenancy/%d", id)
+	defer Delete(auth, url, http.StatusOK, "删除成功")
 }

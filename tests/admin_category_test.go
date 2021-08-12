@@ -5,33 +5,26 @@ import (
 	"net/http"
 	"testing"
 
+	"github.com/gavv/httpexpect"
 	"github.com/snowlyg/go-tenancy/g"
+	"github.com/snowlyg/go-tenancy/model/response"
 	"github.com/snowlyg/go-tenancy/tests/base"
 )
 
 func TestCategoryList(t *testing.T) {
 	auth := base.BaseWithLoginTester(t)
 	defer base.BaseLogOut(auth)
-	obj := auth.GET("v1/admin/productCategory/getProductCategoryList").
-		Expect().Status(http.StatusOK).JSON().Object()
-	obj.Keys().ContainsOnly("status", "data", "message")
-	obj.Value("status").Number().Equal(200)
-	obj.Value("message").String().Equal("获取成功")
-	data := obj.Value("data").Array()
-	data.Length().Ge(0)
-	first := data.First().Object()
-	first.Keys().ContainsOnly("id", "pid", "cateName", "status", "path", "sort", "level", "pic", "createdAt", "updatedAt")
-	first.Value("id").Number().Ge(0)
+
+	url := "v1/admin/productCategory/getProductCategoryList"
+	base.GetList(auth, url, 0, nil, http.StatusOK, "获取成功")
 }
 
 func TestCategorySelect(t *testing.T) {
 	auth := base.BaseWithLoginTester(t)
 	defer base.BaseLogOut(auth)
-	obj := auth.GET("v1/admin/productCategory/getProductCategorySelect").
-		Expect().Status(http.StatusOK).JSON().Object()
-	obj.Keys().ContainsOnly("status", "data", "message")
-	obj.Value("status").Number().Equal(200)
-	obj.Value("message").String().Equal("获取成功")
+
+	url := "v1/admin/productCategory/getProductCategorySelect"
+	base.Get(auth, url, http.StatusOK, "获取成功")
 }
 
 func TestCategoryProcess(t *testing.T) {
@@ -47,95 +40,68 @@ func TestCategoryProcess(t *testing.T) {
 	auth := base.BaseWithLoginTester(t)
 	defer base.BaseLogOut(auth)
 
-	obj := auth.POST("v1/admin/productCategory/createProductCategory").
-		WithJSON(data).
-		Expect().Status(http.StatusOK).JSON().Object()
-	obj.Keys().ContainsOnly("status", "data", "message")
-	obj.Value("status").Number().Equal(200)
-	obj.Value("message").String().Equal("创建成功")
-
-	category := obj.Value("data").Object()
-	category.Value("id").Number().Ge(0)
-	category.Value("cateName").String().Equal(data["cateName"].(string))
-	category.Value("status").Number().Equal(data["status"].(int))
-	category.Value("path").String().Equal(data["path"].(string))
-	category.Value("sort").Number().Equal(data["sort"].(int))
-	category.Value("pid").Number().Equal(data["pid"].(int))
-	category.Value("pic").String().Equal(data["pic"].(string))
-	category.Value("level").Number().Equal(data["level"].(int))
-	categoryId := category.Value("id").Number().Raw()
-	if categoryId > 0 {
-
-		update := map[string]interface{}{
-			"cateName": "家电",
-			"status":   g.StatusTrue,
-			"path":     "http://qmplusimg.henrongyi.top/head.png",
-			"sort":     2,
-			"level":    1,
-			"pid":      1,
-			"pic":      "http://qmplusimg.henrongyi.top/head.png",
+	categoryId := CreateCategory(auth, data, http.StatusOK, "创建成功")
+	if categoryId == 0 {
+		return
+	}
+	defer DeleteCategory(auth, categoryId, http.StatusOK, "删除成功")
+	{
+		keys := base.ResponseKeys{
+			{Type: "uint", Key: "id", Value: categoryId},
+			{Type: "string", Key: "cateName", Value: data["cateName"]},
+			{Type: "int", Key: "status", Value: data["status"]},
+			{Type: "string", Key: "path", Value: data["path"]},
+			{Type: "int", Key: "sort", Value: data["sort"]},
+			{Type: "int", Key: "pid", Value: data["pid"]},
+			{Type: "string", Key: "pic", Value: data["pic"]},
+			{Type: "int", Key: "level", Value: data["level"]},
 		}
+		url := "v1/admin/productCategory/getProductCategoryList"
+		base.GetList(auth, url, 0, keys, http.StatusOK, "获取成功")
+	}
 
-		obj = auth.PUT(fmt.Sprintf("v1/admin/productCategory/updateProductCategory/%d", int(categoryId))).
-			WithJSON(update).
-			Expect().Status(http.StatusOK).JSON().Object()
-		obj.Keys().ContainsOnly("status", "data", "message")
-		obj.Value("status").Number().Equal(200)
-		obj.Value("message").String().Equal("更新成功")
-		category = obj.Value("data").Object()
+	update := map[string]interface{}{
+		"cateName": "家电",
+		"status":   g.StatusTrue,
+		"path":     "http://qmplusimg.henrongyi.top/head.png",
+		"sort":     2,
+		"level":    1,
+		"pid":      1,
+		"pic":      "http://qmplusimg.henrongyi.top/head.png",
+	}
+	{
+		url := fmt.Sprintf("v1/admin/productCategory/updateProductCategory/%d", categoryId)
+		base.Update(auth, url, update, http.StatusOK, "更新成功")
+	}
 
-		category.Value("cateName").String().Equal(update["cateName"].(string))
-		category.Value("status").Number().Equal(update["status"].(int))
-		category.Value("path").String().Equal(update["path"].(string))
-		category.Value("sort").Number().Equal(update["sort"].(int))
-		category.Value("pid").Number().Equal(update["pid"].(int))
-		category.Value("pic").String().Equal(update["pic"].(string))
-		category.Value("level").Number().Equal(update["level"].(int))
+	{
+		url := fmt.Sprintf("v1/admin/productCategory/getProductCategoryById/%d", categoryId)
+		keys := base.ResponseKeys{
+			{Type: "uint", Key: "id", Value: categoryId},
+			{Type: "string", Key: "cateName", Value: update["cateName"]},
+			{Type: "int", Key: "status", Value: update["status"]},
+			{Type: "string", Key: "path", Value: update["path"]},
+			{Type: "int", Key: "sort", Value: update["sort"]},
+			{Type: "int", Key: "pid", Value: update["pid"]},
+			{Type: "string", Key: "pic", Value: update["pic"]},
+			{Type: "int", Key: "level", Value: update["level"]},
+		}
+		base.GetById(auth, url, categoryId, keys, http.StatusOK, "操作成功")
+	}
 
-		obj = auth.GET(fmt.Sprintf("v1/admin/productCategory/getProductCategoryById/%d", int(categoryId))).
-			Expect().Status(http.StatusOK).JSON().Object()
-		obj.Keys().ContainsOnly("status", "data", "message")
-		obj.Value("status").Number().Equal(200)
-		obj.Value("message").String().Equal("操作成功")
-		category = obj.Value("data").Object()
+	{
+		url := "v1/admin/productCategory/changeProductCategoryStatus"
+		base.Post(auth, url, map[string]interface{}{"id": categoryId, "status": g.StatusTrue}, http.StatusOK, "设置成功")
+	}
 
-		category.Value("id").Number().Ge(0)
-		category.Value("cateName").String().Equal(update["cateName"].(string))
-		category.Value("status").Number().Equal(update["status"].(int))
-		category.Value("path").String().Equal(update["path"].(string))
-		category.Value("sort").Number().Equal(update["sort"].(int))
-		category.Value("pid").Number().Equal(update["pid"].(int))
-		category.Value("pic").String().Equal(update["pic"].(string))
-		category.Value("level").Number().Equal(update["level"].(int))
+	{
+		url := "v1/admin/productCategory/getCreateProductCategoryMap"
+		base.Get(auth, url, http.StatusOK, "获取成功")
+	}
 
-		obj = auth.POST("v1/admin/productCategory/changeProductCategoryStatus").
-			WithJSON(map[string]interface{}{
-				"id":     categoryId,
-				"status": g.StatusTrue,
-			}).
-			Expect().Status(http.StatusOK).JSON().Object()
-		obj.Keys().ContainsOnly("status", "data", "message")
-		obj.Value("status").Number().Equal(200)
-		obj.Value("message").String().Equal("设置成功")
-
-		obj = auth.GET("v1/admin/productCategory/getCreateProductCategoryMap").
-			Expect().Status(http.StatusOK).JSON().Object()
-		obj.Keys().ContainsOnly("status", "data", "message")
-		obj.Value("status").Number().Equal(200)
-		obj.Value("message").String().Equal("获取成功")
-
-		obj = auth.GET(fmt.Sprintf("v1/admin/productCategory/getUpdateProductCategoryMap/%d", int(categoryId))).
-			Expect().Status(http.StatusOK).JSON().Object()
-		obj.Keys().ContainsOnly("status", "data", "message")
-		obj.Value("status").Number().Equal(200)
-		obj.Value("message").String().Equal("获取成功")
-
-		// deleteCategory
-		obj = auth.DELETE(fmt.Sprintf("v1/admin/productCategory/deleteProductCategory/%d", int(categoryId))).
-			Expect().Status(http.StatusOK).JSON().Object()
-		obj.Keys().ContainsOnly("status", "data", "message")
-		obj.Value("status").Number().Equal(200)
-		obj.Value("message").String().Equal("删除成功")
+	{
+		url := fmt.Sprintf("v1/admin/productCategory/getUpdateProductCategoryMap/%d", categoryId)
+		base.Get(auth, url, http.StatusOK, "获取成功")
 	}
 
 }
@@ -152,11 +118,25 @@ func TestCategoryRegisterError(t *testing.T) {
 	}
 	auth := base.BaseWithLoginTester(t)
 	defer base.BaseLogOut(auth)
-	obj := auth.POST("v1/admin/productCategory/createProductCategory").
-		WithJSON(data).
-		Expect().Status(http.StatusOK).JSON().Object()
-	obj.Keys().ContainsOnly("status", "data", "message")
-	obj.Value("status").Number().Equal(4000)
-	obj.Value("message").String().Equal("Key: 'ProductCategory.BaseProductCategory.CateName' Error:Field validation for 'CateName' failed on the 'required' tag")
 
+	msg := "Key: 'ProductCategory.BaseProductCategory.CateName' Error:Field validation for 'CateName' failed on the 'required' tag"
+	categoryId := CreateCategory(auth, data, response.BAD_REQUEST_ERROR, msg)
+	if categoryId == 0 {
+		return
+	}
+	defer DeleteCategory(auth, categoryId, http.StatusOK, "删除成功")
+}
+
+func CreateCategory(auth *httpexpect.Expect, create map[string]interface{}, status int, message string) uint {
+	url := "v1/admin/productCategory/createProductCategory"
+	keys := base.ResponseKeys{
+		{Type: "uint", Key: "id", Value: uint(0)},
+	}
+	base.Create(auth, url, create, keys, status, message)
+	return keys.GetId()
+}
+
+func DeleteCategory(auth *httpexpect.Expect, id uint, status int, message string) {
+	url := fmt.Sprintf("v1/admin/productCategory/deleteProductCategory/%d", id)
+	base.Delete(auth, url, status, message)
 }

@@ -1,6 +1,7 @@
 package tests
 
 import (
+	"fmt"
 	"os"
 	"testing"
 
@@ -40,6 +41,8 @@ func TestMain(m *testing.M) {
 		return
 	}
 
+	cache.DeleteCache(g.TENANCY_CONFIG.Mysql.Dbname)
+
 	db, _ := g.TENANCY_DB.DB()
 	db.Close()
 	multi.AuthDriver.Close()
@@ -60,7 +63,7 @@ func dorpDB(uuid string) error {
 		}
 	}
 
-	if err := g.TENANCY_DB.Exec("drop database if exists %s;", uuid).Error; err != nil {
+	if err := g.TENANCY_DB.Exec(fmt.Sprintf("drop database if exists `%s`;", uuid)).Error; err != nil {
 		return err
 	}
 

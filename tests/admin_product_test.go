@@ -91,12 +91,8 @@ func productlist(t *testing.T, params map[string]interface{}, length int) {
 func TestGetProductFilter(t *testing.T) {
 	auth := base.BaseWithLoginTester(t)
 	defer base.BaseLogOut(auth)
-	obj := auth.GET("v1/admin/product/getProductFilter").
-		Expect().Status(http.StatusOK).JSON().Object()
-	obj.Keys().ContainsOnly("status", "data", "message")
-	obj.Value("status").Number().Equal(200)
-	obj.Value("message").String().Equal("获取成功")
-
+	url := "v1/admin/product/getProductFilter"
+	base.Get(auth, url, http.StatusOK, "获取成功")
 }
 
 func TestProductProcess(t *testing.T) {

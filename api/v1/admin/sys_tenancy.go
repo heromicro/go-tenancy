@@ -47,11 +47,11 @@ func CreateTenancy(ctx *gin.Context) {
 		response.FailWithMessage(errs.Error(), ctx)
 		return
 	}
-	if id, err := service.CreateTenancy(tenancy); err != nil {
+	if id, uuid, username, err := service.CreateTenancy(tenancy); err != nil {
 		g.TENANCY_LOG.Error("创建失败!", zap.Any("err", err))
 		response.FailWithMessage("添加失败:"+err.Error(), ctx)
 	} else {
-		response.OkWithDetailed(gin.H{"id": id}, "创建成功", ctx)
+		response.OkWithDetailed(gin.H{"id": id, "uuid": uuid, "username": username}, "创建成功", ctx)
 	}
 }
 

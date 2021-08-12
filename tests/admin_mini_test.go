@@ -1,34 +1,21 @@
 package tests
 
 import (
+	"fmt"
 	"net/http"
 	"testing"
 
+	"github.com/gavv/httpexpect"
+	"github.com/snowlyg/go-tenancy/model/response"
 	"github.com/snowlyg/go-tenancy/tests/base"
 )
 
 func TestMiniList(t *testing.T) {
 	auth := base.BaseWithLoginTester(t)
 	defer base.BaseLogOut(auth)
-	obj := auth.POST("v1/admin/mini/getMiniList").
-		WithJSON(map[string]interface{}{"page": 1, "pageSize": 10}).
-		Expect().Status(http.StatusOK).JSON().Object()
-	obj.Keys().ContainsOnly("status", "data", "message")
-	obj.Value("status").Number().Equal(200)
-	obj.Value("message").String().Equal("获取成功")
 
-	data := obj.Value("data").Object()
-	data.Keys().ContainsOnly("list", "total", "page", "pageSize")
-	data.Value("pageSize").Number().Equal(10)
-	data.Value("page").Number().Equal(1)
-	data.Value("total").Number().Ge(0)
-
-	list := data.Value("list").Array()
-	list.Length().Ge(0)
-	first := list.First().Object()
-	first.Keys().ContainsOnly("id", "uuid", "name", "appId", "appSecret", "remark", "createdAt", "updatedAt")
-	first.Value("id").Number().Ge(0)
-
+	url := "v1/admin/mini/getMiniList"
+	base.PostList(auth, url, 0, base.PageRes, nil, http.StatusOK, "获取成功")
 }
 
 func TestMiniProcess(t *testing.T) {
@@ -40,69 +27,49 @@ func TestMiniProcess(t *testing.T) {
 	}
 	auth := base.BaseWithLoginTester(t)
 	defer base.BaseLogOut(auth)
-	obj := auth.POST("v1/admin/mini/createMini").
-		WithJSON(data).
-		Expect().Status(http.StatusOK).JSON().Object()
-	obj.Keys().ContainsOnly("status", "data", "message")
-	obj.Value("status").Number().Equal(200)
-	obj.Value("message").String().Equal("创建成功")
 
-	mini := obj.Value("data").Object()
-	mini.Value("id").Number().Ge(0)
-	mini.Value("uuid").String().NotEmpty()
-	mini.Value("name").String().Equal(data["name"].(string))
-	mini.Value("appId").String().Equal(data["appId"].(string))
-	mini.Value("appSecret").String().Equal(data["appSecret"].(string))
-	mini.Value("remark").String().Equal(data["remark"].(string))
-	miniId := mini.Value("id").Number().Raw()
-	if miniId > 0 {
-		update := map[string]interface{}{
-			"id":        miniId,
-			"name":      "中德澳线上点餐商城1",
-			"appId":     "YJ3s1abt7MAfT6gWVKoDjnhjsfsd",
-			"appSecret": "tRE49zaf5NCm6PidFZoaFg3u4WCHDok7fxgL63yV0pF4AMsdfbnfgh",
-			"remark":    "中德澳线上点餐商城1",
+	miniId := CreateMini(auth, data, http.StatusOK, "创建成功")
+	if miniId == 0 {
+		return
+	}
+	defer DeleteMini(auth, miniId, http.StatusOK, "删除成功")
+
+	{
+		url := "v1/admin/mini/getMiniList"
+		keys := base.ResponseKeys{
+			{Type: "uint", Key: "id", Value: miniId},
+			{Type: "string", Key: "name", Value: data["name"]},
+			{Type: "string", Key: "appId", Value: data["appId"]},
+			{Type: "string", Key: "appSecret", Value: data["appSecret"]},
+			{Type: "string", Key: "remark", Value: data["remark"]},
 		}
-
-		obj = auth.PUT("v1/admin/mini/updateMini").
-			WithJSON(update).
-			Expect().Status(http.StatusOK).JSON().Object()
-		obj.Keys().ContainsOnly("status", "data", "message")
-		obj.Value("status").Number().Equal(200)
-		obj.Value("message").String().Equal("更新成功")
-		mini = obj.Value("data").Object()
-
-		mini.Value("id").Number().Ge(0)
-		mini.Value("uuid").String().NotEmpty()
-		mini.Value("name").String().Equal(update["name"].(string))
-		mini.Value("appId").String().Equal(update["appId"].(string))
-		mini.Value("appSecret").String().Equal(update["appSecret"].(string))
-		mini.Value("remark").String().Equal(update["remark"].(string))
-
-		obj = auth.POST("v1/admin/mini/getMiniById").
-			WithJSON(map[string]interface{}{"id": miniId}).
-			Expect().Status(http.StatusOK).JSON().Object()
-		obj.Keys().ContainsOnly("status", "data", "message")
-		obj.Value("status").Number().Equal(200)
-		obj.Value("message").String().Equal("操作成功")
-		mini = obj.Value("data").Object()
-
-		mini.Value("id").Number().Ge(0)
-		mini.Value("uuid").String().NotEmpty()
-		mini.Value("name").String().Equal(update["name"].(string))
-		mini.Value("appId").String().Equal(update["appId"].(string))
-		mini.Value("appSecret").String().Equal(update["appSecret"].(string))
-		mini.Value("remark").String().Equal(update["remark"].(string))
-
-		// setUserAuthority
-		obj = auth.DELETE("v1/admin/mini/deleteMini").
-			WithJSON(map[string]interface{}{"id": miniId}).
-			Expect().Status(http.StatusOK).JSON().Object()
-		obj.Keys().ContainsOnly("status", "data", "message")
-		obj.Value("status").Number().Equal(200)
-		obj.Value("message").String().Equal("删除成功")
+		base.PostList(auth, url, miniId, base.PageRes, keys, http.StatusOK, "获取成功")
 	}
 
+	update := map[string]interface{}{
+		"id":        miniId,
+		"name":      "中德澳线上点餐商城1",
+		"appId":     "YJ3s1abt7MAfT6gWVKoDjnhjsfsd",
+		"appSecret": "tRE49zaf5NCm6PidFZoaFg3u4WCHDok7fxgL63yV0pF4AMsdfbnfgh",
+		"remark":    "中德澳线上点餐商城1",
+	}
+
+	{
+		url := fmt.Sprintf("v1/admin/mini/updateMin/%d", miniId)
+		base.Update(auth, url, update, http.StatusOK, "更新成功")
+	}
+
+	{
+		url := fmt.Sprintf("v1/admin/mini/getMiniById/%d", miniId)
+		keys := base.ResponseKeys{
+			{Type: "uint", Key: "id", Value: miniId},
+			{Type: "string", Key: "name", Value: update["name"]},
+			{Type: "string", Key: "appId", Value: update["appId"]},
+			{Type: "string", Key: "appSecret", Value: update["appSecret"]},
+			{Type: "string", Key: "remark", Value: update["remark"]},
+		}
+		base.GetById(auth, url, miniId, keys, http.StatusOK, "操作成功")
+	}
 }
 
 func TestMiniRegisterError(t *testing.T) {
@@ -114,11 +81,29 @@ func TestMiniRegisterError(t *testing.T) {
 	}
 	auth := base.BaseWithLoginTester(t)
 	defer base.BaseLogOut(auth)
-	obj := auth.POST("v1/admin/mini/createMini").
-		WithJSON(data).
-		Expect().Status(http.StatusOK).JSON().Object()
-	obj.Keys().ContainsOnly("status", "data", "message")
-	obj.Value("status").Number().Equal(4000)
-	obj.Value("message").String().Equal("添加失败:商户名称已被注冊")
+	miniId := CreateMini(auth, data, http.StatusOK, "创建成功")
+	if miniId == 0 {
+		return
+	}
+	defer DeleteMini(auth, miniId, http.StatusOK, "删除成功")
 
+	miniId = CreateMini(auth, data, response.BAD_REQUEST_ERROR, "添加失败:商户名称已被注冊")
+	if miniId == 0 {
+		return
+	}
+	defer DeleteMini(auth, miniId, http.StatusOK, "删除成功")
+}
+
+func CreateMini(auth *httpexpect.Expect, create map[string]interface{}, status int, message string) uint {
+	url := "v1/admin/mini/createMini"
+	keys := base.ResponseKeys{
+		{Type: "uint", Key: "id", Value: uint(0)},
+	}
+	base.Create(auth, url, create, keys, status, message)
+	return keys.GetId()
+}
+
+func DeleteMini(auth *httpexpect.Expect, id uint, status int, message string) {
+	url := fmt.Sprintf("v1/admin/mini/deleteMini/%d", id)
+	base.Delete(auth, url, status, message)
 }

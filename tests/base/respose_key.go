@@ -24,17 +24,21 @@ func (rks ResponseKeys) Keys() []string {
 func (rks ResponseKeys) Test(object *httpexpect.Object) {
 	for _, rk := range rks {
 		object.Keys().Contains(rk.Key)
+		if rk.Value == nil {
+			continue
+		}
 		switch strings.ToLower(rk.Type) {
 		case "string":
 			object.Value(rk.Key).String().Equal(rk.Value.(string))
-		case "number":
+		case "float64":
+			object.Value(rk.Key).Number().Equal(rk.Value.(float64))
+		case "uint":
+			object.Value(rk.Key).Number().Equal(rk.Value.(uint))
+		case "int":
 			object.Value(rk.Key).Number().Equal(rk.Value.(int))
 		case "object":
 			continue
 		case "array":
-			if rk.Value == nil {
-				continue
-			}
 			subs := rk.Value.([]ResponseKeys)
 			object.Value(rk.Key).Array().Length().Equal(len(subs))
 			length := int(object.Value(rk.Key).Array().Length().Raw())
@@ -51,16 +55,20 @@ func (rks ResponseKeys) Test(object *httpexpect.Object) {
 }
 
 func (rks ResponseKeys) Scan(object *httpexpect.Object) {
-	for _, rk := range rks {
+	for k, rk := range rks {
 		switch strings.ToLower(rk.Type) {
 		case "string":
-			rk.Value = object.Value(rk.Key).String().Raw()
-		case "number":
-			rk.Value = object.Value(rk.Key).Number().Raw()
+			rks[k].Value = object.Value(rk.Key).String().Raw()
+		case "uint":
+			rks[k].Value = uint(object.Value(rk.Key).Number().Raw())
+		case "int":
+			rks[k].Value = int(object.Value(rk.Key).Number().Raw())
+		case "float64":
+			rks[k].Value = object.Value(rk.Key).Number().Raw()
 		case "object":
 			continue
 		default:
-			rk.Value = object.Value(rk.Key).String().Raw()
+			rks[k].Value = object.Value(rk.Key).String().Raw()
 		}
 	}
 }
@@ -68,6 +76,9 @@ func (rks ResponseKeys) Scan(object *httpexpect.Object) {
 func (rks ResponseKeys) GetStringValue(key string) string {
 	for _, rk := range rks {
 		if key == rk.Key {
+			if rk.Value == nil {
+				return ""
+			}
 			switch strings.ToLower(rk.Type) {
 			case "string":
 				return rk.Value.(string)
@@ -76,11 +87,38 @@ func (rks ResponseKeys) GetStringValue(key string) string {
 	}
 	return ""
 }
+
 func (rks ResponseKeys) GetUintValue(key string) uint {
 	for _, rk := range rks {
 		if key == rk.Key {
+			if rk.Value == nil {
+				return 0
+			}
 			switch strings.ToLower(rk.Type) {
-			case "number":
+			case "float64":
+				return uint(rk.Value.(float64))
+			case "uint":
+				return rk.Value.(uint)
+			case "int":
+				return uint(rk.Value.(int))
+			}
+		}
+	}
+	return 0
+}
+
+func (rks ResponseKeys) GetId() uint {
+	for _, rk := range rks {
+		if rk.Key == "id" {
+			if rk.Value == nil {
+				return 0
+			}
+			switch strings.ToLower(rk.Type) {
+			case "float64":
+				return uint(rk.Value.(float64))
+			case "uint":
+				return rk.Value.(uint)
+			case "int":
 				return uint(rk.Value.(int))
 			}
 		}

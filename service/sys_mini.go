@@ -12,11 +12,11 @@ import (
 )
 
 // CreateMini
-func CreateMini(m request.CreateSysMini) (model.SysMini, error) {
+func CreateMini(m request.CreateSysMini) (uint, error) {
 	var mini model.SysMini
 	err := g.TENANCY_DB.Where("name = ?", m.Name).First(&mini).Error
 	if !errors.Is(err, gorm.ErrRecordNotFound) {
-		return mini, errors.New("商户名称已被注冊")
+		return mini.ID, errors.New("商户名称已被注冊")
 	}
 	mini.UUID = utils.UUIDV5()
 	mini.Name = m.Name
@@ -24,7 +24,7 @@ func CreateMini(m request.CreateSysMini) (model.SysMini, error) {
 	mini.AppSecret = m.AppSecret
 	mini.Remark = m.Remark
 	err = g.TENANCY_DB.Create(&mini).Error
-	return mini, err
+	return mini.ID, err
 }
 
 // GetMiniByID
@@ -35,19 +35,26 @@ func GetMiniByID(id uint) (model.SysMini, error) {
 }
 
 // UpdateMini
-func UpdateMini(m request.UpdateSysMini) (model.SysMini, error) {
+func UpdateMini(id uint, m request.UpdateSysMini) error {
 	var mini model.SysMini
-	err := g.TENANCY_DB.Where("name = ?", m.Name).Not("id = ?", m.Id).First(&mini).Error
+	err := g.TENANCY_DB.Where("name = ?", m.Name).Not("id = ?", id).First(&mini).Error
 	if !errors.Is(err, gorm.ErrRecordNotFound) {
-		return mini, errors.New("商户名称已被注冊")
+		return errors.New("商户名称已被注冊")
 	}
 	mini.ID = m.Id
 	mini.Name = m.Name
 	mini.AppID = m.AppID
 	mini.AppSecret = m.AppSecret
 	mini.Remark = m.Remark
-	err = g.TENANCY_DB.Updates(&mini).Error
-	return mini, err
+
+	data := map[string]interface{}{
+		"name":       m.Name,
+		"app_id":     m.AppID,
+		"app_secret": m.AppSecret,
+		"remark":     m.Remark,
+	}
+	err = g.TENANCY_DB.Model(&model.SysMini{}).Omit("uuid").Updates(&data).Error
+	return err
 }
 
 // DeleteMini

@@ -5,8 +5,8 @@ import (
 	"net/http"
 	"testing"
 
+	"github.com/gavv/httpexpect"
 	"github.com/snowlyg/go-tenancy/g"
-	"github.com/snowlyg/go-tenancy/model"
 	"github.com/snowlyg/go-tenancy/tests/base"
 )
 
@@ -152,173 +152,158 @@ func TestClinetProductProcess(t *testing.T) {
 	}
 	auth := base.TenancyWithLoginTester(t)
 	defer base.BaseLogOut(auth)
-	obj := auth.POST("v1/merchant/product/createProduct").
-		WithJSON(data).
-		Expect().Status(http.StatusOK).JSON().Object()
-	obj.Keys().ContainsOnly("status", "data", "message")
-	obj.Value("status").Number().Equal(200)
-	obj.Value("message").String().Equal("创建成功")
 
-	product := obj.Value("data").Object()
-	product.Value("id").Number().Ge(0)
-	product.Value("storeName").String().Equal(data["storeName"].(string))
-	product.Value("storeInfo").String().Equal(data["storeInfo"].(string))
-	product.Value("keyword").String().Equal(data["keyword"].(string))
-	product.Value("barCode").String().Equal(data["barCode"].(string))
-	product.Value("isShow").Number().Equal(g.StatusFalse)
-	product.Value("status").Number().Equal(model.SuccessProductStatus)
-	product.Value("unitName").String().Equal(data["unitName"].(string))
-	product.Value("sort").Number().Equal(data["sort"].(int))
-	product.Value("rank").Number().Equal(0)
-	product.Value("sales").Number().Equal(0)
-	product.Value("price").Number().Equal(0)
-	product.Value("cost").Number().Equal(0)
-	product.Value("otPrice").Number().Equal(0)
-	product.Value("stock").Number().Equal(0)
-	product.Value("isHot").Number().Equal(g.StatusFalse)
-	product.Value("isBenefit").Number().Equal(g.StatusFalse)
-	product.Value("isBest").Number().Equal(g.StatusFalse)
-	product.Value("isNew").Number().Equal(g.StatusFalse)
-	product.Value("isGood").Number().Equal(data["isGood"].(int))
-	product.Value("productType").Number().Equal(model.GeneralSale)
-	product.Value("ficti").Number().Equal(0)
-	product.Value("browse").Number().Equal(0)
-	product.Value("codePath").String().Equal("")
-	product.Value("videoLink").String().Equal(data["videoLink"].(string))
-	product.Value("specType").Number().Equal(data["specType"].(int))
-	product.Value("refusal").String().Equal("")
-	product.Value("rate").Number().Equal(5)
-	product.Value("replyCount").Number().Equal(0)
-	product.Value("isGiftBag").Number().Equal(2)
-	product.Value("careCount").Number().Equal(0)
-	product.Value("image").String().NotEmpty()
-	product.Value("sliderImage").String().NotEmpty()
-	product.Value("oldId").Number().Equal(0)
-	product.Value("tempId").Number().Equal(data["tempId"].(int))
-	product.Value("sysBrandId").Number().Equal(data["sysBrandId"].(int))
-	product.Value("productCategoryId").Number().Equal(data["cateId"].(int))
-	productId := product.Value("id").Number().Raw()
-	if productId > 0 {
+	productId := CreateProduct(auth, data, http.StatusOK, "创建成功")
+	if productId == 0 {
+		return
+	}
+	defer DeleteProduct(auth, productId, http.StatusOK, "删除成功")
 
-		update := map[string]interface{}{
-			"attrValue": []map[string]interface{}{
-				{
-					"image":        "http://127.0.0.1:8089/uploads/file/b39024efbc6de61976f585c8421c6bba_20210702150027.png",
-					"barCode":      "",
-					"brokerage":    1,
-					"brokerageTwo": 1,
-					"cost":         1,
-					"detail": map[string]interface{}{
-						"尺寸": "S",
-					},
-					"otPrice": 1,
-					"price":   1,
-					"stock":   1,
-					"value0":  "S",
-					"volume":  1,
-					"weight":  1,
+	update := map[string]interface{}{
+		"attrValue": []map[string]interface{}{
+			{
+				"image":        "http://127.0.0.1:8089/uploads/file/b39024efbc6de61976f585c8421c6bba_20210702150027.png",
+				"barCode":      "",
+				"brokerage":    1,
+				"brokerageTwo": 1,
+				"cost":         1,
+				"detail": map[string]interface{}{
+					"尺寸": "S",
 				},
+				"otPrice": 1,
+				"price":   1,
+				"stock":   1,
+				"value0":  "S",
+				"volume":  1,
+				"weight":  1,
 			},
-			"cateId":    183,
-			"content":   "<p>是的发生的发sadsdfsdfsdf</p>",
-			"image":     "http://127.0.0.1:8089/uploads/file/b39024efbc6de61976f585c8421c6bba_20210702150027.png",
-			"isGiftBag": g.StatusTrue,
-			"isGood":    g.StatusFalse,
-			"keyword":   "sdfdsfsdfsdf",
-			"sliderImages": []string{
-				"http://127.0.0.1:8089/uploads/file/b39024efbc6de61976f585c8421c6bba_20210702150027.png",
-				"http://127.0.0.1:8089/uploads/file/0701aa317da5a004fbf6111545678a6c_20210702150036.png",
-			},
-			"sort":              21321,
-			"specType":          2,
-			"storeInfo":         "的是否是否",
-			"storeName":         "是防守打法发",
-			"sysBrandId":        3,
-			"tempId":            2,
-			"tenancyCategoryId": []int{174},
-			"unitName":          "放松的方式213123",
-			"videoLink":         "sdfsdfsd11",
-			"barCode":           "sdfsdfsd11",
-		}
-
-		obj = auth.PUT(fmt.Sprintf("v1/merchant/product/updateProduct/%d", int(productId))).
-			WithJSON(update).
-			Expect().Status(http.StatusOK).JSON().Object()
-		obj.Keys().ContainsOnly("status", "data", "message")
-		obj.Value("status").Number().Equal(200)
-		obj.Value("message").String().Equal("更新成功")
-
-		obj = auth.GET(fmt.Sprintf("v1/merchant/product/getProductById/%d", int(productId))).
-			WithJSON(map[string]interface{}{"id": productId}).
-			Expect().Status(http.StatusOK).JSON().Object()
-		obj.Keys().ContainsOnly("status", "data", "message")
-		obj.Value("status").Number().Equal(200)
-		obj.Value("message").String().Equal("操作成功")
-		product = obj.Value("data").Object()
-
-		product.Value("id").Number().Ge(0)
-		product.Value("storeName").String().Equal(update["storeName"].(string))
-		product.Value("storeInfo").String().Equal(update["storeInfo"].(string))
-		product.Value("keyword").String().Equal(update["keyword"].(string))
-		product.Value("barCode").String().Equal(update["barCode"].(string))
-		product.Value("isShow").Number().Equal(g.StatusFalse)
-		product.Value("status").Number().Equal(model.SuccessProductStatus)
-		product.Value("unitName").String().Equal(update["unitName"].(string))
-		product.Value("sort").Number().Equal(update["sort"].(int))
-		product.Value("rank").Number().Equal(0)
-		product.Value("sales").Number().Equal(0)
-		product.Value("price").Number().Equal(0)
-		product.Value("cost").Number().Equal(0)
-		product.Value("otPrice").Number().Equal(0)
-		product.Value("stock").Number().Equal(0)
-		product.Value("isHot").Number().Equal(g.StatusFalse)
-		product.Value("isBenefit").Number().Equal(g.StatusFalse)
-		product.Value("isBest").Number().Equal(g.StatusFalse)
-		product.Value("isNew").Number().Equal(g.StatusFalse)
-		product.Value("isGood").Number().Equal(update["isGood"].(int))
-		product.Value("productType").Number().Equal(model.GeneralSale)
-		product.Value("ficti").Number().Equal(0)
-		product.Value("browse").Number().Equal(0)
-		product.Value("codePath").String().Equal("")
-		product.Value("videoLink").String().Equal(update["videoLink"].(string))
-		product.Value("specType").Number().Equal(update["specType"].(int))
-		product.Value("refusal").String().Equal("")
-		product.Value("rate").Number().Equal(5)
-		product.Value("replyCount").Number().Equal(0)
-		product.Value("isGiftBag").Number().Equal(update["isGiftBag"].(int))
-		product.Value("careCount").Number().Equal(0)
-		product.Value("image").String().NotEmpty()
-		product.Value("sliderImage").String().NotEmpty()
-		product.Value("oldId").Number().Equal(0)
-		product.Value("tempId").Number().Equal(update["tempId"].(int))
-		product.Value("sysBrandId").Number().Equal(update["sysBrandId"].(int))
-		product.Value("productCategoryId").Number().Equal(update["cateId"].(int))
-
-		obj = auth.POST("v1/merchant/product/changeProductIsShow").
-			WithJSON(map[string]interface{}{"id": productId, "isShow": 1}).
-			Expect().Status(http.StatusOK).JSON().Object()
-		obj.Keys().ContainsOnly("status", "data", "message")
-		obj.Value("status").Number().Equal(200)
-		obj.Value("message").String().Equal("设置成功")
-
-		obj = auth.DELETE(fmt.Sprintf("v1/merchant/product/deleteProduct/%d", int(productId))).
-			Expect().Status(http.StatusOK).JSON().Object()
-		obj.Keys().ContainsOnly("status", "data", "message")
-		obj.Value("status").Number().Equal(200)
-		obj.Value("message").String().Equal("操作成功")
-
-		obj = auth.GET(fmt.Sprintf("v1/merchant/product/restoreProduct/%d", int(productId))).
-			Expect().Status(http.StatusOK).JSON().Object()
-		obj.Keys().ContainsOnly("status", "data", "message")
-		obj.Value("status").Number().Equal(200)
-		obj.Value("message").String().Equal("操作成功")
-
-		// setUserAuthority
-		obj = auth.DELETE(fmt.Sprintf("v1/merchant/product/destoryProduct/%d", int(productId))).
-			Expect().Status(http.StatusOK).JSON().Object()
-		obj.Keys().ContainsOnly("status", "data", "message")
-		obj.Value("status").Number().Equal(200)
-		obj.Value("message").String().Equal("删除成功")
+		},
+		"cateId":    183,
+		"content":   "<p>是的发生的发sadsdfsdfsdf</p>",
+		"image":     "http://127.0.0.1:8089/uploads/file/b39024efbc6de61976f585c8421c6bba_20210702150027.png",
+		"isGiftBag": g.StatusTrue,
+		"isGood":    g.StatusFalse,
+		"keyword":   "sdfdsfsdfsdf",
+		"sliderImages": []string{
+			"http://127.0.0.1:8089/uploads/file/b39024efbc6de61976f585c8421c6bba_20210702150027.png",
+			"http://127.0.0.1:8089/uploads/file/0701aa317da5a004fbf6111545678a6c_20210702150036.png",
+		},
+		"sort":              21321,
+		"specType":          2,
+		"storeInfo":         "的是否是否",
+		"storeName":         "是防守打法发",
+		"sysBrandId":        3,
+		"tempId":            2,
+		"tenancyCategoryId": []int{174},
+		"unitName":          "放松的方式213123",
+		"videoLink":         "sdfsdfsd11",
+		"barCode":           "sdfsdfsd11",
+	}
+	{
+		url := fmt.Sprintf("v1/merchant/product/updateProduct/%d", productId)
+		base.Post(auth, url, update, http.StatusOK, "更新成功")
 	}
 
+	keys := base.ResponseKeys{
+		{Type: "uint", Key: "id", Value: productId},
+		{Type: "int", Key: "sort", Value: update["sort"]},
+		{Type: "int", Key: "specType", Value: update["specType"]},
+		{Type: "uint", Key: "sysBrandId", Value: update["sysBrandId"]},
+		{Type: "uint", Key: "tenancyCategoryId", Value: update["tenancyCategoryId"]},
+		{Type: "uint", Key: "tempId", Value: update["tempId"]},
+		{Type: "uint", Key: "cateId", Value: update["cateId"]},
+		{Type: "string", Key: "storeInfo", Value: update["storeInfo"]},
+		{Type: "string", Key: "storeName", Value: update["storeName"]},
+		{Type: "string", Key: "unitName", Value: update["unitName"]},
+		{Type: "string", Key: "videoLink", Value: update["videoLink"]},
+		{Type: "string", Key: "keyword", Value: update["keyword"]},
+		{Type: "string", Key: "barCode", Value: update["barCode"]},
+		{Type: "string", Key: "sliderImage", Value: update["sliderImage"]},
+		{Type: "string", Key: "content", Value: update["content"]},
+		{Type: "string", Key: "image", Value: update["image"]},
+		{Type: "int", Key: "isGiftBag", Value: update["isGiftBag"]},
+		{Type: "int", Key: "isGood", Value: update["isGood"]},
+	}
+	url := fmt.Sprintf("v1/merchant/product/getProductById/%d", productId)
+	base.GetById(auth, url, productId, keys, http.StatusOK, "操作成功")
+
+	// 	obj = auth.GET(fmt.Sprintf("v1/merchant/product/getProductById/%d", int(productId))).
+	// 		WithJSON(map[string]interface{}{"id": productId}).
+	// 		Expect().Status(http.StatusOK).JSON().Object()
+	// 	obj.Keys().ContainsOnly("status", "data", "message")
+	// 	obj.Value("status").Number().Equal(200)
+	// 	obj.Value("message").String().Equal("操作成功")
+	// 	product = obj.Value("data").Object()
+
+	// 	product.Value("id").Number().Ge(0)
+	// 	product.Value("storeName").String().Equal(update["storeName"].(string))
+	// 	product.Value("storeInfo").String().Equal(update["storeInfo"].(string))
+	// 	product.Value("keyword").String().Equal(update["keyword"].(string))
+	// 	product.Value("barCode").String().Equal(update["barCode"].(string))
+	// 	product.Value("isShow").Number().Equal(g.StatusFalse)
+	// 	product.Value("status").Number().Equal(model.SuccessProductStatus)
+	// 	product.Value("unitName").String().Equal(update["unitName"].(string))
+	// 	product.Value("sort").Number().Equal(update["sort"].(int))
+	// 	product.Value("rank").Number().Equal(0)
+	// 	product.Value("sales").Number().Equal(0)
+	// 	product.Value("price").Number().Equal(0)
+	// 	product.Value("cost").Number().Equal(0)
+	// 	product.Value("otPrice").Number().Equal(0)
+	// 	product.Value("stock").Number().Equal(0)
+	// 	product.Value("isHot").Number().Equal(g.StatusFalse)
+	// 	product.Value("isBenefit").Number().Equal(g.StatusFalse)
+	// 	product.Value("isBest").Number().Equal(g.StatusFalse)
+	// 	product.Value("isNew").Number().Equal(g.StatusFalse)
+	// 	product.Value("isGood").Number().Equal(update["isGood"].(int))
+	// 	product.Value("productType").Number().Equal(model.GeneralSale)
+	// 	product.Value("ficti").Number().Equal(0)
+	// 	product.Value("browse").Number().Equal(0)
+	// 	product.Value("codePath").String().Equal("")
+	// 	product.Value("videoLink").String().Equal(update["videoLink"].(string))
+	// 	product.Value("specType").Number().Equal(update["specType"].(int))
+	// 	product.Value("refusal").String().Equal("")
+	// 	product.Value("rate").Number().Equal(5)
+	// 	product.Value("replyCount").Number().Equal(0)
+	// 	product.Value("isGiftBag").Number().Equal(update["isGiftBag"].(int))
+	// 	product.Value("careCount").Number().Equal(0)
+	// 	product.Value("image").String().NotEmpty()
+	// 	product.Value("sliderImage").String().NotEmpty()
+	// 	product.Value("oldId").Number().Equal(0)
+	// 	product.Value("tempId").Number().Equal(update["tempId"].(int))
+	// 	product.Value("sysBrandId").Number().Equal(update["sysBrandId"].(int))
+	// 	product.Value("productCategoryId").Number().Equal(update["cateId"].(int))
+
+	// 	obj = auth.POST("v1/merchant/product/changeProductIsShow").
+	// 		WithJSON(map[string]interface{}{"id": productId, "isShow": 1}).
+	// 		Expect().Status(http.StatusOK).JSON().Object()
+	// 	obj.Keys().ContainsOnly("status", "data", "message")
+	// 	obj.Value("status").Number().Equal(200)
+	// 	obj.Value("message").String().Equal("设置成功")
+
+	// 	obj = auth.DELETE(fmt.Sprintf("v1/merchant/product/deleteProduct/%d", int(productId))).
+	// 		Expect().Status(http.StatusOK).JSON().Object()
+	// 	obj.Keys().ContainsOnly("status", "data", "message")
+	// 	obj.Value("status").Number().Equal(200)
+	// 	obj.Value("message").String().Equal("操作成功")
+
+	// 	obj = auth.GET(fmt.Sprintf("v1/merchant/product/restoreProduct/%d", int(productId))).
+	// 		Expect().Status(http.StatusOK).JSON().Object()
+	// 	obj.Keys().ContainsOnly("status", "data", "message")
+	// 	obj.Value("status").Number().Equal(200)
+	// 	obj.Value("message").String().Equal("操作成功")
+
+}
+
+func CreateProduct(auth *httpexpect.Expect, create map[string]interface{}, status int, message string) uint {
+	res := base.ResponseKeys{
+		{Type: "uint", Key: "id", Value: uint(0)},
+	}
+	url := "v1/merchant/product/createProduct"
+	base.Create(auth, url, create, res, status, message)
+	return res.GetId()
+}
+
+func DeleteProduct(auth *httpexpect.Expect, id uint, status int, message string) {
+	url := fmt.Sprintf("v1/merchant/product/destoryProduct/%d", id)
+	base.Delete(auth, url, status, message)
 }
