@@ -271,5 +271,4 @@ func TestAuthorityRegisterError(t *testing.T) {
 	obj.Keys().ContainsOnly("status", "data", "message")
 	obj.Value("status").Number().Equal(4000)
 	obj.Value("message").String().Equal("创建失败存在相同角色id")
-
 }

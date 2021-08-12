@@ -4,59 +4,24 @@ import (
 	"net/http"
 	"testing"
 
+	"github.com/snowlyg/go-tenancy/model/response"
 	"github.com/snowlyg/go-tenancy/tests/base"
 )
 
 func TestApiList(t *testing.T) {
 	auth := base.BaseWithLoginTester(t)
 	defer base.BaseLogOut(auth)
-	obj := auth.POST("v1/admin/api/getApiList").
-		WithJSON(map[string]interface{}{"page": 1, "pageSize": 10}).
-		Expect().Status(http.StatusOK).JSON().Object()
-	obj.Keys().ContainsOnly("status", "data", "message")
-	obj.Value("status").Number().Equal(200)
-	obj.Value("message").String().Equal("获取成功")
-
-	data := obj.Value("data").Object()
-	data.Keys().ContainsOnly("list", "total", "page", "pageSize")
-	data.Value("pageSize").Number().Equal(10)
-	data.Value("page").Number().Equal(1)
-	data.Value("total").Number().Ge(0)
-
-	list := data.Value("list").Array()
-	list.Length().Ge(0)
-	first := list.First().Object()
-	first.Keys().ContainsOnly("id", "path", "description", "apiGroup", "method", "createdAt", "updatedAt")
-	first.Value("id").Number().Ge(0)
+	base.ApiList(auth)
 
 }
 func TestAllApi(t *testing.T) {
 	auth := base.BaseWithLoginTester(t)
 	defer base.BaseLogOut(auth)
-	obj := auth.POST("v1/admin/api/getAllApis").
-		WithJSON(map[string]interface{}{"page": 1, "pageSize": 10}).
-		Expect().Status(http.StatusOK).JSON().Object()
-	obj.Keys().ContainsOnly("status", "data", "message")
-	obj.Value("status").Number().Equal(200)
-	obj.Value("message").String().Equal("获取成功")
-
-	data := obj.Value("data").Object().Value("apis").Array()
-	first := data.First().Object()
-	first.Keys().ContainsOnly(
-		"id",
-		"path",
-		"description",
-		"apiGroup",
-		"method",
-		"createdAt",
-		"updatedAt",
-	)
-	first.Value("id").Number().Ge(0)
-
+	base.AllApi(auth)
 }
 
 func TestApiProcess(t *testing.T) {
-	data := map[string]interface{}{
+	create := map[string]interface{}{
 		"apiGroup":    "test_api_process",
 		"description": "test_api_process",
 		"method":      "POST",
@@ -64,23 +29,7 @@ func TestApiProcess(t *testing.T) {
 	}
 	auth := base.BaseWithLoginTester(t)
 	defer base.BaseLogOut(auth)
-	obj := auth.POST("v1/admin/api/createApi").
-		WithJSON(data).
-		Expect().Status(http.StatusOK).JSON().Object()
-	obj.Keys().ContainsOnly("status", "data", "message")
-	obj.Value("status").Number().Equal(200)
-	obj.Value("message").String().Equal("创建成功")
-
-	api := obj.Value("data").Object()
-	api.Value("id").Number().Ge(0)
-	api.Value("path").String().Equal(data["path"].(string))
-	api.Value("description").String().Equal(data["description"].(string))
-	api.Value("apiGroup").String().Equal(data["apiGroup"].(string))
-	api.Value("method").String().Equal(data["method"].(string))
-	apiId := api.Value("id").Number().Raw()
-	apiPath := api.Value("path").String().Raw()
-	apiMethod := api.Value("method").String().Raw()
-
+	apiId, apiPath, apiMethod := base.CreateApi(auth, create, http.StatusOK, "创建成功")
 	if apiId > 0 {
 
 		update := map[string]interface{}{
@@ -90,46 +39,14 @@ func TestApiProcess(t *testing.T) {
 			"method":      "POST",
 			"path":        "update_test_api_process",
 		}
-
-		obj = auth.POST("v1/admin/api/updateApi").
-			WithJSON(update).
-			Expect().Status(http.StatusOK).JSON().Object()
-		obj.Keys().ContainsOnly("status", "data", "message")
-		obj.Value("status").Number().Equal(200)
-		obj.Value("message").String().Equal("修改成功")
-
-		obj = auth.POST("v1/admin/api/getApiById").
-			WithJSON(map[string]interface{}{"id": apiId}).
-			Expect().Status(http.StatusOK).JSON().Object()
-		obj.Keys().ContainsOnly("status", "data", "message")
-		obj.Value("status").Number().Equal(200)
-		obj.Value("message").String().Equal("操作成功")
-		api = obj.Value("data").Object().Value("api").Object()
-
-		api.Value("id").Number().Ge(0)
-		api.Value("path").String().Equal(update["path"].(string))
-		api.Value("description").String().Equal(update["description"].(string))
-		api.Value("apiGroup").String().Equal(update["apiGroup"].(string))
-		api.Value("method").String().Equal(update["method"].(string))
-
-		// setUserAuthority
-		obj = auth.DELETE("v1/admin/api/deleteApi").
-			WithJSON(map[string]interface{}{
-				"id":     apiId,
-				"path":   apiPath,
-				"method": apiMethod,
-			}).
-			Expect().Status(http.StatusOK).JSON().Object()
-		obj.Keys().ContainsOnly("status", "data", "message")
-		obj.Value("status").Number().Equal(200)
-		obj.Value("message").String().Equal("删除成功")
-
+		base.UpdateApi(auth, apiId, update)
+		base.GetApi(auth, apiId, update)
+		base.DeleteApi(auth, apiId, apiPath, apiMethod)
 	}
-
 }
 
 func TestApiRegisterError(t *testing.T) {
-	data := map[string]interface{}{
+	create := map[string]interface{}{
 		"apiGroup":    "auth",
 		"description": "用户注册",
 		"method":      "GET",
@@ -137,11 +54,5 @@ func TestApiRegisterError(t *testing.T) {
 	}
 	auth := base.BaseWithLoginTester(t)
 	defer base.BaseLogOut(auth)
-	obj := auth.POST("v1/admin/api/createApi").
-		WithJSON(data).
-		Expect().Status(http.StatusOK).JSON().Object()
-	obj.Keys().ContainsOnly("status", "data", "message")
-	obj.Value("status").Number().Equal(4000)
-	obj.Value("message").String().Equal("添加失败:存在相同api")
-
+	base.CreateApi(auth, create, response.BAD_REQUEST_ERROR, "添加失败:存在相同api")
 }

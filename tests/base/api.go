@@ -6,7 +6,7 @@ import (
 	"github.com/gavv/httpexpect"
 )
 
-func apiList(auth *httpexpect.Expect) {
+func ApiList(auth *httpexpect.Expect) {
 	obj := auth.POST("v1/admin/api/getApiList").
 		WithJSON(map[string]interface{}{"page": 1, "pageSize": 10}).
 		Expect().Status(http.StatusOK).JSON().Object()
@@ -27,7 +27,7 @@ func apiList(auth *httpexpect.Expect) {
 	first.Value("id").Number().Ge(0)
 }
 
-func allApi(auth *httpexpect.Expect) {
+func AllApi(auth *httpexpect.Expect) {
 	obj := auth.POST("v1/admin/api/getAllApis").
 		WithJSON(map[string]interface{}{"page": 1, "pageSize": 10}).
 		Expect().Status(http.StatusOK).JSON().Object()
@@ -49,35 +49,39 @@ func allApi(auth *httpexpect.Expect) {
 	first.Value("id").Number().Ge(0)
 }
 
-func createApi(auth *httpexpect.Expect, create map[string]interface{}) (uint, string, string) {
+func CreateApi(auth *httpexpect.Expect, create map[string]interface{}, status int, message string) (uint, string, string) {
 	obj := auth.POST("v1/admin/api/createApi").
 		WithJSON(create).
 		Expect().Status(http.StatusOK).JSON().Object()
 	obj.Keys().ContainsOnly("status", "data", "message")
-	obj.Value("status").Number().Equal(200)
-	obj.Value("message").String().Equal("创建成功")
-	api := obj.Value("data").Object()
-	apiId := api.Value("id").Number().Raw()
-	apiPath := api.Value("path").String().Raw()
-	apiMethod := api.Value("method").String().Raw()
-	return uint(apiId), apiPath, apiMethod
+
+	obj.Value("status").Number().Equal(status)
+	obj.Value("message").String().Equal(message)
+	if status == http.StatusOK {
+		api := obj.Value("data").Object()
+		apiId := api.Value("id").Number().Raw()
+		apiPath := api.Value("path").String().Raw()
+		apiMethod := api.Value("method").String().Raw()
+		return uint(apiId), apiPath, apiMethod
+	}
+	return 0, "", ""
 }
 
-func updateApi(auth *httpexpect.Expect, apiId uint, update map[string]interface{}) {
+func UpdateApi(auth *httpexpect.Expect, apiId uint, update map[string]interface{}) {
 	obj := auth.POST("v1/admin/api/updateApi").
 		WithJSON(update).
 		Expect().Status(http.StatusOK).JSON().Object()
 	obj.Keys().ContainsOnly("status", "data", "message")
-	obj.Value("status").Number().Equal(200)
+	obj.Value("status").Number().Equal(http.StatusOK)
 	obj.Value("message").String().Equal("修改成功")
 }
 
-func getApi(auth *httpexpect.Expect, apiId uint, update map[string]interface{}) {
+func GetApi(auth *httpexpect.Expect, apiId uint, update map[string]interface{}) {
 	obj := auth.POST("v1/admin/api/getApiById").
 		WithJSON(map[string]interface{}{"id": apiId}).
 		Expect().Status(http.StatusOK).JSON().Object()
 	obj.Keys().ContainsOnly("status", "data", "message")
-	obj.Value("status").Number().Equal(200)
+	obj.Value("status").Number().Equal(http.StatusOK)
 	obj.Value("message").String().Equal("操作成功")
 	api := obj.Value("data").Object().Value("api").Object()
 
@@ -88,8 +92,7 @@ func getApi(auth *httpexpect.Expect, apiId uint, update map[string]interface{}) 
 	api.Value("method").String().Equal(update["method"].(string))
 }
 
-func deleteApi(auth *httpexpect.Expect, apiId uint, apiPath, apiMethod string) {
-	// setUserAuthority
+func DeleteApi(auth *httpexpect.Expect, apiId uint, apiPath, apiMethod string) {
 	obj := auth.DELETE("v1/admin/api/deleteApi").
 		WithJSON(map[string]interface{}{
 			"id":     apiId,
@@ -98,6 +101,6 @@ func deleteApi(auth *httpexpect.Expect, apiId uint, apiPath, apiMethod string) {
 		}).
 		Expect().Status(http.StatusOK).JSON().Object()
 	obj.Keys().ContainsOnly("status", "data", "message")
-	obj.Value("status").Number().Equal(200)
+	obj.Value("status").Number().Equal(http.StatusOK)
 	obj.Value("message").String().Equal("删除成功")
 }

@@ -14,7 +14,6 @@ import (
 )
 
 func TestMain(m *testing.M) {
-
 	g.TENANCY_VP = core.Viper() // 初始化Viper
 	MysqlConfig := config.Mysql{
 		Path:     "127.0.0.1:3306",
