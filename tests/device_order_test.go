@@ -188,7 +188,7 @@ func TestDeviceCheckOrder(t *testing.T) {
 	}
 }
 
-func TestDeviceCreateOrder(t *testing.T) {
+func TestDeviceOrderProcess(t *testing.T) {
 	var brandId, shipTempId, cateId, tenancyCategoryId, productId, cartId uint
 	var uniques []string
 	var productType int
@@ -372,6 +372,7 @@ func TestDeviceCreateOrder(t *testing.T) {
 		url := fmt.Sprintf("v1/device/order/payOrder/%d", orderId)
 		keys := base.ResponseKeys{
 			{Type: "uint", Key: "id", Value: orderId},
+			{Type: "string", Key: "qrcode", Value: "21312"},
 		}
 		base.GetById(auth, url, orderId, keys, http.StatusOK, "操作成功")
 	}
