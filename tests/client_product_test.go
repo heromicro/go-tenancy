@@ -10,7 +10,7 @@ import (
 	"github.com/snowlyg/go-tenancy/tests/base"
 )
 
-func TestClinetProductList(t *testing.T) {
+func TestClientProductList(t *testing.T) {
 	auth, _ := base.TenancyWithLoginTester(t)
 	defer base.BaseLogOut(auth)
 	params := []base.Param{
@@ -44,15 +44,16 @@ func TestGetClientProductFilter(t *testing.T) {
 
 }
 
-func TestClinetProductProcess(t *testing.T) {
+func TestClientProductProcess(t *testing.T) {
 
 	var brandId, shipTempId, cateId, tenancyCategoryId uint
 	{
+
 		auth := base.BaseWithLoginTester(t)
 		defer base.BaseLogOut(auth)
 
 		createPid := map[string]interface{}{
-			"cateName": "箱包服饰",
+			"cateName": "箱包服饰_client",
 			"status":   g.StatusTrue,
 			"path":     "http://qmplusimg.henrongyi.top/head.png",
 			"sort":     1,
@@ -66,7 +67,7 @@ func TestClinetProductProcess(t *testing.T) {
 		}
 		defer DeleteBrandCategory(auth, brandCategoryPid)
 		createBrandCategory := map[string]interface{}{
-			"cateName": "精品服饰",
+			"cateName": "精品服饰_client",
 			"status":   g.StatusTrue,
 			"path":     "http://qmplusimg.henrongyi.top/head.png",
 			"sort":     1,
@@ -81,7 +82,7 @@ func TestClinetProductProcess(t *testing.T) {
 		defer DeleteBrandCategory(auth, brandCategoryId)
 
 		createBrand := map[string]interface{}{
-			"brandName":       "冈本",
+			"brandName":       "冈本_client",
 			"status":          g.StatusTrue,
 			"pic":             "http://qmplusimg.henrongyi.top/head.png",
 			"sort":            1,
@@ -94,24 +95,8 @@ func TestClinetProductProcess(t *testing.T) {
 		defer DeleteBrand(auth, brandId)
 
 		{
-			create := map[string]interface{}{
-				"name":       "物流邮费模板",
-				"type":       2,
-				"appoint":    2,
-				"undelivery": 2,
-				"isDefault":  1,
-				"sort":       2,
-			}
-			shipTempId = CreateShippingTemplate(auth, create, http.StatusOK, "创建成功")
-			if shipTempId == 0 {
-				return
-			}
-			defer DeleteShippingTemplate(auth, shipTempId, http.StatusOK, "删除成功")
-		}
-
-		{
 			data := map[string]interface{}{
-				"cateName": "客户端数码产品",
+				"cateName": "数码产品_client",
 				"status":   g.StatusTrue,
 				"path":     "http://qmplusimg.henrongyi.top/head.png",
 				"sort":     1,
@@ -119,28 +104,6 @@ func TestClinetProductProcess(t *testing.T) {
 				"pid":      1,
 				"pic":      "http://qmplusimg.henrongyi.top/head.png",
 			}
-			auth, _ := base.TenancyWithLoginTester(t)
-			defer base.BaseLogOut(auth)
-
-			tenancyCategoryId = ClientCreateCategory(auth, data, http.StatusOK, "创建成功")
-			if tenancyCategoryId == 0 {
-				return
-			}
-			defer DeleteClientCategory(auth, tenancyCategoryId, http.StatusOK, "删除成功")
-		}
-
-		{
-			data := map[string]interface{}{
-				"cateName": "数码产品",
-				"status":   g.StatusTrue,
-				"path":     "http://qmplusimg.henrongyi.top/head.png",
-				"sort":     1,
-				"level":    1,
-				"pid":      1,
-				"pic":      "http://qmplusimg.henrongyi.top/head.png",
-			}
-			auth := base.BaseWithLoginTester(t)
-			defer base.BaseLogOut(auth)
 
 			cateId = CreateCategory(auth, data, http.StatusOK, "创建成功")
 			if cateId == 0 {
@@ -148,6 +111,43 @@ func TestClinetProductProcess(t *testing.T) {
 			}
 			defer DeleteCategory(auth, cateId, http.StatusOK, "删除成功")
 		}
+	}
+
+	auth, _ := base.TenancyWithLoginTester(t)
+	defer base.BaseLogOut(auth)
+
+	{
+		create := map[string]interface{}{
+			"name":       "物流邮费模板_client",
+			"type":       2,
+			"appoint":    2,
+			"undelivery": 2,
+			"isDefault":  1,
+			"sort":       2,
+		}
+		shipTempId = CreateShippingTemplate(auth, create, http.StatusOK, "创建成功")
+		if shipTempId == 0 {
+			return
+		}
+		defer DeleteShippingTemplate(auth, shipTempId, http.StatusOK, "删除成功")
+	}
+
+	{
+		data := map[string]interface{}{
+			"cateName": "客户端数码产品_client",
+			"status":   g.StatusTrue,
+			"path":     "http://qmplusimg.henrongyi.top/head.png",
+			"sort":     1,
+			"level":    1,
+			"pid":      1,
+			"pic":      "http://qmplusimg.henrongyi.top/head.png",
+		}
+
+		tenancyCategoryId = ClientCreateCategory(auth, data, http.StatusOK, "创建成功")
+		if tenancyCategoryId == 0 {
+			return
+		}
+		defer DeleteClientCategory(auth, tenancyCategoryId, http.StatusOK, "删除成功")
 	}
 
 	data := map[string]interface{}{
@@ -191,10 +191,7 @@ func TestClinetProductProcess(t *testing.T) {
 		"barCode":           "sdfsdfsd",
 	}
 
-	auth, _ := base.TenancyWithLoginTester(t)
-	defer base.BaseLogOut(auth)
-
-	productId := CreateProduct(auth, data, http.StatusOK, "创建成功")
+	productId, _, _ := CreateProduct(auth, data, http.StatusOK, "创建成功")
 	if productId == 0 {
 		return
 	}
@@ -242,17 +239,17 @@ func TestClinetProductProcess(t *testing.T) {
 	}
 	{
 		url := fmt.Sprintf("v1/merchant/product/updateProduct/%d", productId)
-		base.Post(auth, url, update, http.StatusOK, "更新成功")
+		base.Update(auth, url, update, http.StatusOK, "更新成功")
 	}
 
 	keys := base.ResponseKeys{
 		{Type: "uint", Key: "id", Value: productId},
 		{Type: "int", Key: "sort", Value: update["sort"]},
 		{Type: "int", Key: "specType", Value: update["specType"]},
-		{Type: "uint", Key: "sysBrandId", Value: update["sysBrandId"]},
-		{Type: "uint", Key: "tenancyCategoryId", Value: update["tenancyCategoryId"]},
-		{Type: "uint", Key: "tempId", Value: update["tempId"]},
-		{Type: "uint", Key: "cateId", Value: update["cateId"]},
+		{Type: "int", Key: "sysBrandId", Value: update["sysBrandId"]},
+		{Type: "array", Key: "tenancyCategoryId", Value: update["tenancyCategoryId"]},
+		{Type: "int", Key: "tempId", Value: update["tempId"]},
+		{Type: "int", Key: "cateId", Value: update["cateId"]},
 		{Type: "string", Key: "storeInfo", Value: update["storeInfo"]},
 		{Type: "string", Key: "storeName", Value: update["storeName"]},
 		{Type: "string", Key: "unitName", Value: update["unitName"]},
@@ -264,6 +261,8 @@ func TestClinetProductProcess(t *testing.T) {
 		{Type: "string", Key: "image", Value: update["image"]},
 		{Type: "int", Key: "isGiftBag", Value: update["isGiftBag"]},
 		{Type: "int", Key: "isGood", Value: update["isGood"]},
+		{Type: "array", Key: "attrValue", Value: update["attrValue"]},
+		{Type: "array", Key: "sliderImages", Value: update["sliderImages"]},
 	}
 	url := fmt.Sprintf("v1/merchant/product/getProductById/%d", productId)
 	base.GetById(auth, url, productId, keys, http.StatusOK, "操作成功")
@@ -282,11 +281,15 @@ func TestClinetProductProcess(t *testing.T) {
 
 }
 
-func CreateProduct(auth *httpexpect.Expect, create map[string]interface{}, status int, message string) uint {
-	res := base.IdKeys
+func CreateProduct(auth *httpexpect.Expect, create map[string]interface{}, status int, message string) (uint, []string, int) {
+	res := base.ResponseKeys{
+		{Type: "uint", Key: "id", Value: uint(0)},
+		{Type: "array", Key: "uniques", Value: []string{}},
+		{Type: "int", Key: "productType", Value: 0},
+	}
 	url := "v1/merchant/product/createProduct"
 	base.Create(auth, url, create, res, status, message)
-	return res.GetId()
+	return res.GetId(), res.GetStringArrayValue("uniques"), res.GetIntValue("int")
 }
 
 func DeleteProduct(auth *httpexpect.Expect, id uint, status int, message string) {

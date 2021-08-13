@@ -78,6 +78,19 @@ func GetById(auth *httpexpect.Expect, url string, id uint, keys ResponseKeys, st
 	}
 }
 
+func ScanById(auth *httpexpect.Expect, url string, id uint, keys ResponseKeys, status int, message string) {
+	obj := auth.GET(url).
+		Expect().Status(http.StatusOK).JSON().Object()
+	obj.Keys().ContainsOnly("status", "data", "message")
+	obj.Value("status").Number().Equal(status)
+	obj.Value("message").String().Equal(message)
+	if status == http.StatusOK {
+		if keys != nil {
+			keys.Scan(obj.Value("data").Object())
+		}
+	}
+}
+
 func Post(auth *httpexpect.Expect, url string, data map[string]interface{}, status int, message string) {
 	obj := auth.POST(url).
 		WithJSON(data).

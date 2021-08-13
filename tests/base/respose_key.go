@@ -49,12 +49,29 @@ func (rks ResponseKeys) Test(object *httpexpect.Object) {
 		case "object":
 			continue
 		case "array":
-			subs := rk.Value.([]ResponseKeys)
-			object.Value(rk.Key).Array().Length().Equal(len(subs))
-			length := int(object.Value(rk.Key).Array().Length().Raw())
-			if length > 0 && len(subs) == length {
-				for i := 0; i < length; i++ {
-					subs[i].Test(object.Value(rk.Key).Array().Element(i).Object())
+			if subs, ok := rk.Value.([]ResponseKeys); ok {
+				object.Value(rk.Key).Array().Length().Equal(len(subs))
+				length := int(object.Value(rk.Key).Array().Length().Raw())
+				if length > 0 && len(subs) == length {
+					for i := 0; i < length; i++ {
+						subs[i].Test(object.Value(rk.Key).Array().Element(i).Object())
+					}
+				}
+			} else if subs, ok := rk.Value.([]uint); ok {
+				object.Value(rk.Key).Array().Length().Equal(len(subs))
+				length := int(object.Value(rk.Key).Array().Length().Raw())
+				if length > 0 && len(subs) == length {
+					for i := 0; i < length; i++ {
+						object.Value(rk.Key).Array().Element(i).Number().Equal(subs[i])
+					}
+				}
+			} else if subs, ok := rk.Value.([]string); ok {
+				object.Value(rk.Key).Array().Length().Equal(len(subs))
+				length := int(object.Value(rk.Key).Array().Length().Raw())
+				if length > 0 && len(subs) == length {
+					for i := 0; i < length; i++ {
+						object.Value(rk.Key).Array().Element(i).String().Equal(subs[i])
+					}
 				}
 			}
 		case "notempty":
@@ -76,6 +93,18 @@ func (rks ResponseKeys) Scan(object *httpexpect.Object) {
 			rks[k].Value = int(object.Value(rk.Key).Number().Raw())
 		case "float64":
 			rks[k].Value = object.Value(rk.Key).Number().Raw()
+		case "array":
+			length := int(object.Value(rk.Key).Array().Length().Raw())
+			if length == 0 {
+				continue
+			}
+			if reskey, ok := rks[k].Value.([]string); ok {
+				for i := 0; i < length; i++ {
+					reskey = append(reskey, object.Value(rk.Key).Array().Element(i).String().Raw())
+				}
+				rks[k].Value = reskey
+			}
+
 		case "object":
 			continue
 		default:
@@ -99,6 +128,21 @@ func (rks ResponseKeys) GetStringValue(key string) string {
 	return ""
 }
 
+func (rks ResponseKeys) GetStringArrayValue(key string) []string {
+	for _, rk := range rks {
+		if key == rk.Key {
+			if rk.Value == nil {
+				return nil
+			}
+			switch strings.ToLower(rk.Type) {
+			case "string":
+				return rk.Value.([]string)
+			}
+		}
+	}
+	return nil
+}
+
 func (rks ResponseKeys) GetUintValue(key string) uint {
 	for _, rk := range rks {
 		if key == rk.Key {
@@ -112,6 +156,25 @@ func (rks ResponseKeys) GetUintValue(key string) uint {
 				return rk.Value.(uint)
 			case "int":
 				return uint(rk.Value.(int))
+			}
+		}
+	}
+	return 0
+}
+
+func (rks ResponseKeys) GetIntValue(key string) int {
+	for _, rk := range rks {
+		if key == rk.Key {
+			if rk.Value == nil {
+				return 0
+			}
+			switch strings.ToLower(rk.Type) {
+			case "float64":
+				return int(rk.Value.(float64))
+			case "int":
+				return rk.Value.(int)
+			case "uint":
+				return int(rk.Value.(uint))
 			}
 		}
 	}

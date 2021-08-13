@@ -118,7 +118,8 @@ func getProductConditionByType(tenancyId uint, isTenancy bool, t int) response.P
 }
 
 // CreateProduct
-func CreateProduct(req request.CreateProduct, tenancyId uint) (model.Product, error) {
+func CreateProduct(req request.CreateProduct, tenancyId uint) (uint, []string, int32, error) {
+	var uniques []string
 	product := model.Product{
 		BaseProduct: req.BaseProduct,
 		SliderImage: strings.Join(req.SliderImages, ","),
@@ -133,7 +134,7 @@ func CreateProduct(req request.CreateProduct, tenancyId uint) (model.Product, er
 
 	tenancy, err := GetTenancyByID(tenancyId)
 	if err != nil {
-		return product, err
+		return product.ID, uniques, product.ProductType, err
 	}
 
 	// 开启商品审核的商家，审核商品
@@ -161,7 +162,7 @@ func CreateProduct(req request.CreateProduct, tenancyId uint) (model.Product, er
 			return fmt.Errorf("set product content  %w", err)
 		}
 
-		err = SetProductAttrValue(tx, true, product.ID, req.ProductType, req.AttrValue)
+		uniques, err = SetProductAttrValue(tx, true, product.ID, req.ProductType, req.AttrValue)
 		if err != nil {
 			return fmt.Errorf("set product attr %w", err)
 		}
@@ -169,9 +170,10 @@ func CreateProduct(req request.CreateProduct, tenancyId uint) (model.Product, er
 		return nil
 	})
 	if err != nil {
-		return product, err
+		return product.ID, uniques, product.ProductType, err
 	}
-	return product, nil
+
+	return product.ID, uniques, product.ProductType, nil
 }
 
 // UpdateProduct
@@ -202,7 +204,7 @@ func UpdateProduct(req request.UpdateProduct, id uint, ctx *gin.Context) error {
 			if err := tx.Where("id = ?", id).Updates(&product).Error; err != nil {
 				return err
 			}
-			err = SetProductAttrValue(tx, true, id, req.ProductType, req.AttrValue)
+			_, err = SetProductAttrValue(tx, true, id, req.ProductType, req.AttrValue)
 			if err != nil {
 				return fmt.Errorf("set product attr %w", err)
 			}
@@ -244,24 +246,26 @@ func GetProductAttrValues(productIds []uint, uniques []string) ([]model.ProductA
 	return attrValues, nil
 }
 
-func SetProductAttrValue(tx *gorm.DB, isUpdate bool, productId uint, productType int32, reqAttrValue []request.ProductAttrValue) error {
+func SetProductAttrValue(tx *gorm.DB, isUpdate bool, productId uint, productType int32, reqAttrValue []request.ProductAttrValue) ([]string, error) {
+	var uniques []string
 	if isUpdate {
 		err := tx.Where("product_id = ?", productId).Delete(&model.ProductAttrValue{}).Error
 		if err != nil {
-			return fmt.Errorf("create product attr %w", err)
+			return uniques, fmt.Errorf("create product attr %w", err)
 		}
 	}
 	var productAttrValues []model.ProductAttrValue
 	for _, attrValue := range reqAttrValue {
 		detail, err := json.Marshal(attrValue.Detail)
 		if err != nil {
-			return fmt.Errorf("json product attr value detail marshal %w", err)
+			return uniques, fmt.Errorf("json product attr value detail marshal %w", err)
 		}
 		unique, err := file.Md5Byte([]byte(fmt.Sprintf("%s%d", string(detail), productId)))
 		if err != nil {
-			return fmt.Errorf("get product attr value unique %w", err)
+			return uniques, fmt.Errorf("get product attr value unique %w", err)
 		}
 		unique = fmt.Sprintf("%s%d", unique[12:23], productType)
+		uniques = append(uniques, unique)
 		attrValue.BaseProductAttrValue.Sku = attrValue.Value0
 		attrValue.BaseProductAttrValue.Unique = unique
 		productAttrValue := model.ProductAttrValue{ProductID: productId, BaseProductAttrValue: attrValue.BaseProductAttrValue, Detail: string(detail), Type: productType}
@@ -270,10 +274,10 @@ func SetProductAttrValue(tx *gorm.DB, isUpdate bool, productId uint, productType
 
 	err := tx.Model(&model.ProductAttrValue{}).Create(&productAttrValues).Error
 	if err != nil {
-		return fmt.Errorf("create product attr value %w", err)
+		return uniques, fmt.Errorf("create product attr value %w", err)
 	}
 
-	return nil
+	return uniques, nil
 }
 
 func GetProductCategoryIdsById(id uint) ([]uint, error) {
