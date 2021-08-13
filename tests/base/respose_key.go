@@ -10,6 +10,12 @@ var IdKeys = ResponseKeys{
 	{Type: "uint", Key: "id", Value: uint(0)},
 }
 
+type Param struct {
+	Name         string
+	Args         map[string]interface{}
+	ResponseKeys ResponseKeys
+}
+
 type ResponseKeys []ResponseKey
 type ResponseKey struct {
 	Type  string

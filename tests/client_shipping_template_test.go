@@ -18,7 +18,7 @@ func TestShippingTemplateList(t *testing.T) {
 			"type":       2,
 			"appoint":    2,
 			"undelivery": 2,
-			"isDefault":  2,
+			"isDefault":  1,
 			"sort":       2,
 		}
 		shipTempId := CreateShippingTemplate(auth, create, http.StatusOK, "创建成功")
@@ -33,7 +33,7 @@ func TestShippingTemplateList(t *testing.T) {
 			"type":       2,
 			"appoint":    2,
 			"undelivery": 2,
-			"isDefault":  2,
+			"isDefault":  1,
 			"sort":       2,
 		}
 		shipTempId := CreateShippingTemplate(auth, create, http.StatusOK, "创建成功")
@@ -43,30 +43,35 @@ func TestShippingTemplateList(t *testing.T) {
 		defer DeleteShippingTemplate(auth, shipTempId, http.StatusOK, "删除成功")
 	}
 
-	params := []param{
-		{args: map[string]interface{}{"page": 1, "pageSize": 10, "name": ""}, length: 2,
-			responseKeys: base.ResponseKeys{
+	params := []base.Param{
+		{
+			Args: map[string]interface{}{"page": 1, "pageSize": 10, "name": ""},
+			ResponseKeys: base.ResponseKeys{
 				{Type: "int", Key: "pageSize", Value: 10},
 				{Type: "int", Key: "page", Value: 1},
 				{Type: "int", Key: "total", Value: 2},
 			},
 		},
-		{args: map[string]interface{}{"page": 1, "pageSize": 10, "name": "邮费"}, length: 2,
-			responseKeys: base.ResponseKeys{
+		{
+			Args: map[string]interface{}{"page": 1, "pageSize": 10, "name": "物流"},
+			ResponseKeys: base.ResponseKeys{
 				{Type: "int", Key: "pageSize", Value: 10},
 				{Type: "int", Key: "page", Value: 1},
 				{Type: "int", Key: "total", Value: 1},
-			}},
-		{args: map[string]interface{}{"page": 1, "pageSize": 10, "name": "陕西"}, length: 1,
-			responseKeys: base.ResponseKeys{
+			},
+		},
+		{
+			Args: map[string]interface{}{"page": 1, "pageSize": 10, "name": "陕西"},
+			ResponseKeys: base.ResponseKeys{
 				{Type: "int", Key: "pageSize", Value: 10},
 				{Type: "int", Key: "page", Value: 1},
 				{Type: "int", Key: "total", Value: 1},
-			}},
+			},
+		},
 	}
 	for _, param := range params {
 		url := "v1/merchant/shippingTemplate/getShippingTemplateList"
-		base.PostList(auth, url, param.args, param.responseKeys, http.StatusOK, "获取成功")
+		base.PostList(auth, url, param.Args, param.ResponseKeys, http.StatusOK, "获取成功")
 	}
 }
 
