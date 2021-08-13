@@ -5,6 +5,3 @@ type ShippingTemplatePageInfo struct {
 	PageSize int    `json:"pageSize" form:"pageSize" binding:"required"`
 	Name     string `json:"name" form:"name"`
 }
-
-type UpdateShippingTemplate struct {
-}

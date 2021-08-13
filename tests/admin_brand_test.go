@@ -155,14 +155,12 @@ func TestBrandRegisterError(t *testing.T) {
 
 func brandList(auth *httpexpect.Expect, pageRes map[string]interface{}, pageKeys base.ResponseKeys, status int, message string) {
 	url := "v1/admin/brand/getBrandList"
-	base.PostList(auth, url, 0, pageRes, pageKeys, status, message)
+	base.PostList(auth, url, pageRes, pageKeys, status, message)
 }
 
 func CreateBrand(auth *httpexpect.Expect, create map[string]interface{}, status int, message string) uint {
 	url := "v1/admin/brand/createBrand"
-	res := base.ResponseKeys{
-		{Type: "uint", Key: "id", Value: uint(0)},
-	}
+	res := base.IdKeys
 	base.Create(auth, url, create, res, status, message)
 	return res.GetId()
 }

@@ -8,7 +8,7 @@ import (
 )
 
 func TestClientGetConfigMap(t *testing.T) {
-	auth := base.TenancyWithLoginTester(t)
+	auth, _ := base.TenancyWithLoginTester(t)
 	defer base.BaseLogOut(auth)
 	obj := auth.GET("v1/merchant/config/getConfigMap/alipay").
 		Expect().Status(http.StatusOK).JSON().Object()

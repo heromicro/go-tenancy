@@ -10,7 +10,7 @@ import (
 )
 
 func TestClientMediaList(t *testing.T) {
-	auth := base.TenancyWithLoginTester(t)
+	auth, _ := base.TenancyWithLoginTester(t)
 	defer base.BaseLogOut(auth)
 	obj := auth.POST("v1/merchant/media/getFileList").
 		WithJSON(map[string]interface{}{"page": 1, "pageSize": 10}).
@@ -31,7 +31,7 @@ func TestClientMediaProcess(t *testing.T) {
 	path := "/api"
 	fh, _ := os.Open("./" + name)
 	defer fh.Close()
-	auth := base.TenancyWithLoginTester(t)
+	auth, _ := base.TenancyWithLoginTester(t)
 	defer base.BaseLogOut(auth)
 	obj := auth.POST("v1/merchant/media/upload").
 		WithMultipart().

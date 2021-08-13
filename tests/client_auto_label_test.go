@@ -9,7 +9,8 @@ import (
 )
 
 func TestClientAutoList(t *testing.T) {
-	auth := base.TenancyWithLoginTester(t)
+	t.SkipNow()
+	auth, _ := base.TenancyWithLoginTester(t)
 	defer base.BaseLogOut(auth)
 	obj := auth.POST("v1/merchant/userLabel/auto/getLabelList").
 		WithJSON(map[string]interface{}{"page": 1, "pageSize": 10}).
@@ -31,10 +32,11 @@ func TestClientAutoList(t *testing.T) {
 }
 
 func TestClientAutoProcess(t *testing.T) {
+	t.SkipNow()
 	data := map[string]interface{}{
 		"labelName": "sdfsdfs34234",
 	}
-	auth := base.TenancyWithLoginTester(t)
+	auth, _ := base.TenancyWithLoginTester(t)
 	defer base.BaseLogOut(auth)
 	obj := auth.POST("v1/merchant/userLabel/auto/createUserLabel").
 		WithJSON(data).

@@ -1,67 +1,136 @@
 package tests
 
 import (
+	"fmt"
 	"net/http"
 	"testing"
 
+	"github.com/gavv/httpexpect"
 	"github.com/snowlyg/go-tenancy/tests/base"
 )
 
 func TestShippingTemplateList(t *testing.T) {
+	auth, _ := base.TenancyWithLoginTester(t)
+	defer base.BaseLogOut(auth)
+	{
+		create := map[string]interface{}{
+			"name":       "物流邮费模板",
+			"type":       2,
+			"appoint":    2,
+			"undelivery": 2,
+			"isDefault":  2,
+			"sort":       2,
+		}
+		shipTempId := CreateShippingTemplate(auth, create, http.StatusOK, "创建成功")
+		if shipTempId == 0 {
+			return
+		}
+		defer DeleteShippingTemplate(auth, shipTempId, http.StatusOK, "删除成功")
+	}
+	{
+		create := map[string]interface{}{
+			"name":       "陕西物流邮费模板",
+			"type":       2,
+			"appoint":    2,
+			"undelivery": 2,
+			"isDefault":  2,
+			"sort":       2,
+		}
+		shipTempId := CreateShippingTemplate(auth, create, http.StatusOK, "创建成功")
+		if shipTempId == 0 {
+			return
+		}
+		defer DeleteShippingTemplate(auth, shipTempId, http.StatusOK, "删除成功")
+	}
+
 	params := []param{
-		{args: map[string]interface{}{"page": 1, "pageSize": 10, "name": ""}, length: 4},
-		{args: map[string]interface{}{"page": 1, "pageSize": 10, "name": "邮费"}, length: 2},
-		{args: map[string]interface{}{"page": 1, "pageSize": 10, "name": "陕西"}, length: 1},
+		{args: map[string]interface{}{"page": 1, "pageSize": 10, "name": ""}, length: 2,
+			responseKeys: base.ResponseKeys{
+				{Type: "int", Key: "pageSize", Value: 10},
+				{Type: "int", Key: "page", Value: 1},
+				{Type: "int", Key: "total", Value: 2},
+			},
+		},
+		{args: map[string]interface{}{"page": 1, "pageSize": 10, "name": "邮费"}, length: 2,
+			responseKeys: base.ResponseKeys{
+				{Type: "int", Key: "pageSize", Value: 10},
+				{Type: "int", Key: "page", Value: 1},
+				{Type: "int", Key: "total", Value: 1},
+			}},
+		{args: map[string]interface{}{"page": 1, "pageSize": 10, "name": "陕西"}, length: 1,
+			responseKeys: base.ResponseKeys{
+				{Type: "int", Key: "pageSize", Value: 10},
+				{Type: "int", Key: "page", Value: 1},
+				{Type: "int", Key: "total", Value: 1},
+			}},
 	}
 	for _, param := range params {
-		shippingTemplate(t, param.args, param.length)
-	}
-}
-
-func shippingTemplate(t *testing.T, params map[string]interface{}, length int) {
-	auth := base.TenancyWithLoginTester(t)
-	defer base.BaseLogOut(auth)
-	obj := auth.POST("v1/merchant/shippingTemplate/getShippingTemplateList").
-		WithJSON(params).
-		Expect().Status(http.StatusOK).JSON().Object()
-	obj.Keys().ContainsOnly("status", "data", "message")
-	obj.Value("status").Number().Equal(200)
-	obj.Value("message").String().Equal("获取成功")
-
-	data := obj.Value("data").Object()
-	data.Keys().ContainsOnly("list", "total", "page", "pageSize")
-	data.Value("pageSize").Number().Equal(10)
-	data.Value("page").Number().Equal(1)
-	data.Value("total").Number().Equal(length)
-	if length > 0 {
-		list := data.Value("list").Array()
-		list.Length().Ge(0)
-		first := list.First().Object()
-		first.Keys().ContainsOnly(
-			"id",
-			"createdAt",
-			"updatedAt",
-			"name",
-			"type",
-			"appoint",
-			"undelivery",
-			"isDefault",
-			"sort",
-		)
-		first.Value("id").Number().Ge(0)
+		url := "v1/merchant/shippingTemplate/getShippingTemplateList"
+		base.PostList(auth, url, param.args, param.responseKeys, http.StatusOK, "获取成功")
 	}
 }
 
 func TestShippingTemplateSelect(t *testing.T) {
-	auth := base.TenancyWithLoginTester(t)
+	auth, _ := base.TenancyWithLoginTester(t)
 	defer base.BaseLogOut(auth)
-	obj := auth.GET("v1/merchant/shippingTemplate/getShippingTemplateSelect").
-		Expect().Status(http.StatusOK).JSON().Object()
-	obj.Keys().ContainsOnly("status", "data", "message")
-	obj.Value("status").Number().Equal(200)
-	obj.Value("message").String().Equal("获取成功")
-	obj.Value("data").Array().First().Object().Keys().ContainsOnly(
-		"id",
-		"name",
-	)
+
+	url := "v1/merchant/shippingTemplate/getShippingTemplateSelect"
+	base.Get(auth, url, http.StatusOK, "获取成功")
+}
+
+func TestShippingTemplateProcess(t *testing.T) {
+	auth, _ := base.TenancyWithLoginTester(t)
+	defer base.BaseLogOut(auth)
+
+	create := map[string]interface{}{
+		"name":       "物流模板名称",
+		"type":       2,
+		"appoint":    2,
+		"undelivery": 2,
+		"isDefault":  2,
+		"sort":       2,
+	}
+	shipTempId := CreateShippingTemplate(auth, create, http.StatusOK, "创建成功")
+	if shipTempId == 0 {
+		return
+	}
+	defer DeleteShippingTemplate(auth, shipTempId, http.StatusOK, "删除成功")
+
+	update := map[string]interface{}{
+		"name":       "物流模板名称_update",
+		"type":       1,
+		"appoint":    1,
+		"undelivery": 1,
+		"isDefault":  1,
+		"sort":       1,
+	}
+	{
+		url := fmt.Sprintf("v1/merchant/shippingTemplate/updateShippingTemplate/%d", shipTempId)
+		base.Update(auth, url, update, http.StatusOK, "更新成功")
+	}
+	{
+		url := fmt.Sprintf("v1/merchant/shippingTemplate/getShippingTemplateById/%d", shipTempId)
+		keys := base.ResponseKeys{
+			{Type: "uint", Key: "id", Value: shipTempId},
+			{Type: "string", Key: "name", Value: update["name"]},
+			{Type: "int", Key: "type", Value: update["type"]},
+			{Type: "int", Key: "appoint", Value: update["appoint"]},
+			{Type: "int", Key: "undelivery", Value: update["undelivery"]},
+			{Type: "int", Key: "isDefault", Value: update["isDefault"]},
+			{Type: "int", Key: "sort", Value: update["sort"]},
+		}
+		base.GetById(auth, url, shipTempId, keys, http.StatusOK, "操作成功")
+	}
+}
+
+func CreateShippingTemplate(auth *httpexpect.Expect, create map[string]interface{}, status int, message string) uint {
+	url := "v1/merchant/shippingTemplate/createShippingTemplate"
+	keys := base.IdKeys
+	base.Create(auth, url, create, keys, status, message)
+	return keys.GetId()
+}
+
+func DeleteShippingTemplate(auth *httpexpect.Expect, id uint, status int, message string) {
+	url := fmt.Sprintf("v1/merchant/shippingTemplate/deleteShippingTemplate/%d", id)
+	base.Delete(auth, url, status, message)
 }

@@ -52,10 +52,11 @@ var baseApis = []model.SysApi{
 	// api 管理
 	{Path: "/v1/admin/api/createApi", Description: "创建api", ApiGroup: "api", Method: "POST"},
 	{Path: "/v1/admin/api/getApiList", Description: "获取api列表", ApiGroup: "api", Method: "POST"},
-	{Path: "/v1/admin/api/getApiById", Description: "获取api详细信息", ApiGroup: "api", Method: "POST"},
-	{Path: "/v1/admin/api/deleteApi", Description: "删除Api", ApiGroup: "api", Method: "POST"},
-	{Path: "/v1/admin/api/updateApi", Description: "更新Api", ApiGroup: "api", Method: "POST"},
+	{Path: "/v1/admin/api/getApiById/:id", Description: "获取api详细信息", ApiGroup: "api", Method: "GET"},
+	{Path: "/v1/admin/api/deleteApi", Description: "删除Api", ApiGroup: "api", Method: "DELETE"},
+	{Path: "/v1/admin/api/updateApi/:id", Description: "更新Api", ApiGroup: "api", Method: "PUT"},
 	{Path: "/v1/admin/api/getAllApis", Description: "获取所有api", ApiGroup: "api", Method: "GET"},
+	{Path: "/v1/admin/api/deleteApisByIds", Description: "批量删除api", ApiGroup: "api", Method: "DELETE"},
 
 	// 角色管理
 	{Path: "/v1/admin/authority/createAuthority", Description: "创建角色", ApiGroup: "authority", Method: "POST"},
@@ -223,7 +224,6 @@ var baseApis = []model.SysApi{
 
 	// other
 	{Path: "/v1/admin/email/emailTest", Description: "发送测试邮件", ApiGroup: "email", Method: "POST"},
-	{Path: "/v1/admin/api/deleteApisByIds", Description: "批量删除api", ApiGroup: "api", Method: "DELETE"},
 
 	// TODO:商户用户权限
 	{Path: "/v1/merchant/config/getConfigMap/:category", Description: "获取配置表单", ApiGroup: "configClient", Method: "GET"},

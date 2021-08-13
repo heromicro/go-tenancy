@@ -129,9 +129,7 @@ func TestCategoryRegisterError(t *testing.T) {
 
 func CreateCategory(auth *httpexpect.Expect, create map[string]interface{}, status int, message string) uint {
 	url := "v1/admin/productCategory/createProductCategory"
-	keys := base.ResponseKeys{
-		{Type: "uint", Key: "id", Value: uint(0)},
-	}
+	keys := base.IdKeys
 	base.Create(auth, url, create, keys, status, message)
 	return keys.GetId()
 }

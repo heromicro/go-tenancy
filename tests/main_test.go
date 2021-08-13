@@ -10,6 +10,7 @@ import (
 	"github.com/snowlyg/go-tenancy/g"
 	"github.com/snowlyg/go-tenancy/initialize"
 	"github.com/snowlyg/go-tenancy/initialize/cache"
+	"github.com/snowlyg/go-tenancy/model"
 	"github.com/snowlyg/go-tenancy/model/request"
 	"github.com/snowlyg/go-tenancy/service"
 	"github.com/snowlyg/multi"
@@ -32,16 +33,41 @@ func TestMain(m *testing.M) {
 	}
 	service.InitDB(mysqlConfig)
 
+	req := request.CreateTenancy{
+		SysTenancy: model.SysTenancy{
+			BaseTenancy: model.BaseTenancy{
+				Name:          "多商户平台直营医院",
+				Tele:          "0755-23568911",
+				Address:       "xxx街道666号",
+				BusinessTime:  "08:30-17:30",
+				Status:        g.StatusTrue,
+				SysRegionCode: 1,
+			},
+		},
+		Username: "tenancy_hospital",
+	}
+	tennancyId, tenancyUUID, username, err := service.CreateTenancy(req)
+	if err != nil {
+		fmt.Printf("初始化商户错误： %v\n", err)
+		return
+	}
+	cache.SetCache(g.TENANCY_CONFIG.Mysql.Dbname+":username", username, 0)
+	cache.SetCache(g.TENANCY_CONFIG.Mysql.Dbname+":id", tennancyId, 0)
+	cache.SetCache(g.TENANCY_CONFIG.Mysql.Dbname+":uuid", tenancyUUID, 0)
+
 	// call flag.Parse() here if TestMain uses flags
 	// 如果 TestMain 使用了 flags，这里应该加上 flag.Parse()
 	code := m.Run()
 
-	err := dorpDB(uuid)
+	err = dorpDB(uuid)
 	if err != nil {
+		fmt.Printf("初始化商户错误： %v\n", err)
 		return
 	}
 
-	cache.DeleteCache(g.TENANCY_CONFIG.Mysql.Dbname)
+	cache.DeleteCache(g.TENANCY_CONFIG.Mysql.Dbname + ":username")
+	cache.DeleteCache(g.TENANCY_CONFIG.Mysql.Dbname + ":id")
+	cache.DeleteCache(g.TENANCY_CONFIG.Mysql.Dbname + ":uuid")
 
 	db, _ := g.TENANCY_DB.DB()
 	db.Close()

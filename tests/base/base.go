@@ -54,26 +54,10 @@ func BaseWithLoginTester(t *testing.T) *httpexpect.Expect {
 	})
 }
 
-func TenancyWithLoginTester(t *testing.T) *httpexpect.Expect {
+func TenancyWithLoginTester(t *testing.T) (*httpexpect.Expect, uint) {
 	username, _ := cache.GetCacheString(g.TENANCY_CONFIG.Mysql.Dbname + ":username")
-	if username == "" {
-		data := map[string]interface{}{
-			"username":      "tenancy_hospital",
-			"name":          "多商户平台直营医院",
-			"tele":          "0755-23568911",
-			"address":       "xxx街道666号",
-			"businessTime":  "08:30-17:30",
-			"status":        g.StatusTrue,
-			"sysRegionCode": 1,
-		}
-		auth := BaseWithLoginTester(t)
-		defer BaseLogOut(auth)
-
-		_, username, _ = CreateTenancy(auth, data, http.StatusOK, "创建成功")
-		cache.SetCache(g.TENANCY_CONFIG.Mysql.Dbname+":username", username, 0)
-	}
-
-	if username == "" {
+	id, _ := cache.GetCacheUint(g.TENANCY_CONFIG.Mysql.Dbname + ":id")
+	if username == "" || id == 0 {
 		t.Fatal("创建商户失败")
 	}
 	e := BaseTester(t)
@@ -99,7 +83,7 @@ func TenancyWithLoginTester(t *testing.T) *httpexpect.Expect {
 	token := data.Value("AccessToken").String().Raw()
 	return e.Builder(func(req *httpexpect.Request) {
 		req.WithHeader("Authorization", "Bearer "+token)
-	})
+	}), uint(id)
 }
 
 func DeviceWithLoginTester(t *testing.T) *httpexpect.Expect {

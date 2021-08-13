@@ -12,8 +12,8 @@ func InitApiRouter(Router *gin.RouterGroup) {
 		ApiRouter.POST("/createApi", admin.CreateApi)               // 创建Api
 		ApiRouter.DELETE("/deleteApi", admin.DeleteApi)             // 删除Api
 		ApiRouter.POST("/getApiList", admin.GetApiList)             // 获取Api列表
-		ApiRouter.POST("/getApiById", admin.GetApiById)             // 获取单条Api消息
-		ApiRouter.POST("/updateApi", admin.UpdateApi)               // 更新api
+		ApiRouter.GET("/getApiById/:id", admin.GetApiById)          // 获取单条Api消息
+		ApiRouter.PUT("/updateApi/:id", admin.UpdateApi)            // 更新api
 		ApiRouter.GET("/getAllApis", admin.GetAllApis)              // 获取所有api
 		ApiRouter.DELETE("/deleteApisByIds", admin.DeleteApisByIds) // 删除选中api
 	}
@@ -182,7 +182,7 @@ func InitMiniRouter(Router *gin.RouterGroup) {
 	{
 		MiniRouter.POST("/createMini", admin.CreateMini)
 		MiniRouter.POST("/getMiniList", admin.GetMiniList)
-		MiniRouter.POST("/getMiniById/:id", admin.GetMiniById)
+		MiniRouter.GET("/getMiniById/:id", admin.GetMiniById)
 		MiniRouter.PUT("/updateMini/:id", admin.UpdateMini)
 		MiniRouter.DELETE("/deleteMini/:id", admin.DeleteMini)
 	}

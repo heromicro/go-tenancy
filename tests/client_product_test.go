@@ -30,7 +30,7 @@ func TestClinetProductList(t *testing.T) {
 }
 
 func clinetProductList(t *testing.T, params map[string]interface{}, length int) {
-	auth := base.TenancyWithLoginTester(t)
+	auth, _ := base.TenancyWithLoginTester(t)
 	defer base.BaseLogOut(auth)
 	obj := auth.POST("v1/merchant/product/getProductList").
 		WithJSON(params).
@@ -99,7 +99,7 @@ func clinetProductList(t *testing.T, params map[string]interface{}, length int) 
 }
 
 func TestGetClientProductFilter(t *testing.T) {
-	auth := base.TenancyWithLoginTester(t)
+	auth, _ := base.TenancyWithLoginTester(t)
 	defer base.BaseLogOut(auth)
 	obj := auth.GET("v1/merchant/product/getProductFilter").
 		Expect().Status(http.StatusOK).JSON().Object()
@@ -110,6 +110,53 @@ func TestGetClientProductFilter(t *testing.T) {
 }
 
 func TestClinetProductProcess(t *testing.T) {
+
+	var brandId uint
+	{
+		auth := base.BaseWithLoginTester(t)
+		defer base.BaseLogOut(auth)
+
+		createPid := map[string]interface{}{
+			"cateName": "箱包服饰",
+			"status":   g.StatusTrue,
+			"path":     "http://qmplusimg.henrongyi.top/head.png",
+			"sort":     1,
+			"level":    1,
+			"pid":      0,
+		}
+
+		brandCategoryPid := CreateBrandCategory(auth, createPid, http.StatusOK, "创建成功")
+		if brandCategoryPid == 0 {
+			return
+		}
+		defer DeleteBrandCategory(auth, brandCategoryPid)
+		createBrandCategory := map[string]interface{}{
+			"cateName": "精品服饰",
+			"status":   g.StatusTrue,
+			"path":     "http://qmplusimg.henrongyi.top/head.png",
+			"sort":     1,
+			"level":    1,
+			"pid":      brandCategoryPid,
+		}
+
+		brandCategoryId := CreateBrandCategory(auth, createBrandCategory, http.StatusOK, "创建成功")
+		if brandCategoryId > 0 {
+			return
+		}
+		defer DeleteBrandCategory(auth, brandCategoryId)
+		createBrand := map[string]interface{}{
+			"brandName":       "冈本",
+			"status":          g.StatusTrue,
+			"pic":             "http://qmplusimg.henrongyi.top/head.png",
+			"sort":            1,
+			"brandCategoryId": brandCategoryId,
+		}
+		brandId = CreateBrand(auth, createBrand, http.StatusOK, "创建成功")
+	}
+	if brandId > 0 {
+		return
+	}
+
 	data := map[string]interface{}{
 		"attrValue": []map[string]interface{}{
 			{
@@ -143,14 +190,15 @@ func TestClinetProductProcess(t *testing.T) {
 		"specType":          1,
 		"storeInfo":         "的是否是否",
 		"storeName":         "是防守打法发",
-		"sysBrandId":        3,
+		"sysBrandId":        brandId,
 		"tempId":            2,
 		"tenancyCategoryId": []int{174},
 		"unitName":          "放松的方式",
 		"videoLink":         "sdfsdfsd",
 		"barCode":           "sdfsdfsd",
 	}
-	auth := base.TenancyWithLoginTester(t)
+
+	auth, _ := base.TenancyWithLoginTester(t)
 	defer base.BaseLogOut(auth)
 
 	productId := CreateProduct(auth, data, http.StatusOK, "创建成功")
@@ -295,9 +343,7 @@ func TestClinetProductProcess(t *testing.T) {
 }
 
 func CreateProduct(auth *httpexpect.Expect, create map[string]interface{}, status int, message string) uint {
-	res := base.ResponseKeys{
-		{Type: "uint", Key: "id", Value: uint(0)},
-	}
+	res := base.IdKeys
 	url := "v1/merchant/product/createProduct"
 	base.Create(auth, url, create, res, status, message)
 	return res.GetId()

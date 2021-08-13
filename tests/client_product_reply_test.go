@@ -25,7 +25,7 @@ func TestClientProductReplyList(t *testing.T) {
 }
 
 func productReplyClientlist(t *testing.T, params map[string]interface{}, length int) {
-	auth := base.TenancyWithLoginTester(t)
+	auth, _ := base.TenancyWithLoginTester(t)
 	defer base.BaseLogOut(auth)
 	obj := auth.POST("v1/merchant/productReply/getProductReplyList").
 		WithJSON(params).
@@ -71,8 +71,9 @@ func productReplyClientlist(t *testing.T, params map[string]interface{}, length 
 }
 
 func TestClientProductReply(t *testing.T) {
-	auth := base.TenancyWithLoginTester(t)
+	auth, _ := base.TenancyWithLoginTester(t)
 	defer base.BaseLogOut(auth)
+	
 	obj := auth.GET("v1/merchant/productReply/replyMap/1").
 		Expect().Status(http.StatusOK).JSON().Object()
 	obj.Keys().ContainsOnly("status", "data", "message")

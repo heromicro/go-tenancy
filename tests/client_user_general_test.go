@@ -33,7 +33,7 @@ func TestClientGeneralUserList(t *testing.T) {
 }
 
 func userClientGeneralTest(t *testing.T, params map[string]interface{}, length int) {
-	auth := base.TenancyWithLoginTester(t)
+	auth, _ := base.TenancyWithLoginTester(t)
 	defer base.BaseLogOut(auth)
 	obj := auth.POST("v1/merchant/cuser/getGeneralList").
 		WithJSON(params).
@@ -95,7 +95,7 @@ func userClientGeneralTest(t *testing.T, params map[string]interface{}, length i
 }
 
 func TestClientUserGetOrderList(t *testing.T) {
-	auth := base.TenancyWithLoginTester(t)
+	auth, _ := base.TenancyWithLoginTester(t)
 	defer base.BaseLogOut(auth)
 	obj := auth.POST(fmt.Sprintf("v1/merchant/cuser/getOrderList/%d", cuserClientId)).
 		WithJSON(map[string]interface{}{
@@ -115,7 +115,7 @@ func TestClientUserGetOrderList(t *testing.T) {
 }
 
 func TestClientUserSetUserLabel(t *testing.T) {
-	auth := base.TenancyWithLoginTester(t)
+	auth, _ := base.TenancyWithLoginTester(t)
 	defer base.BaseLogOut(auth)
 	obj := auth.GET(fmt.Sprintf("v1/merchant/cuser/setUserLabelMap/%d", cuserClientId)).
 		Expect().Status(http.StatusOK).JSON().Object()

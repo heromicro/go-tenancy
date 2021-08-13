@@ -86,9 +86,9 @@ func GetApiById(id uint) (model.SysApi, error) {
 }
 
 // UpdateApi 根据id更新api
-func UpdateApi(api model.SysApi) error {
+func UpdateApi(api model.SysApi, id uint) error {
 	var oldA model.SysApi
-	err := g.TENANCY_DB.Where("id = ?", api.ID).First(&oldA).Error
+	err := g.TENANCY_DB.Where("id = ?", id).First(&oldA).Error
 	if err != nil {
 		return err
 	}

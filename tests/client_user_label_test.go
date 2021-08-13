@@ -9,7 +9,7 @@ import (
 )
 
 func TestClientUserLabelList(t *testing.T) {
-	auth := base.TenancyWithLoginTester(t)
+	auth, _ := base.TenancyWithLoginTester(t)
 	defer base.BaseLogOut(auth)
 	obj := auth.POST("v1/merchant/userLabel/getLabelList").
 		WithJSON(map[string]interface{}{"page": 1, "pageSize": 10}).
@@ -34,7 +34,7 @@ func TestClientUserLabelProcess(t *testing.T) {
 	data := map[string]interface{}{
 		"labelName": "sdfsdfs34234",
 	}
-	auth := base.TenancyWithLoginTester(t)
+	auth, _ := base.TenancyWithLoginTester(t)
 	defer base.BaseLogOut(auth)
 	obj := auth.POST("v1/merchant/userLabel/createUserLabel").
 		WithJSON(data).

@@ -7,14 +7,13 @@ import (
 	"github.com/snowlyg/go-tenancy/model"
 	"github.com/snowlyg/go-tenancy/model/request"
 	"github.com/snowlyg/go-tenancy/model/response"
-	"gorm.io/gorm"
 )
 
 // CreateShippingTemplate
-func CreateShippingTemplate(shippingTem model.ShippingTemplate, tenancyId uint) (model.ShippingTemplate, error) {
+func CreateShippingTemplate(shippingTem model.ShippingTemplate, tenancyId uint) (uint, error) {
 	shippingTem.SysTenancyID = tenancyId
 	err := g.TENANCY_DB.Create(&shippingTem).Error
-	return shippingTem, err
+	return shippingTem.ID, err
 }
 
 // GetShippingTemplateByID
@@ -27,15 +26,19 @@ func GetShippingTemplateByID(id uint) (response.ShippingTemplateDetail, error) {
 }
 
 // UpdateShippingTemplate
-func UpdateShippingTemplate(req request.UpdateShippingTemplate, id uint) error {
-	shippingTem := model.ShippingTemplate{BaseShippingTemplate: model.BaseShippingTemplate{}}
-	err := g.TENANCY_DB.Transaction(func(tx *gorm.DB) error {
-		if err := tx.Where("id = ?", id).Updates(&shippingTem).Error; err != nil {
-			return err
-		}
-		return nil
-	})
-	return err
+func UpdateShippingTemplate(req model.ShippingTemplate, id uint) error {
+	shipTemp := map[string]interface{}{
+		"name":       req.Name,
+		"type":       req.Type,
+		"appoint":    req.Appoint,
+		"undelivery": req.Undelivery,
+		"is_default": req.IsDefault,
+		"sort":       req.Sort,
+	}
+	if err := g.TENANCY_DB.Model(&model.ShippingTemplate{}).Where("id = ?", id).Updates(&shipTemp).Error; err != nil {
+		return err
+	}
+	return nil
 }
 
 // DeleteShippingTemplate

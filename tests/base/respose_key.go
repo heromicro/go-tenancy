@@ -6,6 +6,10 @@ import (
 	"github.com/gavv/httpexpect"
 )
 
+var IdKeys = ResponseKeys{
+	{Type: "uint", Key: "id", Value: uint(0)},
+}
+
 type ResponseKeys []ResponseKey
 type ResponseKey struct {
 	Type  string
@@ -47,7 +51,8 @@ func (rks ResponseKeys) Test(object *httpexpect.Object) {
 					subs[i].Test(object.Value(rk.Key).Array().Element(i).Object())
 				}
 			}
-
+		case "notempty":
+			object.Value(rk.Key).String().NotEmpty()
 		default:
 			object.Value(rk.Key).String().Equal(rk.Value.(string))
 		}

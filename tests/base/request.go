@@ -12,7 +12,7 @@ var PageKeys = ResponseKeys{
 	{Type: "int", Key: "page", Value: 1},
 }
 
-func PostList(auth *httpexpect.Expect, url string, id uint, res map[string]interface{}, pageKeys ResponseKeys, status int, message string) {
+func PostList(auth *httpexpect.Expect, url string, res map[string]interface{}, pageKeys ResponseKeys, status int, message string) {
 	obj := auth.POST(url).
 		WithJSON(res).
 		Expect().Status(http.StatusOK).JSON().Object()

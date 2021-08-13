@@ -41,11 +41,6 @@ func UpdateMini(id uint, m request.UpdateSysMini) error {
 	if !errors.Is(err, gorm.ErrRecordNotFound) {
 		return errors.New("商户名称已被注冊")
 	}
-	mini.ID = m.Id
-	mini.Name = m.Name
-	mini.AppID = m.AppID
-	mini.AppSecret = m.AppSecret
-	mini.Remark = m.Remark
 
 	data := map[string]interface{}{
 		"name":       m.Name,
@@ -53,7 +48,7 @@ func UpdateMini(id uint, m request.UpdateSysMini) error {
 		"app_secret": m.AppSecret,
 		"remark":     m.Remark,
 	}
-	err = g.TENANCY_DB.Model(&model.SysMini{}).Omit("uuid").Updates(&data).Error
+	err = g.TENANCY_DB.Model(&model.SysMini{}).Where("id =?", id).Updates(&data).Error
 	return err
 }
 

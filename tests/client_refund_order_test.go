@@ -31,7 +31,7 @@ func TestClientRefundOrderList(t *testing.T) {
 }
 
 func refundOrderClientlist(t *testing.T, params map[string]interface{}, length int) {
-	auth := base.TenancyWithLoginTester(t)
+	auth, _ := base.TenancyWithLoginTester(t)
 	defer base.BaseLogOut(auth)
 	obj := auth.POST("v1/merchant/refundOrder/getRefundOrderList").
 		WithJSON(params).
@@ -93,7 +93,7 @@ func refundOrderClientlist(t *testing.T, params map[string]interface{}, length i
 
 func TestClientRefundOrderRecord(t *testing.T) {
 	orderId := 1
-	auth := base.TenancyWithLoginTester(t)
+	auth, _ := base.TenancyWithLoginTester(t)
 	defer base.BaseLogOut(auth)
 	obj := auth.POST(fmt.Sprintf("v1/merchant/refundOrder/getRefundOrderRecord/%d", orderId)).
 		WithJSON(map[string]interface{}{
@@ -112,7 +112,7 @@ func TestClientRefundOrderRecord(t *testing.T) {
 
 func TestClientRefundOrderRemark(t *testing.T) {
 	orderId := 1
-	auth := base.TenancyWithLoginTester(t)
+	auth, _ := base.TenancyWithLoginTester(t)
 	defer base.BaseLogOut(auth)
 	obj := auth.GET(fmt.Sprintf("v1/merchant/refundOrder/getRefundOrderRemarkMap/%d", orderId)).
 		Expect().Status(http.StatusOK).JSON().Object()
@@ -130,7 +130,7 @@ func TestClientRefundOrderRemark(t *testing.T) {
 
 func TestClientRefundOrderAudit(t *testing.T) {
 	orderId := 1
-	auth := base.TenancyWithLoginTester(t)
+	auth, _ := base.TenancyWithLoginTester(t)
 	defer base.BaseLogOut(auth)
 	obj := auth.GET(fmt.Sprintf("v1/merchant/refundOrder/getRefundOrderMap/%d", orderId)).
 		Expect().Status(http.StatusOK).JSON().Object()

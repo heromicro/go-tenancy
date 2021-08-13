@@ -10,40 +10,26 @@ import (
 )
 
 func TestClientCategoryList(t *testing.T) {
-	auth := base.TenancyWithLoginTester(t)
+	auth, _ := base.TenancyWithLoginTester(t)
 	defer base.BaseLogOut(auth)
-	obj := auth.GET("v1/merchant/productCategory/getProductCategoryList").
-		Expect().Status(http.StatusOK).JSON().Object()
-	obj.Keys().ContainsOnly("status", "data", "message")
-	obj.Value("status").Number().Equal(200)
-	obj.Value("message").String().Equal("获取成功")
 
-	data := obj.Value("data").Array()
-
-	data.Length().Ge(0)
-	first := data.First().Object()
-	first.Keys().ContainsOnly("id", "pid", "cateName", "status", "path", "sort", "level", "children", "pic", "createdAt", "updatedAt")
-	first.Value("id").Number().Ge(0)
+	url := "v1/merchant/productCategory/getProductCategoryList"
+	base.GetList(auth, url, 0, nil, http.StatusOK, "获取成功")
 }
 
 func TestClientCategorySelect(t *testing.T) {
-	auth := base.TenancyWithLoginTester(t)
+	auth, _ := base.TenancyWithLoginTester(t)
 	defer base.BaseLogOut(auth)
-	obj := auth.GET("v1/merchant/productCategory/getProductCategorySelect").
-		Expect().Status(http.StatusOK).JSON().Object()
-	obj.Keys().ContainsOnly("status", "data", "message")
-	obj.Value("status").Number().Equal(200)
-	obj.Value("message").String().Equal("获取成功")
+
+	url := "v1/merchant/productCategory/getProductCategorySelect"
+	base.Get(auth, url, http.StatusOK, "获取成功")
 }
 
 func TestGetAdminCategorySelect(t *testing.T) {
-	auth := base.TenancyWithLoginTester(t)
+	auth, _ := base.TenancyWithLoginTester(t)
 	defer base.BaseLogOut(auth)
-	obj := auth.GET("v1/merchant/productCategory/getAdminProductCategorySelect").
-		Expect().Status(http.StatusOK).JSON().Object()
-	obj.Keys().ContainsOnly("status", "data", "message")
-	obj.Value("status").Number().Equal(200)
-	obj.Value("message").String().Equal("获取成功")
+	url := "v1/merchant/productCategory/getAdminProductCategorySelect"
+	base.Get(auth, url, http.StatusOK, "获取成功")
 }
 
 func TestClientCategoryProcess(t *testing.T) {
@@ -56,7 +42,7 @@ func TestClientCategoryProcess(t *testing.T) {
 		"pid":      1,
 		"pic":      "http://qmplusimg.henrongyi.top/head.png",
 	}
-	auth := base.TenancyWithLoginTester(t)
+	auth, _ := base.TenancyWithLoginTester(t)
 	defer base.BaseLogOut(auth)
 
 	obj := auth.POST("v1/merchant/productCategory/createProductCategory").
@@ -162,7 +148,7 @@ func TestClientCategoryRegisterError(t *testing.T) {
 		"pid":      1,
 		"pic":      "http://qmplusimg.henrongyi.top/head.png",
 	}
-	auth := base.TenancyWithLoginTester(t)
+	auth, _ := base.TenancyWithLoginTester(t)
 	defer base.BaseLogOut(auth)
 	obj := auth.POST("v1/merchant/productCategory/createProductCategory").
 		WithJSON(data).

@@ -8,7 +8,7 @@ import (
 )
 
 func TestGetTenancyInfo(t *testing.T) {
-	auth := base.TenancyWithLoginTester(t)
+	auth, _ := base.TenancyWithLoginTester(t)
 	defer base.BaseLogOut(auth)
 	obj := auth.GET("v1/merchant/tenancy/getTenancyInfo").
 		Expect().Status(http.StatusOK).JSON().Object()
@@ -18,7 +18,7 @@ func TestGetTenancyInfo(t *testing.T) {
 }
 
 func TestUpdateClientTenancy(t *testing.T) {
-	auth := base.TenancyWithLoginTester(t)
+	auth, _ := base.TenancyWithLoginTester(t)
 	defer base.BaseLogOut(auth)
 	data := map[string]interface{}{
 		"avatar": "http://127.0.0.1:8089/uploads/file/49989c75324ef71956c91e79ae49b10d.jpg",

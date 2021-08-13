@@ -5,99 +5,76 @@ import (
 	"net/http"
 	"testing"
 
+	"github.com/gavv/httpexpect"
 	"github.com/snowlyg/go-tenancy/tests/base"
 )
 
 func TestGetAttrTemplateList(t *testing.T) {
-	auth := base.TenancyWithLoginTester(t)
+	auth, _ := base.TenancyWithLoginTester(t)
 	defer base.BaseLogOut(auth)
-	obj := auth.POST("v1/merchant/attrTemplate/getAttrTemplateList").
-		WithJSON(map[string]interface{}{"page": 1, "pageSize": 10}).
-		Expect().Status(http.StatusOK).JSON().Object()
-	obj.Keys().ContainsOnly("status", "data", "message")
-	obj.Value("status").Number().Equal(200)
-	obj.Value("message").String().Equal("获取成功")
 
-	data := obj.Value("data").Object().Value("list").Array()
-
-	data.Length().Ge(0)
-	first := data.First().Object()
-	first.Keys().ContainsOnly(
-		"id",
-		"createdAt",
-		"updatedAt",
-		"templateName",
-		"templateValue",
-		"sysTenancyId",
-	)
-	first.Value("id").Number().Ge(0)
+	url := "v1/merchant/attrTemplate/getAttrTemplateList"
+	base.PostList(auth, url,  base.PageRes, base.PageKeys, http.StatusOK, "获取成功")
 }
 
 func TestAttrTemplateProcess(t *testing.T) {
-	detail := "1"
-	value := "sfsdf"
+
 	data := map[string]interface{}{
-		"templateName": "fsdaf ",
+		"templateName": "fsdaf_data",
 		"templateValue": []map[string]interface{}{
-			{"value": value, "detail": []string{detail}},
+			{"value": "value_data", "detail": []string{"S"}},
 		},
 	}
-	auth := base.TenancyWithLoginTester(t)
+	auth, tenancyId := base.TenancyWithLoginTester(t)
 	defer base.BaseLogOut(auth)
 
-	obj := auth.POST("v1/merchant/attrTemplate/createAttrTemplate").
-		WithJSON(data).
-		Expect().Status(http.StatusOK).JSON().Object()
-	obj.Keys().ContainsOnly("status", "data", "message")
-	obj.Value("status").Number().Equal(200)
-	obj.Value("message").String().Equal("创建成功")
+	attrTemplateId := CreateAttrTemplate(auth, data, http.StatusOK, "创建成功")
+	if attrTemplateId == 0 {
+		return
+	}
+	defer DeleteAttrTemplate(auth, attrTemplateId, http.StatusOK, "删除成功")
 
-	attrTemplate := obj.Value("data").Object()
-	attrTemplate.Value("id").Number().Ge(0)
-	attrTemplate.Value("templateName").String().Equal(data["templateName"].(string))
-	attrTemplate.Value("createdAt").String().NotEmpty()
-	attrTemplate.Value("updatedAt").String().NotEmpty()
-	attrTemplate.Value("sysTenancyId").Number().Equal(1)
-	attrTemplate.Value("templateValue").Array().First().Object().Value("value").Equal(value)
-	attrTemplate.Value("templateValue").Array().First().Object().Value("detail").Array().First().Equal(detail)
-	attrTemplateId := attrTemplate.Value("id").Number().Raw()
-	if attrTemplateId > 0 {
-
-		data = map[string]interface{}{
-			"templateName": "fsdaf ",
-			"templateValue": []map[string]interface{}{
-				{"value": value, "detail": []string{detail}},
+	update := map[string]interface{}{
+		"templateName": "fsdaf_update",
+		"templateValue": []map[string]interface{}{
+			{
+				"value":  "value",
+				"detail": []string{"L"},
 			},
-		}
-
-		obj = auth.PUT(fmt.Sprintf("v1/merchant/attrTemplate/updateAttrTemplate/%d", int(attrTemplateId))).
-			WithJSON(data).
-			Expect().Status(http.StatusOK).JSON().Object()
-		obj.Keys().ContainsOnly("status", "data", "message")
-		obj.Value("status").Number().Equal(200)
-		obj.Value("message").String().Equal("更新成功")
-
-		obj = auth.GET(fmt.Sprintf("v1/merchant/attrTemplate/getAttrTemplateById/%d", int(attrTemplateId))).
-			Expect().Status(http.StatusOK).JSON().Object()
-		obj.Keys().ContainsOnly("status", "data", "message")
-		obj.Value("status").Number().Equal(200)
-		obj.Value("message").String().Equal("操作成功")
-		attrTemplate = obj.Value("data").Object()
-
-		attrTemplate.Value("id").Number().Ge(0)
-		attrTemplate.Value("templateName").String().Equal(data["templateName"].(string))
-		attrTemplate.Value("createdAt").String().NotEmpty()
-		attrTemplate.Value("updatedAt").String().NotEmpty()
-		attrTemplate.Value("sysTenancyId").Number().Equal(1)
-		attrTemplate.Value("templateValue").Array().First().Object().Value("value").Equal(value)
-		attrTemplate.Value("templateValue").Array().First().Object().Value("detail").Array().First().Equal(detail)
-
-		// deleteCategory
-		obj = auth.DELETE(fmt.Sprintf("v1/merchant/attrTemplate/deleteAttrTemplate/%d", int(attrTemplateId))).
-			Expect().Status(http.StatusOK).JSON().Object()
-		obj.Keys().ContainsOnly("status", "data", "message")
-		obj.Value("status").Number().Equal(200)
-		obj.Value("message").String().Equal("删除成功")
+		},
 	}
 
+	{
+		url := fmt.Sprintf("v1/merchant/attrTemplate/updateAttrTemplate/%d", attrTemplateId)
+		base.Update(auth, url, update, http.StatusOK, "更新成功")
+	}
+
+	{
+		url := fmt.Sprintf("v1/merchant/attrTemplate/getAttrTemplateById/%d", attrTemplateId)
+		keys := base.ResponseKeys{
+			{Type: "uint", Key: "id", Value: attrTemplateId},
+			{Type: "uint", Key: "sysTenancyId", Value: tenancyId},
+			{Type: "string", Key: "templateName", Value: update["templateName"]},
+			{Type: "notempty", Key: "createdAt", Value: update["createdAt"]},
+			{Type: "notempty", Key: "updatedAt", Value: update["updatedAt"]},
+			{Type: "array", Key: "templateValue", Value: base.ResponseKeys{
+				{Type: "string", Key: "value", Value: update["updatedAt"].([]map[string]interface{})[0]["value"]},
+				{Type: "string", Key: "detail", Value: update["updatedAt"].([]map[string]interface{})[0]["detail"].([]string)[0]},
+			}},
+		}
+		base.GetById(auth, url, attrTemplateId, keys, http.StatusOK, "操作成功")
+	}
+
+}
+
+func DeleteAttrTemplate(auth *httpexpect.Expect, id uint, status int, message string) {
+	url := fmt.Sprintf("v1/merchant/attrTemplate/deleteAttrTemplate/%d", id)
+	base.Delete(auth, url, status, message)
+}
+
+func CreateAttrTemplate(auth *httpexpect.Expect, create map[string]interface{}, status int, message string) uint {
+	url := "v1/merchant/attrTemplate/createAttrTemplate"
+	keys := base.ResponseKeys{}
+	base.Create(auth, url, create, keys, status, message)
+	return keys.GetId()
 }

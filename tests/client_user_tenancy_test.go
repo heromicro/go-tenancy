@@ -10,7 +10,7 @@ import (
 )
 
 func TestTenancyUserList(t *testing.T) {
-	auth := base.TenancyWithLoginTester(t)
+	auth, _ := base.TenancyWithLoginTester(t)
 	defer base.BaseLogOut(auth)
 	obj := auth.POST("v1/merchant/user/getAdminList").
 		WithJSON(map[string]interface{}{"page": 1, "pageSize": 10}).
@@ -27,7 +27,7 @@ func TestTenancyUserList(t *testing.T) {
 }
 
 func TestTenancyLoginUser(t *testing.T) {
-	auth := base.TenancyWithLoginTester(t)
+	auth, _ := base.TenancyWithLoginTester(t)
 	defer base.BaseLogOut(auth)
 	// changePassword success
 	obj := auth.POST("v1/merchant/user/changePassword").
@@ -71,7 +71,7 @@ func TestTenancyLoginUser(t *testing.T) {
 }
 
 func TestTenancyUserProcess(t *testing.T) {
-	auth := base.TenancyWithLoginTester(t)
+	auth, _ := base.TenancyWithLoginTester(t)
 	defer base.BaseLogOut(auth)
 	obj := auth.POST("v1/merchant/user/registerAdmin").
 		WithJSON(map[string]interface{}{"username": "admin1111", "password": "123456", "ConfirmPassword": "123456", "authorityId": []string{source.TenancyAuthorityId}}).

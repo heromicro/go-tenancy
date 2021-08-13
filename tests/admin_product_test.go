@@ -23,6 +23,8 @@ func TestProductList(t *testing.T) {
 func productlist(t *testing.T, params map[string]interface{}, length int) {
 	auth := base.BaseWithLoginTester(t)
 	defer base.BaseLogOut(auth)
+
+	
 	obj := auth.POST("v1/admin/product/getProductList").
 		WithJSON(params).
 		Expect().Status(http.StatusOK).JSON().Object()

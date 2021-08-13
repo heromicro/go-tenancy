@@ -19,11 +19,11 @@ func CreateShippingTemplate(ctx *gin.Context) {
 		return
 	}
 
-	if returnShippingTemplate, err := service.CreateShippingTemplate(product, multi.GetTenancyId(ctx)); err != nil {
+	if id, err := service.CreateShippingTemplate(product, multi.GetTenancyId(ctx)); err != nil {
 		g.TENANCY_LOG.Error("创建失败!", zap.Any("err", err))
 		response.FailWithMessage("添加失败:"+err.Error(), ctx)
 	} else {
-		response.OkWithDetailed(returnShippingTemplate, "创建成功", ctx)
+		response.OkWithDetailed(gin.H{"id": id}, "创建成功", ctx)
 	}
 }
 
@@ -34,7 +34,7 @@ func UpdateShippingTemplate(ctx *gin.Context) {
 		response.FailWithMessage(errs.Error(), ctx)
 		return
 	}
-	var product request.UpdateShippingTemplate
+	var product model.ShippingTemplate
 	if errs := ctx.ShouldBindJSON(&product); errs != nil {
 		response.FailWithMessage(errs.Error(), ctx)
 		return

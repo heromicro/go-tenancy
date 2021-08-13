@@ -15,7 +15,7 @@ func TestMiniList(t *testing.T) {
 	defer base.BaseLogOut(auth)
 
 	url := "v1/admin/mini/getMiniList"
-	base.PostList(auth, url, 0, base.PageRes, nil, http.StatusOK, "获取成功")
+	base.PostList(auth, url, base.PageRes, base.PageKeys, http.StatusOK, "获取成功")
 }
 
 func TestMiniProcess(t *testing.T) {
@@ -36,14 +36,22 @@ func TestMiniProcess(t *testing.T) {
 
 	{
 		url := "v1/admin/mini/getMiniList"
-		keys := base.ResponseKeys{
-			{Type: "uint", Key: "id", Value: miniId},
-			{Type: "string", Key: "name", Value: data["name"]},
-			{Type: "string", Key: "appId", Value: data["appId"]},
-			{Type: "string", Key: "appSecret", Value: data["appSecret"]},
-			{Type: "string", Key: "remark", Value: data["remark"]},
+		pageKeys := base.ResponseKeys{
+			{Type: "int", Key: "pageSize", Value: 10},
+			{Type: "int", Key: "page", Value: 1},
+			{Type: "array", Key: "list", Value: []base.ResponseKeys{
+				{
+					{Type: "uint", Key: "id", Value: miniId},
+					{Type: "string", Key: "name", Value: data["name"]},
+					{Type: "string", Key: "appId", Value: data["appId"]},
+					{Type: "string", Key: "appSecret", Value: data["appSecret"]},
+					{Type: "string", Key: "remark", Value: data["remark"]},
+				},
+			},
+			},
+			{Type: "int", Key: "total", Value: 1},
 		}
-		base.PostList(auth, url, miniId, base.PageRes, keys, http.StatusOK, "获取成功")
+		base.PostList(auth, url, base.PageRes, pageKeys, http.StatusOK, "获取成功")
 	}
 
 	update := map[string]interface{}{
@@ -55,7 +63,7 @@ func TestMiniProcess(t *testing.T) {
 	}
 
 	{
-		url := fmt.Sprintf("v1/admin/mini/updateMin/%d", miniId)
+		url := fmt.Sprintf("v1/admin/mini/updateMini/%d", miniId)
 		base.Update(auth, url, update, http.StatusOK, "更新成功")
 	}
 
@@ -96,9 +104,7 @@ func TestMiniRegisterError(t *testing.T) {
 
 func CreateMini(auth *httpexpect.Expect, create map[string]interface{}, status int, message string) uint {
 	url := "v1/admin/mini/createMini"
-	keys := base.ResponseKeys{
-		{Type: "uint", Key: "id", Value: uint(0)},
-	}
+	keys := base.IdKeys
 	base.Create(auth, url, create, keys, status, message)
 	return keys.GetId()
 }

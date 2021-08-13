@@ -51,9 +51,7 @@ func cartList(auth *httpexpect.Expect, pageRes map[string]interface{}, pageKeys 
 
 func CreateCart(auth *httpexpect.Expect, create map[string]interface{}, status int, message string) uint {
 	url := "v1/device/cart/createCart"
-	res := base.ResponseKeys{
-		{Type: "uint", Key: "id", Value: uint(0)},
-	}
+	res := base.IdKeys
 	base.Create(auth, url, create, res, status, message)
 	return res.GetId()
 }

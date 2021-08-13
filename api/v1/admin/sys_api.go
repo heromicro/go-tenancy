@@ -26,7 +26,7 @@ func CreateApi(ctx *gin.Context) {
 		g.TENANCY_LOG.Error("创建失败!", zap.Any("err", err))
 		response.FailWithMessage("添加失败:"+err.Error(), ctx)
 	} else {
-		response.OkWithDetailed(api, "创建成功", ctx)
+		response.OkWithDetailed(gin.H{"id": api.ID, "path": api.Path, "method": api.Method}, "创建成功", ctx)
 	}
 }
 
@@ -67,28 +67,33 @@ func GetApiList(ctx *gin.Context) {
 
 // GetApiById 根据id获取api
 func GetApiById(ctx *gin.Context) {
-	var idInfo request.GetById
-	if errs := ctx.ShouldBindJSON(&idInfo); errs != nil {
+	var req request.GetById
+	if errs := ctx.ShouldBindUri(&req); errs != nil {
 		response.FailWithMessage(errs.Error(), ctx)
 		return
 	}
-	api, err := service.GetApiById(idInfo.Id)
+	api, err := service.GetApiById(req.Id)
 	if err != nil {
 		g.TENANCY_LOG.Error("获取失败!", zap.Any("err", err))
 		response.FailWithMessage("获取失败:"+err.Error(), ctx)
 	} else {
-		response.OkWithData(response.SysAPIResponse{Api: api}, ctx)
+		response.OkWithData(api, ctx)
 	}
 }
 
 // UpdateApi 更新基础api
 func UpdateApi(ctx *gin.Context) {
+	var req request.GetById
+	if errs := ctx.ShouldBindUri(&req); errs != nil {
+		response.FailWithMessage(errs.Error(), ctx)
+		return
+	}
 	var api model.SysApi
 	if errs := ctx.ShouldBindJSON(&api); errs != nil {
 		response.FailWithMessage(errs.Error(), ctx)
 		return
 	}
-	if err := service.UpdateApi(api); err != nil {
+	if err := service.UpdateApi(api, req.Id); err != nil {
 		g.TENANCY_LOG.Error("修改失败!", zap.Any("err", err))
 		response.FailWithMessage("修改失败", ctx)
 	} else {

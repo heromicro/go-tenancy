@@ -12,9 +12,10 @@ import (
 )
 
 type param struct {
-	name   string
-	args   map[string]interface{}
-	length int
+	name         string
+	args         map[string]interface{}
+	length       int
+	responseKeys base.ResponseKeys
 }
 
 func TestTenancyList(t *testing.T) {
