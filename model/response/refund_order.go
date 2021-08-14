@@ -27,5 +27,10 @@ type RefundProduct struct {
 	RefundNum      int64 `json:"refundNum"`      // 退货数
 	OrderProduct
 }
+
 type CheckRefundOrder struct {
+	TotalRefundPrice float64        `json:"totalRefundPrice" form:"totalRefundPrice"`
+	PostagePrice     float64        `json:"postagePrice" form:"postagePrice"`
+	Product          []OrderProduct `json:"product" form:"product"`
+	Status           int            `json:"status" form:"status"`
 }

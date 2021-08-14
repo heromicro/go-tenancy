@@ -395,6 +395,17 @@ func GetReturnOrdersProductById(orderProductIds []uint, orderId, tenancyId, user
 	return orderProducts, nil
 }
 
+func GetTotalRefundPrice(products []response.OrderProduct) float64 {
+	totalRefundPrice := decimal.NewFromInt(0)
+	for _, product := range products {
+		productPrice := decimal.NewFromFloat(product.ProductPrice).Mul(decimal.NewFromInt(product.ProductNum))
+		totalRefundPrice = totalRefundPrice.Add(productPrice)
+	}
+
+	price, _ := totalRefundPrice.Round(2).Float64()
+	return price
+}
+
 func GetOrderProductsByOrderIds(orderIds []uint) ([]response.OrderProduct, error) {
 	orderProducts := []response.OrderProduct{}
 	err := g.TENANCY_DB.Model(&model.OrderProduct{}).Where("order_id in ?", orderIds).Find(&orderProducts).Error
@@ -631,10 +642,10 @@ func CreateOrder(req request.CreateOrder, tenancyId, userId uint, tenancyName st
 		cost = cost.Add(costPrice)
 	}
 
-	totalPrice, _ := orderInfo.TotalPrice.Float64()
-	postagePrice, _ := orderInfo.PostagePrice.Float64()
-	orderPrice, _ := orderInfo.OrderPrice.Float64()
-	orderCost, _ := cost.Float64()
+	totalPrice, _ := orderInfo.TotalPrice.Round(2).Float64()
+	postagePrice, _ := orderInfo.PostagePrice.Round(2).Float64()
+	orderPrice, _ := orderInfo.OrderPrice.Round(2).Float64()
+	orderCost, _ := cost.Round(2).Float64()
 
 	groupOrder := model.GroupOrder{
 		GroupOrderSn: g.CreateOrderSn("G"),

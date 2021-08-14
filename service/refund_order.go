@@ -526,6 +526,12 @@ func CheckRefundOrder(orderId, tenancyId, userId uint, orderPorductIds []uint) (
 	if len(orderProducts) != len(orderPorductIds) {
 		return checkRefundOrder, fmt.Errorf("请选择正确的退款商品")
 	}
+	checkRefundOrder.TotalRefundPrice = GetTotalRefundPrice(orderProducts)
+	if order.Status >= model.OrderStatusNoReceive { // 发货
+		checkRefundOrder.PostagePrice = order.PayPostage
+	}
+	checkRefundOrder.Status = order.Status
+	checkRefundOrder.Product = orderProducts
 
 	return checkRefundOrder, nil
 }
