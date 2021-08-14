@@ -81,7 +81,7 @@ func TestClientCategoryProcess(t *testing.T) {
 			{Type: "int", Key: "pid", Value: update["pid"]},
 			{Type: "int", Key: "level", Value: update["level"]},
 		}
-		base.GetById(auth, url, cateId, keys, http.StatusOK, "操作成功")
+		base.GetById(auth, url, cateId,nil, keys, http.StatusOK, "操作成功")
 	}
 
 	{

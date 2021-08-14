@@ -87,7 +87,7 @@ func TestCategoryProcess(t *testing.T) {
 			{Type: "string", Key: "pic", Value: update["pic"]},
 			{Type: "int", Key: "level", Value: update["level"]},
 		}
-		base.GetById(auth, url, categoryId, keys, http.StatusOK, "操作成功")
+		base.GetById(auth, url, categoryId,nil, keys, http.StatusOK, "操作成功")
 	}
 
 	{

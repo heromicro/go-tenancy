@@ -84,6 +84,7 @@ func PayOrder(ctx *gin.Context) {
 		response.FailWithMessage(errs.Error(), ctx)
 		return
 	}
+
 	var payOrder request.PayOrder
 	if err := ctx.ShouldBind(&payOrder); err != nil {
 		g.TENANCY_LOG.Error("参数校验不通过", zap.Any("err", err))

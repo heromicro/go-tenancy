@@ -363,12 +363,16 @@ func TestDeviceOrderProcess(t *testing.T) {
 	getOrderByIdKeys := base.ResponseKeys{
 		{Type: "uint", Key: "id", Value: orderId},
 	}
-	base.GetById(deviceAuth, fmt.Sprintf("v1/device/order/getOrderById/%d", orderId), orderId, getOrderByIdKeys, http.StatusOK, "操作成功")
+	base.GetById(deviceAuth, fmt.Sprintf("v1/device/order/getOrderById/%d", orderId), orderId, nil, getOrderByIdKeys, http.StatusOK, "操作成功")
 
 	payOrderKeys := base.ResponseKeys{
 		{Type: "notempty", Key: "qrcode", Value: ""},
 	}
-	base.GetById(deviceAuth, fmt.Sprintf("v1/device/order/payOrder/%d", orderId), orderId, payOrderKeys, http.StatusOK, "获取成功")
+
+	// 重新支付订单
+	base.GetById(deviceAuth, fmt.Sprintf("v1/device/order/payOrder/%d", orderId), orderId, map[string]interface{}{"orderType": createOrderData["orderType"]}, payOrderKeys, http.StatusOK, "获取成功")
+
+	// 取消订单
 	base.Get(deviceAuth, fmt.Sprintf("v1/device/order/cancelOrder/%d", orderId), http.StatusOK, "操作成功")
 }
 

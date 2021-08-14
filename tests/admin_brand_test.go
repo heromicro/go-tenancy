@@ -115,7 +115,7 @@ func TestBrandProcess(t *testing.T) {
 			{Type: "string", Key: "pic", Value: updateBrand["pic"]},
 		}
 		url := fmt.Sprintf("v1/admin/brand/getBrandById/%d", brandId)
-		base.GetById(auth, url, brandId, responseKeys, http.StatusOK, "操作成功")
+		base.GetById(auth, url, brandId,nil, responseKeys, http.StatusOK, "操作成功")
 	}
 
 	{

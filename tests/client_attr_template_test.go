@@ -63,7 +63,7 @@ func TestAttrTemplateProcess(t *testing.T) {
 				{Type: "string", Key: "detail", Value: update["updatedAt"].([]map[string]interface{})[0]["detail"].([]string)[0]},
 			}},
 		}
-		base.GetById(auth, url, attrTemplateId, keys, http.StatusOK, "操作成功")
+		base.GetById(auth, url, attrTemplateId,nil, keys, http.StatusOK, "操作成功")
 	}
 
 }

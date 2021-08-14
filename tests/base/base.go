@@ -23,6 +23,8 @@ func BaseTester(t *testing.T) *httpexpect.Expect {
 		Reporter: httpexpect.NewAssertReporter(t),
 		Printers: []httpexpect.Printer{
 			httpexpect.NewDebugPrinter(t, true),
+			httpexpect.NewCurlPrinter(t),
+			httpexpect.NewCompactPrinter(t),
 		},
 	})
 }

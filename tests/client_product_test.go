@@ -270,7 +270,7 @@ func TestClientProductProcess(t *testing.T) {
 		{Type: "array", Key: "sliderImages", Value: update["sliderImages"]},
 	}
 	url := fmt.Sprintf("v1/merchant/product/getProductById/%d", productId)
-	base.GetById(auth, url, productId, keys, http.StatusOK, "操作成功")
+	base.GetById(auth, url, productId, nil, keys, http.StatusOK, "操作成功")
 
 	ChangeProductIsShow(auth, productId, g.StatusTrue, http.StatusOK, "设置成功")
 	ChangeProductIsShow(auth, productId, g.StatusFalse, http.StatusOK, "设置成功")

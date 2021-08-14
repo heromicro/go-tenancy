@@ -64,7 +64,7 @@ func TestApiProcess(t *testing.T) {
 			{Type: "string", Key: "description", Value: update["description"]},
 			{Type: "string", Key: "apiGroup", Value: update["apiGroup"]},
 		}
-		base.GetById(auth, url, apiId, keys, http.StatusOK, "操作成功")
+		base.GetById(auth, url, apiId,nil, keys, http.StatusOK, "操作成功")
 	}
 
 }

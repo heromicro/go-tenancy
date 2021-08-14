@@ -23,7 +23,7 @@ func TestDeviceProductDetail(t *testing.T) {
 
 	url := fmt.Sprintf("v1/device/product/getProductById/%d", 1)
 	keys := base.ResponseKeys{}
-	base.GetById(auth, url, 0, keys, http.StatusOK, "操作成功")
+	base.GetById(auth, url, 0, nil, keys, http.StatusOK, "操作成功")
 	// obj := auth.GET(fmt.Sprintf("v1/device/product/getProductById/%d", 1)).
 	// 	Expect().Status(http.StatusOK).JSON().Object()
 	// obj.Keys().ContainsOnly("status", "data", "message")

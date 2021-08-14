@@ -76,7 +76,7 @@ func TestBrandCategoryProcess(t *testing.T) {
 
 			{
 				url := fmt.Sprintf("v1/admin/brandCategory/getBrandCategoryById/%d", brandCategoryId)
-				base.GetById(auth, url, brandCategoryId, rkeys, http.StatusOK, "操作成功")
+				base.GetById(auth, url, brandCategoryId,nil, rkeys, http.StatusOK, "操作成功")
 			}
 
 			{
