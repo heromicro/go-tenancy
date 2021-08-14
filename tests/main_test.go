@@ -42,6 +42,7 @@ func TestMain(m *testing.M) {
 				BusinessTime:  "08:30-17:30",
 				Status:        g.StatusTrue,
 				SysRegionCode: 1,
+				IsAudit:       g.StatusFalse, // 商品无需审核
 			},
 		},
 		Username: "tenancy_hospital",

@@ -90,6 +90,7 @@ func TestClientProductProcess(t *testing.T) {
 		}
 		brandId = CreateBrand(auth, createBrand, http.StatusOK, "创建成功")
 		if brandId == 0 {
+			t.Errorf("添加品牌失败")
 			return
 		}
 		defer DeleteBrand(auth, brandId)
@@ -107,6 +108,7 @@ func TestClientProductProcess(t *testing.T) {
 
 			cateId = CreateCategory(auth, data, http.StatusOK, "创建成功")
 			if cateId == 0 {
+				t.Errorf("添加分类失败")
 				return
 			}
 			defer DeleteCategory(auth, cateId, http.StatusOK, "删除成功")
@@ -127,6 +129,7 @@ func TestClientProductProcess(t *testing.T) {
 		}
 		shipTempId = CreateShippingTemplate(auth, create, http.StatusOK, "创建成功")
 		if shipTempId == 0 {
+			t.Errorf("添加物流模板失败")
 			return
 		}
 		defer DeleteShippingTemplate(auth, shipTempId, http.StatusOK, "删除成功")
@@ -145,6 +148,7 @@ func TestClientProductProcess(t *testing.T) {
 
 		tenancyCategoryId = ClientCreateCategory(auth, data, http.StatusOK, "创建成功")
 		if tenancyCategoryId == 0 {
+			t.Errorf("添加商户分类失败")
 			return
 		}
 		defer DeleteClientCategory(auth, tenancyCategoryId, http.StatusOK, "删除成功")
@@ -193,6 +197,7 @@ func TestClientProductProcess(t *testing.T) {
 
 	productId, _, _ := CreateProduct(auth, data, http.StatusOK, "创建成功")
 	if productId == 0 {
+		t.Errorf("添加商品失败")
 		return
 	}
 	defer DeleteProduct(auth, productId, http.StatusOK, "删除成功")
@@ -267,34 +272,35 @@ func TestClientProductProcess(t *testing.T) {
 	url := fmt.Sprintf("v1/merchant/product/getProductById/%d", productId)
 	base.GetById(auth, url, productId, keys, http.StatusOK, "操作成功")
 
-	{
-		url := "v1/merchant/product/changeProductIsShow"
-		base.Post(auth, url, map[string]interface{}{"id": productId, "isShow": 1}, http.StatusOK, "设置成功")
-	}
-	{
-		url := "v1/merchant/product/changeProductIsShow"
-		base.Post(auth, url, map[string]interface{}{"id": productId, "isShow": 1}, http.StatusOK, "设置成功")
-	}
+	ChangeProductIsShow(auth, productId, g.StatusTrue, http.StatusOK, "设置成功")
+	ChangeProductIsShow(auth, productId, g.StatusFalse, http.StatusOK, "设置成功")
 
 	DeleteProduct(auth, productId, http.StatusOK, "删除成功")
 	defer RestoreProduct(auth, productId, http.StatusOK, "操作成功")
 
 }
 
-func CreateProduct(auth *httpexpect.Expect, create map[string]interface{}, status int, message string) (uint, []string, int) {
+func CreateProduct(auth *httpexpect.Expect, create map[string]interface{}, status int, message string) (uint, []string, int32) {
 	res := base.ResponseKeys{
 		{Type: "uint", Key: "id", Value: uint(0)},
 		{Type: "array", Key: "uniques", Value: []string{}},
-		{Type: "int", Key: "productType", Value: 0},
+		{Type: "int32", Key: "productType", Value: 0},
 	}
 	url := "v1/merchant/product/createProduct"
 	base.Create(auth, url, create, res, status, message)
-	return res.GetId(), res.GetStringArrayValue("uniques"), res.GetIntValue("int")
+	fmt.Printf("res: %+v \n\n\n", res)
+	return res.GetId(), res.GetStringArrayValue("uniques"), res.GetInt32Value("productType")
 }
 
 func DeleteProduct(auth *httpexpect.Expect, id uint, status int, message string) {
 	url := fmt.Sprintf("v1/merchant/product/destoryProduct/%d", id)
 	base.Delete(auth, url, status, message)
+}
+
+// 上架商品
+func ChangeProductIsShow(auth *httpexpect.Expect, id uint, isShow, status int, message string) {
+	url := "v1/merchant/product/changeProductIsShow"
+	base.Post(auth, url, map[string]interface{}{"id": id, "isShow": isShow}, http.StatusOK, "设置成功")
 }
 
 func RestoreProduct(auth *httpexpect.Expect, id uint, status int, message string) {

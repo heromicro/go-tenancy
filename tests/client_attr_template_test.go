@@ -14,7 +14,7 @@ func TestGetAttrTemplateList(t *testing.T) {
 	defer base.BaseLogOut(auth)
 
 	url := "v1/merchant/attrTemplate/getAttrTemplateList"
-	base.PostList(auth, url,  base.PageRes, base.PageKeys, http.StatusOK, "获取成功")
+	base.PostList(auth, url, base.PageRes, base.PageKeys, http.StatusOK, "获取成功")
 }
 
 func TestAttrTemplateProcess(t *testing.T) {
@@ -30,6 +30,7 @@ func TestAttrTemplateProcess(t *testing.T) {
 
 	attrTemplateId := CreateAttrTemplate(auth, data, http.StatusOK, "创建成功")
 	if attrTemplateId == 0 {
+		t.Errorf("添加商品规格模板失败")
 		return
 	}
 	defer DeleteAttrTemplate(auth, attrTemplateId, http.StatusOK, "删除成功")

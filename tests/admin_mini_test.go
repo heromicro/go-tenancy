@@ -30,6 +30,7 @@ func TestMiniProcess(t *testing.T) {
 
 	miniId := CreateMini(auth, data, http.StatusOK, "创建成功")
 	if miniId == 0 {
+		t.Errorf("添加小程序失败")
 		return
 	}
 	defer DeleteMini(auth, miniId, http.StatusOK, "删除成功")
@@ -104,7 +105,7 @@ func TestMiniRegisterError(t *testing.T) {
 
 func CreateMini(auth *httpexpect.Expect, create map[string]interface{}, status int, message string) uint {
 	url := "v1/admin/mini/createMini"
-	keys := base.IdKeys
+	keys := base.IdKeys()
 	base.Create(auth, url, create, keys, status, message)
 	return keys.GetId()
 }

@@ -97,6 +97,7 @@ func TestShippingTemplateProcess(t *testing.T) {
 	}
 	shipTempId := CreateShippingTemplate(auth, create, http.StatusOK, "创建成功")
 	if shipTempId == 0 {
+		t.Errorf("添加物流模板失败")
 		return
 	}
 	defer DeleteShippingTemplate(auth, shipTempId, http.StatusOK, "删除成功")
@@ -130,7 +131,7 @@ func TestShippingTemplateProcess(t *testing.T) {
 
 func CreateShippingTemplate(auth *httpexpect.Expect, create map[string]interface{}, status int, message string) uint {
 	url := "v1/merchant/shippingTemplate/createShippingTemplate"
-	keys := base.IdKeys
+	keys := base.IdKeys()
 	base.Create(auth, url, create, keys, status, message)
 	return keys.GetId()
 }

@@ -73,7 +73,7 @@ func CreateOrder(ctx *gin.Context) {
 		g.TENANCY_LOG.Error("获取失败!", zap.Any("err", err))
 		response.FailWithMessage("获取失败:"+err.Error(), ctx)
 	} else {
-		response.OkWithDetailed(gin.H{"qrcode": qrcode, "orderId": orderId}, "获取成功", ctx)
+		response.OkWithDetailed(gin.H{"qrcode": qrcode, "id": orderId}, "获取成功", ctx)
 	}
 }
 

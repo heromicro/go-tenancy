@@ -22,6 +22,7 @@ func TestDeviceCartProcess(t *testing.T) {
 	create := map[string]interface{}{"cartNum": 2, "isNew": 2, "productAttrUnique": "e2fe28308fd2", "productId": 1, "productType": 1}
 	cartId := CreateCart(auth, create, http.StatusOK, "创建成功")
 	if cartId == 0 {
+		t.Error("添加购物车失败")
 		return
 	}
 	defer DeleteCart(auth, map[string]interface{}{"ids": []uint{cartId}}, http.StatusOK, "操作成功")
@@ -51,7 +52,7 @@ func cartList(auth *httpexpect.Expect, pageRes map[string]interface{}, pageKeys 
 
 func CreateCart(auth *httpexpect.Expect, create map[string]interface{}, status int, message string) uint {
 	url := "v1/device/cart/createCart"
-	res := base.IdKeys
+	res := base.IdKeys()
 	base.Create(auth, url, create, res, status, message)
 	return res.GetId()
 }

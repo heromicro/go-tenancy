@@ -582,7 +582,7 @@ func GetOrderInfoByCartId(tenancyId, userId uint, cartIds []uint) (response.Chec
 	}
 
 	if len(list) > 1 || len(list) == 0 {
-		return res, fmt.Errorf("购物车数据异常")
+		return res, fmt.Errorf("购物车数据异常:%d", len(list))
 	}
 
 	res.OrderType = model.OrderTypeSelf // TODO:所有订单默认自提
@@ -616,12 +616,12 @@ func CreateOrder(req request.CreateOrder, tenancyId, userId uint, tenancyName st
 	// 床旁用户登录，userId 为患者id
 	patient, err := GetPatientById(userId, tenancyId)
 	if err != nil {
-		return nil, order.ID, err
+		return nil, 0, err
 	}
 	userAddress := fmt.Sprintf("%s-%s-%s床", tenancyName, patient.LocName, patient.BedNum)
 	orderInfo, err := GetOrderInfoByCartId(tenancyId, userId, req.CartIds)
 	if err != nil {
-		return nil, order.ID, err
+		return nil, 0, err
 	}
 
 	// 获取成本价
@@ -732,7 +732,7 @@ func CreateOrder(req request.CreateOrder, tenancyId, userId uint, tenancyName st
 		return nil
 	})
 	if err != nil {
-		return nil, order.ID, err
+		return nil, 0, err
 	}
 
 	return png, order.ID, nil

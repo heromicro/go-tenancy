@@ -20,7 +20,7 @@ func TestApiList(t *testing.T) {
 		{Type: "array", Key: "list", Value: nil},
 		{Type: "int", Key: "total", Value: 289},
 	}
-	base.PostList(auth, url,  base.PageRes, pageKeys, http.StatusOK, "获取成功")
+	base.PostList(auth, url, base.PageRes, pageKeys, http.StatusOK, "获取成功")
 }
 func TestAllApi(t *testing.T) {
 	auth := base.BaseWithLoginTester(t)
@@ -40,6 +40,7 @@ func TestApiProcess(t *testing.T) {
 	defer base.BaseLogOut(auth)
 	apiId, apiPath, apiMethod := CreateApi(auth, create, http.StatusOK, "创建成功")
 	if apiId == 0 || apiPath == "" || apiMethod == "" {
+		t.Errorf("添加 api 失败")
 		return
 	}
 	defer DeleteApi(auth, apiId, apiPath, apiMethod)

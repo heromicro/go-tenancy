@@ -45,7 +45,8 @@ func TestBrandProcess(t *testing.T) {
 	}
 
 	brandCategoryId := CreateBrandCategory(auth, createBrandCategory, http.StatusOK, "创建成功")
-	if brandCategoryId > 0 {
+	if brandCategoryId == 0 {
+		t.Errorf("添加品牌分类失败")
 		return
 	}
 	defer DeleteBrandCategory(auth, brandCategoryId)
@@ -57,7 +58,8 @@ func TestBrandProcess(t *testing.T) {
 		"brandCategoryId": brandCategoryId,
 	}
 	brandId := CreateBrand(auth, createBrand, http.StatusOK, "创建成功")
-	if brandId > 0 {
+	if brandId == 0 {
+		t.Errorf("添加品牌失败")
 		return
 	}
 	{
@@ -160,7 +162,7 @@ func brandList(auth *httpexpect.Expect, pageRes map[string]interface{}, pageKeys
 
 func CreateBrand(auth *httpexpect.Expect, create map[string]interface{}, status int, message string) uint {
 	url := "v1/admin/brand/createBrand"
-	res := base.IdKeys
+	res := base.IdKeys()
 	base.Create(auth, url, create, res, status, message)
 	return res.GetId()
 }

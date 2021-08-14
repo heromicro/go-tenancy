@@ -6,10 +6,6 @@ import (
 	"github.com/gavv/httpexpect"
 )
 
-var IdKeys = ResponseKeys{
-	{Type: "uint", Key: "id", Value: uint(0)},
-}
-
 type Param struct {
 	Name         string
 	Args         map[string]interface{}
@@ -29,6 +25,12 @@ func (rks ResponseKeys) Keys() []string {
 		keys = append(keys, rk.Key)
 	}
 	return keys
+}
+
+func IdKeys() ResponseKeys {
+	return ResponseKeys{
+		{Type: "uint", Key: "id", Value: uint(0)},
+	}
 }
 
 func (rks ResponseKeys) Test(object *httpexpect.Object) {
@@ -84,6 +86,9 @@ func (rks ResponseKeys) Test(object *httpexpect.Object) {
 
 func (rks ResponseKeys) Scan(object *httpexpect.Object) {
 	for k, rk := range rks {
+		if !Exist(object, rk.Key) {
+			continue
+		}
 		switch strings.ToLower(rk.Type) {
 		case "string":
 			rks[k].Value = object.Value(rk.Key).String().Raw()
@@ -91,18 +96,23 @@ func (rks ResponseKeys) Scan(object *httpexpect.Object) {
 			rks[k].Value = uint(object.Value(rk.Key).Number().Raw())
 		case "int":
 			rks[k].Value = int(object.Value(rk.Key).Number().Raw())
+		case "int32":
+			rks[k].Value = int32(object.Value(rk.Key).Number().Raw())
 		case "float64":
 			rks[k].Value = object.Value(rk.Key).Number().Raw()
 		case "array":
 			length := int(object.Value(rk.Key).Array().Length().Raw())
+
 			if length == 0 {
 				continue
 			}
-			if reskey, ok := rks[k].Value.([]string); ok {
+			reskey, ok := rks[k].Value.([]string)
+			if ok {
+				var strings []string
 				for i := 0; i < length; i++ {
-					reskey = append(reskey, object.Value(rk.Key).Array().Element(i).String().Raw())
+					strings = append(reskey, object.Value(rk.Key).Array().Element(i).String().Raw())
 				}
-				rks[k].Value = reskey
+				rks[k].Value = strings
 			}
 
 		case "object":
@@ -111,6 +121,16 @@ func (rks ResponseKeys) Scan(object *httpexpect.Object) {
 			rks[k].Value = object.Value(rk.Key).String().Raw()
 		}
 	}
+}
+
+func Exist(object *httpexpect.Object, key string) bool {
+	objectKyes := object.Keys().Raw()
+	for _, objectKey := range objectKyes {
+		if key == objectKey.(string) {
+			return true
+		}
+	}
+	return false
 }
 
 func (rks ResponseKeys) GetStringValue(key string) string {
@@ -135,7 +155,7 @@ func (rks ResponseKeys) GetStringArrayValue(key string) []string {
 				return nil
 			}
 			switch strings.ToLower(rk.Type) {
-			case "string":
+			case "array":
 				return rk.Value.([]string)
 			}
 		}
@@ -152,6 +172,8 @@ func (rks ResponseKeys) GetUintValue(key string) uint {
 			switch strings.ToLower(rk.Type) {
 			case "float64":
 				return uint(rk.Value.(float64))
+			case "int32":
+				return uint(rk.Value.(int32))
 			case "uint":
 				return rk.Value.(uint)
 			case "int":
@@ -173,8 +195,30 @@ func (rks ResponseKeys) GetIntValue(key string) int {
 				return int(rk.Value.(float64))
 			case "int":
 				return rk.Value.(int)
+			case "int32":
+				return int(rk.Value.(int32))
 			case "uint":
 				return int(rk.Value.(uint))
+			}
+		}
+	}
+	return 0
+}
+func (rks ResponseKeys) GetInt32Value(key string) int32 {
+	for _, rk := range rks {
+		if key == rk.Key {
+			if rk.Value == nil {
+				return 0
+			}
+			switch strings.ToLower(rk.Type) {
+			case "float64":
+				return int32(rk.Value.(float64))
+			case "int32":
+				return rk.Value.(int32)
+			case "int":
+				return int32(rk.Value.(int))
+			case "uint":
+				return int32(rk.Value.(uint))
 			}
 		}
 	}

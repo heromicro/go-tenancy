@@ -1,6 +1,7 @@
 package tests
 
 import (
+	"fmt"
 	"net/http"
 	"testing"
 
@@ -18,7 +19,7 @@ func TestGetTenancyInfo(t *testing.T) {
 }
 
 func TestUpdateClientTenancy(t *testing.T) {
-	auth, _ := base.TenancyWithLoginTester(t)
+	auth, tenancyId := base.TenancyWithLoginTester(t)
 	defer base.BaseLogOut(auth)
 	data := map[string]interface{}{
 		"avatar": "http://127.0.0.1:8089/uploads/file/49989c75324ef71956c91e79ae49b10d.jpg",
@@ -27,7 +28,7 @@ func TestUpdateClientTenancy(t *testing.T) {
 		"state":  1,
 		"tele":   "15109234132",
 	}
-	obj := auth.PUT("v1/merchant/tenancy/updateTenancy/1").
+	obj := auth.PUT(fmt.Sprintf("v1/merchant/tenancy/updateTenancy/%d", tenancyId)).
 		WithJSON(data).
 		Expect().Status(http.StatusOK).JSON().Object()
 	obj.Keys().ContainsOnly("status", "data", "message")

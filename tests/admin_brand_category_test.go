@@ -119,7 +119,7 @@ func TestBrandCategoryRegisterError(t *testing.T) {
 
 func CreateBrandCategory(auth *httpexpect.Expect, create map[string]interface{}, status int, message string) uint {
 	url := "v1/admin/brandCategory/createBrandCategory"
-	res := base.IdKeys
+	res := base.IdKeys()
 	base.Create(auth, url, create, res, status, message)
 	return res.GetId()
 }
