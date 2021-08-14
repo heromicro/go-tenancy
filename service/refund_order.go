@@ -500,7 +500,7 @@ func UpdateRefundOrderById(db *gorm.DB, refundOrderId uint, data map[string]inte
 	return nil
 }
 
-func CheckRefundOrder(orderId, tenancyId, userId uint, req request.CheckRefundOrder) (response.CheckRefundOrder, error) {
+func CheckRefundOrder(orderId, tenancyId, userId uint, orderPorductIds []uint) (response.CheckRefundOrder, error) {
 	var checkRefundOrder response.CheckRefundOrder
 	order, err := GetOrderByOrderId(orderId, tenancyId, userId)
 	if errors.Is(err, gorm.ErrRecordNotFound) {
@@ -516,17 +516,17 @@ func CheckRefundOrder(orderId, tenancyId, userId uint, req request.CheckRefundOr
 		return checkRefundOrder, fmt.Errorf("订单未付款,请取消订单")
 	}
 
-	orderProducts, err := GetReturnOrdersProductById(req.Ids, orderId, tenancyId, userId)
+	orderProducts, err := GetReturnOrdersProductById(orderPorductIds, orderId, tenancyId, userId)
 	if err != nil {
 		return checkRefundOrder, err
 	}
 	if len(orderProducts) == 0 {
 		return checkRefundOrder, fmt.Errorf("商品不存在或已退款")
 	}
-	if len(orderProducts) != len(req.Ids) {
+	if len(orderProducts) != len(orderPorductIds) {
 		return checkRefundOrder, fmt.Errorf("请选择正确的退款商品")
 	}
-	
+
 	return checkRefundOrder, nil
 }
 

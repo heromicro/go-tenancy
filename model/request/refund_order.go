@@ -15,10 +15,6 @@ type OrderAudit struct {
 	FailMessage string `json:"failMessage"`
 }
 
-type CheckRefundOrder struct {
-	Ids []uint `json:"ids"  form:"ids"  binding:"required"`
-}
-
 type CreateRefundOrder struct {
 	Ids           []uint  `json:"ids"  form:"ids"  binding:"required"`
 	RefundMessage string  `json:"refundMessage"  binding:"required"`

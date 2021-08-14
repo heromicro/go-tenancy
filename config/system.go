@@ -9,6 +9,4 @@ type System struct {
 	CacheType   string `mapstructure:"cache-type" json:"cacheType" yaml:"cache-type"`
 	AdminPreix  string `mapstructure:"admin-preix" json:"adminPreix" yaml:"admin-preix"`
 	ClientPreix string `mapstructure:"client-preix" json:"clientPreix" yaml:"client-preix"`
-	AdminURL    string `mapstructure:"admin-url" json:"adminUrl" yaml:"admin-url"`
-	ClientURL   string `mapstructure:"client-url" json:"clientUrl" yaml:"client-url"`
 }

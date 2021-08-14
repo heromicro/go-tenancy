@@ -66,7 +66,7 @@ func ChangeIsPayByIds(tx *gorm.DB, ids []uint) error {
 }
 
 // DeleteCart
-func DeleteCart(ids []int, userId, tenancyId uint) error {
+func DeleteCart(ids []uint, userId, tenancyId uint) error {
 	return g.TENANCY_DB.Model(&model.Cart{}).
 		Where("sys_user_id = ?", userId).
 		Where("sys_tenancy_id = ?", tenancyId).

@@ -63,10 +63,6 @@ type DeliveryOrder struct {
 	DeliveryType int    `json:"deliveryType" form:"deliveryType"`
 }
 
-type CheckOrder struct {
-	CartIds []uint `json:"cartIds" form:"cartIds"`
-}
-
 type CreateOrder struct {
 	CartIds   []uint `json:"cartIds" form:"cartIds"`
 	OrderType int    `json:"orderType" form:"orderType"` // 点单类型

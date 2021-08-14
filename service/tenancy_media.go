@@ -41,7 +41,7 @@ func Upload(file model.TenancyMedia) (model.TenancyMedia, error) {
 }
 
 // FindFiles
-func FindFiles(ids []int) ([]model.TenancyMedia, error) {
+func FindFiles(ids []uint) ([]model.TenancyMedia, error) {
 	var files []model.TenancyMedia
 	err := g.TENANCY_DB.Where("id in ?", ids).Find(&files).Error
 	return files, err
@@ -55,7 +55,7 @@ func FindFile(id uint) (model.TenancyMedia, error) {
 }
 
 // DeleteFile
-func DeleteFile(ids []int) error {
+func DeleteFile(ids []uint) error {
 	files, err := FindFiles(ids)
 	if err != nil {
 		return fmt.Errorf("find files %w", err)

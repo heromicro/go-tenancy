@@ -27,6 +27,5 @@ type RefundProduct struct {
 	RefundNum      int64 `json:"refundNum"`      // 退货数
 	OrderProduct
 }
-
 type CheckRefundOrder struct {
 }

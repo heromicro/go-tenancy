@@ -79,7 +79,13 @@ func LoginTenancy(id uint) (response.LoginTenancy, error) {
 	}
 	loginTenancy.Token = token
 	loginTenancy.Exp = exp
-	loginTenancy.Url = g.TENANCY_CONFIG.System.ClientURL + g.TENANCY_CONFIG.System.ClientPreix
+
+	url, err := GetSeitURL()
+	if err != nil {
+		return loginTenancy, err
+	}
+
+	loginTenancy.Url = url + g.TENANCY_CONFIG.System.ClientPreix
 
 	return loginTenancy, nil
 }

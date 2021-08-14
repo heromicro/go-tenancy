@@ -566,8 +566,8 @@ func DeleteOrder(id uint) error {
 	return g.TENANCY_DB.Model(&model.Order{}).Where("id = ?", id).Update("is_system_del", g.StatusTrue).Error
 }
 
-func CheckOrder(req request.CheckOrder, tenancyId, UserId uint) (response.CheckOrder, error) {
-	return GetOrderInfoByCartId(tenancyId, UserId, req.CartIds)
+func CheckOrder(cartIds []uint, tenancyId, UserId uint) (response.CheckOrder, error) {
+	return GetOrderInfoByCartId(tenancyId, UserId, cartIds)
 }
 
 func GetOrderInfoByCartId(tenancyId, userId uint, cartIds []uint) (response.CheckOrder, error) {

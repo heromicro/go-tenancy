@@ -34,12 +34,12 @@ func GetOrderList(ctx *gin.Context) {
 }
 
 func CheckOrder(ctx *gin.Context) {
-	var req request.CheckOrder
+	var req request.IdsReq
 	if errs := ctx.ShouldBindJSON(&req); errs != nil {
 		response.FailWithMessage(errs.Error(), ctx)
 		return
 	}
-	if order, err := service.CheckOrder(req, multi.GetTenancyId(ctx), multi.GetUserId(ctx)); err != nil {
+	if order, err := service.CheckOrder(req.Ids, multi.GetTenancyId(ctx), multi.GetUserId(ctx)); err != nil {
 		g.TENANCY_LOG.Error("获取失败!", zap.Any("err", err))
 		response.FailWithMessage("获取失败:"+err.Error(), ctx)
 	} else {
@@ -130,14 +130,14 @@ func CheckRefundOrder(ctx *gin.Context) {
 		response.FailWithMessage(errs.Error(), ctx)
 		return
 	}
-	var checkRefundOrder request.CheckRefundOrder
-	if err := ctx.ShouldBind(&checkRefundOrder); err != nil {
+	var idsReq request.IdsReq
+	if err := ctx.ShouldBind(&idsReq); err != nil {
 		g.TENANCY_LOG.Error("参数校验不通过", zap.Any("err", err))
 		response.FailWithMessage("参数校验不通过", ctx)
 		return
 	}
 
-	if refundOrder, err := service.CheckRefundOrder(req.Id, multi.GetTenancyId(ctx), multi.GetUserId(ctx), checkRefundOrder); err != nil {
+	if refundOrder, err := service.CheckRefundOrder(req.Id, multi.GetTenancyId(ctx), multi.GetUserId(ctx), idsReq.Ids); err != nil {
 		g.TENANCY_LOG.Error("操作失败!", zap.Any("err", err))
 		response.FailWithMessage("操作失败:"+err.Error(), ctx)
 	} else {

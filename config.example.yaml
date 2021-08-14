@@ -39,8 +39,6 @@ system:
   oss-type: 'local'    # 控制oss选择走本期还是 七牛等其他仓 自行增加其他oss仓可以在 server/utils/upload/upload.go 中 NewOss函数配置
   admin-preix: /admin 
   client-preix: /merchant 
-  admin-url: "http://localhost:9527"
-  client-url: "http://localhost:9528"
 timer:
   start: false
   spec: '@daily'
