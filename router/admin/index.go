@@ -117,6 +117,7 @@ func InitConfigValueRouter(Router *gin.RouterGroup) {
 func InitConfigRouter(Router *gin.RouterGroup) {
 	ConfigRouter := Router.Group("/config")
 	{
+		ConfigRouter.GET("/getUploadConfigMap", admin.GetUploadConfigMap)
 		ConfigRouter.GET("/getConfigMap/:category", admin.GetConfigMap)
 		ConfigRouter.GET("/getCreateConfigMap", admin.GetCreateConfigMap)
 		ConfigRouter.GET("/getUpdateConfigMap/:id", admin.GetUpdateConfigMap)

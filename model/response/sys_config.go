@@ -2,6 +2,7 @@ package response
 
 type SysConfig struct {
 	TenancyResponse
+	CateKey    string `json:"cateKey"`    // 分类 key
 	ConfigName string `json:"configName"` // 字段名称
 	ConfigKey  string `json:"configKey"`  // 字段 key
 	ConfigType string `json:"configType"` // 配置类型

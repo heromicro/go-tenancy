@@ -14,11 +14,59 @@ import (
 	"gorm.io/gorm"
 )
 
+// GetUploadConfigMap
+func GetUploadConfigMap(tenancyId uint) (Form, error) {
+	form := Form{
+		Method: "POST",
+		Action: "/sys/admin/configValue/saveConfigValue/upload",
+	}
+
+	uploadType, err := GetConfigValueByKey("upload_type")
+	if err != nil {
+		return form, err
+	}
+
+	rule := NewRadio("上传类型", "upload_type", "文件上传的类型", uploadType)
+	cateKeys := []string{"aliyun_oss", "qiniuyun", "tengxun"}
+	configs, err := GetConfigByCateKeys(cateKeys, tenancyId)
+	if err != nil {
+		return form, err
+	}
+	rule.AddControl(GetControl(configs, "qiniuyun", "2"))
+	rule.AddControl(GetControl(configs, "aliyun_oss", "3"))
+	rule.AddControl(GetControl(configs, "tengxun", "4"))
+	rule.AddOption(Option{Value: "1", Label: "本地存储"})
+	rule.AddOption(Option{Value: "2", Label: "七牛云存储"})
+	rule.AddOption(Option{Value: "3", Label: "阿里云OSS"})
+	rule.AddOption(Option{Value: "4", Label: "腾讯COS"})
+	rule.Props = map[string]interface{}{}
+	form.AddRule(*rule)
+	return form, nil
+}
+
+func GetControl(configs []response.SysConfig, cateKey string, value interface{}) Control {
+	control := Control{Value: value}
+	for i := 0; i < len(configs); i++ {
+		if configs[i].CateKey != cateKey {
+			continue
+		}
+		controlRule := Rule{
+			Title: configs[i].ConfigName,
+			Type:  configs[i].ConfigType,
+			Field: configs[i].ConfigKey,
+			Info:  configs[i].Info,
+			Value: configs[i].Value,
+		}
+		controlRule.TransData(configs[i].ConfigRule, nil)
+		control.Rule = append(control.Rule, controlRule)
+	}
+	return control
+}
+
 // GetConfigMapByCate
 func GetConfigMapByCate(cate string, ctx *gin.Context) (Form, error) {
 	form := Form{
-		Method:  "POST",
-		Headers: nil,
+		Method: "POST",
 	}
 
 	//TODO: 添加 /sys/ 前缀，兼容前端 form-create/element-ui 组件
@@ -92,12 +140,43 @@ func CreateConfig(m model.SysConfig) (model.SysConfig, error) {
 }
 
 // GetConfigByCateKey
-func GetConfigByCateKey(config_key string, tenancyId uint) ([]response.SysConfig, error) {
+func GetConfigByCateKey(configKey string, tenancyId uint) ([]response.SysConfig, error) {
 	var configs []response.SysConfig
 	err := g.TENANCY_DB.Model(&model.SysConfig{}).
 		Select("sys_configs.*").
 		Joins("left join sys_config_categories on sys_configs.sys_config_category_id = sys_config_categories.id").
-		Where("sys_config_categories.key = ?", config_key).
+		Where("sys_config_categories.key = ?", configKey).
+		Where("sys_configs.status = ?", g.StatusTrue).
+		Find(&configs).Error
+	if err != nil {
+		return nil, err
+	}
+
+	var values []model.SysConfigValue
+	err = g.TENANCY_DB.Where("sys_tenancy_id = ?", tenancyId).Find(&values).Error
+	if err != nil {
+		return nil, err
+	}
+
+	for i := 0; i < len(configs); i++ {
+		for _, value := range values {
+			if configs[i].ConfigKey == value.ConfigKey {
+				configs[i].Value = value.Value
+				break
+			}
+		}
+	}
+
+	return configs, err
+}
+
+// GetConfigByCateKeys
+func GetConfigByCateKeys(configKeys []string, tenancyId uint) ([]response.SysConfig, error) {
+	var configs []response.SysConfig
+	err := g.TENANCY_DB.Model(&model.SysConfig{}).
+		Select("sys_configs.*,sys_config_categories.key as cate_key").
+		Joins("left join sys_config_categories on sys_configs.sys_config_category_id = sys_config_categories.id").
+		Where("sys_config_categories.key in ?", configKeys).
 		Where("sys_configs.status = ?", g.StatusTrue).
 		Find(&configs).Error
 	if err != nil {

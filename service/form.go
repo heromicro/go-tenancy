@@ -29,7 +29,7 @@ type Rule struct {
 	Props    map[string]interface{}   `json:"props"`
 	Col      map[string]interface{}   `json:"col,omitempty"`
 	Options  []Option                 `json:"options,omitempty"`
-	Control  []Control                `json:"control,omitempty"`
+	Controls []Control                `json:"control,omitempty"`
 	Validate []map[string]interface{} `json:"validate,omitempty"`
 }
 type ControlRule struct {
@@ -44,8 +44,8 @@ type ControlRule struct {
 }
 
 type Control struct {
-	Value int    `json:"value"`
-	Rule  []Rule `json:"rule"`
+	Value interface{} `json:"value"`
+	Rule  []Rule      `json:"rule"`
 }
 
 func (r *Rule) TransData(rule string, token []byte) {
@@ -108,9 +108,30 @@ func (rule *Rule) AddValidator(validator map[string]interface{}) *Rule {
 	rule.Validate = append(rule.Validate, validator)
 	return rule
 }
+
+func (rule *Rule) AddOption(opt Option) *Rule {
+	rule.Options = append(rule.Options, opt)
+	return rule
+}
+
+func (rule *Rule) AddControl(control Control) *Rule {
+	rule.Controls = append(rule.Controls, control)
+	return rule
+}
+
 func (rule *Rule) AddProps(props map[string]interface{}) *Rule {
 	rule.Props = props
 	return rule
+}
+
+func NewRadio(title, field, info string, value interface{}) *Rule {
+	return &Rule{
+		Title: title,
+		Type:  "radio",
+		Field: field,
+		Value: value,
+		Info:  info,
+	}
 }
 
 func NewInput(title, field, placeholder string, value interface{}) *Rule {

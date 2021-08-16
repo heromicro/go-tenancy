@@ -19,6 +19,8 @@ func SaveConfigValue(values map[string]interface{}, configKey string, tenancyId 
 		typeName := reflect.TypeOf(value).Name()
 		if typeName == "string" {
 			val = value.(string)
+		} else if typeName == "int" {
+			val = strconv.FormatInt(int64(value.(int)), 10)
 		} else if typeName == "float64" {
 			val = strconv.FormatFloat(value.(float64), 'E', -1, 64)
 		}
@@ -37,7 +39,7 @@ func SaveConfigValue(values map[string]interface{}, configKey string, tenancyId 
 func GetConfigValueByKey(configKey string) (string, error) {
 	configValue := model.SysConfigValue{}
 	err := g.TENANCY_DB.Where("config_key = ?", configKey).First(&configValue).Error
-	if err != nil {
+	if err != nil && !errors.Is(err, gorm.ErrRecordNotFound) {
 		return "", err
 	}
 	return configValue.Value, nil

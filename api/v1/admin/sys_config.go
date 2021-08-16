@@ -7,6 +7,7 @@ import (
 	"github.com/snowlyg/go-tenancy/model/request"
 	"github.com/snowlyg/go-tenancy/model/response"
 	"github.com/snowlyg/go-tenancy/service"
+	"github.com/snowlyg/multi"
 	"go.uber.org/zap"
 )
 
@@ -18,6 +19,16 @@ func GetConfigMap(ctx *gin.Context) {
 		return
 	}
 	if form, err := service.GetConfigMapByCate(req.Cate, ctx); err != nil {
+		g.TENANCY_LOG.Error("获取表单失败!", zap.Any("err", err))
+		response.FailWithMessage("获取表单失败:"+err.Error(), ctx)
+	} else {
+		response.OkWithDetailed(form, "获取成功", ctx)
+	}
+}
+
+// GetUploadConfigMap
+func GetUploadConfigMap(ctx *gin.Context) {
+	if form, err := service.GetUploadConfigMap(multi.GetTenancyId(ctx)); err != nil {
 		g.TENANCY_LOG.Error("获取表单失败!", zap.Any("err", err))
 		response.FailWithMessage("获取表单失败:"+err.Error(), ctx)
 	} else {

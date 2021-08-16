@@ -82,16 +82,17 @@ func RegisterAdminMap(id uint, ctx *gin.Context) (Form, error) {
 
 // Register 用户注册
 func Register(req request.Register, authorityType int, tenancyId uint) (uint, error) {
-	if !errors.Is(g.TENANCY_DB.
+	err := g.TENANCY_DB.
 		Where("sys_users.username = ?", req.Username).
 		Where("sys_authorities.authority_type = ?", authorityType).
 		Joins("left join sys_authorities on sys_authorities.authority_id = sys_users.authority_id").
-		First(&model.SysUser{}).Error, gorm.ErrRecordNotFound) { // 判断用户名是否注册
+		First(&model.SysUser{}).Error
+	if !errors.Is(err, gorm.ErrRecordNotFound) { // 判断用户名是否注册
 		return 0, errors.New("用户名已注册")
 	}
 	// 否则 附加uuid 密码md5简单加密 注册
 	user := model.SysUser{Username: req.Username, Password: utils.MD5V([]byte(req.Password)), AuthorityId: req.AuthorityId[0], Status: req.Status, IsShow: g.StatusTrue, SysTenancyID: tenancyId}
-	err := g.TENANCY_DB.Transaction(func(tx *gorm.DB) error {
+	err = g.TENANCY_DB.Transaction(func(tx *gorm.DB) error {
 		err := tx.Create(&user).Error
 		if err != nil {
 			return err

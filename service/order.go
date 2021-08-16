@@ -31,7 +31,7 @@ func DeliveryOrderMap(id uint, ctx *gin.Context) (Form, error) {
 	if err != nil {
 		return form, err
 	}
-	form.Rule[0].Control[0].Rule[0].Options = opts
+	form.Rule[0].Controls[0].Rule[0].Options = opts
 	return form, err
 }
 
