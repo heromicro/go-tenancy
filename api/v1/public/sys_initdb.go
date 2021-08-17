@@ -32,7 +32,7 @@ func InitDB(ctx *gin.Context) {
 
 // CheckDB 初始化用户项目
 func CheckDB(ctx *gin.Context) {
-	if g.TENANCY_DB != nil && (g.TENANCY_CONFIG.System.CacheType == "redis" && g.TENANCY_CACHE != nil) {
+	if g.TENANCY_DB != nil || (g.TENANCY_CONFIG.System.CacheType == "redis" && g.TENANCY_CACHE != nil) {
 		g.TENANCY_LOG.Info("项目无需初始化")
 		response.OkWithDetailed(gin.H{
 			"needInit": false,

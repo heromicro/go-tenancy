@@ -13,11 +13,13 @@ config.yaml
 tests/config.yaml
 latest_log
 main
+tests/resource/favicon.ico
+tests/main_test.go
+.air.toml
 
 # ext
 *.log
 *.exe
 *.crt
-.air.toml
-tests/resource/favicon.ico
-tests/main_test.go
+
+

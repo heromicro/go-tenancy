@@ -47,7 +47,7 @@ func Routers(app *gin.Engine) {
 		public.InitPayRouter(PublicGroup)    // 自动初始化相关
 	}
 
-	V1Group := app.Group("/v1", middleware.Auth())
+	V1Group := app.Group("/v1", middleware.NeedInit(), middleware.Auth())
 	{
 		Auth := V1Group.Group("/auth")
 		{

@@ -10,7 +10,7 @@ import (
 func NeedInit() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		if g.TENANCY_DB == nil {
-			response.OkWithDetailed(gin.H{
+			response.NeedInitWithDetailed(gin.H{
 				"needInit": true,
 			}, "前往初始化数据库", ctx)
 			ctx.Abort()

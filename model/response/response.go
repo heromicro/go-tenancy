@@ -13,10 +13,9 @@ type Response struct {
 }
 
 const (
-	SUCCESS                    = 200
-	BAD_REQUEST_ERROR          = 4000
-	UNAUTHORIZED_REQUEST_ERROR = 4001
-	FORBIDDEN_REQUEST_ERROR    = 4003
+	SUCCESS           = 2000
+	BAD_REQUEST_ERROR = 4000
+	NEED_INIT_ERROR   = 4007
 )
 
 func Result(code int, data interface{}, msg string, ctx *gin.Context) {
@@ -29,37 +28,44 @@ func Result(code int, data interface{}, msg string, ctx *gin.Context) {
 }
 
 func Ok(ctx *gin.Context) {
-	Result(SUCCESS, map[string]interface{}{}, "操作成功", ctx)
+	Result(http.StatusOK, map[string]interface{}{}, "操作成功", ctx)
 }
 
 func OkWithMessage(message string, ctx *gin.Context) {
-	Result(SUCCESS, map[string]interface{}{}, message, ctx)
+	Result(http.StatusOK, map[string]interface{}{}, message, ctx)
 }
 
 func OkWithData(data interface{}, ctx *gin.Context) {
-	Result(SUCCESS, data, "操作成功", ctx)
+	Result(http.StatusOK, data, "操作成功", ctx)
 }
 
 func OkWithDetailed(data interface{}, message string, ctx *gin.Context) {
-	Result(SUCCESS, data, message, ctx)
+	Result(http.StatusOK, data, message, ctx)
 }
 
 func Fail(ctx *gin.Context) {
-	Result(BAD_REQUEST_ERROR, map[string]interface{}{}, "操作失败", ctx)
+	Result(http.StatusBadRequest, map[string]interface{}{}, "操作失败", ctx)
 }
 
 func UnauthorizedFailWithMessage(message string, ctx *gin.Context) {
-	Result(UNAUTHORIZED_REQUEST_ERROR, map[string]interface{}{}, message, ctx)
+	Result(http.StatusUnauthorized, map[string]interface{}{}, message, ctx)
+}
+
+func UnauthorizedFailWithDetailed(data interface{}, message string, ctx *gin.Context) {
+	Result(http.StatusUnauthorized, data, message, ctx)
 }
 
 func ForbiddenFailWithMessage(message string, ctx *gin.Context) {
-	Result(FORBIDDEN_REQUEST_ERROR, map[string]interface{}{}, message, ctx)
+	Result(http.StatusForbidden, map[string]interface{}{}, message, ctx)
 }
 
 func FailWithMessage(message string, ctx *gin.Context) {
-	Result(BAD_REQUEST_ERROR, map[string]interface{}{}, message, ctx)
+	Result(http.StatusBadRequest, map[string]interface{}{}, message, ctx)
 }
 
 func FailWithDetailed(data interface{}, message string, ctx *gin.Context) {
-	Result(BAD_REQUEST_ERROR, data, message, ctx)
+	Result(http.StatusBadRequest, data, message, ctx)
+}
+func NeedInitWithDetailed(data interface{}, message string, ctx *gin.Context) {
+	Result(NEED_INIT_ERROR, data, message, ctx)
 }

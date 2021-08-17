@@ -3,7 +3,6 @@ package public
 import (
 	"github.com/gin-gonic/gin"
 	public "github.com/snowlyg/go-tenancy/api/v1/public"
-	"github.com/snowlyg/go-tenancy/middleware"
 )
 
 func InitAuthRouter(Router *gin.RouterGroup) {
@@ -31,7 +30,7 @@ func InitInitRouter(Router *gin.RouterGroup) {
 
 // 登录授权验证码
 func InitPublicRouter(Router *gin.RouterGroup) {
-	BaseRouter := Router.Group("/public", middleware.NeedInit())
+	BaseRouter := Router.Group("/public")
 	{
 		BaseRouter.POST("/admin/login", public.AdminLogin)
 		BaseRouter.POST("/merchant/login", public.ClientLogin)
