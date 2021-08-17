@@ -5,6 +5,8 @@ type InitDB struct {
 	SqlType   string `json:"sqlType"`
 	Cache     Cache  `json:"cache"`
 	CacheType string `json:"cacheType"`
+	Level     string `json:"level"` // debug,release,test
+	Env       string `json:"env"`   // dev , pro
 }
 
 type Sql struct {

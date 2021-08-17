@@ -39,6 +39,8 @@ func TestMain(m *testing.M) {
 			Port:     "6379",
 			Password: "Chindeo",
 		},
+		Level: "test",
+		Env:   "dev",
 	}
 	service.InitDB(mysqlConfig)
 

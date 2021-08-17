@@ -96,12 +96,13 @@ func CreateTenancy(req request.CreateTenancy) (uint, string, string, error) {
 	if !errors.Is(err, gorm.ErrRecordNotFound) {
 		return 0, "", "", errors.New("商户名称已被注冊")
 	}
+
 	err = g.TENANCY_DB.
 		Where("sys_users.username = ?", req.Username).
 		Where("sys_authorities.authority_type = ?", multi.TenancyAuthority).
 		Joins("left join sys_authorities on sys_authorities.authority_id = sys_users.authority_id").
 		First(&model.SysUser{}).Error
-	if !errors.Is(err, gorm.ErrRecordNotFound) { // 判断用户名是否注册
+	if !errors.Is(err, gorm.ErrRecordNotFound) {
 		return 0, "", "", errors.New("管理员用户名已注册")
 	}
 

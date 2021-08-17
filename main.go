@@ -12,7 +12,6 @@ func main() {
 	g.TENANCY_VP = core.Viper()      // 初始化Viper
 	g.TENANCY_LOG = core.Zap()       // 初始化zap日志库
 	g.TENANCY_DB = initialize.Gorm() // gorm连接数据库
-
 	if g.TENANCY_DB != nil {
 		// 没有数据库无法初始化定时任务
 		job.Timer()

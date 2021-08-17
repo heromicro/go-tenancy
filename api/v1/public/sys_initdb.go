@@ -30,16 +30,16 @@ func InitDB(ctx *gin.Context) {
 	response.OkWithData("自动创建数据库成功", ctx)
 }
 
-// CheckDB 初始化用户数据库
+// CheckDB 初始化用户项目
 func CheckDB(ctx *gin.Context) {
-	if g.TENANCY_DB != nil {
-		g.TENANCY_LOG.Info("数据库无需初始化")
+	if g.TENANCY_DB != nil && (g.TENANCY_CONFIG.System.CacheType == "redis" && g.TENANCY_CACHE != nil) {
+		g.TENANCY_LOG.Info("项目无需初始化")
 		response.OkWithDetailed(gin.H{
 			"needInit": false,
-		}, "数据库无需初始化", ctx)
+		}, "项目无需初始化", ctx)
 		return
 	} else {
-		g.TENANCY_LOG.Info("前往初始化数据库")
+		g.TENANCY_LOG.Info("前往初始化项目")
 		response.OkWithDetailed(gin.H{
 			"needInit": true,
 		}, "前往初始化数据库", ctx)

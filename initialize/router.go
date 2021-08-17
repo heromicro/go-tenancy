@@ -13,6 +13,7 @@ import (
 	"github.com/snowlyg/go-tenancy/router/device"
 	"github.com/snowlyg/go-tenancy/router/public"
 	"github.com/snowlyg/go-tenancy/utils"
+	"github.com/thinkerou/favicon"
 )
 
 // 初始化总路由
@@ -29,6 +30,7 @@ func App() *gin.Engine {
 
 // Routers
 func Routers(app *gin.Engine) {
+	app.Use(favicon.New("resource/favicon.ico"))
 	app.Use(static.Serve("/", static.LocalFile("doc/apidoc", true)))
 	app.LoadHTMLGlob(filepath.Join(g.TENANCY_CONFIG.Casbin.ModelPath, "resource/template/*"))
 	app.StaticFS(g.TENANCY_CONFIG.Local.Path, http.Dir(g.TENANCY_CONFIG.Local.Path)) // 为用户头像和文件提供静态地址

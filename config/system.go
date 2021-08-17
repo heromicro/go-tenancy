@@ -2,7 +2,7 @@ package config
 
 type System struct {
 	Level       string `mapstructure:"level" json:"level" yaml:"level"` // debug,release,test
-	Env         string `mapstructure:"env" json:"env" yaml:"env"`       // dev , test pro
+	Env         string `mapstructure:"env" json:"env" yaml:"env"`       // dev , pro
 	Addr        int    `mapstructure:"addr" json:"addr" yaml:"addr"`
 	DbType      string `mapstructure:"db-type" json:"dbType" yaml:"db-type"`
 	OssType     string `mapstructure:"oss-type" json:"ossType" yaml:"oss-type"` // Oss类型

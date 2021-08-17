@@ -6,10 +6,13 @@ import (
 
 	"github.com/snowlyg/go-tenancy/config"
 	"github.com/snowlyg/go-tenancy/g"
+	"github.com/snowlyg/go-tenancy/initialize/cache"
 	"github.com/snowlyg/go-tenancy/model"
 	"github.com/snowlyg/go-tenancy/model/request"
 	"github.com/snowlyg/go-tenancy/source"
 	"github.com/snowlyg/go-tenancy/utils"
+	"github.com/snowlyg/multi"
+	"go.uber.org/zap"
 
 	"github.com/spf13/viper"
 	"gorm.io/driver/mysql"
@@ -19,6 +22,16 @@ import (
 // WriteConfig 回写配置
 func WriteConfig(viper *viper.Viper, mysql config.Mysql) error {
 	g.TENANCY_CONFIG.Mysql = mysql
+	cs := utils.StructToMap(g.TENANCY_CONFIG)
+	for k, v := range cs {
+		viper.Set(k, v)
+	}
+	return viper.WriteConfig()
+}
+
+// WriteCacheTypeConfig 回写配置
+func WriteCacheTypeConfig(viper *viper.Viper, system config.System) error {
+	g.TENANCY_CONFIG.System = system
 	cs := utils.StructToMap(g.TENANCY_CONFIG)
 	for k, v := range cs {
 		viper.Set(k, v)
@@ -64,7 +77,27 @@ func initDB(InitDBFunctions ...model.InitDBFunc) error {
 
 // InitDB 创建数据库并初始化
 func InitDB(conf request.InitDB) error {
-	BaseSystem := config.System{CacheType: conf.CacheType}
+	level := conf.Level
+	if level == "" {
+		level = "release"
+	}
+	env := conf.Level
+	if env == "" {
+		env = "pro"
+	}
+	BaseSystem := config.System{
+		CacheType:   conf.CacheType,
+		Level:       level,
+		Env:         env,
+		Addr:        8089,
+		OssType:     "local",
+		DbType:      conf.SqlType,
+		AdminPreix:  "/admin",
+		ClientPreix: "/merchant",
+	}
+	if err := WriteCacheTypeConfig(g.TENANCY_VP, BaseSystem); err != nil {
+		return err
+	}
 	if BaseSystem.CacheType == "redis" {
 		BaseCache := config.Redis{
 			DB:       0,
@@ -73,6 +106,13 @@ func InitDB(conf request.InitDB) error {
 		}
 		if err := WriteRedisConfig(g.TENANCY_VP, BaseCache); err != nil {
 			return err
+		}
+		g.TENANCY_CACHE = cache.Cache() // redis缓存
+		err := multi.InitDriver(&multi.Config{
+			DriverType:      g.TENANCY_CONFIG.System.CacheType,
+			UniversalClient: g.TENANCY_CACHE})
+		if err != nil {
+			g.TENANCY_LOG.Error("初始化缓存驱动:", zap.Any("err", err))
 		}
 	}
 

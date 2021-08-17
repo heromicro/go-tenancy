@@ -19,3 +19,4 @@ main
 *.exe
 *.crt
 .air.toml
+tests/resource/favicon.ico
