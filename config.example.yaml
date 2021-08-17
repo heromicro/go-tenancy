@@ -17,25 +17,25 @@ email:
 local:
   path: uploads/file
 mysql:
-  path: 
+  path: ""
   config: charset=utf8mb4&parseTime=True&loc=Local
-  db-name: 
-  username: 
-  password: 
+  db-name: ""
+  username: ""
+  password: ""
   max-idle-conns: 0
   max-open-conns: 0
   log-mode: false
   log-zap: ""
 redis:
   db: 0
-  addr: 127.0.0.1:6379
-  password: 
+  addr: ""
+  password: ""
 system:
   level: error
   env: dev
   addr: 8089
   db-type: mysql
-  cache-type: redis # redis , local
+  cache-type:  # redis , local
   oss-type: 'local'    # 控制oss选择走本期还是 七牛等其他仓 自行增加其他oss仓可以在 server/utils/upload/upload.go 中 NewOss函数配置
   admin-preix: /admin 
   client-preix: /merchant 
