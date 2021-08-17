@@ -9,7 +9,7 @@ captcha:
   img-width: 240
   img-height: 80
 casbin:
-  model-path: D:/go/src/github.com/snowlyg/go-tenancy/resource/rbac_model.conf
+  model-path: D:/go/src/github.com/snowlyg/go-tenancy
 wechat-pay:
   state: ""
 email:

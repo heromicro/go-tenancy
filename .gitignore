@@ -20,3 +20,4 @@ main
 *.crt
 .air.toml
 tests/resource/favicon.ico
+tests/main_test.go

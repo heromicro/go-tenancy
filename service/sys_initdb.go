@@ -85,11 +85,15 @@ func InitDB(conf request.InitDB) error {
 	if env == "" {
 		env = "pro"
 	}
+	addr := conf.Addr
+	if addr == 0 {
+		addr = 80
+	}
 	BaseSystem := config.System{
 		CacheType:   conf.CacheType,
 		Level:       level,
 		Env:         env,
-		Addr:        8089,
+		Addr:        addr,
 		OssType:     "local",
 		DbType:      conf.SqlType,
 		AdminPreix:  "/admin",
