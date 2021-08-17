@@ -215,7 +215,7 @@ func TestConfigRegisterError(t *testing.T) {
 		WithJSON(data).
 		Expect().Status(http.StatusOK).JSON().Object()
 	obj.Keys().ContainsOnly("status", "data", "message")
-	obj.Value("status").Number().Equal(4000)
+	obj.Value("status").Number().Equal(http.StatusBadRequest)
 	obj.Value("message").String().Equal("添加失败:设置key:site_url已经使用")
 
 }

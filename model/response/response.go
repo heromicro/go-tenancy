@@ -13,9 +13,7 @@ type Response struct {
 }
 
 const (
-	SUCCESS           = 2000
-	BAD_REQUEST_ERROR = 4000
-	NEED_INIT_ERROR   = 4007
+	NEED_INIT_ERROR = 4007
 )
 
 func Result(code int, data interface{}, msg string, ctx *gin.Context) {

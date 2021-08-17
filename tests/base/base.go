@@ -13,6 +13,7 @@ import (
 	"github.com/snowlyg/multi"
 )
 
+//go:embed  resource/template/*
 var fs embed.FS
 
 func BaseTester(t *testing.T) *httpexpect.Expect {

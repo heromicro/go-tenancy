@@ -188,7 +188,7 @@ func TestAddressRegisterError(t *testing.T) {
 		WithJSON(data).
 		Expect().Status(http.StatusOK).JSON().Object()
 	obj.Keys().ContainsOnly("status", "data", "message")
-	obj.Value("status").Number().Equal(4000)
+	obj.Value("status").Number().Equal(http.StatusBadRequest)
 	obj.Value("message").String().Equal("Key: 'CreateAddress.Name' Error:Field validation for 'Name' failed on the 'required' tag")
 
 }

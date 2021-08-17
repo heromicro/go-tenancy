@@ -15,6 +15,7 @@ tests/config.yaml
 latest_log
 main
 tests/resource/favicon.ico
+tests/base/resource/template/wechat_pay.html
 tests/main_test.go
 .air.toml
 

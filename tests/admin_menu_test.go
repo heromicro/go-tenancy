@@ -260,7 +260,7 @@ func TestMenuAddError(t *testing.T) {
 		WithJSON(data).
 		Expect().Status(http.StatusOK).JSON().Object()
 	obj.Keys().ContainsOnly("status", "data", "message")
-	obj.Value("status").Number().Equal(4000)
+	obj.Value("status").Number().Equal(http.StatusBadRequest)
 	obj.Value("message").String().Equal("添加失败:存在重复route，请修改route")
 
 }

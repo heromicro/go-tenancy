@@ -41,7 +41,7 @@ func TestAdminLoginUser(t *testing.T) {
 		WithJSON(map[string]interface{}{"username": "admin", "password": "123456", "newPassword": "456789", "confirmPassword": "456789"}).
 		Expect().Status(http.StatusOK).JSON().Object()
 	obj.Keys().ContainsOnly("status", "data", "message")
-	obj.Value("status").Number().Equal(4000)
+	obj.Value("status").Number().Equal(http.StatusBadRequest)
 	obj.Value("message").String().Equal("修改失败，原密码与当前账户不符")
 
 	// changeProfile success
@@ -156,7 +156,7 @@ func TestAdminUserRegisterError(t *testing.T) {
 		WithJSON(map[string]interface{}{"username": "admin", "password": "123456", "ConfirmPassword": "123456", "authorityId": []string{source.AdminAuthorityId}}).
 		Expect().Status(http.StatusOK).JSON().Object()
 	obj.Keys().ContainsOnly("status", "data", "message")
-	obj.Value("status").Number().Equal(4000)
+	obj.Value("status").Number().Equal(http.StatusBadRequest)
 	obj.Value("message").String().Equal("用户名已注册")
 
 }
@@ -168,7 +168,7 @@ func TestAdminUserRegisterAuthorityIdEmpty(t *testing.T) {
 		WithJSON(map[string]interface{}{"username": "admin_authrity_id_empty", "password": "123456", "ConfirmPassword": "123456", "authorityId": nil}).
 		Expect().Status(http.StatusOK).JSON().Object()
 	obj.Keys().ContainsOnly("status", "data", "message")
-	obj.Value("status").Number().Equal(4000)
+	obj.Value("status").Number().Equal(http.StatusBadRequest)
 	obj.Value("message").String().Equal("Key: 'Register.AuthorityId' Error:Field validation for 'AuthorityId' failed on the 'required' tag")
 
 }

@@ -7,7 +7,6 @@ import (
 
 	"github.com/gavv/httpexpect"
 	"github.com/snowlyg/go-tenancy/g"
-	"github.com/snowlyg/go-tenancy/model/response"
 	"github.com/snowlyg/go-tenancy/tests/base"
 )
 
@@ -87,7 +86,7 @@ func TestCategoryProcess(t *testing.T) {
 			{Type: "string", Key: "pic", Value: update["pic"]},
 			{Type: "int", Key: "level", Value: update["level"]},
 		}
-		base.GetById(auth, url, categoryId,nil, keys, http.StatusOK, "操作成功")
+		base.GetById(auth, url, categoryId, nil, keys, http.StatusOK, "操作成功")
 	}
 
 	{
@@ -121,7 +120,7 @@ func TestCategoryRegisterError(t *testing.T) {
 	defer base.BaseLogOut(auth)
 
 	msg := "Key: 'ProductCategory.BaseProductCategory.CateName' Error:Field validation for 'CateName' failed on the 'required' tag"
-	categoryId := CreateCategory(auth, data, response.BAD_REQUEST_ERROR, msg)
+	categoryId := CreateCategory(auth, data, http.StatusBadRequest, msg)
 	if categoryId == 0 {
 		return
 	}

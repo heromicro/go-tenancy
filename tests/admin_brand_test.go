@@ -7,7 +7,6 @@ import (
 
 	"github.com/gavv/httpexpect"
 	"github.com/snowlyg/go-tenancy/g"
-	"github.com/snowlyg/go-tenancy/model/response"
 	"github.com/snowlyg/go-tenancy/tests/base"
 )
 
@@ -115,7 +114,7 @@ func TestBrandProcess(t *testing.T) {
 			{Type: "string", Key: "pic", Value: updateBrand["pic"]},
 		}
 		url := fmt.Sprintf("v1/admin/brand/getBrandById/%d", brandId)
-		base.GetById(auth, url, brandId,nil, responseKeys, http.StatusOK, "操作成功")
+		base.GetById(auth, url, brandId, nil, responseKeys, http.StatusOK, "操作成功")
 	}
 
 	{
@@ -148,7 +147,7 @@ func TestBrandRegisterError(t *testing.T) {
 	auth := base.BaseWithLoginTester(t)
 	defer base.BaseLogOut(auth)
 	msg := "Key: 'SysBrand.BrandName' Error:Field validation for 'BrandName' failed on the 'required' tag"
-	brandId := CreateBrand(auth, data, response.BAD_REQUEST_ERROR, msg)
+	brandId := CreateBrand(auth, data, http.StatusBadRequest, msg)
 	if brandId == 0 {
 		return
 	}

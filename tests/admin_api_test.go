@@ -6,7 +6,6 @@ import (
 	"testing"
 
 	"github.com/gavv/httpexpect"
-	"github.com/snowlyg/go-tenancy/model/response"
 	"github.com/snowlyg/go-tenancy/source"
 	"github.com/snowlyg/go-tenancy/tests/base"
 )
@@ -80,7 +79,7 @@ func TestApiRegisterError(t *testing.T) {
 	}
 	auth := base.BaseWithLoginTester(t)
 	defer base.BaseLogOut(auth)
-	apiId, apiPath, apiMethod := CreateApi(auth, create, response.BAD_REQUEST_ERROR, "添加失败:存在相同api")
+	apiId, apiPath, apiMethod := CreateApi(auth, create, http.StatusBadRequest, "添加失败:存在相同api")
 	if apiId == 0 || apiPath == "" || apiMethod == "" {
 		return
 	}

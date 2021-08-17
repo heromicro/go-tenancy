@@ -6,7 +6,6 @@ import (
 	"testing"
 
 	"github.com/snowlyg/go-tenancy/g"
-	"github.com/snowlyg/go-tenancy/model/response"
 	"github.com/snowlyg/go-tenancy/tests/base"
 )
 
@@ -266,7 +265,7 @@ func TestTenancyRegisterError(t *testing.T) {
 		defer base.DeleteTenancy(auth, tenancyId)
 	}
 	{
-		tenancyId, _, _ := base.CreateTenancy(auth, data, response.BAD_REQUEST_ERROR, "添加失败:商户名称已被注冊")
+		tenancyId, _, _ := base.CreateTenancy(auth, data, http.StatusBadRequest, "添加失败:商户名称已被注冊")
 		if tenancyId == 0 {
 			t.Fatal("创建失败")
 		}

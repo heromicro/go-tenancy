@@ -149,7 +149,7 @@ func TestReceiptRegisterReceiptTitleError(t *testing.T) {
 		WithJSON(data).
 		Expect().Status(http.StatusOK).JSON().Object()
 	obj.Keys().ContainsOnly("status", "data", "message")
-	obj.Value("status").Number().Equal(4000)
+	obj.Value("status").Number().Equal(http.StatusBadRequest)
 	obj.Value("message").String().Equal("Key: 'CreateReceipt.ReceiptTitle' Error:Field validation for 'ReceiptTitle' failed on the 'required' tag")
 }
 func TestReceiptRegisterReceiptTypeError(t *testing.T) {
@@ -171,7 +171,7 @@ func TestReceiptRegisterReceiptTypeError(t *testing.T) {
 		WithJSON(data).
 		Expect().Status(http.StatusOK).JSON().Object()
 	obj.Keys().ContainsOnly("status", "data", "message")
-	obj.Value("status").Number().Equal(4000)
+	obj.Value("status").Number().Equal(http.StatusBadRequest)
 	obj.Value("message").String().Equal("Key: 'CreateReceipt.ReceiptType' Error:Field validation for 'ReceiptType' failed on the 'oneof' tag")
 
 }
@@ -194,7 +194,7 @@ func TestReceiptRegisterEmaileError(t *testing.T) {
 		WithJSON(data).
 		Expect().Status(http.StatusOK).JSON().Object()
 	obj.Keys().ContainsOnly("status", "data", "message")
-	obj.Value("status").Number().Equal(4000)
+	obj.Value("status").Number().Equal(http.StatusBadRequest)
 	obj.Value("message").String().Equal("Key: 'CreateReceipt.Email' Error:Field validation for 'Email' failed on the 'email' tag")
 
 }

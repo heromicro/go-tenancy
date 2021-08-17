@@ -7,7 +7,6 @@ import (
 
 	"github.com/gavv/httpexpect"
 	"github.com/snowlyg/go-tenancy/g"
-	"github.com/snowlyg/go-tenancy/model/response"
 	"github.com/snowlyg/go-tenancy/tests/base"
 )
 
@@ -76,7 +75,7 @@ func TestBrandCategoryProcess(t *testing.T) {
 
 			{
 				url := fmt.Sprintf("v1/admin/brandCategory/getBrandCategoryById/%d", brandCategoryId)
-				base.GetById(auth, url, brandCategoryId,nil, rkeys, http.StatusOK, "操作成功")
+				base.GetById(auth, url, brandCategoryId, nil, rkeys, http.StatusOK, "操作成功")
 			}
 
 			{
@@ -111,7 +110,7 @@ func TestBrandCategoryRegisterError(t *testing.T) {
 	auth := base.BaseWithLoginTester(t)
 	defer base.BaseLogOut(auth)
 	messge := "Key: 'SysBrandCategory.BaseBrandCategory.CateName' Error:Field validation for 'CateName' failed on the 'required' tag"
-	brandCategoryId := CreateBrandCategory(auth, create, response.BAD_REQUEST_ERROR, messge)
+	brandCategoryId := CreateBrandCategory(auth, create, http.StatusBadRequest, messge)
 	if brandCategoryId > 0 {
 		defer DeleteBrandCategory(auth, brandCategoryId)
 	}

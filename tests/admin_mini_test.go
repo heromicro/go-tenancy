@@ -6,7 +6,6 @@ import (
 	"testing"
 
 	"github.com/gavv/httpexpect"
-	"github.com/snowlyg/go-tenancy/model/response"
 	"github.com/snowlyg/go-tenancy/tests/base"
 )
 
@@ -77,7 +76,7 @@ func TestMiniProcess(t *testing.T) {
 			{Type: "string", Key: "appSecret", Value: update["appSecret"]},
 			{Type: "string", Key: "remark", Value: update["remark"]},
 		}
-		base.GetById(auth, url, miniId,nil, keys, http.StatusOK, "操作成功")
+		base.GetById(auth, url, miniId, nil, keys, http.StatusOK, "操作成功")
 	}
 }
 
@@ -96,7 +95,7 @@ func TestMiniRegisterError(t *testing.T) {
 	}
 	defer DeleteMini(auth, miniId, http.StatusOK, "删除成功")
 
-	miniId = CreateMini(auth, data, response.BAD_REQUEST_ERROR, "添加失败:商户名称已被注冊")
+	miniId = CreateMini(auth, data, http.StatusBadRequest, "添加失败:商户名称已被注冊")
 	if miniId == 0 {
 		return
 	}

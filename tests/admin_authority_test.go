@@ -269,6 +269,6 @@ func TestAuthorityRegisterError(t *testing.T) {
 		WithJSON(data).
 		Expect().Status(http.StatusOK).JSON().Object()
 	obj.Keys().ContainsOnly("status", "data", "message")
-	obj.Value("status").Number().Equal(4000)
+	obj.Value("status").Number().Equal(http.StatusBadRequest)
 	obj.Value("message").String().Equal("创建失败存在相同角色id")
 }
