@@ -12,6 +12,10 @@ var Api = new(api)
 
 type api struct{}
 
+func BaseApisLen() int {
+	return len(baseApis)
+}
+
 var baseApis = []model.SysApi{
 
 	// 授权

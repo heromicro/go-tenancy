@@ -7,18 +7,20 @@ import (
 
 	"github.com/gavv/httpexpect"
 	"github.com/snowlyg/go-tenancy/model/response"
+	"github.com/snowlyg/go-tenancy/source"
 	"github.com/snowlyg/go-tenancy/tests/base"
 )
 
 func TestApiList(t *testing.T) {
 	auth := base.BaseWithLoginTester(t)
 	defer base.BaseLogOut(auth)
+
 	url := "v1/admin/api/getApiList"
 	pageKeys := base.ResponseKeys{
 		{Type: "int", Key: "pageSize", Value: 10},
 		{Type: "int", Key: "page", Value: 1},
 		{Type: "array", Key: "list", Value: nil},
-		{Type: "int", Key: "total", Value: 289},
+		{Type: "int", Key: "total", Value: source.BaseApisLen()},
 	}
 	base.PostList(auth, url, base.PageRes, pageKeys, http.StatusOK, "获取成功")
 }
@@ -64,7 +66,7 @@ func TestApiProcess(t *testing.T) {
 			{Type: "string", Key: "description", Value: update["description"]},
 			{Type: "string", Key: "apiGroup", Value: update["apiGroup"]},
 		}
-		base.GetById(auth, url, apiId,nil, keys, http.StatusOK, "操作成功")
+		base.GetById(auth, url, apiId, nil, keys, http.StatusOK, "操作成功")
 	}
 
 }

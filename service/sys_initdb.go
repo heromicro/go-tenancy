@@ -26,6 +26,16 @@ func WriteConfig(viper *viper.Viper, mysql config.Mysql) error {
 	return viper.WriteConfig()
 }
 
+// WriteRedisConfig 回写配置
+func WriteRedisConfig(viper *viper.Viper, redis config.Redis) error {
+	g.TENANCY_CONFIG.Redis = redis
+	cs := utils.StructToMap(g.TENANCY_CONFIG)
+	for k, v := range cs {
+		viper.Set(k, v)
+	}
+	return viper.WriteConfig()
+}
+
 // createTable 创建数据库(mysql)
 func createTable(dsn string, driver string, createSql string) error {
 	db, err := sql.Open(driver, dsn)
@@ -54,6 +64,18 @@ func initDB(InitDBFunctions ...model.InitDBFunc) error {
 
 // InitDB 创建数据库并初始化
 func InitDB(conf request.InitDB) error {
+	BaseSystem := config.System{CacheType: conf.CacheType}
+	if BaseSystem.CacheType == "redis" {
+		BaseCache := config.Redis{
+			DB:       0,
+			Addr:     fmt.Sprintf("%s:%s", conf.Cache.Host, conf.Cache.Port),
+			Password: conf.Cache.Password,
+		}
+		if err := WriteRedisConfig(g.TENANCY_VP, BaseCache); err != nil {
+			return err
+		}
+	}
+
 	BaseMysql := config.Mysql{
 		Path:     "",
 		Dbname:   "",
@@ -62,25 +84,25 @@ func InitDB(conf request.InitDB) error {
 		Config:   "charset=utf8mb4&parseTime=True&loc=Local",
 	}
 
-	if conf.Host == "" {
-		conf.Host = "127.0.0.1"
+	if conf.Sql.Host == "" {
+		conf.Sql.Host = "127.0.0.1"
 	}
 
-	if conf.Port == "" {
-		conf.Port = "3306"
+	if conf.Sql.Port == "" {
+		conf.Sql.Port = "3306"
 	}
-	dsn := fmt.Sprintf("%s:%s@tcp(%s:%s)/", conf.UserName, conf.Password, conf.Host, conf.Port)
-	createSql := fmt.Sprintf("CREATE DATABASE IF NOT EXISTS `%s` DEFAULT CHARACTER SET utf8mb4 DEFAULT COLLATE utf8mb4_general_ci;", conf.DBName)
+	dsn := fmt.Sprintf("%s:%s@tcp(%s:%s)/", conf.Sql.UserName, conf.Sql.Password, conf.Sql.Host, conf.Sql.Port)
+	createSql := fmt.Sprintf("CREATE DATABASE IF NOT EXISTS `%s` DEFAULT CHARACTER SET utf8mb4 DEFAULT COLLATE utf8mb4_general_ci;", conf.Sql.DBName)
 
 	if err := createTable(dsn, "mysql", createSql); err != nil {
 		return err
 	}
 
 	MysqlConfig := config.Mysql{
-		Path:     fmt.Sprintf("%s:%s", conf.Host, conf.Port),
-		Dbname:   conf.DBName,
-		Username: conf.UserName,
-		Password: conf.Password,
+		Path:     fmt.Sprintf("%s:%s", conf.Sql.Host, conf.Sql.Port),
+		Dbname:   conf.Sql.DBName,
+		Username: conf.Sql.UserName,
+		Password: conf.Sql.Password,
 		Config:   "charset=utf8mb4&parseTime=True&loc=Local",
 	}
 

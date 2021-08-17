@@ -25,11 +25,20 @@ func TestMain(m *testing.M) {
 
 	uuid := uuid.NewV3(uuid.NewV4(), uuid.NamespaceOID.String()).String()
 	mysqlConfig := request.InitDB{
-		Host:     "127.0.0.1",
-		Port:     "3306",
-		UserName: "root",
-		Password: "Chindeo",
-		DBName:   uuid,
+		SqlType: "mysql",
+		Sql: request.Sql{
+			Host:     "127.0.0.1",
+			Port:     "3306",
+			UserName: "root",
+			Password: "Chindeo",
+			DBName:   uuid,
+		},
+		CacheType: "redis",
+		Cache: request.Cache{
+			Host:     "127.0.0.1",
+			Port:     "6379",
+			Password: "Chindeo",
+		},
 	}
 	service.InitDB(mysqlConfig)
 
