@@ -1,12 +1,17 @@
 package main
 
 import (
+	"embed"
+
 	"github.com/snowlyg/go-tenancy/core"
 	"github.com/snowlyg/go-tenancy/g"
 	"github.com/snowlyg/go-tenancy/initialize"
 	"github.com/snowlyg/go-tenancy/job"
 	"github.com/snowlyg/multi"
 )
+
+//go:embed www/admin/* www/merchant/* resource/template/*
+var fs embed.FS
 
 func main() {
 	g.TENANCY_VP = core.Viper()      // 初始化Viper
@@ -28,5 +33,5 @@ func main() {
 		defer multi.AuthDriver.Close()
 	}
 
-	core.RunServer()
+	core.RunServer(fs)
 }

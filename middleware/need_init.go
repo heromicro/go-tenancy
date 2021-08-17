@@ -9,7 +9,7 @@ import (
 // NeedInit
 func NeedInit() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
-		if g.TENANCY_DB == nil {
+		if g.TENANCY_DB == nil || (g.TENANCY_CONFIG.System.CacheType == "redis" && g.TENANCY_CACHE == nil) {
 			response.NeedInitWithDetailed(gin.H{
 				"needInit": true,
 			}, "前往初始化数据库", ctx)

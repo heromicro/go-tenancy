@@ -117,6 +117,10 @@ func InitDB(conf request.InitDB) error {
 			UniversalClient: g.TENANCY_CACHE})
 		if err != nil {
 			g.TENANCY_LOG.Error("初始化缓存驱动:", zap.Any("err", err))
+			return fmt.Errorf("初始化缓存驱动失败 %w", err)
+		}
+		if multi.AuthDriver == nil {
+
 		}
 	}
 

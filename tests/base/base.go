@@ -1,6 +1,7 @@
 package base
 
 import (
+	"embed"
 	"fmt"
 	"net/http"
 	"testing"
@@ -12,8 +13,10 @@ import (
 	"github.com/snowlyg/multi"
 )
 
+var fs embed.FS
+
 func BaseTester(t *testing.T) *httpexpect.Expect {
-	handler := initialize.App()
+	handler := initialize.App(fs)
 	return httpexpect.WithConfig(httpexpect.Config{
 		BaseURL: "http://127.0.0.1:8089/",
 		Client: &http.Client{

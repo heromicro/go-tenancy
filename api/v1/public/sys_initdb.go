@@ -11,9 +11,9 @@ import (
 
 // InitDB 初始化用户数据库
 func InitDB(ctx *gin.Context) {
-	if g.TENANCY_DB != nil {
-		g.TENANCY_LOG.Error("非法访问")
-		response.FailWithMessage("非法访问", ctx)
+	if g.TENANCY_DB != nil || (g.TENANCY_CONFIG.System.CacheType == "redis" && g.TENANCY_CACHE != nil) {
+		g.TENANCY_LOG.Error("项目已经初始化")
+		response.FailWithMessage("项目已经初始化", ctx)
 		return
 	}
 	var dbInfo request.InitDB

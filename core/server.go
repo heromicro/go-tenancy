@@ -1,6 +1,7 @@
 package core
 
 import (
+	"embed"
 	"fmt"
 	"time"
 
@@ -14,8 +15,8 @@ type server interface {
 	ListenAndServe() error
 }
 
-func RunServer() {
-	Router := initialize.App()
+func RunServer(fs embed.FS) {
+	Router := initialize.App(fs)
 	// Router.Static("/form-generator", "./resource/page")
 	address := fmt.Sprintf(":%d", g.TENANCY_CONFIG.System.Addr)
 	// In order to ensure that the text order output can be
