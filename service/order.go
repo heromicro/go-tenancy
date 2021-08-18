@@ -14,6 +14,7 @@ import (
 	"github.com/snowlyg/go-tenancy/model"
 	"github.com/snowlyg/go-tenancy/model/request"
 	"github.com/snowlyg/go-tenancy/model/response"
+	"github.com/snowlyg/go-tenancy/utils/param"
 	"github.com/snowlyg/multi"
 	"gorm.io/gorm"
 )
@@ -767,7 +768,7 @@ func CheckOrderStatusBeforePay(orderId, tenancyId, userId uint) error {
 }
 
 func GetQrCode(orderId, tenancyId, userId uint, orderType int) ([]byte, error) {
-	seitURL, err := GetSeitURL()
+	seitURL, err := param.GetSeitURL()
 	if err != nil {
 		return nil, err
 	}

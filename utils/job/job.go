@@ -12,6 +12,7 @@ import (
 	"github.com/snowlyg/go-tenancy/model"
 	"github.com/snowlyg/go-tenancy/service"
 	"github.com/snowlyg/go-tenancy/utils"
+	"github.com/snowlyg/go-tenancy/utils/param"
 	"go.uber.org/zap"
 )
 
@@ -56,7 +57,7 @@ func Timer() {
 
 		// 定时获取微信平台证书
 		g.TENANCY_Timer.AddTaskByFunc("CheckOrdersPayStatus", EveryTeenHour, func() {
-			wechatConf, err := service.GetWechatPayConfig()
+			wechatConf, err := param.GetWechatPayConfig()
 			if err != nil {
 				g.TENANCY_LOG.Info("定时获取微信平台证书", zap.String("获取微信支付配置错误", err.Error()))
 				return

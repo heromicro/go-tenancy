@@ -14,6 +14,7 @@ import (
 	"github.com/snowlyg/go-tenancy/model/response"
 	"github.com/snowlyg/go-tenancy/source"
 	"github.com/snowlyg/go-tenancy/utils"
+	"github.com/snowlyg/go-tenancy/utils/param"
 	"github.com/snowlyg/multi"
 	"gorm.io/gorm"
 )
@@ -80,7 +81,7 @@ func LoginTenancy(id uint) (response.LoginTenancy, error) {
 	loginTenancy.Token = token
 	loginTenancy.Exp = exp
 
-	url, err := GetSeitURL()
+	url, err := param.GetSeitURL()
 	if err != nil {
 		return loginTenancy, err
 	}
@@ -98,9 +99,9 @@ func CreateTenancy(req request.CreateTenancy) (uint, string, string, error) {
 	}
 
 	err = g.TENANCY_DB.
+		Joins("left join sys_authorities on sys_authorities.authority_id = sys_users.authority_id").
 		Where("sys_users.username = ?", req.Username).
 		Where("sys_authorities.authority_type = ?", multi.TenancyAuthority).
-		Joins("left join sys_authorities on sys_authorities.authority_id = sys_users.authority_id").
 		First(&model.SysUser{}).Error
 	if !errors.Is(err, gorm.ErrRecordNotFound) {
 		return 0, "", "", errors.New("管理员用户名已注册")
@@ -114,7 +115,11 @@ func CreateTenancy(req request.CreateTenancy) (uint, string, string, error) {
 		if err != nil {
 			return err
 		}
-		user := model.SysUser{Username: req.Username, Password: utils.MD5V([]byte("123456")), AuthorityId: source.TenancyAuthorityId, Status: g.StatusTrue, IsShow: g.StatusFalse, SysTenancyID: req.SysTenancy.ID}
+		defaultPwd, _ := param.GetTenancyDefaultPassword()
+		if defaultPwd == "" {
+			defaultPwd = "123456"
+		}
+		user := model.SysUser{Username: req.Username, Password: utils.MD5V([]byte(defaultPwd)), AuthorityId: source.TenancyAuthorityId, Status: g.StatusTrue, IsShow: g.StatusFalse, SysTenancyID: req.SysTenancy.ID}
 		err = tx.Create(&user).Error
 		if err != nil {
 			return err
@@ -217,13 +222,16 @@ func GetTenanciesInfoList(info request.TenancyPageInfo) ([]response.SysTenancy, 
 	var tenancyList []response.SysTenancy
 	limit := info.PageSize
 	offset := info.PageSize * (info.Page - 1)
-	db := g.TENANCY_DB.Model(&model.SysTenancy{}).Where("status = ?", info.Status)
+	db := g.TENANCY_DB.Model(&model.SysTenancy{}).
+		Joins("left join sys_users on sys_users.sys_tenancy_id = sys_tenancies.id").
+		Select("sys_tenancies.*,sys_users.username as username").
+		Where("sys_tenancies.status = ?", info.Status)
 	if info.Keyword != "" {
-		db = db.Where(g.TENANCY_DB.Where("name like ?", info.Keyword+"%").Or("tele like ?", info.Keyword+"%"))
+		db = db.Where(g.TENANCY_DB.Where("sys_tenancies.name like ?", info.Keyword+"%").Or("sys_tenancies.tele like ?", info.Keyword+"%"))
 	}
 
 	if info.Date != "" {
-		db = filterDate(db, info.Date, "")
+		db = filterDate(db, info.Date, "sys_tenancies")
 	}
 
 	var total int64

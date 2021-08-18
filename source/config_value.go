@@ -18,6 +18,7 @@ var configValues = []model.SysConfigValue{
 	{ConfigKey: "wechat_name", Value: "GOTENANCY \u591a\u5546\u6237", SysTenancyID: 0},
 	{ConfigKey: "set_phone", Value: "18741523695", SysTenancyID: 55},
 	{ConfigKey: "set_email", Value: "mkpmkmp", SysTenancyID: 55},
+	{ConfigKey: "tenancy_admin_password", Value: "123456", SysTenancyID: 0},
 	{ConfigKey: "wechat_qrcode", Value: "", SysTenancyID: 0},
 	{ConfigKey: "wechat_avatar", Value: "", SysTenancyID: 0},
 	{ConfigKey: "wechat_share_img", Value: "", SysTenancyID: 0},

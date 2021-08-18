@@ -3,7 +3,7 @@ package upload
 import (
 	"mime/multipart"
 
-	"github.com/snowlyg/go-tenancy/g"
+	"github.com/snowlyg/go-tenancy/utils/param"
 )
 
 type OSS interface {
@@ -12,15 +12,19 @@ type OSS interface {
 }
 
 func NewOss() OSS {
-	switch g.TENANCY_CONFIG.System.OssType {
+	uploadType, _ := param.GetConfigValueByKey("upload_type")
+	switch uploadType {
 	case "local":
 		return &Local{}
 	case "qiniu":
-		return &Qiniu{}
+		config, _ := param.GetQiniuConfig()
+		return &Qiniu{Config: config}
 	case "tencent-cos":
-		return &TencentCOS{}
+		config, _ := param.GetTencentCOSConfig()
+		return &TencentCOS{Config: config}
 	case "aliyun-oss":
-		return &AliyunOSS{}
+		config, _ := param.GetAliyunOSSConfig()
+		return &AliyunOSS{Config: config}
 	default:
 		return &Local{}
 	}

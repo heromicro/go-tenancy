@@ -6,7 +6,6 @@ import (
 	"os"
 
 	"github.com/snowlyg/go-tenancy/g"
-	_ "github.com/snowlyg/go-tenancy/packfile"
 	"github.com/snowlyg/go-tenancy/utils"
 
 	"github.com/fsnotify/fsnotify"

@@ -18,6 +18,7 @@ import (
 	"github.com/snowlyg/go-tenancy/model/request"
 	"github.com/snowlyg/go-tenancy/model/response"
 	"github.com/snowlyg/go-tenancy/utils"
+	"github.com/snowlyg/go-tenancy/utils/param"
 	"go.uber.org/zap"
 	"gorm.io/gorm"
 )
@@ -58,11 +59,11 @@ func PayOrder(req request.PayOrder) (response.PayOrder, error) {
 
 func WechatPay(order model.Order, tenancyName, openid string) (response.PayOrder, error) {
 	var res response.PayOrder
-	siteName, err := GetSeitName()
+	siteName, err := param.GetSeitName()
 	if err != nil {
 		return res, fmt.Errorf("获取商城名称 %w", err)
 	}
-	wechatConf, err := GetWechatPayConfig()
+	wechatConf, err := param.GetWechatPayConfig()
 	if err != nil {
 		return res, err
 	}
@@ -99,7 +100,7 @@ func WechatPay(order model.Order, tenancyName, openid string) (response.PayOrder
 	client.DebugSwitch = gopay.DebugOff
 	expire := time.Now().Add(10 * time.Minute).Format(time.RFC3339)
 
-	notifyUrl, err := GetPayNotifyUrl("wechat")
+	notifyUrl, err := param.GetPayNotifyUrl("wechat")
 	if err != nil {
 		return res, err
 	}
@@ -135,7 +136,7 @@ func WechatPay(order model.Order, tenancyName, openid string) (response.PayOrder
 }
 
 func getOrderPrice(price float64) float64 {
-	seitMode, err := GetSeitMode()
+	seitMode, err := param.GetSeitMode()
 	if err != nil {
 		return price
 	}
@@ -150,7 +151,7 @@ func getOrderPrice(price float64) float64 {
 // Alipay
 func Alipay(order model.Order, tenancyName string) (response.PayOrder, error) {
 	var res response.PayOrder
-	siteName, err := GetSeitName()
+	siteName, err := param.GetSeitName()
 	if err != nil {
 		return res, fmt.Errorf("获取商城名称 %w", err)
 	}
@@ -176,11 +177,11 @@ func Alipay(order model.Order, tenancyName string) (response.PayOrder, error) {
 }
 
 func AliPayClient() (*alipay.Client, error) {
-	alipayConf, err := GetAliPayConfig()
+	alipayConf, err := param.GetAliPayConfig()
 	if err != nil {
 		return nil, fmt.Errorf("获取支付宝配置错误 %w", err)
 	}
-	notifyUrl, err := GetPayNotifyUrl("ali")
+	notifyUrl, err := param.GetPayNotifyUrl("ali")
 	if err != nil {
 		return nil, err
 	}
@@ -201,11 +202,11 @@ func AliPayClient() (*alipay.Client, error) {
 }
 
 func GetAutoCode(redirectUri string) (string, error) {
-	seitUrl, err := GetSeitURL()
+	seitUrl, err := param.GetSeitURL()
 	if err != nil {
 		return "", fmt.Errorf("获取站点url错误 %w", err)
 	}
-	wechatConf, err := GetWechatPayConfig()
+	wechatConf, err := param.GetWechatPayConfig()
 	if err != nil {
 		return "", err
 	}
@@ -217,7 +218,7 @@ func GetAutoCode(redirectUri string) (string, error) {
 }
 
 func GetOpenId(code string) (string, error) {
-	wechatConf, err := GetWechatPayConfig()
+	wechatConf, err := param.GetWechatPayConfig()
 	if err != nil {
 		return "", err
 	}
@@ -238,7 +239,7 @@ func NotifyAliPay(ctx *gin.Context) error {
 	if err != nil {
 		return err
 	}
-	alipayConf, err := GetAliPayConfig()
+	alipayConf, err := param.GetAliPayConfig()
 	if err != nil {
 		return err
 	}

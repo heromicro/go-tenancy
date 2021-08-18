@@ -10,15 +10,18 @@ import (
 	"time"
 
 	"github.com/snowlyg/go-tenancy/g"
+	"github.com/snowlyg/go-tenancy/utils/param"
 	"github.com/tencentyun/cos-go-sdk-v5"
 	"go.uber.org/zap"
 )
 
-type TencentCOS struct{}
+type TencentCOS struct {
+	Config param.TencentCOS
+}
 
 // UploadFile upload file to COS
-func (*TencentCOS) UploadFile(file *multipart.FileHeader) (string, string, error) {
-	client := NewClient()
+func (tcos *TencentCOS) UploadFile(file *multipart.FileHeader) (string, string, error) {
+	client := NewClient(tcos)
 	f, openError := file.Open()
 	if openError != nil {
 		g.TENANCY_LOG.Error("function file.Open() Filed", zap.Any("err", openError.Error()))
@@ -26,17 +29,17 @@ func (*TencentCOS) UploadFile(file *multipart.FileHeader) (string, string, error
 	}
 	fileKey := fmt.Sprintf("%d%s", time.Now().Unix(), file.Filename)
 
-	_, err := client.Object.Put(context.Background(), g.TENANCY_CONFIG.TencentCOS.PathPrefix+"/"+fileKey, f, nil)
+	_, err := client.Object.Put(context.Background(), tcos.Config.PathPrefix+"/"+fileKey, f, nil)
 	if err != nil {
 		panic(err)
 	}
-	return g.TENANCY_CONFIG.TencentCOS.BaseURL + "/" + g.TENANCY_CONFIG.TencentCOS.PathPrefix + "/" + fileKey, fileKey, nil
+	return tcos.Config.BaseURL + "/" + tcos.Config.PathPrefix + "/" + fileKey, fileKey, nil
 }
 
 // DeleteFile delete file form COS
-func (*TencentCOS) DeleteFile(key string) error {
-	client := NewClient()
-	name := g.TENANCY_CONFIG.TencentCOS.PathPrefix + "/" + key
+func (tcos *TencentCOS) DeleteFile(key string) error {
+	client := NewClient(tcos)
+	name := tcos.Config.PathPrefix + "/" + key
 	_, err := client.Object.Delete(context.Background(), name)
 	if err != nil {
 		g.TENANCY_LOG.Error("function bucketManager.DELETE() Filed", zap.Any("err", err.Error()))
@@ -46,13 +49,13 @@ func (*TencentCOS) DeleteFile(key string) error {
 }
 
 // NewClient init COS client
-func NewClient() *cos.Client {
-	urlStr, _ := url.Parse("https://" + g.TENANCY_CONFIG.TencentCOS.Bucket + ".cos." + g.TENANCY_CONFIG.TencentCOS.Region + ".myqcloud.com")
+func NewClient(tcos *TencentCOS) *cos.Client {
+	urlStr, _ := url.Parse("https://" + tcos.Config.Bucket + ".cos." + tcos.Config.Region + ".myqcloud.com")
 	baseURL := &cos.BaseURL{BucketURL: urlStr}
 	client := cos.NewClient(baseURL, &http.Client{
 		Transport: &cos.AuthorizationTransport{
-			SecretID:  g.TENANCY_CONFIG.TencentCOS.SecretID,
-			SecretKey: g.TENANCY_CONFIG.TencentCOS.SecretKey,
+			SecretID:  tcos.Config.SecretID,
+			SecretKey: tcos.Config.SecretKey,
 		},
 	})
 	return client

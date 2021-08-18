@@ -94,7 +94,6 @@ func InitDB(conf request.InitDB) error {
 		Level:       level,
 		Env:         env,
 		Addr:        addr,
-		OssType:     "local",
 		DbType:      conf.SqlType,
 		AdminPreix:  "/admin",
 		ClientPreix: "/merchant",

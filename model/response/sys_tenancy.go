@@ -5,6 +5,7 @@ import "github.com/snowlyg/go-tenancy/model"
 type SysTenancy struct {
 	TenancyResponse
 	model.BaseTenancy
+	Username string `json:"username"`
 }
 type TenancySelect struct {
 	ID   uint   `json:"id"`

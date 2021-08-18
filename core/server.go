@@ -16,9 +16,7 @@ type server interface {
 
 func RunServer() {
 	Router := initialize.App()
-	// Router.Static("/form-generator", "./resource/page")
 	address := fmt.Sprintf(":%d", g.TENANCY_CONFIG.System.Addr)
-	// In order to ensure that the text order output can be
 	s := initServer(address, Router)
 	time.Sleep(10 * time.Microsecond)
 	g.TENANCY_LOG.Info("server run success on ", zap.String("address", address))

@@ -112,7 +112,7 @@ var menus = []model.SysBaseMenu{
 	{TENANCY_MODEL: g.TENANCY_MODEL{ID: 546}, Pid: 526, Path: "/526/", Icon: "", MenuName: " 基础配置", Route: "/merchant/systemForm/modifyStoreInfo", Params: "", Sort: 1, Hidden: 2, IsTenancy: 1, IsMenu: 1},
 	{TENANCY_MODEL: g.TENANCY_MODEL{ID: 666}, Pid: 116, Path: "/520/116/", Icon: "", MenuName: "商业授权", Route: "/admin/maintain/auth", Params: "", Sort: 0, Hidden: 1, IsTenancy: 2, IsMenu: 1},
 	{TENANCY_MODEL: g.TENANCY_MODEL{ID: 667}, Pid: 63, Path: "/110/63/", Icon: "", MenuName: "余额/充值设置", Route: "/admin/systemForm/Basics/balance", Params: "", Sort: 0, Hidden: 1, IsTenancy: 2, IsMenu: 1},
-	{TENANCY_MODEL: g.TENANCY_MODEL{ID: 668}, Pid: 63, Path: "/110/63/", Icon: "", MenuName: "文件上传", Route: "/admin/systemForm/Basics/upload", Params: "", Sort: 0, Hidden: 1, IsTenancy: 2, IsMenu: 1},
+	{TENANCY_MODEL: g.TENANCY_MODEL{ID: 668}, Pid: 63, Path: "/110/63/", Icon: "", MenuName: "文件上传", Route: "/admin/systemForm/Basics/upload", Params: "", Sort: 0, Hidden: 2, IsTenancy: 2, IsMenu: 1},
 	{TENANCY_MODEL: g.TENANCY_MODEL{ID: 669}, Pid: 110, Path: "/110/", Icon: "", MenuName: "支付配置", Route: "/admin/pay_config", Params: "", Sort: 0, Hidden: 2, IsTenancy: 2, IsMenu: 1},
 	{TENANCY_MODEL: g.TENANCY_MODEL{ID: 670}, Pid: 110, Path: "/110/", Icon: "", MenuName: "应用配置", Route: "/admin/app_config", Params: "", Sort: 0, Hidden: 2, IsTenancy: 2, IsMenu: 1},
 	{TENANCY_MODEL: g.TENANCY_MODEL{ID: 671}, Pid: 669, Path: "/110/669/", Icon: "", MenuName: "公众号支付配置", Route: "/admin/systemForm/Basics/wechat_payment", Params: "", Sort: 0, Hidden: 2, IsTenancy: 2, IsMenu: 1},

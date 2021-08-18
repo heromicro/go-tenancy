@@ -8,13 +8,16 @@ import (
 
 	"github.com/aliyun/aliyun-oss-go-sdk/oss"
 	"github.com/snowlyg/go-tenancy/g"
+	"github.com/snowlyg/go-tenancy/utils/param"
 	"go.uber.org/zap"
 )
 
-type AliyunOSS struct{}
+type AliyunOSS struct {
+	Config param.AliyunOSS
+}
 
-func (*AliyunOSS) UploadFile(file *multipart.FileHeader) (string, string, error) {
-	bucket, err := NewBucket()
+func (ao *AliyunOSS) UploadFile(file *multipart.FileHeader) (string, string, error) {
+	bucket, err := NewBucket(ao)
 	if err != nil {
 		g.TENANCY_LOG.Error("function AliyunOSS.NewBucket() Failed", zap.Any("err", err.Error()))
 		return "", "", errors.New("function AliyunOSS.NewBucket() Failed, err:" + err.Error())
@@ -37,11 +40,11 @@ func (*AliyunOSS) UploadFile(file *multipart.FileHeader) (string, string, error)
 		return "", "", errors.New("function formUploader.PUT() Failed, err:" + err.Error())
 	}
 
-	return g.TENANCY_CONFIG.AliyunOSS.BucketUrl + "/" + yunFileTmpPath, yunFileTmpPath, nil
+	return ao.Config.BucketUrl + "/" + yunFileTmpPath, yunFileTmpPath, nil
 }
 
-func (*AliyunOSS) DeleteFile(key string) error {
-	bucket, err := NewBucket()
+func (ao *AliyunOSS) DeleteFile(key string) error {
+	bucket, err := NewBucket(ao)
 	if err != nil {
 		g.TENANCY_LOG.Error("function AliyunOSS.NewBucket() Failed", zap.Any("err", err.Error()))
 		return errors.New("function AliyunOSS.NewBucket() Failed, err:" + err.Error())
@@ -58,15 +61,15 @@ func (*AliyunOSS) DeleteFile(key string) error {
 	return nil
 }
 
-func NewBucket() (*oss.Bucket, error) {
+func NewBucket(ao *AliyunOSS) (*oss.Bucket, error) {
 	// 创建OSSClient实例。
-	client, err := oss.New(g.TENANCY_CONFIG.AliyunOSS.Endpoint, g.TENANCY_CONFIG.AliyunOSS.AccessKeyId, g.TENANCY_CONFIG.AliyunOSS.AccessKeySecret)
+	client, err := oss.New(ao.Config.Endpoint, ao.Config.AccessKeyId, ao.Config.AccessKeySecret)
 	if err != nil {
 		return nil, err
 	}
 
 	// 获取存储空间。
-	bucket, err := client.Bucket(g.TENANCY_CONFIG.AliyunOSS.BucketName)
+	bucket, err := client.Bucket(ao.Config.BucketName)
 	if err != nil {
 		return nil, err
 	}

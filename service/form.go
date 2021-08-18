@@ -6,6 +6,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/snowlyg/go-tenancy/g"
+	"github.com/snowlyg/go-tenancy/utils/param"
 	"github.com/snowlyg/multi"
 )
 
@@ -76,7 +77,7 @@ func (r *Rule) TransData(rule string, token []byte) {
 			}
 		}
 	case "file":
-		seitURL, _ := GetSeitURL()
+		seitURL, _ := param.GetSeitURL()
 		r.Props = map[string]interface{}{
 			"action": fmt.Sprintf("%s/v1/admin/media/upload", seitURL),
 			"data":   map[string]interface{}{},

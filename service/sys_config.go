@@ -10,6 +10,7 @@ import (
 	"github.com/snowlyg/go-tenancy/model"
 	"github.com/snowlyg/go-tenancy/model/request"
 	"github.com/snowlyg/go-tenancy/model/response"
+	"github.com/snowlyg/go-tenancy/utils/param"
 	"github.com/snowlyg/multi"
 	"gorm.io/gorm"
 )
@@ -21,14 +22,14 @@ func GetUploadConfigMap(tenancyId uint) (Form, error) {
 		Action: "/sys/admin/configValue/saveConfigValue/upload",
 	}
 
-	uploadType, err := GetConfigValueByKey("upload_type")
+	uploadType, err := param.GetConfigValueByKey("upload_type")
 	if err != nil {
 		return form, err
 	}
 
 	rule := NewRadio("上传类型", "upload_type", "文件上传的类型", uploadType)
 	cateKeys := []string{"aliyun_oss", "qiniuyun", "tengxun"}
-	configs, err := GetConfigByCateKeys(cateKeys, tenancyId)
+	configs, err := param.GetConfigByCateKeys(cateKeys, tenancyId)
 	if err != nil {
 		return form, err
 	}
@@ -76,7 +77,7 @@ func GetConfigMapByCate(cate string, ctx *gin.Context) (Form, error) {
 		form.Action = "/sys/admin/configValue/saveConfigValue/" + cate
 	}
 
-	configs, err := GetConfigByCateKey(cate, multi.GetTenancyId(ctx))
+	configs, err := param.GetConfigByCateKey(cate, multi.GetTenancyId(ctx))
 	if err != nil {
 		return form, err
 	}
@@ -137,68 +138,6 @@ func CreateConfig(m model.SysConfig) (model.SysConfig, error) {
 	}
 	err = g.TENANCY_DB.Create(&m).Error
 	return m, err
-}
-
-// GetConfigByCateKey
-func GetConfigByCateKey(configKey string, tenancyId uint) ([]response.SysConfig, error) {
-	var configs []response.SysConfig
-	err := g.TENANCY_DB.Model(&model.SysConfig{}).
-		Select("sys_configs.*").
-		Joins("left join sys_config_categories on sys_configs.sys_config_category_id = sys_config_categories.id").
-		Where("sys_config_categories.key = ?", configKey).
-		Where("sys_configs.status = ?", g.StatusTrue).
-		Find(&configs).Error
-	if err != nil {
-		return nil, err
-	}
-
-	var values []model.SysConfigValue
-	err = g.TENANCY_DB.Where("sys_tenancy_id = ?", tenancyId).Find(&values).Error
-	if err != nil {
-		return nil, err
-	}
-
-	for i := 0; i < len(configs); i++ {
-		for _, value := range values {
-			if configs[i].ConfigKey == value.ConfigKey {
-				configs[i].Value = value.Value
-				break
-			}
-		}
-	}
-
-	return configs, err
-}
-
-// GetConfigByCateKeys
-func GetConfigByCateKeys(configKeys []string, tenancyId uint) ([]response.SysConfig, error) {
-	var configs []response.SysConfig
-	err := g.TENANCY_DB.Model(&model.SysConfig{}).
-		Select("sys_configs.*,sys_config_categories.key as cate_key").
-		Joins("left join sys_config_categories on sys_configs.sys_config_category_id = sys_config_categories.id").
-		Where("sys_config_categories.key in ?", configKeys).
-		Where("sys_configs.status = ?", g.StatusTrue).
-		Find(&configs).Error
-	if err != nil {
-		return nil, err
-	}
-
-	var values []model.SysConfigValue
-	err = g.TENANCY_DB.Where("sys_tenancy_id = ?", tenancyId).Find(&values).Error
-	if err != nil {
-		return nil, err
-	}
-
-	for i := 0; i < len(configs); i++ {
-		for _, value := range values {
-			if configs[i].ConfigKey == value.ConfigKey {
-				configs[i].Value = value.Value
-				break
-			}
-		}
-	}
-
-	return configs, err
 }
 
 // GetTenancyConfigValue

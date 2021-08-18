@@ -10,6 +10,7 @@ import (
 	"github.com/snowlyg/go-tenancy/g"
 	"github.com/snowlyg/go-tenancy/model"
 	"github.com/snowlyg/go-tenancy/model/request"
+	"github.com/snowlyg/go-tenancy/utils/param"
 	"github.com/snowlyg/go-tenancy/utils/upload"
 	"github.com/snowlyg/multi"
 )
@@ -98,7 +99,7 @@ func GetFileRecordInfoList(info request.MediaPageInfo, ctx *gin.Context) (interf
 	for i := 0; i < len(fileLists); i++ {
 		url := fileLists[i].Url
 		if !strings.Contains(url, "http://") && !strings.Contains(url, "https://") {
-			seitURL, _ := GetSeitURL()
+			seitURL, _ := param.GetSeitURL()
 			fileLists[i].Url = fmt.Sprintf("%s/%s", seitURL, fileLists[i].Url)
 		}
 	}
