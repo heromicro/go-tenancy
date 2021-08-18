@@ -31,4 +31,3 @@ func SaveConfigValue(ctx *gin.Context) {
 		response.OkWithMessage("操作成功", ctx)
 	}
 }
-

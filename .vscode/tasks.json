@@ -14,6 +14,11 @@
       "command": "go env -w CGO_ENABLED=0 | go env -w GOOS=linux | go build -ldflags '-w -s' -o ./main main.go | ./upx -9 ./main | go env -w GOOS=windows | go env -w CGO_ENABLED=1"
     },
     {
+      "label": "build win",
+      "type": "shell",
+      "command": "go env -w CGO_ENABLED=0 | go build -ldflags '-w -s' -o ./main.exe main.go | ./upx -9 ./main.exe  | go env -w CGO_ENABLED=1"
+    },
+    {
       "label": "git push gitee",
       "type": "shell",
       "command": "git push gitee master"

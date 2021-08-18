@@ -1,11 +1,11 @@
 package initialize
 
 import (
-	"embed"
-	"html/template"
 	"net/http"
+	"path/filepath"
 	"strings"
 
+	"github.com/chindeo/pkg/file"
 	"github.com/gin-contrib/static"
 	"github.com/gin-gonic/gin"
 	"github.com/snowlyg/go-tenancy/g"
@@ -19,13 +19,22 @@ import (
 )
 
 // 初始化总路由
-func App(fs embed.FS) *gin.Engine {
+func App() *gin.Engine {
 	gin.SetMode(g.TENANCY_CONFIG.System.Level)
 	app := gin.Default()
-	// 注册已定义验证方法
-	utils.RegisterValidation()
-	app.Use(favicon.New("resource/favicon.ico"))
+	utils.RegisterValidation() // 注册已定义验证方法
+	Routers(app)
+	return app
+}
 
+// Routers
+func Routers(app *gin.Engine) {
+
+	// 跨域
+	app.Use(middleware.Cors()) // 如需跨域可以打开
+	g.TENANCY_LOG.Info("use middleware cors")
+	// Router.Use(middleware.LoadTls())  // 打开就能玩https了
+	app.Use(favicon.New("resource/favicon.ico"))
 	app.Use(static.Serve("/doc", static.LocalFile("doc/apidoc", true)))
 	app.Use(static.Serve("/admin", static.LocalFile("www/admin", true)))
 	app.Use(static.Serve("/system", static.LocalFile("www/admin/system", true)))
@@ -34,46 +43,27 @@ func App(fs embed.FS) *gin.Engine {
 	app.Use(static.Serve("/uploads", static.LocalFile("uploads", true)))
 	app.Use(static.Serve("/UEditor", static.LocalFile("www/merchant/UEditor", true)))
 
-	templ := template.Must(template.New("").ParseFS(fs, "resource/template/*.html"))
-	app.SetHTMLTemplate(templ)
-	app.StaticFS("uploads", http.FS(fs)) // 为用户头像和文件提供静态地址
-	// Router.Use(middleware.LoadTls())  // 打开就能玩https了
+	app.LoadHTMLGlob(filepath.Join(g.TENANCY_CONFIG.Casbin.ModelPath, "resource/template/*"))
+	app.StaticFS(g.TENANCY_CONFIG.Local.Path, http.Dir(g.TENANCY_CONFIG.Local.Path)) // 为用户头像和文件提供静态地址
+
 	// 关键点【解决页面刷新404的问题】
 	app.NoRoute(func(ctx *gin.Context) {
-		//设置响应状态
 		ctx.Writer.WriteHeader(http.StatusOK)
-		//载入首页
 		if strings.Contains(ctx.Request.RequestURI, "admin") {
-			file, _ := fs.ReadFile("www/admin/index.html")
+			file, _ := file.ReadBytes(filepath.Join(g.TENANCY_CONFIG.Casbin.ModelPath, "www/admin/index.html"))
 			ctx.Writer.Write(file)
 		} else {
-			file, _ := fs.ReadFile("www/merchant/index.html")
+			file, _ := file.ReadBytes(filepath.Join(g.TENANCY_CONFIG.Casbin.ModelPath, "www/merchant/index.html"))
 			ctx.Writer.Write(file)
 		}
-
-		//响应HTML类型
 		ctx.Writer.Header().Add("Accept", "text/html")
-		//显示刷新
 		ctx.Writer.Flush()
 	})
-	// 注册路由
-	Routers(app)
-
-	return app
-}
-
-// Routers
-func Routers(app *gin.Engine) {
-
-	g.TENANCY_LOG.Info("use middleware logger")
 
 	app.GET("/", func(ctx *gin.Context) {
 		ctx.Redirect(http.StatusFound, "/admin")
 	})
 
-	// 跨域
-	app.Use(middleware.Cors()) // 如需跨域可以打开
-	g.TENANCY_LOG.Info("use middleware cors")
 	// 方便统一添加路由组前缀 多服务器上线使用
 	PublicGroup := app.Group("/v1")
 	{

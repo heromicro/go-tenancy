@@ -20,6 +20,7 @@ require (
 	github.com/gavv/httpexpect v2.0.0+incompatible
 	github.com/gin-contrib/static v0.0.1
 	github.com/gin-gonic/gin v1.7.2
+	github.com/go-bindata/go-bindata v1.0.0 // indirect
 	github.com/go-pay/gopay v1.5.53
 	github.com/go-playground/validator/v10 v10.6.1
 	github.com/go-redis/redis/v8 v8.8.2
