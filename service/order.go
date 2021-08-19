@@ -327,7 +327,7 @@ func GetOrderInfoList(info request.OrderPageInfo, ctx *gin.Context) ([]response.
 		{"className": "el-icon-s-finance", "count": 0, "field": "元", "name": "余额支付金额"},
 		{"className": "el-icon-s-cooperation", "count": 0, "field": "元", "name": "支付宝支付金额"},
 	}
-	var orderList []response.OrderList
+	orderList := []response.OrderList{}
 	var total int64
 	limit := info.PageSize
 	offset := info.PageSize * (info.Page - 1)
@@ -359,7 +359,7 @@ func GetOrderInfoList(info request.OrderPageInfo, ctx *gin.Context) ([]response.
 	}
 
 	if len(orderList) > 0 {
-		var orderIds []uint
+		orderIds := []uint{}
 		for _, order := range orderList {
 			orderIds = append(orderIds, order.ID)
 		}
@@ -382,8 +382,8 @@ func GetOrderInfoList(info request.OrderPageInfo, ctx *gin.Context) ([]response.
 	return orderList, stat, total, nil
 }
 
-func GetReturnOrdersProductById(orderProductIds []uint, orderId, tenancyId, userId uint) ([]response.OrderProduct, error) {
-	var orderProducts []response.OrderProduct
+func GetOrdersProductById(orderProductIds []uint, orderId, tenancyId, userId uint) ([]response.OrderProduct, error) {
+	orderProducts := []response.OrderProduct{}
 	db := g.TENANCY_DB.Model(&model.OrderProduct{}).
 		Where("order_id = ?", orderId).
 		Where("refund_num > 0").
@@ -707,7 +707,7 @@ func CreateOrder(req request.CreateOrder, tenancyId, userId uint, tenancyName st
 		}
 
 		// 生成订单商品
-		var orderProducts []model.OrderProduct
+		orderProducts := []model.OrderProduct{}
 		for _, cartProduct := range orderInfo.Products {
 			cartInfo := request.CartInfo{
 				Product: request.CartInfoProduct{
@@ -790,7 +790,7 @@ func GetQrCode(orderId, tenancyId, userId uint, orderType int) ([]byte, error) {
 }
 
 func GetThisMonthOrdersByUserId(userId uint) ([]model.Order, error) {
-	var orders []model.Order
+	orders := []model.Order{}
 	err := g.TENANCY_DB.Model(&model.Order{}).
 		Where("sys_user_id = ?", userId).
 		Where("DATE_FORMAT(`created_at`,'%Y%m')=DATE_FORMAT(CURDATE(),'%Y%m')").
@@ -823,7 +823,7 @@ func GetThisMonthOrderPriceByUserId(userId uint) (response.GeneralUserDetail, er
 }
 
 func GetNoPayOrders() ([]model.Order, error) {
-	var orders []model.Order
+	orders := []model.Order{}
 	err := g.TENANCY_DB.Model(&model.Order{}).
 		Where("paid = ?", g.StatusFalse).
 		Where("status = ?", model.OrderStatusNoPay).
@@ -837,7 +837,7 @@ func GetNoPayOrders() ([]model.Order, error) {
 }
 
 func GetNoPayOver15MinuteOrders() ([]model.Order, error) {
-	var orders []model.Order
+	orders := []model.Order{}
 	err := g.TENANCY_DB.Model(&model.Order{}).
 		Where("paid = ?", g.StatusFalse).
 		Where("status = ?", model.OrderStatusNoPay).
@@ -913,7 +913,7 @@ func CancelOrder(orderId, tenancyId, userId uint) error {
 }
 
 func GetNoPayOrdersByOrderSn(orderSn string) ([]model.Order, error) {
-	var orders []model.Order
+	orders := []model.Order{}
 	err := g.TENANCY_DB.Model(&model.Order{}).Where("order_sn = ?", orderSn).
 		Where("is_system_del = ?", g.StatusFalse).
 		Where("is_del = ?", g.StatusFalse).

@@ -49,7 +49,7 @@ func DeleteShippingTemplate(id uint) error {
 
 // GetShippingTemplateInfoList
 func GetShippingTemplateInfoList(info request.ShippingTemplatePageInfo) ([]response.ShippingTemplateList, int64, error) {
-	var shippingTemList []response.ShippingTemplateList
+	shippingTemList := []response.ShippingTemplateList{}
 	var total int64
 	limit := info.PageSize
 	offset := info.PageSize * (info.Page - 1)
@@ -70,7 +70,7 @@ func GetShippingTemplateInfoList(info request.ShippingTemplatePageInfo) ([]respo
 
 // GetShippingTemplateInfoSelect
 func GetShippingTemplateInfoSelect() ([]response.SelectOption, error) {
-	var shippingTemList []response.SelectOption
+	shippingTemList := []response.SelectOption{}
 	err := g.TENANCY_DB.Model(&model.ShippingTemplate{}).Select("id,name").Find(&shippingTemList).Error
 	if err != nil {
 		return nil, err

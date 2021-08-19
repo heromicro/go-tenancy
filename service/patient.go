@@ -23,7 +23,7 @@ func FindOrCreatePatient(patient model.Patient) (model.Patient, error) {
 
 // GetPatientInfoList
 func GetPatientInfoList(info request.PageInfo, tenancyId uint) ([]response.PatientList, int64, error) {
-	var patientList []response.PatientList
+	patientList := []response.PatientList{}
 	var total int64
 	limit := info.PageSize
 	offset := info.PageSize * (info.Page - 1)

@@ -77,7 +77,7 @@ func GetRefundOrderInfoList(info request.RefundOrderPageInfo, ctx *gin.Context) 
 		"end":      0,
 		"refuse":   0,
 	}
-	var refundOrderList []response.RefundOrderList
+	refundOrderList := []response.RefundOrderList{}
 	var total int64
 	limit := info.PageSize
 	offset := info.PageSize * (info.Page - 1)
@@ -130,7 +130,7 @@ func GetRefundOrderInfoList(info request.RefundOrderPageInfo, ctx *gin.Context) 
 }
 
 func getRefundProducts(refundOrderIds []uint) ([]response.RefundProduct, error) {
-	var refundProducts []response.RefundProduct
+	refundProducts := []response.RefundProduct{}
 	err := g.TENANCY_DB.Model(&model.RefundProduct{}).
 		Select("refund_products.*,order_products.*").
 		Joins("left join order_products on refund_products.order_product_id = order_products.id").
@@ -227,7 +227,7 @@ func getRefundStat(stat map[string]int64, ctx *gin.Context) (map[string]int64, e
 }
 
 func GetRefundOrderRecord(id uint, info request.PageInfo) ([]model.RefundStatus, int64, error) {
-	var returnRecord []model.RefundStatus
+	returnRecord := []model.RefundStatus{}
 	var total int64
 	limit := info.PageSize
 	offset := info.PageSize * (info.Page - 1)
@@ -324,7 +324,7 @@ func checkRefundPrice(refundOrder model.RefundOrder, isDelField string) (float64
 }
 
 func GetOtherRefundOrderIds(orderId, refundOrderId uint) ([]uint, error) {
-	var ids []uint
+	ids := []uint{}
 	err := g.TENANCY_DB.Model(&model.RefundOrder{}).Select("id").Where("order_id = ?", orderId).
 		Where("status in ?", []int{model.RefundStatusAudit, model.RefundStatusAgree, model.RefundStatusBackgood}).
 		Where("id != ?", refundOrderId).Find(&ids).Error
@@ -516,7 +516,7 @@ func CheckRefundOrder(orderId, tenancyId, userId uint, orderPorductIds []uint) (
 		return checkRefundOrder, fmt.Errorf("订单未付款,请取消订单")
 	}
 
-	orderProducts, err := GetReturnOrdersProductById(orderPorductIds, orderId, tenancyId, userId)
+	orderProducts, err := GetOrdersProductById(orderPorductIds, orderId, tenancyId, userId)
 	if err != nil {
 		return checkRefundOrder, err
 	}

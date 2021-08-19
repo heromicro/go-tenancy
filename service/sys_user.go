@@ -288,7 +288,7 @@ func ChangeProfile(user request.ChangeProfile, sysUserId uint) error {
 
 // GetAdminInfoList 分页获取数据
 func GetAdminInfoList(info request.PageInfo, userId uint) ([]response.SysAdminUser, int64, error) {
-	var userList []response.SysAdminUser
+	userList := []response.SysAdminUser{}
 	var total int64
 	limit := info.PageSize
 	offset := info.PageSize * (info.Page - 1)
@@ -318,7 +318,7 @@ func GetAdminInfoList(info request.PageInfo, userId uint) ([]response.SysAdminUs
 
 // GetTenancyByUserIds
 func GetTenancyByUserIds(userIds []uint, tenancyId uint) ([]response.SysAdminUser, error) {
-	var userList []response.SysAdminUser
+	userList := []response.SysAdminUser{}
 	tenancyAuthorityIds, err := GetUserAuthorityIds(multi.TenancyAuthority)
 	if err != nil {
 		return userList, err
@@ -339,7 +339,7 @@ func GetTenancyByUserIds(userIds []uint, tenancyId uint) ([]response.SysAdminUse
 
 // GetAdminByUserIds
 func GetAdminByUserIds(userIds []uint) ([]response.SysAdminUser, error) {
-	var userList []response.SysAdminUser
+	userList := []response.SysAdminUser{}
 	adminAuthorityIds, err := GetUserAuthorityIds(multi.AdminAuthority)
 	if err != nil {
 		return userList, err
@@ -488,7 +488,7 @@ func CleanToken(userId string) error {
 
 // GetTenancyInfoList 分页获取数据
 func GetTenancyInfoList(info request.PageInfo, userId, tenancyId uint) ([]response.SysAdminUser, int64, error) {
-	var userList []response.SysAdminUser
+	userList := []response.SysAdminUser{}
 	var tenancyAuthorityIds []int
 	var total int64
 	limit := info.PageSize

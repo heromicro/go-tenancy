@@ -35,14 +35,15 @@ func Routers(app *gin.Engine) {
 	app.Use(middleware.Cors()) // 如需跨域可以打开
 	g.TENANCY_LOG.Info("use middleware cors")
 	// Router.Use(middleware.LoadTls())  // 打开就能玩https了
+
 	app.Use(favicon.New("resource/favicon.ico"))
-	app.Use(static.Serve("/doc", static.LocalFile("doc/apidoc", true)))
-	app.Use(static.Serve("/admin", static.LocalFile("www/admin", true)))
-	app.Use(static.Serve("/system", static.LocalFile("www/admin/system", true)))
-	app.Use(static.Serve("/merchant", static.LocalFile("www/merchant", true)))
-	app.Use(static.Serve("/client", static.LocalFile("www/merchant/client", true)))
+	app.Static("/doc", "doc/apidoc")
+	app.Static("/admin", "www/admin")
+	app.Static("/system", "www/admin/system")
+	app.Static("/merchant", "www/merchant")
+	app.Static("/client", "www/merchant/client")
+	app.Static("/UEditor", "www/merchant/UEditor")
 	app.Use(static.Serve("/uploads", static.LocalFile("uploads", true)))
-	app.Use(static.Serve("/UEditor", static.LocalFile("www/merchant/UEditor", true)))
 
 	app.LoadHTMLGlob(filepath.Join(g.TENANCY_CONFIG.Casbin.ModelPath, "resource/template/*"))
 	app.StaticFS(g.TENANCY_CONFIG.Local.Path, http.Dir(g.TENANCY_CONFIG.Local.Path)) // 为用户头像和文件提供静态地址

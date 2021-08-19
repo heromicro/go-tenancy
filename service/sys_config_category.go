@@ -89,15 +89,15 @@ func DeleteConfigCategory(id uint) error {
 
 // GetConfigCategoriesInfoList
 func GetConfigCategoriesInfoList() ([]model.SysConfigCategory, error) {
-	var cateList []model.SysConfigCategory
+	cateList := []model.SysConfigCategory{}
 	err := g.TENANCY_DB.Find(&cateList).Error
 	return cateList, err
 }
 
 // GetConfigCategoriesOptions
 func GetConfigCategoriesOptions() ([]Option, error) {
-	var options []Option
-	var opts []Opt
+	options := []Option{}
+	opts := []Opt{}
 	err := g.TENANCY_DB.Model(&model.SysConfigCategory{}).Select("id as value,name as label").Where("status = ?", g.StatusTrue).Find(&opts).Error
 	if err != nil {
 		return options, err

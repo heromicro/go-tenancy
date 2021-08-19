@@ -58,7 +58,7 @@ func DeleteReceipt(id uint, user_id uint) error {
 
 // GetReceiptInfoList
 func GetReceiptInfoList(info request.PageInfo, user_id uint) ([]model.UserReceipt, int64, error) {
-	var receiptList []model.UserReceipt
+	receiptList := []model.UserReceipt{}
 	limit := info.PageSize
 	offset := info.PageSize * (info.Page - 1)
 	db := g.TENANCY_DB.Model(&model.UserReceipt{}).Where("sys_user_id = ?", user_id)

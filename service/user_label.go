@@ -42,8 +42,8 @@ func GetUserLabelMap(id uint, ctx *gin.Context) (Form, error) {
 
 // GetUserLabelOptions
 func GetUserLabelOptions(tenancyId uint) ([]Option, error) {
-	var options []Option
-	var opts []Opt
+	options := []Option{}
+	opts := []Opt{}
 	err := g.TENANCY_DB.Model(&model.UserLabel{}).Select("id as value,label_name as label").Where("sys_tenancy_id", tenancyId).Find(&opts).Error
 	if err != nil {
 		return options, err
@@ -76,7 +76,7 @@ func GetUserLabelByID(id uint, tenancyId uint) (model.UserLabel, error) {
 
 // GetUserLabelByUserIds
 func GetUserLabelByUserIds(ids []uint, tenancyId uint) ([]response.UserLabelWithUserId, error) {
-	var userLabels []response.UserLabelWithUserId
+	userLabels := []response.UserLabelWithUserId{}
 	err := g.TENANCY_DB.Model(&model.UserLabel{}).
 		Select("user_labels.*,user_user_labels.sys_user_id").
 		Joins("left join user_user_labels on user_user_labels.user_label_id = user_labels.id and user_user_labels.sys_tenancy_id =?", tenancyId).
@@ -88,7 +88,7 @@ func GetUserLabelByUserIds(ids []uint, tenancyId uint) ([]response.UserLabelWith
 
 // GetUserLabelByIds
 func GetUserLabelByIds(ids []string, tenancyId uint) ([]response.UserLabelWithUserId, error) {
-	var userLabels []response.UserLabelWithUserId
+	userLabels := []response.UserLabelWithUserId{}
 	err := g.TENANCY_DB.Model(&model.UserLabel{}).
 		Select("user_labels.*,user_user_labels.sys_user_id").
 		Joins("left join user_user_labels on user_user_labels.user_label_id = user_labels.id").
@@ -115,7 +115,7 @@ func DeleteUserLabel(id uint, tenancyId uint) error {
 
 // GetUserLabelInfoList
 func GetUserLabelInfoList(info request.UserLabelPageInfo, tenancyId uint) ([]model.UserLabel, int64, error) {
-	var userLabelList []model.UserLabel
+	userLabelList := []model.UserLabel{}
 	limit := info.PageSize
 	offset := info.PageSize * (info.Page - 1)
 	db := g.TENANCY_DB.Model(&model.UserLabel{})

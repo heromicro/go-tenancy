@@ -88,7 +88,7 @@ func DeleteProductCategory(id uint) error {
 
 // GetCategoryInfoList
 func GetProductCategoryInfoList(tenancyId uint, isCuser bool) ([]response.ProductCategory, error) {
-	var productCategoryList []response.ProductCategory
+	productCategoryList := []response.ProductCategory{}
 	treeMap, err := getProductCategoryMap(tenancyId, isCuser)
 	productCategoryList = treeMap[0]
 	for i := 0; i < len(productCategoryList); i++ {
@@ -99,7 +99,7 @@ func GetProductCategoryInfoList(tenancyId uint, isCuser bool) ([]response.Produc
 
 // getProductCategoryMap
 func getProductCategoryMap(tenancyId uint, isCuser bool) (map[int32][]response.ProductCategory, error) {
-	var productCategoryList []response.ProductCategory
+	productCategoryList := []response.ProductCategory{}
 	treeMap := make(map[int32][]response.ProductCategory)
 	db := g.TENANCY_DB.Model(&model.ProductCategory{})
 	db = CheckTenancyId(db, tenancyId, "")
@@ -125,7 +125,7 @@ func getProductCategoryBaseChildrenList(cate *response.ProductCategory, treeMap 
 
 // GetProductCategoriesOptions
 func GetProductCategoriesOptions(tenancyId uint, isCuser bool) ([]Option, error) {
-	var options []Option
+	options := []Option{}
 	options = append(options, Option{Label: "请选择", Value: 0})
 	treeMap, err := getProductCategoryMap(tenancyId, isCuser)
 
@@ -153,7 +153,7 @@ func getProductCategoriesOption(op *Option, treeMap map[int32][]response.Product
 }
 
 func getProductCatesByProductId(productId, tenancyId uint) ([]response.ProductCate, error) {
-	var productCates []response.ProductCate
+	productCates := []response.ProductCate{}
 	err := g.TENANCY_DB.Model(&model.ProductCategory{}).Select("product_categories.*").
 		Joins("left join product_product_cates on product_product_cates.product_category_id = product_categories.id and product_product_cates.sys_tenancy_id = product_categories.sys_tenancy_id").
 		Where("product_categories.sys_tenancy_id = ?", tenancyId).
@@ -164,7 +164,7 @@ func getProductCatesByProductId(productId, tenancyId uint) ([]response.ProductCa
 }
 
 func getProductIdsByProductCategoryId(productCategoryId, tenancyId uint) ([]uint, error) {
-	var productIds []uint
+	productIds := []uint{}
 	db := g.TENANCY_DB.Model(&model.ProductProductCate{}).Select("product_id").Where("product_category_id = ?", productCategoryId)
 	db = CheckTenancyId(db, tenancyId, "")
 	err := db.

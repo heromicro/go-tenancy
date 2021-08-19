@@ -29,10 +29,10 @@ func DeleteApi(req request.DeleteApi) error {
 
 // GetAPIInfoList 分页获取数据
 func GetAPIInfoList(pageInfo request.SearchApiParams) ([]model.SysApi, int64, error) {
+	apiList := []model.SysApi{}
 	limit := pageInfo.PageSize
 	offset := pageInfo.PageSize * (pageInfo.Page - 1)
 	db := g.TENANCY_DB.Model(&model.SysApi{})
-	var apiList []model.SysApi
 
 	if pageInfo.Path != "" {
 		db = db.Where("path LIKE ?", "%"+pageInfo.Path+"%")
@@ -73,7 +73,7 @@ func GetAPIInfoList(pageInfo request.SearchApiParams) ([]model.SysApi, int64, er
 
 // GetAllApis 获取所有的api
 func GetAllApis() ([]model.SysApi, error) {
-	var apis []model.SysApi
+	apis := []model.SysApi{}
 	err := g.TENANCY_DB.Find(&apis).Error
 	return apis, err
 }

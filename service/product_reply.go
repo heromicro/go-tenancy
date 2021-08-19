@@ -98,7 +98,7 @@ func AddFictiReply(req request.AddFictiReply) (uint, error) {
 
 // GetProductReplyInfoList
 func GetProductReplyInfoList(info request.ProductReplyPageInfo, tenancyId uint, isAdmin bool) ([]response.ProductReplyList, int64, error) {
-	var productReplyList []response.ProductReplyList
+	productReplyList := []response.ProductReplyList{}
 	var total int64
 	limit := info.PageSize
 	offset := info.PageSize * (info.Page - 1)
@@ -136,8 +136,8 @@ func GetProductReplyInfoList(info request.ProductReplyPageInfo, tenancyId uint, 
 		return productReplyList, total, err
 	}
 
-	var productIds []uint
-	var products []response.ProductForReply
+	productIds := []uint{}
+	products := []response.ProductForReply{}
 	if len(productReplyList) > 0 {
 		for _, productReply := range productReplyList {
 			productIds = append(productIds, productReply.ProductID)

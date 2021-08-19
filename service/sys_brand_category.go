@@ -84,7 +84,7 @@ func DeleteBrandCategory(id uint) error {
 
 // GetBrandCategoryInfoList
 func GetBrandCategoryInfoList() ([]response.SysBrandCategory, error) {
-	var brandCategoryList []response.SysBrandCategory
+	brandCategoryList := []response.SysBrandCategory{}
 	treeMap, err := getBrandCategoryMap()
 	brandCategoryList = treeMap[0]
 	for i := 0; i < len(brandCategoryList); i++ {
@@ -95,7 +95,7 @@ func GetBrandCategoryInfoList() ([]response.SysBrandCategory, error) {
 
 // getBrandCategoryMap
 func getBrandCategoryMap() (map[int32][]response.SysBrandCategory, error) {
-	var brandCategoryList []response.SysBrandCategory
+	brandCategoryList := []response.SysBrandCategory{}
 	treeMap := make(map[int32][]response.SysBrandCategory)
 	err := g.TENANCY_DB.Model(&model.SysBrandCategory{}).Order("sort").Find(&brandCategoryList).Error
 	for _, v := range brandCategoryList {
@@ -115,7 +115,7 @@ func getBrandCategoryBaseChildrenList(cate *response.SysBrandCategory, treeMap m
 
 // GetBrandCategoriesOptions
 func GetBrandCategoriesOptions() ([]Option, error) {
-	var options []Option
+	options := []Option{}
 	options = append(options, Option{Label: "请选择", Value: 0})
 	treeMap, err := getBrandCategoryMap()
 

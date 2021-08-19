@@ -82,7 +82,7 @@ func DeleteBrand(id uint) error {
 
 // GetBrandInfoList
 func GetBrandInfoList(info request.BrandPageInfo) ([]model.SysBrand, int64, error) {
-	var brandList []model.SysBrand
+	brandList := []model.SysBrand{}
 	limit := info.PageSize
 	offset := info.PageSize * (info.Page - 1)
 	db := g.TENANCY_DB.Model(&model.SysBrand{})
@@ -100,7 +100,7 @@ func GetBrandInfoList(info request.BrandPageInfo) ([]model.SysBrand, int64, erro
 
 // GetBrandOptions
 func GetBrandOptions() ([]Option, error) {
-	var options []Option
+	options := []Option{}
 	brandList, _, err := GetBrandInfoList(request.BrandPageInfo{})
 	if err != nil {
 		return options, err

@@ -35,7 +35,7 @@ func CopyAuthority(copyInfo response.SysAuthorityCopyResponse) (model.SysAuthori
 	if err != nil {
 		return copyInfo.Authority, err
 	}
-	var baseMenu []model.SysBaseMenu
+	baseMenu := []model.SysBaseMenu{}
 	for _, v := range menus {
 		v.SysBaseMenu.ID = v.MenuId
 		baseMenu = append(baseMenu, v.SysBaseMenu)
@@ -103,7 +103,7 @@ func GetAuthorityInfoList(info request.PageInfo, authorityType int) ([]model.Sys
 	}
 	var total int64
 	db.Count(&total)
-	var authority []model.SysAuthority
+	authority := []model.SysAuthority{}
 	err := db.Limit(limit).Offset(offset).Preload("DataAuthorityId").Find(&authority).Error
 	if len(authority) > 0 {
 		for k := range authority {
@@ -148,7 +148,7 @@ func findChildrenAuthority(authority *model.SysAuthority) error {
 }
 
 func GetUserAuthorityIds(authorityType int) ([]int, error) {
-	var generalAuthorityIds []int
+	generalAuthorityIds := []int{}
 	err := g.TENANCY_DB.Model(&model.SysAuthority{}).Where("authority_type", authorityType).Select("authority_id").Find(&generalAuthorityIds).Error
 	if err != nil {
 		return generalAuthorityIds, fmt.Errorf("get authority ids %w", err)
@@ -158,7 +158,7 @@ func GetUserAuthorityIds(authorityType int) ([]int, error) {
 
 // getAuthorityMap
 func getAuthorityMap(authorityType int) (map[string][]model.SysAuthority, error) {
-	var authority []model.SysAuthority
+	authority := []model.SysAuthority{}
 	treeMap := make(map[string][]model.SysAuthority)
 	err := g.TENANCY_DB.Model(&model.SysAuthority{}).Where("authority_type", authorityType).Find(&authority).Error
 	for _, v := range authority {
@@ -169,7 +169,7 @@ func getAuthorityMap(authorityType int) (map[string][]model.SysAuthority, error)
 
 // GetAuthorityOptions
 func GetAuthorityOptions(authorityType int) ([]Option, error) {
-	var options []Option
+	options := []Option{}
 	options = append(options, Option{Label: "请选择", Value: 0})
 	treeMap, err := getAuthorityMap(authorityType)
 

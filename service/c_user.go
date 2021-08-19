@@ -256,7 +256,7 @@ func SetUserLabel(id, tenancyId uint, reqlabelIds []uint) error {
 	}
 
 	if len(addIds) > 0 {
-		var labels []model.UserUserLabel
+		labels := []model.UserUserLabel{}
 		for _, addId := range addIds {
 			labels = append(labels, model.UserUserLabel{UserLabelID: addId, SysUserID: id, SysTenancyID: tenancyId})
 		}
@@ -318,7 +318,7 @@ func GetGeneralSelect(tenancyId uint) ([]response.SelectOption, error) {
 // GetGeneralInfoList 分页获取数据
 func GetGeneralInfoList(info request.UserPageInfo, ctx *gin.Context) ([]response.GeneralUser, int64, error) {
 	tenancyId := multi.GetTenancyId(ctx)
-	var userList []response.GeneralUser
+	userList := []response.GeneralUser{}
 	var total int64
 	limit := info.PageSize
 	offset := info.PageSize * (info.Page - 1)
@@ -440,7 +440,7 @@ func GetUserIdsByLabelId(labelId string, tenancyId uint) ([]uint, error) {
 }
 
 func GetUserIdsByNickname(nickname string, tenancyId uint) ([]uint, error) {
-	var userIds []uint
+	userIds := []uint{}
 	cuserAuthorityIds, err := GetUserAuthorityIds(multi.GeneralAuthority)
 	if err != nil {
 		return userIds, err
@@ -461,7 +461,7 @@ func GetUserIdsByNickname(nickname string, tenancyId uint) ([]uint, error) {
 
 // GetCuserByUserIds
 func GetCuserByUserIds(userIds []uint, tenancyId uint) ([]response.SysGeneralUser, error) {
-	var userList []response.SysGeneralUser
+	userList := []response.SysGeneralUser{}
 	cuserAuthorityIds, err := GetUserAuthorityIds(multi.GeneralAuthority)
 	if err != nil {
 		return userList, err

@@ -104,7 +104,7 @@ func DeleteAutoLabel(id uint, tenancyId uint) error {
 }
 
 func GetAutoUserLabelInfoList(info request.UserLabelPageInfo, tenancyId uint) ([]response.LabelRule, int64, error) {
-	var userLabelList []response.LabelRule
+	userLabelList := []response.LabelRule{}
 	limit := info.PageSize
 	offset := info.PageSize * (info.Page - 1)
 	db := g.TENANCY_DB.Model(&model.UserLabel{}).

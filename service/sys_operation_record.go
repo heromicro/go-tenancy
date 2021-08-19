@@ -22,9 +22,9 @@ func GetSysOperationRecordInfoList(info request.SysOperationRecordSearch, ctx *g
 	limit := info.PageSize
 	offset := info.PageSize * (info.Page - 1)
 	// 创建db
-	var sysOperationRecords []response.SysOperationRecord
-	var adminUsers []response.SysAdminUser
-	var tenancyUsers []response.SysAdminUser
+	sysOperationRecords := []response.SysOperationRecord{}
+	adminUsers := []response.SysAdminUser{}
+	tenancyUsers := []response.SysAdminUser{}
 	var err error
 	db := g.TENANCY_DB.Model(&model.SysOperationRecord{})
 	if multi.IsTenancy(ctx) {
@@ -51,7 +51,7 @@ func GetSysOperationRecordInfoList(info request.SysOperationRecordSearch, ctx *g
 		return nil, total, err
 	}
 
-	var opUserIds []uint
+	opUserIds := []uint{}
 	for _, sysOperationRecord := range sysOperationRecords {
 		opUserIds = append(opUserIds, sysOperationRecord.UserID)
 	}

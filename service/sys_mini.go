@@ -60,7 +60,7 @@ func DeleteMini(id uint) error {
 
 // GetMiniInfoList
 func GetMiniInfoList(info request.PageInfo) ([]response.SysMini, int64, error) {
-	var miniList []response.SysMini
+	miniList := []response.SysMini{}
 	limit := info.PageSize
 	offset := info.PageSize * (info.Page - 1)
 	db := g.TENANCY_DB.Model(&model.SysMini{})

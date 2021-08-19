@@ -53,7 +53,7 @@ func DeleteAttrTemplate(id uint) error {
 
 // GetAttrTemplateInfoList
 func GetAttrTemplateInfoList(info request.PageInfo) ([]response.AttrTemplate, int64, error) {
-	var attrTemplateList []response.AttrTemplate
+	attrTemplateList := []response.AttrTemplate{}
 	limit := info.PageSize
 	offset := info.PageSize * (info.Page - 1)
 	db := g.TENANCY_DB.Model(&model.AttrTemplate{})

@@ -89,7 +89,7 @@ func DeleteMqtt(id uint) error {
 
 // GetMqttInfoList
 func GetMqttInfoList(info request.PageInfo) ([]model.Mqtt, int64, error) {
-	var mqttList []model.Mqtt
+	mqttList := []model.Mqtt{}
 	limit := info.PageSize
 	offset := info.PageSize * (info.Page - 1)
 	db := g.TENANCY_DB.Model(&model.Mqtt{})
@@ -104,7 +104,7 @@ func GetMqttInfoList(info request.PageInfo) ([]model.Mqtt, int64, error) {
 
 // GetMqttRecordList
 func GetMqttRecordList(info request.PageInfo) ([]model.MqttRecord, int64, error) {
-	var mqttList []model.MqttRecord
+	mqttList := []model.MqttRecord{}
 	limit := info.PageSize
 	offset := info.PageSize * (info.Page - 1)
 	db := g.TENANCY_DB.Model(&model.MqttRecord{})
@@ -118,7 +118,7 @@ func GetMqttRecordList(info request.PageInfo) ([]model.MqttRecord, int64, error)
 }
 
 func GetStatusMqtts() ([]model.Mqtt, error) {
-	var mqtts []model.Mqtt
+	mqtts := []model.Mqtt{}
 	err := g.TENANCY_DB.Model(&model.Mqtt{}).Where("status = ?", g.StatusTrue).Find(&mqtts).Error
 	if err != nil {
 		return mqtts, err
@@ -136,7 +136,7 @@ func CreateMqttRecords(mqttRecords []model.MqttRecord) error {
 }
 
 func SendMqttMsgs(topic string, payload model.Payload, qos byte) error {
-	var mqttRecords []model.MqttRecord
+	mqttRecords := []model.MqttRecord{}
 	mqtts, err := GetStatusMqtts()
 	if err != nil {
 		return err

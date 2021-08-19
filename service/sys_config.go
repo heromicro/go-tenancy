@@ -170,7 +170,7 @@ func GetConfigByID(id uint) (model.SysConfig, error) {
 
 // GetConfigInfoList
 func GetConfigInfoList(info request.PageInfo) ([]model.SysConfig, int64, error) {
-	var configList []model.SysConfig
+	configList := []model.SysConfig{}
 	limit := info.PageSize
 	offset := info.PageSize * (info.Page - 1)
 	db := g.TENANCY_DB.Model(&model.SysConfig{})

@@ -40,8 +40,8 @@ func GetExpressMap(id uint, ctx *gin.Context) (Form, error) {
 
 // GetExpressOptions
 func GetExpressOptions() ([]Option, error) {
-	var options []Option
-	var opts []StringOpt
+	options := []Option{}
+	opts := []StringOpt{}
 	err := g.TENANCY_DB.Model(&model.Express{}).Select("code as value,name as label").Where("status = ?", g.StatusTrue).Find(&opts).Error
 	if err != nil {
 		return options, err
@@ -101,7 +101,7 @@ func DeleteExpress(id uint) error {
 
 // GetExpressInfoList
 func GetExpressInfoList(info request.ExpressPageInfo) ([]model.Express, int64, error) {
-	var expressList []model.Express
+	expressList := []model.Express{}
 	limit := info.PageSize
 	offset := info.PageSize * (info.Page - 1)
 	db := g.TENANCY_DB.Model(&model.Express{})

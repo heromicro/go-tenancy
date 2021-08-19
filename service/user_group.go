@@ -40,8 +40,8 @@ func GetUserGroupMap(id uint, ctx *gin.Context) (Form, error) {
 
 // GetUserGroupOptions
 func GetUserGroupOptions() ([]Option, error) {
-	var options []Option
-	var opts []Opt
+	options := []Option{}
+	opts := []Opt{}
 	err := g.TENANCY_DB.Model(&model.UserGroup{}).Select("id as value,group_name as label").Find(&opts).Error
 	if err != nil {
 		return options, err
@@ -89,7 +89,7 @@ func DeleteUserGroup(id uint) error {
 
 // GetUserGroupInfoList
 func GetUserGroupInfoList(info request.PageInfo) ([]model.UserGroup, int64, error) {
-	var userGroupList []model.UserGroup
+	userGroupList := []model.UserGroup{}
 	limit := info.PageSize
 	offset := info.PageSize * (info.Page - 1)
 	db := g.TENANCY_DB.Model(&model.UserGroup{})

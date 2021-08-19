@@ -60,7 +60,7 @@ func GetMenuByID(id uint) (model.SysBaseMenu, error) {
 
 // getMenuTreeMap 获取路由总树map
 func getMenuTreeMap(ctx *gin.Context) (map[uint][]model.SysMenu, error) {
-	var allMenus []model.SysMenu
+	allMenus := []model.SysMenu{}
 	treeMap := make(map[uint][]model.SysMenu, 1000)
 	db := g.TENANCY_DB.Where("authority_id = ?", multi.GetAuthorityId(ctx))
 	if multi.IsAdmin(ctx) {
@@ -91,6 +91,12 @@ func GetMenuTree(ctx *gin.Context) ([]model.SysMenu, error) {
 // getChildrenList 获取子菜单
 func getChildrenList(menu *model.SysMenu, treeMap map[uint][]model.SysMenu) error {
 	menu.Children = treeMap[menu.MenuId]
+	if menu.Children == nil {
+		menu.Children = []model.SysMenu{}
+	}
+	if menu.SysAuthoritys == nil {
+		menu.SysAuthoritys = []model.SysAuthority{}
+	}
 	for i := 0; i < len(menu.Children); i++ {
 		err := getChildrenList(&menu.Children[i], treeMap)
 		if err != nil {
@@ -102,9 +108,8 @@ func getChildrenList(menu *model.SysMenu, treeMap map[uint][]model.SysMenu) erro
 
 // GetInfoList 获取路由分页
 func GetInfoList(userType int) ([]model.SysBaseMenu, error) {
-	var menuList []model.SysBaseMenu
 	treeMap, err := getBaseMenuTreeMap(userType)
-	menuList = treeMap[0]
+	menuList := treeMap[0]
 	for i := 0; i < len(menuList); i++ {
 		err = getBaseChildrenList(&menuList[i], treeMap)
 	}
@@ -132,7 +137,7 @@ func AddBaseMenu(menu model.SysBaseMenu) (model.SysBaseMenu, error) {
 
 // getBaseMenuTreeMap 获取路由总树map
 func getBaseMenuTreeMap(userType int) (map[uint][]model.SysBaseMenu, error) {
-	var allMenus []model.SysBaseMenu
+	allMenus := []model.SysBaseMenu{}
 	treeMap := make(map[uint][]model.SysBaseMenu)
 	db := g.TENANCY_DB.Where("is_menu = ?", g.StatusTrue)
 	if userType == multi.AdminAuthority {
@@ -177,7 +182,7 @@ func GetMenuAuthority(info *request.GetAuthorityId) ([]model.SysMenu, error) {
 
 // GetMenusOptions
 func GetMenusOptions(userType int) ([]Option, error) {
-	var options []Option
+	options := []Option{}
 	options = append(options, Option{Label: "请选择", Value: 0})
 	treeMap, err := getBaseMenuTreeMap(userType)
 

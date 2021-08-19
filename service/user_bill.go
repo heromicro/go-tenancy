@@ -8,7 +8,7 @@ import (
 
 // GetUserBillInfoList
 func GetUserBillInfoList(info request.PageInfo, sys_user_id uint) ([]model.UserBill, int64, error) {
-	var userBillList []model.UserBill
+	userBillList := []model.UserBill{}
 	limit := info.PageSize
 	offset := info.PageSize * (info.Page - 1)
 	db := g.TENANCY_DB.Model(&model.UserBill{}).Where("sys_user_id = ?", sys_user_id)

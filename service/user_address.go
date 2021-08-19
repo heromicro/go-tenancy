@@ -53,7 +53,7 @@ func DeleteAddress(id uint, user_id uint) error {
 
 // GetAddressInfoList
 func GetAddressInfoList(info request.PageInfo, user_id uint) ([]model.UserAddress, int64, error) {
-	var addressList []model.UserAddress
+	 addressList := []model.UserAddress{}
 	limit := info.PageSize
 	offset := info.PageSize * (info.Page - 1)
 	db := g.TENANCY_DB.Model(&model.UserAddress{}).Where("sys_user_id = ?", user_id)

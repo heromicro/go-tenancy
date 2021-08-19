@@ -8,7 +8,7 @@
  * @apiDescription 获取用户下单数据详情
  *   
  *
- * @apiBody {Number[]} cartIds 购物车ids
+ * @apiBody {Number[]} ids 购物车ids
  * 
  * @apiHeader {String} Authorization 接口需要带上此头信息
  * @apiHeaderExample {Header} Header-Example

@@ -62,7 +62,7 @@ func DeleteFile(ids []uint) error {
 		return fmt.Errorf("find files %w", err)
 	}
 
-	var delIds []uint
+	delIds := []uint{}
 	for _, file := range files {
 
 		oss := upload.NewOss()
@@ -78,6 +78,7 @@ func DeleteFile(ids []uint) error {
 
 func GetFileRecordInfoList(info request.MediaPageInfo, ctx *gin.Context) (interface{}, int64, error) {
 	var total int64
+	fileLists := []model.TenancyMedia{}
 	limit := info.PageSize
 	offset := info.PageSize * (info.Page - 1)
 	db := g.TENANCY_DB
@@ -87,7 +88,7 @@ func GetFileRecordInfoList(info request.MediaPageInfo, ctx *gin.Context) (interf
 	if info.Name != "" {
 		db = db.Where("name like ?", fmt.Sprintf("%s%%", info.Name))
 	}
-	var fileLists []model.TenancyMedia
+
 	err := db.Find(&fileLists).Count(&total).Error
 	if err != nil {
 		return fileLists, total, err

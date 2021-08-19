@@ -46,7 +46,7 @@ func GetEditProductFictiMap(id uint, ctx *gin.Context) (Form, error) {
 // GetProductFilter
 func GetProductFilter(tenancyId uint, isTenancy bool) ([]response.ProductFilter, error) {
 	wheres := getProductConditions(tenancyId, isTenancy)
-	var filters []response.ProductFilter
+	filters := []response.ProductFilter{}
 	for _, where := range wheres {
 		filter := response.ProductFilter{Name: where.Name, Type: where.Type}
 		db := g.TENANCY_DB.Model(&model.Product{})
@@ -119,7 +119,7 @@ func getProductConditionByType(tenancyId uint, isTenancy bool, t int) response.P
 
 // CreateProduct
 func CreateProduct(req request.CreateProduct, tenancyId uint) (uint, []string, int32, error) {
-	var uniques []string
+	uniques := []string{}
 	product := model.Product{
 		BaseProduct: req.BaseProduct,
 		SliderImage: strings.Join(req.SliderImages, ","),
@@ -231,7 +231,7 @@ func UpdateProduct(req request.UpdateProduct, id uint, ctx *gin.Context) error {
 }
 
 func GetProductAttrValues(productIds []uint, uniques []string) ([]model.ProductAttrValue, error) {
-	var attrValues []model.ProductAttrValue
+	attrValues := []model.ProductAttrValue{}
 	db := g.TENANCY_DB.Model(&model.ProductAttrValue{})
 	if len(productIds) > 0 {
 		db = db.Where("product_id in ?", productIds)
@@ -247,14 +247,14 @@ func GetProductAttrValues(productIds []uint, uniques []string) ([]model.ProductA
 }
 
 func SetProductAttrValue(tx *gorm.DB, isUpdate bool, productId uint, productType int32, reqAttrValue []request.ProductAttrValue) ([]string, error) {
-	var uniques []string
+	uniques := []string{}
 	if isUpdate {
 		err := tx.Where("product_id = ?", productId).Delete(&model.ProductAttrValue{}).Error
 		if err != nil {
 			return uniques, fmt.Errorf("create product attr %w", err)
 		}
 	}
-	var productAttrValues []model.ProductAttrValue
+	productAttrValues := []model.ProductAttrValue{}
 	for _, attrValue := range reqAttrValue {
 		detail, err := json.Marshal(attrValue.Detail)
 		if err != nil {
@@ -316,7 +316,7 @@ func SetProductCategory(tx *gorm.DB, id, tenancyId uint, reqIds []uint) error {
 	}
 
 	// 删除
-	var delIds []uint
+	delIds := []uint{}
 	for _, cateId := range cateIds {
 		isDel := true
 		for _, reqlId := range reqIds {
@@ -337,7 +337,7 @@ func SetProductCategory(tx *gorm.DB, id, tenancyId uint, reqIds []uint) error {
 	}
 
 	// 增加
-	var addIds []uint
+	addIds := []uint{}
 	for _, reqId := range reqIds {
 		isAdd := true
 		for _, cateId := range cateIds {
@@ -365,7 +365,7 @@ func SetProductCategory(tx *gorm.DB, id, tenancyId uint, reqIds []uint) error {
 }
 
 func GetProductForReplysByIds(ids []uint, tenancyId uint) ([]response.ProductForReply, error) {
-	var productForReplies []response.ProductForReply
+	productForReplies := []response.ProductForReply{}
 	db := g.TENANCY_DB.Model(&model.Product{}).Select("id,store_name,image")
 	db = CheckTenancyId(db, tenancyId, "")
 	err := db.Where("id in ?", ids).
@@ -377,7 +377,7 @@ func GetProductForReplysByIds(ids []uint, tenancyId uint) ([]response.ProductFor
 }
 
 func GetProductIdsByKeyword(keyword string, tenancyId uint) ([]uint, error) {
-	var ids []uint
+	ids := []uint{}
 	db := g.TENANCY_DB.Model(&model.Product{}).Select("id")
 	db = CheckTenancyId(db, tenancyId, "")
 	err := db.Where(g.TENANCY_DB.Where("id like ?", keyword+"%").Or("store_name like ?", keyword+"%").Or("store_info like ?", keyword+"%").Or("keyword like ?", keyword+"%")).
@@ -390,7 +390,7 @@ func GetProductIdsByKeyword(keyword string, tenancyId uint) ([]uint, error) {
 
 // GetCartProducts
 func GetCartProducts(sysTenancyID, sysUserID uint, cartIds []uint) ([]response.CartProduct, error) {
-	var cartProducts []response.CartProduct
+	cartProducts := []response.CartProduct{}
 	db := g.TENANCY_DB.Model(&model.Product{}).Where("products.is_show = ?", g.StatusTrue).Where("products.status = ?", model.SuccessProductStatus).Select("products.id as product_id,products.store_name,products.image,products.spec_type,products.price,carts.id,carts.cart_num,carts.sys_tenancy_id as sys_tenancy_id,carts.product_attr_unique,carts.is_fail").
 		Joins("left join carts on products.id = carts.product_id")
 	db = CheckTenancyId(db, sysTenancyID, "carts.")
@@ -590,7 +590,7 @@ func ForceDeleteProduct(id uint) error {
 
 // GetProductInfoList
 func GetProductInfoList(info request.ProductPageInfo, tenancyId uint, isTenancy, isCuser bool) ([]response.ProductList, int64, error) {
-	var productList []response.ProductList
+	productList := []response.ProductList{}
 	var total int64
 	limit := info.PageSize
 	offset := info.PageSize * (info.Page - 1)
