@@ -71,6 +71,7 @@ var carbines = []gormadapter.CasbinRule{
 
 	// 用户管理
 	{Ptype: "p", V0: AdminAuthorityId, V1: "/v1/admin/cuser/getGeneralList", V2: "POST"},
+	{Ptype: "p", V0: AdminAuthorityId, V1: "/v1/admin/cuser/getGeneralSelect/:tenancy_id", V2: "GET"},
 	{Ptype: "p", V0: AdminAuthorityId, V1: "/v1/admin/cuser/getGeneralDetail/:id", V2: "GET"},
 	{Ptype: "p", V0: AdminAuthorityId, V1: "/v1/admin/cuser/getOrderList/:id", V2: "POST"},
 	{Ptype: "p", V0: AdminAuthorityId, V1: "/v1/admin/cuser/getBillList/:id", V2: "POST"},
@@ -103,7 +104,7 @@ var carbines = []gormadapter.CasbinRule{
 
 	// other
 	{Ptype: "p", V0: AdminAuthorityId, V1: "/v1/admin/test/emailTest", V2: "POST"},
-	{Ptype: "p", V0: AdminAuthorityId, V1: "/v1/admin/test/pay", V2: "GET"},
+	{Ptype: "p", V0: AdminAuthorityId, V1: "/v1/admin/test/pay", V2: "POST"},
 	{Ptype: "p", V0: AdminAuthorityId, V1: "/v1/admin/test/mqtt", V2: "GET"},
 
 	// 商户

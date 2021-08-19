@@ -19,30 +19,30 @@ func GetQiniuConfig() (Qiniu, error) {
 	}
 
 	for _, conf := range configs {
-		if conf.ConfigKey == "zone" {
+		if conf.ConfigKey == "qiniu_zone" {
 			config.Zone = conf.Value
 		}
-		if conf.ConfigKey == "bucket" {
+		if conf.ConfigKey == "qiniu_bucket" {
 			config.Bucket = conf.Value
 		}
-		if conf.ConfigKey == "img_path" {
+		if conf.ConfigKey == "qiniu_img_path" {
 			config.ImgPath = conf.Value
 		}
-		if conf.ConfigKey == "access_key" {
+		if conf.ConfigKey == "qiniu_access_key" {
 			config.AccessKey = conf.Value
 		}
-		if conf.ConfigKey == "secret_key" {
+		if conf.ConfigKey == "qiniu_secret_key" {
 			config.SecretKey = conf.Value
 		}
-		if conf.ConfigKey == "bucket_url" {
+		if conf.ConfigKey == "qiniu_bucket_url" {
 			config.SecretKey = conf.Value
 		}
-		if conf.ConfigKey == "secret_key" {
+		if conf.ConfigKey == "qiniu_use_https" {
 			if conf.Value == "1" {
 				config.UseHTTPS = true
 			}
 		}
-		if conf.ConfigKey == "use_cdn_domains" {
+		if conf.ConfigKey == "qiniu_use_cdn_domains" {
 			if conf.Value == "1" {
 				config.UseCdnDomains = true
 			}

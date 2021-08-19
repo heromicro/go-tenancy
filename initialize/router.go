@@ -5,6 +5,7 @@ import (
 	"path/filepath"
 	"strings"
 
+	limit "github.com/aviddiviner/gin-limit"
 	"github.com/chindeo/pkg/file"
 	"github.com/gin-contrib/static"
 	"github.com/gin-gonic/gin"
@@ -29,7 +30,7 @@ func App() *gin.Engine {
 
 // Routers
 func Routers(app *gin.Engine) {
-
+	app.Use(limit.MaxAllowed(50))
 	// 跨域
 	app.Use(middleware.Cors()) // 如需跨域可以打开
 	g.TENANCY_LOG.Info("use middleware cors")

@@ -36,6 +36,7 @@ var baseApis = []model.SysApi{
 	{Path: "/v1/admin/user/deleteUser", Description: "删除用户", ApiGroup: "user", Method: "DELETE"},
 
 	// 用户管理
+	{Path: "/v1/admin/cuser/getGeneralSelect/:tenancy_id", Description: "获取c用户下拉选项", ApiGroup: "cuser", Method: "GET"},
 	{Path: "/v1/admin/cuser/getGeneralList", Description: "获取c用户列表", ApiGroup: "cuser", Method: "POST"},
 	{Path: "/v1/admin/cuser/getGeneralDetail/:id", Description: "获取c用户列表", ApiGroup: "cuser", Method: "GET"},
 	{Path: "/v1/admin/cuser/getOrderList/:id", Description: "消费列表", ApiGroup: "cuser", Method: "POST"},
@@ -228,7 +229,9 @@ var baseApis = []model.SysApi{
 	{Path: "/v1/admin/refundOrder/getRefundOrderList", Description: "退款订单列表", ApiGroup: "refundOrder", Method: "POST"},
 
 	// other
-	{Path: "/v1/admin/email/emailTest", Description: "发送测试邮件", ApiGroup: "email", Method: "POST"},
+	{Path: "/v1/admin/test/emailTest", Description: "发送测试邮件", ApiGroup: "email", Method: "POST"},
+	{Path: "/v1/admin/test/pay", Description: "支付测试", ApiGroup: "email", Method: "POST"},
+	{Path: "/v1/admin/test/mqtt", Description: "mqtt测试", ApiGroup: "email", Method: "GET"},
 
 	// TODO:商户用户权限
 	{Path: "/v1/merchant/config/getConfigMap/:category", Description: "获取配置表单", ApiGroup: "configClient", Method: "GET"},

@@ -14,7 +14,7 @@ func Cache() redis.UniversalClient {
 	universalOptions := &redis.UniversalOptions{
 		Addrs:       strings.Split(g.TENANCY_CONFIG.Redis.Addr, ","),
 		Password:    g.TENANCY_CONFIG.Redis.Password,
-		PoolSize:    10,
+		PoolSize:    10000,
 		IdleTimeout: 300 * time.Second,
 		Dialer: func(ctx context.Context, network, addr string) (net.Conn, error) {
 			conn, err := net.Dial(network, addr)

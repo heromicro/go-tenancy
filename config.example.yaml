@@ -26,11 +26,11 @@ mysql:
   max-open-conns: 0
   log-mode: false
   log-zap: ""
-
 redis:
   db: 0
   addr: ""
   password: ""
+  pool-size: 1000
 system:
   level: error
   env: dev

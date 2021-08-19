@@ -12,6 +12,11 @@ type ChangeStatus struct {
 }
 
 // Find by id structure
+type GetByTenancyId struct {
+	TenancyId uint `json:"tenancy_id" uri:"tenancy_id" form:"tenancy_id" binding:"required"`
+}
+
+// Find by id structure
 type GetById struct {
 	Id uint `json:"id" uri:"id" form:"id" binding:"required"`
 }

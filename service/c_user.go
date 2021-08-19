@@ -300,6 +300,21 @@ func GetGeneralDetail(id, tenancyId uint) (response.GeneralUserDetail, error) {
 	return user, nil
 }
 
+func GetGeneralSelect(tenancyId uint) ([]response.CUserSelect, error) {
+	selects := []response.CUserSelect{
+		{ID: 0, Name: "请选择"},
+	}
+	var userSelects []response.CUserSelect
+	err := g.TENANCY_DB.Model(&model.SysUser{}).
+		Joins("left join general_infos on general_infos.sys_user_id = sys_users.id").
+		Select("sys_users.id as id,general_infos.nick_name as name").
+		Where("status = ?", g.StatusTrue).
+		Where("is_show = ?", g.StatusTrue).
+		Find(&userSelects).Error
+	selects = append(selects, userSelects...)
+	return selects, err
+}
+
 // GetGeneralInfoList 分页获取数据
 func GetGeneralInfoList(info request.UserPageInfo, ctx *gin.Context) ([]response.GeneralUser, int64, error) {
 	tenancyId := multi.GetTenancyId(ctx)

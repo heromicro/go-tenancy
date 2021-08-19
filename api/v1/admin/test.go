@@ -24,16 +24,15 @@ func EmailTest(ctx *gin.Context) {
 
 // PayTest 发送测试邮件
 func PayTest(ctx *gin.Context) {
-	req := request.CreateCart{
-		BaseCart: model.BaseCart{
-			CartNum:           2,
-			IsNew:             2,
-			ProductAttrUnique: "e2fe28308fd2",
-		},
-		ProductID:    1,
-		SysUserID:    1,
-		SysTenancyID: 1,
+	var req request.CreateCart
+	if errs := ctx.ShouldBindJSON(&req); errs != nil {
+		response.FailWithMessage(errs.Error(), ctx)
+		return
 	}
+
+	req.CartNum = 1
+	req.IsNew = 2
+
 	if qrcode, err := service.PayTest(req, "宝安中心人民医院"); err != nil {
 		g.TENANCY_LOG.Error("测试失败!", zap.Any("err", err))
 		response.FailWithMessage("测试失败", ctx)

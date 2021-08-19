@@ -23,7 +23,7 @@ func CreateCart(req request.CreateCart) (model.Cart, error) {
 		Where("is_new = ?", g.StatusFalse).
 		Where("product_attr_unique = ?", req.ProductAttrUnique).
 		First(&cart).Error
-	if errors.Is(err, gorm.ErrRecordNotFound) { // 没有商品直接新建
+	if errors.Is(err, gorm.ErrRecordNotFound) { // 没有购物车商品直接新建
 		cart = model.Cart{BaseCart: model.BaseCart{
 			ProductType:       req.ProductType,
 			ProductAttrUnique: req.ProductAttrUnique,

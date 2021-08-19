@@ -17,10 +17,10 @@ func GetTencentCOSConfig() (TencentCOS, error) {
 	}
 
 	for _, conf := range configs {
-		if conf.ConfigKey == "bucket" {
+		if conf.ConfigKey == "tengxun_bucket" {
 			config.Bucket = conf.Value
 		}
-		if conf.ConfigKey == "region" {
+		if conf.ConfigKey == "tengxun_region" {
 			config.Region = conf.Value
 		}
 		if conf.ConfigKey == "tengxun_access_key" {
@@ -29,10 +29,10 @@ func GetTencentCOSConfig() (TencentCOS, error) {
 		if conf.ConfigKey == "tengxun_secret_key" {
 			config.SecretKey = conf.Value
 		}
-		if conf.ConfigKey == "base_url" {
+		if conf.ConfigKey == "tengxun_base_url" {
 			config.BaseURL = conf.Value
 		}
-		if conf.ConfigKey == "path_prefix" {
+		if conf.ConfigKey == "tengxun_path_prefix" {
 			config.PathPrefix = conf.Value
 		}
 	}

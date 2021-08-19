@@ -10,6 +10,21 @@ import (
 	"go.uber.org/zap"
 )
 
+// GetGeneralSelect 获取c用户下拉选项
+func GetGeneralSelect(ctx *gin.Context) {
+	var req request.GetByTenancyId
+	if errs := ctx.ShouldBindUri(&req); errs != nil {
+		response.FailWithMessage(errs.Error(), ctx)
+		return
+	}
+	if users, err := service.GetGeneralSelect(req.TenancyId); err != nil {
+		g.TENANCY_LOG.Error("获取失败", zap.Any("err", err))
+		response.FailWithMessage("获取失败:"+err.Error(), ctx)
+	} else {
+		response.OkWithDetailed(users, "获取成功", ctx)
+	}
+}
+
 // GetGeneralList 分页获取c用户列表
 func GetGeneralList(ctx *gin.Context) {
 	var pageInfo request.UserPageInfo

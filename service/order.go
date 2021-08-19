@@ -628,7 +628,11 @@ func CreateOrder(req request.CreateOrder, tenancyId, userId uint, tenancyName st
 	// 床旁用户登录，userId 为患者id
 	patient, err := GetPatientById(userId, tenancyId)
 	if err != nil {
-		return nil, 0, err
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return nil, 0, fmt.Errorf("患者不存在")
+		} else {
+			return nil, 0, fmt.Errorf("患者数据错误")
+		}
 	}
 	userAddress := fmt.Sprintf("%s-%s-%s床", tenancyName, patient.LocName, patient.BedNum)
 	orderInfo, err := GetOrderInfoByCartId(tenancyId, userId, req.CartIds)
@@ -734,7 +738,7 @@ func CreateOrder(req request.CreateOrder, tenancyId, userId uint, tenancyName st
 
 		err = ChangeIsPayByIds(tx, req.CartIds)
 		if err != nil {
-			return fmt.Errorf("生成订单-修改购物车isPay属性错误 %w", err)
+			return fmt.Errorf("生成订单-修改购物车属性错误 %w", err)
 		}
 		// 生成二维码
 		png, err = GetQrCode(order.ID, tenancyId, userId, order.OrderType)

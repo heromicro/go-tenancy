@@ -16,19 +16,19 @@ func GetAliyunOSSConfig() (AliyunOSS, error) {
 	}
 
 	for _, alipayConfig := range alipayConfigs {
-		if alipayConfig.ConfigKey == "endpoint" {
+		if alipayConfig.ConfigKey == "aliyun_endpoint" {
 			config.Endpoint = alipayConfig.Value
 		}
-		if alipayConfig.ConfigKey == "access_key_id" {
+		if alipayConfig.ConfigKey == "aliyun_access_key_id" {
 			config.AccessKeyId = alipayConfig.Value
 		}
-		if alipayConfig.ConfigKey == "access_key_secret" {
+		if alipayConfig.ConfigKey == "aliyun_access_key_secret" {
 			config.AccessKeySecret = alipayConfig.Value
 		}
-		if alipayConfig.ConfigKey == "bucket_name" {
+		if alipayConfig.ConfigKey == "aliyun_bucket_name" {
 			config.BucketName = alipayConfig.Value
 		}
-		if alipayConfig.ConfigKey == "bucket_url" {
+		if alipayConfig.ConfigKey == "aliyun_bucket_url" {
 			config.BucketUrl = alipayConfig.Value
 		}
 	}

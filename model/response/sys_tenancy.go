@@ -7,6 +7,7 @@ type SysTenancy struct {
 	model.BaseTenancy
 	Username string `json:"username"`
 }
+
 type TenancySelect struct {
 	ID   uint   `json:"id"`
 	Name string `json:"name"`
