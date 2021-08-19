@@ -300,11 +300,11 @@ func GetGeneralDetail(id, tenancyId uint) (response.GeneralUserDetail, error) {
 	return user, nil
 }
 
-func GetGeneralSelect(tenancyId uint) ([]response.CUserSelect, error) {
-	selects := []response.CUserSelect{
+func GetGeneralSelect(tenancyId uint) ([]response.SelectOption, error) {
+	selects := []response.SelectOption{
 		{ID: 0, Name: "请选择"},
 	}
-	var userSelects []response.CUserSelect
+	var userSelects []response.SelectOption
 	err := g.TENANCY_DB.Model(&model.SysUser{}).
 		Joins("left join general_infos on general_infos.sys_user_id = sys_users.id").
 		Select("sys_users.id as id,general_infos.nick_name as name").

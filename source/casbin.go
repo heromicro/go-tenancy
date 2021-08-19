@@ -69,9 +69,11 @@ var carbines = []gormadapter.CasbinRule{
 	{Ptype: "p", V0: AdminAuthorityId, V1: "/v1/admin/user/setUserInfo/:user_id", V2: "PUT"},
 	{Ptype: "p", V0: AdminAuthorityId, V1: "/v1/admin/user/deleteUser", V2: "DELETE"},
 
+	// 患者管理
+	{Ptype: "p", V0: AdminAuthorityId, V1: "/v1/admin/cuser/getPatientSelect/:tenancy_id", V2: "GET"},
 	// 用户管理
-	{Ptype: "p", V0: AdminAuthorityId, V1: "/v1/admin/cuser/getGeneralList", V2: "POST"},
 	{Ptype: "p", V0: AdminAuthorityId, V1: "/v1/admin/cuser/getGeneralSelect/:tenancy_id", V2: "GET"},
+	{Ptype: "p", V0: AdminAuthorityId, V1: "/v1/admin/cuser/getGeneralList", V2: "POST"},
 	{Ptype: "p", V0: AdminAuthorityId, V1: "/v1/admin/cuser/getGeneralDetail/:id", V2: "GET"},
 	{Ptype: "p", V0: AdminAuthorityId, V1: "/v1/admin/cuser/getOrderList/:id", V2: "POST"},
 	{Ptype: "p", V0: AdminAuthorityId, V1: "/v1/admin/cuser/getBillList/:id", V2: "POST"},
@@ -220,6 +222,7 @@ var carbines = []gormadapter.CasbinRule{
 	{Ptype: "p", V0: AdminAuthorityId, V1: "/v1/admin/productCategory/deleteProductCategory/:id", V2: "DELETE"},
 
 	//商品
+	{Ptype: "p", V0: AdminAuthorityId, V1: "/v1/admin/product/getProductSelect/:tenancy_id", V2: "GET"},
 	{Ptype: "p", V0: AdminAuthorityId, V1: "/v1/admin/product/getEditProductFictiMap/:id", V2: "GET"},
 	{Ptype: "p", V0: AdminAuthorityId, V1: "/v1/admin/product/setProductFicti/:id", V2: "PUT"},
 	{Ptype: "p", V0: AdminAuthorityId, V1: "/v1/admin/product/getProductFilter", V2: "GET"},

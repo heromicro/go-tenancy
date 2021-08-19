@@ -15,7 +15,3 @@ type ShippingTemplateDetail struct {
 	Undelives model.ShippingTemplateUndelivery `gorm:"-" json:"undelives"`
 }
 
-type ShippingTemplateSelect struct {
-	ID   uint   `json:"id"`
-	Name string `json:"name"`
-}

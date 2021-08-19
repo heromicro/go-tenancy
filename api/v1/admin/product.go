@@ -10,6 +10,20 @@ import (
 	"go.uber.org/zap"
 )
 
+func GetProductSelect(ctx *gin.Context) {
+	var req request.GetByTenancyId
+	if errs := ctx.ShouldBindUri(&req); errs != nil {
+		response.FailWithMessage(errs.Error(), ctx)
+		return
+	}
+	if rules, err := service.GetProductSelect(req.TenancyId); err != nil {
+		g.TENANCY_LOG.Error("获取失败!", zap.Any("err", err))
+		response.FailWithMessage("获取失败:"+err.Error(), ctx)
+	} else {
+		response.OkWithDetailed(rules, "获取成功", ctx)
+	}
+}
+
 func GetEditProductFictiMap(ctx *gin.Context) {
 	var req request.GetById
 	if errs := ctx.ShouldBindUri(&req); errs != nil {

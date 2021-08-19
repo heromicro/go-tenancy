@@ -8,11 +8,6 @@ type SysTenancy struct {
 	Username string `json:"username"`
 }
 
-type TenancySelect struct {
-	ID   uint   `json:"id"`
-	Name string `json:"name"`
-}
-
 type Counts struct {
 	Invalid int
 	Valid   int

@@ -201,6 +201,7 @@ func InitSysOperationRecordRouter(Router *gin.RouterGroup) {
 func InitProductRouter(Router *gin.RouterGroup) {
 	ProductRouter := Router.Group("/product")
 	{
+		ProductRouter.GET("/getProductSelect/:tenancy_id", admin.GetProductSelect)
 		ProductRouter.GET("/getEditProductFictiMap/:id", admin.GetEditProductFictiMap)
 		ProductRouter.GET("/getProductFilter", admin.GetProductFilter)
 		ProductRouter.PUT("/setProductFicti/:id", admin.SetProductFicti)                //设置虚拟销量
@@ -380,5 +381,13 @@ func InitUserLabelRouter(Router *gin.RouterGroup) {
 		UserLabelRouter.POST("/createUserLabel", admin.CreateUserLabel)
 		UserLabelRouter.PUT("/updateUserLabel/:id", admin.UpdateUserLabel)
 		UserLabelRouter.DELETE("/deleteUserLabel/:id", admin.DeleteUserLabel)
+	}
+}
+
+// 患者管理
+func InitPatientRouter(Router *gin.RouterGroup) {
+	PatientRouter := Router.Group("/patient")
+	{
+		PatientRouter.GET("/getPatientSelect/:tenancy_id", admin.GetPatientSelect)
 	}
 }

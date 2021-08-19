@@ -50,3 +50,15 @@ func GetPatientById(patientId, tenancyId uint) (model.Patient, error) {
 	}
 	return patient, nil
 }
+
+func GetPatientSelect(tenancyId uint) ([]response.SelectOption, error) {
+	selects := []response.SelectOption{
+		{ID: 0, Name: "请选择"},
+	}
+	var patientSelects []response.SelectOption
+	err := g.TENANCY_DB.Model(&model.Patient{}).
+		Select("id,name").
+		Find(&patientSelects).Error
+	selects = append(selects, patientSelects...)
+	return selects, err
+}

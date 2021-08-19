@@ -671,3 +671,17 @@ func UpdateOrderProductIsRefund(db *gorm.DB, orderProductId uint, isRefund uint8
 	}
 	return nil
 }
+
+func GetProductSelect(tenancyId uint) ([]response.SelectOption, error) {
+	selects := []response.SelectOption{
+		{ID: 0, Name: "请选择"},
+	}
+	var userSelects []response.SelectOption
+	err := g.TENANCY_DB.Model(&model.Product{}).
+		Select("id,store_name as name").
+		Where("status = ?", g.StatusTrue).
+		Where("is_show = ?", g.StatusTrue).
+		Find(&userSelects).Error
+	selects = append(selects, userSelects...)
+	return selects, err
+}

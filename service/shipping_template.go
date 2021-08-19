@@ -69,8 +69,8 @@ func GetShippingTemplateInfoList(info request.ShippingTemplatePageInfo) ([]respo
 }
 
 // GetShippingTemplateInfoSelect
-func GetShippingTemplateInfoSelect() ([]response.ShippingTemplateSelect, error) {
-	var shippingTemList []response.ShippingTemplateSelect
+func GetShippingTemplateInfoSelect() ([]response.SelectOption, error) {
+	var shippingTemList []response.SelectOption
 	err := g.TENANCY_DB.Model(&model.ShippingTemplate{}).Select("id,name").Find(&shippingTemList).Error
 	if err != nil {
 		return nil, err

@@ -30,7 +30,7 @@ redis:
   db: 0
   addr: ""
   password: ""
-  pool-size: 1000
+  pool-size: 0
 system:
   level: error
   env: dev

@@ -2,7 +2,6 @@ package cache
 
 import (
 	"context"
-	"net"
 	"strings"
 	"time"
 
@@ -14,18 +13,8 @@ func Cache() redis.UniversalClient {
 	universalOptions := &redis.UniversalOptions{
 		Addrs:       strings.Split(g.TENANCY_CONFIG.Redis.Addr, ","),
 		Password:    g.TENANCY_CONFIG.Redis.Password,
-		PoolSize:    10000,
+		PoolSize:    g.TENANCY_CONFIG.Redis.PoolSize,
 		IdleTimeout: 300 * time.Second,
-		Dialer: func(ctx context.Context, network, addr string) (net.Conn, error) {
-			conn, err := net.Dial(network, addr)
-			if err == nil {
-				go func() {
-					time.Sleep(5 * time.Second)
-					conn.Close()
-				}()
-			}
-			return conn, err
-		},
 	}
 	return redis.NewUniversalClient(universalOptions)
 }

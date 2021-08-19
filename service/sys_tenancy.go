@@ -251,11 +251,11 @@ func GetTenanciesByRegion(p_code string) ([]response.SysTenancy, error) {
 }
 
 // GetTenancySelect
-func GetTenancySelect() ([]response.TenancySelect, error) {
-	selects := []response.TenancySelect{
+func GetTenancySelect() ([]response.SelectOption, error) {
+	selects := []response.SelectOption{
 		{ID: 0, Name: "请选择"},
 	}
-	var tenancySelects []response.TenancySelect
+	var tenancySelects []response.SelectOption
 	err := g.TENANCY_DB.Model(&model.SysTenancy{}).Select("id,name").Where("status = ?", g.StatusTrue).Where("state = ?", g.StatusTrue).Find(&tenancySelects).Error
 	selects = append(selects, tenancySelects...)
 	return selects, err

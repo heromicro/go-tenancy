@@ -41,7 +41,3 @@ type GeneralUserDetail struct {
 	LabelIds      []uint         `gorm:"-"  json:"labelId"`
 }
 
-type CUserSelect struct {
-	ID   uint   `json:"id"`
-	Name string `json:"name"`
-}

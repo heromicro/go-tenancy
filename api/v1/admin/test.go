@@ -30,9 +30,6 @@ func PayTest(ctx *gin.Context) {
 		return
 	}
 
-	req.CartNum = 1
-	req.IsNew = 2
-
 	if qrcode, err := service.PayTest(req, "宝安中心人民医院"); err != nil {
 		g.TENANCY_LOG.Error("测试失败!", zap.Any("err", err))
 		response.FailWithMessage("测试失败", ctx)
