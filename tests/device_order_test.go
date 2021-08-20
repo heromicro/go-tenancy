@@ -33,62 +33,28 @@ func TestDeviceCheckOrder(t *testing.T) {
 	deviceAuth = base.DeviceWithLoginTester(t)
 	defer base.BaseLogOut(deviceAuth)
 
-	createPid := map[string]interface{}{
-		"cateName": "箱包服饰_client",
-		"status":   g.StatusTrue,
-		"path":     "http://qmplusimg.henrongyi.top/head.png",
-		"sort":     1,
-		"level":    1,
-		"pid":      0,
-	}
-	brandCategoryPid := CreateBrandCategory(adminAuth, createPid, http.StatusOK, "创建成功")
+	brandCategoryPid, _ := CreateBrandCategory(adminAuth, "箱包服饰_device_check_order", 0, http.StatusOK, "创建成功")
 	if brandCategoryPid == 0 {
 		t.Error("添加品牌父分类失败")
 		return
 	}
 	defer DeleteBrandCategory(adminAuth, brandCategoryPid)
 
-	createBrandCategory := map[string]interface{}{
-		"cateName": "精品服饰_client",
-		"status":   g.StatusTrue,
-		"path":     "http://qmplusimg.henrongyi.top/head.png",
-		"sort":     1,
-		"level":    1,
-		"pid":      brandCategoryPid,
-	}
-
-	brandCategoryId := CreateBrandCategory(adminAuth, createBrandCategory, http.StatusOK, "创建成功")
+	brandCategoryId, _ := CreateBrandCategory(adminAuth, "精品服饰_device_check_order", brandCategoryPid, http.StatusOK, "创建成功")
 	if brandCategoryId == 0 {
 		t.Error("添加品牌分类失败")
 		return
 	}
 	defer DeleteBrandCategory(adminAuth, brandCategoryId)
 
-	createBrand := map[string]interface{}{
-		"brandName":       "冈本_client",
-		"status":          g.StatusTrue,
-		"pic":             "http://qmplusimg.henrongyi.top/head.png",
-		"sort":            1,
-		"brandCategoryId": brandCategoryId,
-	}
-	brandId = CreateBrand(adminAuth, createBrand, http.StatusOK, "创建成功")
+	brandId, _ = CreateBrand(adminAuth, "冈本_device_check_order", brandCategoryId, http.StatusOK, "创建成功")
 	if brandId == 0 {
 		t.Error("添加品牌失败")
 		return
 	}
 	defer DeleteBrand(adminAuth, brandId)
 
-	createCategory := map[string]interface{}{
-		"cateName": "数码产品_client",
-		"status":   g.StatusTrue,
-		"path":     "http://qmplusimg.henrongyi.top/head.png",
-		"sort":     1,
-		"level":    1,
-		"pid":      1,
-		"pic":      "http://qmplusimg.henrongyi.top/head.png",
-	}
-
-	cateId = CreateCategory(adminAuth, createCategory, http.StatusOK, "创建成功")
+	cateId, _ = CreateCategory(adminAuth, "数码产品_device_check_order", http.StatusOK, "创建成功")
 	if cateId == 0 {
 		t.Error("添加分类失败")
 		return
@@ -186,7 +152,7 @@ func TestDeviceCheckOrder(t *testing.T) {
 	defer DeleteCart(deviceAuth, map[string]interface{}{"ids": []uint{cartId}}, http.StatusOK, "操作成功")
 
 	url := "v1/device/order/checkOrder"
-	base.Post(deviceAuth, url, map[string]interface{}{"cartIds": []uint{uint(cartId)}}, http.StatusOK, "获取成功")
+	base.Post(deviceAuth, url, map[string]interface{}{"ids": []uint{uint(cartId)}}, http.StatusOK, "获取成功")
 }
 
 func TestDeviceOrderProcess(t *testing.T) {
@@ -203,61 +169,28 @@ func TestDeviceOrderProcess(t *testing.T) {
 
 	deviceAuth = base.DeviceWithLoginTester(t)
 	defer base.BaseLogOut(deviceAuth)
-
-	createPid := map[string]interface{}{
-		"cateName": "箱包服饰_client",
-		"status":   g.StatusTrue,
-		"path":     "http://qmplusimg.henrongyi.top/head.png",
-		"sort":     1,
-		"level":    1,
-		"pid":      0,
-	}
-	brandCategoryPid := CreateBrandCategory(adminAuth, createPid, http.StatusOK, "创建成功")
+	brandCategoryPid, _ := CreateBrandCategory(adminAuth, "箱包服饰_device_process", 0, http.StatusOK, "创建成功")
 	if brandCategoryPid == 0 {
 		t.Error("添加品牌分类父分类失败")
 		return
 	}
 	defer DeleteBrandCategory(adminAuth, brandCategoryPid)
 
-	createBrandCategory := map[string]interface{}{
-		"cateName": "精品服饰_client",
-		"status":   g.StatusTrue,
-		"path":     "http://qmplusimg.henrongyi.top/head.png",
-		"sort":     1,
-		"level":    1,
-		"pid":      brandCategoryPid,
-	}
-	brandCategoryId := CreateBrandCategory(adminAuth, createBrandCategory, http.StatusOK, "创建成功")
+	brandCategoryId, _ := CreateBrandCategory(adminAuth, "精品服饰_device_process", brandCategoryPid, http.StatusOK, "创建成功")
 	if brandCategoryId == 0 {
 		t.Error("添加品牌分类失败")
 		return
 	}
 	defer DeleteBrandCategory(adminAuth, brandCategoryId)
 
-	createBrand := map[string]interface{}{
-		"brandName":       "冈本_client",
-		"status":          g.StatusTrue,
-		"pic":             "http://qmplusimg.henrongyi.top/head.png",
-		"sort":            1,
-		"brandCategoryId": brandCategoryId,
-	}
-	brandId = CreateBrand(adminAuth, createBrand, http.StatusOK, "创建成功")
+	brandId, _ = CreateBrand(adminAuth, "冈本_device_process", brandCategoryId, http.StatusOK, "创建成功")
 	if brandId == 0 {
 		t.Error("添加品牌失败")
 		return
 	}
 	defer DeleteBrand(adminAuth, brandId)
 
-	categoryData := map[string]interface{}{
-		"cateName": "数码产品_client",
-		"status":   g.StatusTrue,
-		"path":     "http://qmplusimg.henrongyi.top/head.png",
-		"sort":     1,
-		"level":    1,
-		"pid":      1,
-		"pic":      "http://qmplusimg.henrongyi.top/head.png",
-	}
-	cateId = CreateCategory(adminAuth, categoryData, http.StatusOK, "创建成功")
+	cateId, _ = CreateCategory(adminAuth, "数码产品_device_process", http.StatusOK, "创建成功")
 	if cateId == 0 {
 		t.Error("添加分类失败")
 		return

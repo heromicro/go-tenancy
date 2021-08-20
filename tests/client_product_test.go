@@ -52,43 +52,19 @@ func TestClientProductProcess(t *testing.T) {
 		auth := base.BaseWithLoginTester(t)
 		defer base.BaseLogOut(auth)
 
-		createPid := map[string]interface{}{
-			"cateName": "箱包服饰_client",
-			"status":   g.StatusTrue,
-			"path":     "http://qmplusimg.henrongyi.top/head.png",
-			"sort":     1,
-			"level":    1,
-			"pid":      0,
-		}
-
-		brandCategoryPid := CreateBrandCategory(auth, createPid, http.StatusOK, "创建成功")
+		brandCategoryPid, _ := CreateBrandCategory(auth, "箱包服饰_client", 0, http.StatusOK, "创建成功")
 		if brandCategoryPid == 0 {
 			return
 		}
 		defer DeleteBrandCategory(auth, brandCategoryPid)
-		createBrandCategory := map[string]interface{}{
-			"cateName": "精品服饰_client",
-			"status":   g.StatusTrue,
-			"path":     "http://qmplusimg.henrongyi.top/head.png",
-			"sort":     1,
-			"level":    1,
-			"pid":      brandCategoryPid,
-		}
 
-		brandCategoryId := CreateBrandCategory(auth, createBrandCategory, http.StatusOK, "创建成功")
+		brandCategoryId, _ := CreateBrandCategory(auth, "精品服饰_client", brandCategoryPid, http.StatusOK, "创建成功")
 		if brandCategoryId == 0 {
 			return
 		}
 		defer DeleteBrandCategory(auth, brandCategoryId)
 
-		createBrand := map[string]interface{}{
-			"brandName":       "冈本_client",
-			"status":          g.StatusTrue,
-			"pic":             "http://qmplusimg.henrongyi.top/head.png",
-			"sort":            1,
-			"brandCategoryId": brandCategoryId,
-		}
-		brandId = CreateBrand(auth, createBrand, http.StatusOK, "创建成功")
+		brandId, _ = CreateBrand(auth, "冈本_client", brandCategoryId, http.StatusOK, "创建成功")
 		if brandId == 0 {
 			t.Errorf("添加品牌失败")
 			return
@@ -96,17 +72,8 @@ func TestClientProductProcess(t *testing.T) {
 		defer DeleteBrand(auth, brandId)
 
 		{
-			data := map[string]interface{}{
-				"cateName": "数码产品_client",
-				"status":   g.StatusTrue,
-				"path":     "http://qmplusimg.henrongyi.top/head.png",
-				"sort":     1,
-				"level":    1,
-				"pid":      1,
-				"pic":      "http://qmplusimg.henrongyi.top/head.png",
-			}
 
-			cateId = CreateCategory(auth, data, http.StatusOK, "创建成功")
+			cateId, _ = CreateCategory(auth, "数码产品_client", http.StatusOK, "创建成功")
 			if cateId == 0 {
 				t.Errorf("添加分类失败")
 				return

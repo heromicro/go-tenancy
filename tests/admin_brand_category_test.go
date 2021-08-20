@@ -20,16 +20,8 @@ func TestBrandCategoryList(t *testing.T) {
 func TestBrandCategoryProcess(t *testing.T) {
 	auth := base.BaseWithLoginTester(t)
 	defer base.BaseLogOut(auth)
-	create := map[string]interface{}{
-		"cateName": "数码产品",
-		"status":   g.StatusFalse,
-		"path":     "http://qmplusimg.henrongyi.top/head.png",
-		"sort":     1,
-		"level":    1,
-		"pid":      0,
-	}
 
-	brandCategoryId := CreateBrandCategory(auth, create, http.StatusOK, "创建成功")
+	brandCategoryId, create := CreateBrandCategory(auth, "数码产品", 0, http.StatusOK, "创建成功")
 	if brandCategoryId > 0 {
 		defer DeleteBrandCategory(auth, brandCategoryId)
 		{
@@ -99,28 +91,28 @@ func TestBrandCategoryProcess(t *testing.T) {
 }
 
 func TestBrandCategoryRegisterError(t *testing.T) {
-	create := map[string]interface{}{
-		"cateName": "",
-		"status":   g.StatusTrue,
-		"path":     "http://qmplusimg.henrongyi.top/head.png",
-		"sort":     2,
-		"level":    1,
-		"pid":      1,
-	}
 	auth := base.BaseWithLoginTester(t)
 	defer base.BaseLogOut(auth)
 	messge := "Key: 'SysBrandCategory.BaseBrandCategory.CateName' Error:Field validation for 'CateName' failed on the 'required' tag"
-	brandCategoryId := CreateBrandCategory(auth, create, http.StatusBadRequest, messge)
+	brandCategoryId, _ := CreateBrandCategory(auth, "", 0, http.StatusBadRequest, messge)
 	if brandCategoryId > 0 {
 		defer DeleteBrandCategory(auth, brandCategoryId)
 	}
 }
 
-func CreateBrandCategory(auth *httpexpect.Expect, create map[string]interface{}, status int, message string) uint {
+func CreateBrandCategory(auth *httpexpect.Expect, cateName string, pid uint, status int, message string) (uint, map[string]interface{}) {
+	create := map[string]interface{}{
+		"cateName": cateName,
+		"status":   g.StatusTrue,
+		"path":     "http://qmplusimg.henrongyi.top/head.png",
+		"sort":     1,
+		"level":    1,
+		"pid":      pid,
+	}
 	url := "v1/admin/brandCategory/createBrandCategory"
 	res := base.IdKeys()
 	base.Create(auth, url, create, res, status, message)
-	return res.GetId()
+	return res.GetId(), create
 }
 
 func DeleteBrandCategory(auth *httpexpect.Expect, id uint) {

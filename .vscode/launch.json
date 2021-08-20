@@ -10,7 +10,7 @@
       "request": "launch",
       "mode": "debug",
       "remotePath": "",
-      // "port": 8089,
+      // "port": 8089, // debug 模式需要配置 port
       "host": "127.0.0.1",
       "program": "${workspaceRoot}",
       "showLog": true

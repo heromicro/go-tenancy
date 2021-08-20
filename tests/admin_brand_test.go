@@ -20,43 +20,19 @@ func TestBrandProcess(t *testing.T) {
 	auth := base.BaseWithLoginTester(t)
 	defer base.BaseLogOut(auth)
 
-	createPid := map[string]interface{}{
-		"cateName": "箱包服饰",
-		"status":   g.StatusTrue,
-		"path":     "http://qmplusimg.henrongyi.top/head.png",
-		"sort":     1,
-		"level":    1,
-		"pid":      0,
-	}
-
-	brandCategoryPid := CreateBrandCategory(auth, createPid, http.StatusOK, "创建成功")
+	brandCategoryPid, _ := CreateBrandCategory(auth, "箱包服饰", 0, http.StatusOK, "创建成功")
 	if brandCategoryPid == 0 {
 		return
 	}
 	defer DeleteBrandCategory(auth, brandCategoryPid)
-	createBrandCategory := map[string]interface{}{
-		"cateName": "精品服饰",
-		"status":   g.StatusTrue,
-		"path":     "http://qmplusimg.henrongyi.top/head.png",
-		"sort":     1,
-		"level":    1,
-		"pid":      brandCategoryPid,
-	}
 
-	brandCategoryId := CreateBrandCategory(auth, createBrandCategory, http.StatusOK, "创建成功")
+	brandCategoryId, _ := CreateBrandCategory(auth, "精品服饰", brandCategoryPid, http.StatusOK, "创建成功")
 	if brandCategoryId == 0 {
 		t.Errorf("添加品牌分类失败")
 		return
 	}
 	defer DeleteBrandCategory(auth, brandCategoryId)
-	createBrand := map[string]interface{}{
-		"brandName":       "冈本",
-		"status":          g.StatusTrue,
-		"pic":             "http://qmplusimg.henrongyi.top/head.png",
-		"sort":            1,
-		"brandCategoryId": brandCategoryId,
-	}
-	brandId := CreateBrand(auth, createBrand, http.StatusOK, "创建成功")
+	brandId, createBrand := CreateBrand(auth, "冈本", brandCategoryId, http.StatusOK, "创建成功")
 	if brandId == 0 {
 		t.Errorf("添加品牌失败")
 		return
@@ -137,17 +113,11 @@ func TestBrandProcess(t *testing.T) {
 }
 
 func TestBrandRegisterError(t *testing.T) {
-	data := map[string]interface{}{
-		"brandName":       "",
-		"status":          g.StatusTrue,
-		"pic":             "http://qmplusimg.henrongyi.top/head.png",
-		"sort":            2,
-		"brandCategoryId": 0,
-	}
+
 	auth := base.BaseWithLoginTester(t)
 	defer base.BaseLogOut(auth)
 	msg := "Key: 'SysBrand.BrandName' Error:Field validation for 'BrandName' failed on the 'required' tag"
-	brandId := CreateBrand(auth, data, http.StatusBadRequest, msg)
+	brandId, _ := CreateBrand(auth, "", 0, http.StatusBadRequest, msg)
 	if brandId == 0 {
 		return
 	}
@@ -159,11 +129,18 @@ func brandList(auth *httpexpect.Expect, pageRes map[string]interface{}, pageKeys
 	base.PostList(auth, url, pageRes, pageKeys, status, message)
 }
 
-func CreateBrand(auth *httpexpect.Expect, create map[string]interface{}, status int, message string) uint {
+func CreateBrand(auth *httpexpect.Expect, brandName string, brandCategoryId uint, status int, message string) (uint, map[string]interface{}) {
+	create := map[string]interface{}{
+		"brandName":       "冈本_client",
+		"status":          g.StatusTrue,
+		"pic":             "http://qmplusimg.henrongyi.top/head.png",
+		"sort":            1,
+		"brandCategoryId": brandCategoryId,
+	}
 	url := "v1/admin/brand/createBrand"
 	res := base.IdKeys()
 	base.Create(auth, url, create, res, status, message)
-	return res.GetId()
+	return res.GetId(), create
 }
 
 func DeleteBrand(auth *httpexpect.Expect, id uint) {
