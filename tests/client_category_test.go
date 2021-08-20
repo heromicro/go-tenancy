@@ -34,19 +34,10 @@ func TestGetAdminCategorySelect(t *testing.T) {
 }
 
 func TestClientCategoryProcess(t *testing.T) {
-	data := map[string]interface{}{
-		"cateName": "数码产品",
-		"status":   g.StatusTrue,
-		"path":     "http://qmplusimg.henrongyi.top/head.png",
-		"sort":     1,
-		"level":    1,
-		"pid":      1,
-		"pic":      "http://qmplusimg.henrongyi.top/head.png",
-	}
 	auth, _ := base.TenancyWithLoginTester(t)
 	defer base.BaseLogOut(auth)
 
-	cateId := ClientCreateCategory(auth, data, http.StatusOK, "创建成功")
+	cateId, _ := ClientCreateCategory(auth, "数码产品", 0, http.StatusOK, "创建成功")
 	if cateId == 0 {
 		t.Errorf("添加商户分类失败")
 		return
@@ -104,31 +95,31 @@ func TestClientCategoryProcess(t *testing.T) {
 }
 
 func TestClientCategoryRegisterError(t *testing.T) {
-	data := map[string]interface{}{
-		"cateName": "",
-		"status":   g.StatusTrue,
-		"path":     "http://qmplusimg.henrongyi.top/head.png",
-		"sort":     2,
-		"level":    1,
-		"pid":      1,
-		"pic":      "http://qmplusimg.henrongyi.top/head.png",
-	}
 	auth, _ := base.TenancyWithLoginTester(t)
 	defer base.BaseLogOut(auth)
 
 	msg := "Key: 'ProductCategory.BaseProductCategory.CateName' Error:Field validation for 'CateName' failed on the 'required' tag"
-	cateId := ClientCreateCategory(auth, data, http.StatusBadRequest, msg)
+	cateId, _ := ClientCreateCategory(auth, "", 0, http.StatusBadRequest, msg)
 	if cateId == 0 {
 		return
 	}
 	defer DeleteClientCategory(auth, cateId, http.StatusOK, "删除成功")
 }
 
-func ClientCreateCategory(auth *httpexpect.Expect, create map[string]interface{}, status int, message string) uint {
+func ClientCreateCategory(auth *httpexpect.Expect, cateName string, pid uint, status int, message string) (uint, map[string]interface{}) {
+	create := map[string]interface{}{
+		"cateName": cateName,
+		"status":   g.StatusTrue,
+		"path":     "http://qmplusimg.henrongyi.top/head.png",
+		"sort":     1,
+		"level":    1,
+		"pid":      pid,
+		"pic":      "http://qmplusimg.henrongyi.top/head.png",
+	}
 	url := "v1/merchant/productCategory/createProductCategory"
 	keys := base.IdKeys()
 	base.Create(auth, url, create, keys, status, message)
-	return keys.GetId()
+	return keys.GetId(), create
 }
 
 func DeleteClientCategory(auth *httpexpect.Expect, id uint, status int, message string) {

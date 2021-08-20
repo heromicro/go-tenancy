@@ -47,127 +47,59 @@ func TestGetClientProductFilter(t *testing.T) {
 func TestClientProductProcess(t *testing.T) {
 
 	var brandId, shipTempId, cateId, tenancyCategoryId uint
-	{
 
-		auth := base.BaseWithLoginTester(t)
-		defer base.BaseLogOut(auth)
+	adminAuth := base.BaseWithLoginTester(t)
+	defer base.BaseLogOut(adminAuth)
 
-		brandCategoryPid, _ := CreateBrandCategory(auth, "箱包服饰_client", 0, http.StatusOK, "创建成功")
-		if brandCategoryPid == 0 {
-			return
-		}
-		defer DeleteBrandCategory(auth, brandCategoryPid)
-
-		brandCategoryId, _ := CreateBrandCategory(auth, "精品服饰_client", brandCategoryPid, http.StatusOK, "创建成功")
-		if brandCategoryId == 0 {
-			return
-		}
-		defer DeleteBrandCategory(auth, brandCategoryId)
-
-		brandId, _ = CreateBrand(auth, "冈本_client", brandCategoryId, http.StatusOK, "创建成功")
-		if brandId == 0 {
-			t.Errorf("添加品牌失败")
-			return
-		}
-		defer DeleteBrand(auth, brandId)
-
-		{
-
-			cateId, _ = CreateCategory(auth, "数码产品_client", http.StatusOK, "创建成功")
-			if cateId == 0 {
-				t.Errorf("添加分类失败")
-				return
-			}
-			defer DeleteCategory(auth, cateId, http.StatusOK, "删除成功")
-		}
+	brandCategoryPid, _ := CreateBrandCategory(adminAuth, "箱包服饰_client", 0, http.StatusOK, "创建成功")
+	if brandCategoryPid == 0 {
+		return
 	}
+	defer DeleteBrandCategory(adminAuth, brandCategoryPid)
 
-	auth, _ := base.TenancyWithLoginTester(t)
-	defer base.BaseLogOut(auth)
-
-	{
-		create := map[string]interface{}{
-			"name":       "物流邮费模板_client",
-			"type":       2,
-			"appoint":    2,
-			"undelivery": 2,
-			"isDefault":  1,
-			"sort":       2,
-		}
-		shipTempId = CreateShippingTemplate(auth, create, http.StatusOK, "创建成功")
-		if shipTempId == 0 {
-			t.Errorf("添加物流模板失败")
-			return
-		}
-		defer DeleteShippingTemplate(auth, shipTempId, http.StatusOK, "删除成功")
+	brandCategoryId, _ := CreateBrandCategory(adminAuth, "精品服饰_client", brandCategoryPid, http.StatusOK, "创建成功")
+	if brandCategoryId == 0 {
+		return
 	}
+	defer DeleteBrandCategory(adminAuth, brandCategoryId)
 
-	{
-		data := map[string]interface{}{
-			"cateName": "客户端数码产品_client",
-			"status":   g.StatusTrue,
-			"path":     "http://qmplusimg.henrongyi.top/head.png",
-			"sort":     1,
-			"level":    1,
-			"pid":      1,
-			"pic":      "http://qmplusimg.henrongyi.top/head.png",
-		}
-
-		tenancyCategoryId = ClientCreateCategory(auth, data, http.StatusOK, "创建成功")
-		if tenancyCategoryId == 0 {
-			t.Errorf("添加商户分类失败")
-			return
-		}
-		defer DeleteClientCategory(auth, tenancyCategoryId, http.StatusOK, "删除成功")
+	brandId, _ = CreateBrand(adminAuth, "冈本_client", brandCategoryId, http.StatusOK, "创建成功")
+	if brandId == 0 {
+		t.Errorf("添加品牌失败")
+		return
 	}
+	defer DeleteBrand(adminAuth, brandId)
 
-	data := map[string]interface{}{
-		"attrValue": []map[string]interface{}{
-			{
-				"image":        "http://127.0.0.1:8089/uploads/file/b39024efbc6de61976f585c8421c6bba_20210702150027.png",
-				"barCode":      "",
-				"brokerage":    1,
-				"brokerageTwo": 1,
-				"cost":         1,
-				"detail": map[string]interface{}{
-					"尺寸": "S",
-				},
-				"otPrice": 1,
-				"price":   1,
-				"stock":   1,
-				"value0":  "S",
-				"volume":  1,
-				"weight":  1,
-			},
-		},
-		"cateId":    cateId,
-		"content":   "<p>是的发生的发sad</p>",
-		"image":     "http://127.0.0.1:8089/uploads/file/b39024efbc6de61976f585c8421c6bba_20210702150027.png",
-		"isGiftBag": 2,
-		"isGood":    1,
-		"keyword":   "sdfdsfsdfsdf",
-		"sliderImages": []string{
-			"http://127.0.0.1:8089/uploads/file/b39024efbc6de61976f585c8421c6bba_20210702150027.png",
-			"http://127.0.0.1:8089/uploads/file/0701aa317da5a004fbf6111545678a6c_20210702150036.png",
-		},
-		"sort":              1,
-		"specType":          1,
-		"storeInfo":         "的是否是否",
-		"storeName":         "是防守打法发",
-		"sysBrandId":        brandId,
-		"tempId":            shipTempId,
-		"tenancyCategoryId": []uint{tenancyCategoryId},
-		"unitName":          "放松的方式",
-		"videoLink":         "sdfsdfsd",
-		"barCode":           "sdfsdfsd",
+	cateId, _ = CreateCategory(adminAuth, "数码产品_client", http.StatusOK, "创建成功")
+	if cateId == 0 {
+		t.Errorf("添加分类失败")
+		return
 	}
+	defer DeleteCategory(adminAuth, cateId, http.StatusOK, "删除成功")
 
-	productId, _, _ := CreateProduct(auth, data, http.StatusOK, "创建成功")
+	clientAuth, _ := base.TenancyWithLoginTester(t)
+	defer base.BaseLogOut(clientAuth)
+
+	shipTempId, _ = CreateShippingTemplate(clientAuth, "物流邮费模板_client", http.StatusOK, "创建成功")
+	if shipTempId == 0 {
+		t.Errorf("添加物流模板失败")
+		return
+	}
+	defer DeleteShippingTemplate(clientAuth, shipTempId, http.StatusOK, "删除成功")
+
+	tenancyCategoryId, _ = ClientCreateCategory(clientAuth, "客户端数码产品_client", 0, http.StatusOK, "创建成功")
+	if tenancyCategoryId == 0 {
+		t.Errorf("添加商户分类失败")
+		return
+	}
+	defer DeleteClientCategory(clientAuth, tenancyCategoryId, http.StatusOK, "删除成功")
+
+	productId, _, _, _ := CreateProduct(clientAuth, cateId, brandId, shipTempId, tenancyCategoryId, http.StatusOK, "创建成功")
 	if productId == 0 {
 		t.Errorf("添加商品失败")
 		return
 	}
-	defer DeleteProduct(auth, productId, http.StatusOK, "删除成功")
+	defer DeleteProduct(clientAuth, productId, http.StatusOK, "删除成功")
 
 	update := map[string]interface{}{
 		"attrValue": []map[string]interface{}{
@@ -211,7 +143,7 @@ func TestClientProductProcess(t *testing.T) {
 	}
 	{
 		url := fmt.Sprintf("v1/merchant/product/updateProduct/%d", productId)
-		base.Update(auth, url, update, http.StatusOK, "更新成功")
+		base.Update(clientAuth, url, update, http.StatusOK, "更新成功")
 	}
 
 	keys := base.ResponseKeys{
@@ -237,26 +169,66 @@ func TestClientProductProcess(t *testing.T) {
 		{Type: "array", Key: "sliderImages", Value: update["sliderImages"]},
 	}
 	url := fmt.Sprintf("v1/merchant/product/getProductById/%d", productId)
-	base.GetById(auth, url, productId, nil, keys, http.StatusOK, "操作成功")
+	base.GetById(clientAuth, url, productId, nil, keys, http.StatusOK, "操作成功")
 
-	ChangeProductIsShow(auth, productId, g.StatusTrue, http.StatusOK, "设置成功")
-	ChangeProductIsShow(auth, productId, g.StatusFalse, http.StatusOK, "设置成功")
+	ChangeProductIsShow(clientAuth, productId, g.StatusTrue, http.StatusOK, "设置成功")
+	ChangeProductIsShow(clientAuth, productId, g.StatusFalse, http.StatusOK, "设置成功")
 
-	DeleteProduct(auth, productId, http.StatusOK, "删除成功")
-	defer RestoreProduct(auth, productId, http.StatusOK, "操作成功")
+	DeleteProduct(clientAuth, productId, http.StatusOK, "删除成功")
+	defer RestoreProduct(clientAuth, productId, http.StatusOK, "操作成功")
 
 }
 
-func CreateProduct(auth *httpexpect.Expect, create map[string]interface{}, status int, message string) (uint, []string, int32) {
+func CreateProduct(auth *httpexpect.Expect, cateId, brandId, shipTempId, tenancyCategoryId uint, status int, message string) (uint, []string, int32, map[string]interface{}) {
+	createProduct := map[string]interface{}{
+		"attrValue": []map[string]interface{}{
+			{
+				"image":        "http://127.0.0.1:8089/uploads/file/b39024efbc6de61976f585c8421c6bba_20210702150027.png",
+				"barCode":      "",
+				"brokerage":    1,
+				"brokerageTwo": 1,
+				"cost":         1,
+				"detail": map[string]interface{}{
+					"尺寸": "S",
+				},
+				"otPrice": 1,
+				"price":   1,
+				"stock":   1,
+				"value0":  "S",
+				"volume":  1,
+				"weight":  1,
+			},
+		},
+		"cateId":    cateId,
+		"content":   "<p>是的发生的发sad</p>",
+		"image":     "http://127.0.0.1:8089/uploads/file/b39024efbc6de61976f585c8421c6bba_20210702150027.png",
+		"isGiftBag": 2,
+		"isGood":    1,
+		"keyword":   "sdfdsfsdfsdf",
+		"sliderImages": []string{
+			"http://127.0.0.1:8089/uploads/file/b39024efbc6de61976f585c8421c6bba_20210702150027.png",
+			"http://127.0.0.1:8089/uploads/file/0701aa317da5a004fbf6111545678a6c_20210702150036.png",
+		},
+		"sort":              1,
+		"specType":          1,
+		"storeInfo":         "的是否是否",
+		"storeName":         "是防守打法发",
+		"sysBrandId":        brandId,
+		"tempId":            shipTempId,
+		"tenancyCategoryId": []uint{tenancyCategoryId},
+		"unitName":          "放松的方式",
+		"videoLink":         "sdfsdfsd",
+		"barCode":           "sdfsdfsd",
+	}
 	res := base.ResponseKeys{
 		{Type: "uint", Key: "id", Value: uint(0)},
 		{Type: "array", Key: "uniques", Value: []string{}},
 		{Type: "int32", Key: "productType", Value: 0},
 	}
 	url := "v1/merchant/product/createProduct"
-	base.Create(auth, url, create, res, status, message)
+	base.Create(auth, url, createProduct, res, status, message)
 	fmt.Printf("res: %+v \n\n\n", res)
-	return res.GetId(), res.GetStringArrayValue("uniques"), res.GetInt32Value("productType")
+	return res.GetId(), res.GetStringArrayValue("uniques"), res.GetInt32Value("productType"), createProduct
 }
 
 func DeleteProduct(auth *httpexpect.Expect, id uint, status int, message string) {

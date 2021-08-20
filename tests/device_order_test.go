@@ -61,80 +61,21 @@ func TestDeviceCheckOrder(t *testing.T) {
 	}
 	defer DeleteCategory(adminAuth, cateId, http.StatusOK, "删除成功")
 
-	createShipTemp := map[string]interface{}{
-		"name":       "物流邮费模板_client",
-		"type":       2,
-		"appoint":    2,
-		"undelivery": 2,
-		"isDefault":  1,
-		"sort":       2,
-	}
-	shipTempId = CreateShippingTemplate(tenancyAuth, createShipTemp, http.StatusOK, "创建成功")
+	shipTempId, _ = CreateShippingTemplate(tenancyAuth, "ship_temp_name_物流邮费模板", http.StatusOK, "创建成功")
 	if shipTempId == 0 {
 		t.Error("添加物流模板失败")
 		return
 	}
 	defer DeleteShippingTemplate(tenancyAuth, shipTempId, http.StatusOK, "删除成功")
 
-	createTenancyCategory := map[string]interface{}{
-		"cateName": "客户端数码产品_client",
-		"status":   g.StatusTrue,
-		"path":     "http://qmplusimg.henrongyi.top/head.png",
-		"sort":     1,
-		"level":    1,
-		"pid":      1,
-		"pic":      "http://qmplusimg.henrongyi.top/head.png",
-	}
-
-	tenancyCategoryId = ClientCreateCategory(tenancyAuth, createTenancyCategory, http.StatusOK, "创建成功")
+	tenancyCategoryId, _ = ClientCreateCategory(tenancyAuth, "客户端数码产品_device_order", 0, http.StatusOK, "创建成功")
 	if tenancyCategoryId == 0 {
 		t.Error("添加商户分类失败")
 		return
 	}
 	defer DeleteClientCategory(tenancyAuth, tenancyCategoryId, http.StatusOK, "删除成功")
 
-	createProduct := map[string]interface{}{
-		"attrValue": []map[string]interface{}{
-			{
-				"image":        "http://127.0.0.1:8089/uploads/file/b39024efbc6de61976f585c8421c6bba_20210702150027.png",
-				"barCode":      "",
-				"brokerage":    1,
-				"brokerageTwo": 1,
-				"cost":         1,
-				"detail": map[string]interface{}{
-					"尺寸": "S",
-				},
-				"otPrice": 1,
-				"price":   1,
-				"stock":   1,
-				"value0":  "S",
-				"volume":  1,
-				"weight":  1,
-			},
-		},
-		"cateId":    cateId,
-		"content":   "<p>是的发生的发sad</p>",
-		"image":     "http://127.0.0.1:8089/uploads/file/b39024efbc6de61976f585c8421c6bba_20210702150027.png",
-		"isGiftBag": 2,
-		"isGood":    1,
-		"keyword":   "sdfdsfsdfsdf",
-		"sliderImages": []string{
-			"http://127.0.0.1:8089/uploads/file/b39024efbc6de61976f585c8421c6bba_20210702150027.png",
-			"http://127.0.0.1:8089/uploads/file/0701aa317da5a004fbf6111545678a6c_20210702150036.png",
-		},
-		"sort":              1,
-		"specType":          1,
-		"storeInfo":         "的是否是否",
-		"storeName":         "是防守打法发",
-		"sysBrandId":        brandId,
-		"tempId":            shipTempId,
-		"tenancyCategoryId": []uint{tenancyCategoryId},
-		"unitName":          "放松的方式",
-		"videoLink":         "sdfsdfsd",
-		"barCode":           "sdfsdfsd",
-	}
-
-	productId, uniques, productType = CreateProduct(tenancyAuth, createProduct, http.StatusOK, "创建成功")
+	productId, uniques, productType, _ = CreateProduct(tenancyAuth, cartId, brandId, shipTempId, tenancyCategoryId, http.StatusOK, "创建成功")
 	if productId == 0 || len(uniques) == 0 || productType == 0 {
 		t.Errorf("添加商品失败 商品id:%d 规格:%+v,商品类型:%d", productId, uniques, productType)
 		return
@@ -197,79 +138,21 @@ func TestDeviceOrderProcess(t *testing.T) {
 	}
 	defer DeleteCategory(adminAuth, cateId, http.StatusOK, "删除成功")
 
-	shippingTemplateCreate := map[string]interface{}{
-		"name":       "物流邮费模板_client",
-		"type":       2,
-		"appoint":    2,
-		"undelivery": 2,
-		"isDefault":  1,
-		"sort":       2,
-	}
-	shipTempId = CreateShippingTemplate(tenancyAuth, shippingTemplateCreate, http.StatusOK, "创建成功")
+	shipTempId, _ = CreateShippingTemplate(tenancyAuth, "物流邮费模板_device_process", http.StatusOK, "创建成功")
 	if shipTempId == 0 {
 		t.Error("添加物流模板失败")
 		return
 	}
 	defer DeleteShippingTemplate(tenancyAuth, shipTempId, http.StatusOK, "删除成功")
 
-	shippingTemplateData := map[string]interface{}{
-		"cateName": "客户端数码产品_client",
-		"status":   g.StatusTrue,
-		"path":     "http://qmplusimg.henrongyi.top/head.png",
-		"sort":     1,
-		"level":    1,
-		"pid":      1,
-		"pic":      "http://qmplusimg.henrongyi.top/head.png",
-	}
-	tenancyCategoryId = ClientCreateCategory(tenancyAuth, shippingTemplateData, http.StatusOK, "创建成功")
+	tenancyCategoryId, _ = ClientCreateCategory(tenancyAuth, "device_order_cate_name", 0, http.StatusOK, "创建成功")
 	if tenancyCategoryId == 0 {
 		t.Error("添加商户分类失败")
 		return
 	}
 	defer DeleteClientCategory(tenancyAuth, tenancyCategoryId, http.StatusOK, "删除成功")
 
-	data := map[string]interface{}{
-		"attrValue": []map[string]interface{}{
-			{
-				"image":        "http://127.0.0.1:8089/uploads/file/b39024efbc6de61976f585c8421c6bba_20210702150027.png",
-				"barCode":      "",
-				"brokerage":    1,
-				"brokerageTwo": 1,
-				"cost":         1,
-				"detail": map[string]interface{}{
-					"尺寸": "S",
-				},
-				"otPrice": 1,
-				"price":   1,
-				"stock":   1,
-				"value0":  "S",
-				"volume":  1,
-				"weight":  1,
-			},
-		},
-		"cateId":    cateId,
-		"content":   "<p>是的发生的发sad</p>",
-		"image":     "http://127.0.0.1:8089/uploads/file/b39024efbc6de61976f585c8421c6bba_20210702150027.png",
-		"isGiftBag": 2,
-		"isGood":    1,
-		"keyword":   "sdfdsfsdfsdf",
-		"sliderImages": []string{
-			"http://127.0.0.1:8089/uploads/file/b39024efbc6de61976f585c8421c6bba_20210702150027.png",
-			"http://127.0.0.1:8089/uploads/file/0701aa317da5a004fbf6111545678a6c_20210702150036.png",
-		},
-		"sort":              1,
-		"specType":          1,
-		"storeInfo":         "的是否是否",
-		"storeName":         "是防守打法发",
-		"sysBrandId":        brandId,
-		"tempId":            shipTempId,
-		"tenancyCategoryId": []uint{tenancyCategoryId},
-		"unitName":          "放松的方式",
-		"videoLink":         "sdfsdfsd",
-		"barCode":           "sdfsdfsd",
-	}
-
-	productId, uniques, productType = CreateProduct(tenancyAuth, data, http.StatusOK, "创建成功")
+	productId, uniques, productType, _ = CreateProduct(tenancyAuth, cartId, brandId, shipTempId, tenancyCategoryId, http.StatusOK, "创建成功")
 	if productId == 0 || len(uniques) == 0 || productType == 0 {
 		t.Errorf("添加商品失败 商品id:%d 规格:%+v,商品类型:%d", productId, uniques, productType)
 		return

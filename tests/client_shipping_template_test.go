@@ -13,30 +13,15 @@ func TestShippingTemplateList(t *testing.T) {
 	auth, _ := base.TenancyWithLoginTester(t)
 	defer base.BaseLogOut(auth)
 	{
-		create := map[string]interface{}{
-			"name":       "物流邮费模板",
-			"type":       2,
-			"appoint":    2,
-			"undelivery": 2,
-			"isDefault":  1,
-			"sort":       2,
-		}
-		shipTempId := CreateShippingTemplate(auth, create, http.StatusOK, "创建成功")
+
+		shipTempId,_ := CreateShippingTemplate(auth, "物流邮费模板_templist", http.StatusOK, "创建成功")
 		if shipTempId == 0 {
 			return
 		}
 		defer DeleteShippingTemplate(auth, shipTempId, http.StatusOK, "删除成功")
 	}
 	{
-		create := map[string]interface{}{
-			"name":       "陕西物流邮费模板",
-			"type":       2,
-			"appoint":    2,
-			"undelivery": 2,
-			"isDefault":  1,
-			"sort":       2,
-		}
-		shipTempId := CreateShippingTemplate(auth, create, http.StatusOK, "创建成功")
+		shipTempId, _ := CreateShippingTemplate(auth, "陕西物流邮费模板", http.StatusOK, "创建成功")
 		if shipTempId == 0 {
 			return
 		}
@@ -87,15 +72,7 @@ func TestShippingTemplateProcess(t *testing.T) {
 	auth, _ := base.TenancyWithLoginTester(t)
 	defer base.BaseLogOut(auth)
 
-	create := map[string]interface{}{
-		"name":       "物流模板名称",
-		"type":       2,
-		"appoint":    2,
-		"undelivery": 2,
-		"isDefault":  2,
-		"sort":       2,
-	}
-	shipTempId := CreateShippingTemplate(auth, create, http.StatusOK, "创建成功")
+	shipTempId, _ := CreateShippingTemplate(auth, "物流模板名称", http.StatusOK, "创建成功")
 	if shipTempId == 0 {
 		t.Errorf("添加物流模板失败")
 		return
@@ -129,11 +106,19 @@ func TestShippingTemplateProcess(t *testing.T) {
 	}
 }
 
-func CreateShippingTemplate(auth *httpexpect.Expect, create map[string]interface{}, status int, message string) uint {
+func CreateShippingTemplate(auth *httpexpect.Expect, name string, status int, message string) (uint, map[string]interface{}) {
+	create := map[string]interface{}{
+		"name":       name,
+		"type":       2,
+		"appoint":    2,
+		"undelivery": 2,
+		"isDefault":  1,
+		"sort":       2,
+	}
 	url := "v1/merchant/shippingTemplate/createShippingTemplate"
 	keys := base.IdKeys()
 	base.Create(auth, url, create, keys, status, message)
-	return keys.GetId()
+	return keys.GetId(), create
 }
 
 func DeleteShippingTemplate(auth *httpexpect.Expect, id uint, status int, message string) {
