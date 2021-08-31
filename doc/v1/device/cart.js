@@ -2,7 +2,7 @@
  * @api {post} /v1/device/cart/createCart 添加购物车
  * @apiVersion 0.0.1
  * @apiName 添加购物车
- * @apiGroup 购物车管理
+ * @apiGroup 购物车管理-[床旁端]
  * @apiPermission device
  *
  * @apiDescription 添加商品到购物车
@@ -65,7 +65,7 @@
  * @api {get} /v1/device/cart/getCartList 购物车商品列表
  * @apiVersion 0.0.1
  * @apiName 购物车商品列表
- * @apiGroup 购物车管理
+ * @apiGroup 购物车管理-[床旁端]
  * @apiPermission device
  *
  * @apiDescription 获取购物车内商品列表信息    
@@ -139,7 +139,7 @@
  * @api {post} /v1/device/cart/changeCartNum/1 修改购物车商品数量
  * @apiVersion 0.0.1
  * @apiName 修改购物车商品数量
- * @apiGroup 购物车管理
+ * @apiGroup 购物车管理-[床旁端]
  * @apiPermission device
  *
  * @apiDescription 修改购物车内商品数量
@@ -172,7 +172,7 @@
  * @api {get} /v1/device/cart/getProductCount 获取购物车商品数
  * @apiVersion 0.0.1
  * @apiName 获取购物车商品数
- * @apiGroup 购物车管理
+ * @apiGroup 购物车管理-[床旁端]
  * @apiPermission device
  *
  * @apiDescription 获取购物车商品数    
@@ -203,7 +203,7 @@
  * @api {delete} /v1/device/cart/deleteCart 删除购物车商品
  * @apiVersion 0.0.1
  * @apiName 删除购物车商品
- * @apiGroup 购物车管理
+ * @apiGroup 购物车管理-[床旁端]
  * @apiPermission device
  *
  * @apiDescription 批量删除购物车商品  

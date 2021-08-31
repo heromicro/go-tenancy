@@ -62,14 +62,14 @@ func TestClientCategoryProcess(t *testing.T) {
 	{
 		url := fmt.Sprintf("v1/merchant/productCategory/getProductCategoryById/%d", cateId)
 		keys := base.ResponseKeys{
-			{Type: "uint", Key: "id", Value: cateId},
-			{Type: "string", Key: "cateName", Value: update["cateName"]},
-			{Type: "string", Key: "path", Value: update["path"]},
-			{Type: "string", Key: "pic", Value: update["pic"]},
-			{Type: "int", Key: "status", Value: update["status"]},
-			{Type: "int", Key: "sort", Value: update["sort"]},
-			{Type: "int", Key: "pid", Value: update["pid"]},
-			{Type: "int", Key: "level", Value: update["level"]},
+			{Key: "id", Value: cateId},
+			{Key: "cateName", Value: update["cateName"]},
+			{Key: "path", Value: update["path"]},
+			{Key: "pic", Value: update["pic"]},
+			{Key: "status", Value: update["status"]},
+			{Key: "sort", Value: update["sort"]},
+			{Key: "pid", Value: update["pid"]},
+			{Key: "level", Value: update["level"]},
 		}
 		base.GetById(auth, url, cateId, nil, keys, http.StatusOK, "操作成功")
 	}

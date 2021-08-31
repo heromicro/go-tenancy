@@ -477,8 +477,8 @@ func DelToken(token string) error {
 }
 
 // CleanToken 清空 token
-func CleanToken(userId string) error {
-	err := multi.AuthDriver.CleanUserTokenCache(userId)
+func CleanToken(authorityType int, userId string) error {
+	err := multi.AuthDriver.CleanUserTokenCache(authorityType, userId)
 	if err != nil {
 		g.TENANCY_LOG.Error("clean token", zap.Any("err", err))
 		return fmt.Errorf("clean token %w", err)

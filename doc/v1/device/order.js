@@ -2,7 +2,7 @@
  * @api {post} /v1/device/order/checkOrder 用户下单数据
  * @apiVersion 0.0.1
  * @apiName 用户下单数据
- * @apiGroup 订单管理管理
+ * @apiGroup 订单管理-[床旁端]
  * @apiPermission device
  *
  * @apiDescription 获取用户下单数据详情
@@ -96,7 +96,7 @@
  * @api {post} /v1/device/order/createOrder 用户结算订单
  * @apiVersion 0.0.1
  * @apiName 用户结算订单
- * @apiGroup 订单管理管理
+ * @apiGroup 订单管理-[床旁端]
  * @apiPermission device
  *
  * @apiDescription 用户结算订单，并生成待支付订单和支付二维码，用户通过支付宝或者微信扫码支付
@@ -134,7 +134,7 @@
  * @api {GET} /v1/device/order/getOrderById/1 根据id获取订单详情
  * @apiVersion 0.0.1
  * @apiName 根据id获取订单详情
- * @apiGroup 订单管理管理
+ * @apiGroup 订单管理-[床旁端]
  * @apiPermission device
  *
  * @apiDescription 根据id获取订单详情
@@ -235,7 +235,7 @@
  * @api {GET} /v1/device/order/payOrder/1?orderType=1 重新获取支付二维码
  * @apiVersion 0.0.1
  * @apiName 重新获取支付二维码
- * @apiGroup 订单管理管理
+ * @apiGroup 订单管理-[床旁端]
  * @apiPermission device
  *
  * @apiDescription 重新获取支付二维码，用户通过支付宝或者微信扫码支付
@@ -278,7 +278,7 @@
  * @api {GET} /v1/device/order/cancelOrder/1 取消订单
  * @apiVersion 0.0.1
  * @apiName 取消订单
- * @apiGroup 订单管理管理
+ * @apiGroup 订单管理-[床旁端]
  * @apiPermission device
  *
  * @apiDescription 用户取消未支付的订单，其他订单无法取消
@@ -308,7 +308,7 @@
  * @api {post} /v1/device/order/getOrderList 我的订单
  * @apiVersion 0.0.1
  * @apiName 我的订单
- * @apiGroup 订单管理管理
+ * @apiGroup 订单管理-[床旁端]
  * @apiPermission device
  *
  * @apiDescription 床旁用户的订单列表

@@ -37,19 +37,19 @@ func TestMiniProcess(t *testing.T) {
 	{
 		url := "v1/admin/mini/getMiniList"
 		pageKeys := base.ResponseKeys{
-			{Type: "int", Key: "pageSize", Value: 10},
-			{Type: "int", Key: "page", Value: 1},
-			{Type: "array", Key: "list", Value: []base.ResponseKeys{
+			{Key: "pageSize", Value: 10},
+			{Key: "page", Value: 1},
+			{Key: "list", Value: []base.ResponseKeys{
 				{
-					{Type: "uint", Key: "id", Value: miniId},
-					{Type: "string", Key: "name", Value: data["name"]},
-					{Type: "string", Key: "appId", Value: data["appId"]},
-					{Type: "string", Key: "appSecret", Value: data["appSecret"]},
-					{Type: "string", Key: "remark", Value: data["remark"]},
+					{Key: "id", Value: miniId},
+					{Key: "name", Value: data["name"]},
+					{Key: "appId", Value: data["appId"]},
+					{Key: "appSecret", Value: data["appSecret"]},
+					{Key: "remark", Value: data["remark"]},
 				},
 			},
 			},
-			{Type: "int", Key: "total", Value: 1},
+			{Key: "total", Value: 1},
 		}
 		base.PostList(auth, url, base.PageRes, pageKeys, http.StatusOK, "获取成功")
 	}
@@ -70,11 +70,11 @@ func TestMiniProcess(t *testing.T) {
 	{
 		url := fmt.Sprintf("v1/admin/mini/getMiniById/%d", miniId)
 		keys := base.ResponseKeys{
-			{Type: "uint", Key: "id", Value: miniId},
-			{Type: "string", Key: "name", Value: update["name"]},
-			{Type: "string", Key: "appId", Value: update["appId"]},
-			{Type: "string", Key: "appSecret", Value: update["appSecret"]},
-			{Type: "string", Key: "remark", Value: update["remark"]},
+			{Key: "id", Value: miniId},
+			{Key: "name", Value: update["name"]},
+			{Key: "appId", Value: update["appId"]},
+			{Key: "appSecret", Value: update["appSecret"]},
+			{Key: "remark", Value: update["remark"]},
 		}
 		base.GetById(auth, url, miniId, nil, keys, http.StatusOK, "操作成功")
 	}

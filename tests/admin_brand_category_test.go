@@ -26,14 +26,14 @@ func TestBrandCategoryProcess(t *testing.T) {
 		defer DeleteBrandCategory(auth, brandCategoryId)
 		{
 			rkeys := base.ResponseKeys{
-				{Type: "uint", Key: "id", Value: brandCategoryId},
-				{Type: "int", Key: "pid", Value: create["pid"]},
-				{Type: "int", Key: "status", Value: create["status"]},
-				{Type: "int", Key: "sort", Value: create["sort"]},
-				{Type: "int", Key: "level", Value: create["level"]},
-				{Type: "string", Key: "cateName", Value: create["cateName"]},
-				{Type: "string", Key: "path", Value: create["path"]},
-				{Type: "object", Key: "children", Value: nil},
+				{Key: "id", Value: brandCategoryId},
+				{Key: "pid", Value: create["pid"]},
+				{Key: "status", Value: create["status"]},
+				{Key: "sort", Value: create["sort"]},
+				{Key: "level", Value: create["level"]},
+				{Key: "cateName", Value: create["cateName"]},
+				{Key: "path", Value: create["path"]},
+				{Key: "children", Value: nil},
 			}
 			url := "v1/admin/brandCategory/getBrandCategoryList"
 			base.GetList(auth, url, brandCategoryId, rkeys, http.StatusOK, "获取成功")
@@ -49,16 +49,16 @@ func TestBrandCategoryProcess(t *testing.T) {
 				"pid":      1,
 			}
 			rkeys := base.ResponseKeys{
-				{Type: "uint", Key: "id", Value: brandCategoryId},
-				{Type: "int", Key: "pid", Value: update["pid"]},
-				{Type: "int", Key: "status", Value: update["status"]},
-				{Type: "int", Key: "sort", Value: update["sort"]},
-				{Type: "int", Key: "level", Value: update["level"]},
-				{Type: "string", Key: "cateName", Value: update["cateName"]},
-				{Type: "string", Key: "path", Value: update["path"]},
-				{Type: "string", Key: "createdAt", Value: update["createdAt"]},
-				{Type: "string", Key: "updatedAt", Value: update["updatedAt"]},
-				{Type: "object", Key: "children", Value: nil},
+				{Key: "id", Value: brandCategoryId},
+				{Key: "pid", Value: update["pid"]},
+				{Key: "status", Value: update["status"]},
+				{Key: "sort", Value: update["sort"]},
+				{Key: "level", Value: update["level"]},
+				{Key: "cateName", Value: update["cateName"]},
+				{Key: "path", Value: update["path"]},
+				{Key: "createdAt", Value: update["createdAt"]},
+				{Key: "updatedAt", Value: update["updatedAt"]},
+				{Key: "children", Value: nil},
 			}
 			{
 				url := fmt.Sprintf("v1/admin/brandCategory/updateBrandCategory/%d", brandCategoryId)

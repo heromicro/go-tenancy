@@ -147,26 +147,26 @@ func TestClientProductProcess(t *testing.T) {
 	}
 
 	keys := base.ResponseKeys{
-		{Type: "uint", Key: "id", Value: productId},
-		{Type: "int", Key: "sort", Value: update["sort"]},
-		{Type: "int", Key: "specType", Value: update["specType"]},
-		{Type: "int", Key: "sysBrandId", Value: update["sysBrandId"]},
-		{Type: "array", Key: "tenancyCategoryId", Value: update["tenancyCategoryId"]},
-		{Type: "int", Key: "tempId", Value: update["tempId"]},
-		{Type: "int", Key: "cateId", Value: update["cateId"]},
-		{Type: "string", Key: "storeInfo", Value: update["storeInfo"]},
-		{Type: "string", Key: "storeName", Value: update["storeName"]},
-		{Type: "string", Key: "unitName", Value: update["unitName"]},
-		{Type: "string", Key: "videoLink", Value: update["videoLink"]},
-		{Type: "string", Key: "keyword", Value: update["keyword"]},
-		{Type: "string", Key: "barCode", Value: update["barCode"]},
-		{Type: "string", Key: "sliderImage", Value: update["sliderImage"]},
-		{Type: "string", Key: "content", Value: update["content"]},
-		{Type: "string", Key: "image", Value: update["image"]},
-		{Type: "int", Key: "isGiftBag", Value: update["isGiftBag"]},
-		{Type: "int", Key: "isGood", Value: update["isGood"]},
-		{Type: "array", Key: "attrValue", Value: update["attrValue"]},
-		{Type: "array", Key: "sliderImages", Value: update["sliderImages"]},
+		{Key: "id", Value: productId},
+		{Key: "sort", Value: update["sort"]},
+		{Key: "specType", Value: update["specType"]},
+		{Key: "sysBrandId", Value: update["sysBrandId"]},
+		{Key: "tenancyCategoryId", Value: update["tenancyCategoryId"]},
+		{Key: "tempId", Value: update["tempId"]},
+		{Key: "cateId", Value: update["cateId"]},
+		{Key: "storeInfo", Value: update["storeInfo"]},
+		{Key: "storeName", Value: update["storeName"]},
+		{Key: "unitName", Value: update["unitName"]},
+		{Key: "videoLink", Value: update["videoLink"]},
+		{Key: "keyword", Value: update["keyword"]},
+		{Key: "barCode", Value: update["barCode"]},
+		{Key: "sliderImage", Value: update["sliderImage"]},
+		{Key: "content", Value: update["content"]},
+		{Key: "image", Value: update["image"]},
+		{Key: "isGiftBag", Value: update["isGiftBag"]},
+		{Key: "isGood", Value: update["isGood"]},
+		{Key: "attrValue", Value: update["attrValue"]},
+		{Key: "sliderImages", Value: update["sliderImages"]},
 	}
 	url := fmt.Sprintf("v1/merchant/product/getProductById/%d", productId)
 	base.GetById(clientAuth, url, productId, nil, keys, http.StatusOK, "操作成功")
@@ -221,13 +221,12 @@ func CreateProduct(auth *httpexpect.Expect, cateId, brandId, shipTempId, tenancy
 		"barCode":           "sdfsdfsd",
 	}
 	res := base.ResponseKeys{
-		{Type: "uint", Key: "id", Value: uint(0)},
-		{Type: "array", Key: "uniques", Value: []string{}},
-		{Type: "int32", Key: "productType", Value: 0},
+		{Key: "id", Value: uint(0)},
+		{Key: "uniques", Value: []string{}},
+		{Key: "productType", Value: 0},
 	}
 	url := "v1/merchant/product/createProduct"
 	base.Create(auth, url, createProduct, res, status, message)
-	fmt.Printf("res: %+v \n\n\n", res)
 	return res.GetId(), res.GetStringArrayValue("uniques"), res.GetInt32Value("productType"), createProduct
 }
 

@@ -1,7 +1,8 @@
 package base
 
 import (
-	"strings"
+	"fmt"
+	"reflect"
 
 	"github.com/gavv/httpexpect"
 )
@@ -14,7 +15,6 @@ type Param struct {
 
 type ResponseKeys []ResponseKey
 type ResponseKey struct {
-	Type  string
 	Key   string
 	Value interface{}
 }
@@ -29,7 +29,7 @@ func (rks ResponseKeys) Keys() []string {
 
 func IdKeys() ResponseKeys {
 	return ResponseKeys{
-		{Type: "uint", Key: "id", Value: uint(0)},
+		{Key: "id", Value: uint(0)},
 	}
 }
 
@@ -39,47 +39,50 @@ func (rks ResponseKeys) Test(object *httpexpect.Object) {
 		if rk.Value == nil {
 			continue
 		}
-		switch strings.ToLower(rk.Type) {
+		switch reflect.TypeOf(rk.Value).String() {
 		case "string":
-			object.Value(rk.Key).String().Equal(rk.Value.(string))
+			if rk.Value.(string) == "notempty" {
+				object.Value(rk.Key).String().NotEmpty()
+			} else {
+				object.Value(rk.Key).String().Equal(rk.Value.(string))
+			}
 		case "float64":
 			object.Value(rk.Key).Number().Equal(rk.Value.(float64))
 		case "uint":
 			object.Value(rk.Key).Number().Equal(rk.Value.(uint))
 		case "int":
 			object.Value(rk.Key).Number().Equal(rk.Value.(int))
-		case "object":
-			continue
-		case "array":
-			if subs, ok := rk.Value.([]ResponseKeys); ok {
-				object.Value(rk.Key).Array().Length().Equal(len(subs))
-				length := int(object.Value(rk.Key).Array().Length().Raw())
-				if length > 0 && len(subs) == length {
-					for i := 0; i < length; i++ {
-						subs[i].Test(object.Value(rk.Key).Array().Element(i).Object())
-					}
-				}
-			} else if subs, ok := rk.Value.([]uint); ok {
-				object.Value(rk.Key).Array().Length().Equal(len(subs))
-				length := int(object.Value(rk.Key).Array().Length().Raw())
-				if length > 0 && len(subs) == length {
-					for i := 0; i < length; i++ {
-						object.Value(rk.Key).Array().Element(i).Number().Equal(subs[i])
-					}
-				}
-			} else if subs, ok := rk.Value.([]string); ok {
-				object.Value(rk.Key).Array().Length().Equal(len(subs))
-				length := int(object.Value(rk.Key).Array().Length().Raw())
-				if length > 0 && len(subs) == length {
-					for i := 0; i < length; i++ {
-						object.Value(rk.Key).Array().Element(i).String().Equal(subs[i])
-					}
+		// case "object":
+		// 	continue
+		case "[]ResponseKeys":
+
+			object.Value(rk.Key).Array().Length().Equal(len(rk.Value.([]ResponseKeys)))
+			length := int(object.Value(rk.Key).Array().Length().Raw())
+			if length > 0 && len(rk.Value.([]ResponseKeys)) == length {
+				for i := 0; i < length; i++ {
+					rk.Value.([]ResponseKeys)[i].Test(object.Value(rk.Key).Array().Element(i).Object())
 				}
 			}
-		case "notempty":
-			object.Value(rk.Key).String().NotEmpty()
+		case "[]uint":
+
+			object.Value(rk.Key).Array().Length().Equal(len(rk.Value.([]uint)))
+			length := int(object.Value(rk.Key).Array().Length().Raw())
+			if length > 0 && len(rk.Value.([]uint)) == length {
+				for i := 0; i < length; i++ {
+					object.Value(rk.Key).Array().Element(i).Number().Equal(rk.Value.([]uint)[i])
+				}
+			}
+		case "[]string":
+			object.Value(rk.Key).Array().Length().Equal(len(rk.Value.([]string)))
+			length := int(object.Value(rk.Key).Array().Length().Raw())
+			if length > 0 && len(rk.Value.([]string)) == length {
+				for i := 0; i < length; i++ {
+					object.Value(rk.Key).Array().Element(i).String().Equal(rk.Value.([]string)[i])
+				}
+			}
+
 		default:
-			object.Value(rk.Key).String().Equal(rk.Value.(string))
+			continue
 		}
 	}
 }
@@ -89,7 +92,7 @@ func (rks ResponseKeys) Scan(object *httpexpect.Object) {
 		if !Exist(object, rk.Key) {
 			continue
 		}
-		switch strings.ToLower(rk.Type) {
+		switch reflect.TypeOf(rk.Value).String() {
 		case "string":
 			rks[k].Value = object.Value(rk.Key).String().Raw()
 		case "uint":
@@ -100,7 +103,7 @@ func (rks ResponseKeys) Scan(object *httpexpect.Object) {
 			rks[k].Value = int32(object.Value(rk.Key).Number().Raw())
 		case "float64":
 			rks[k].Value = object.Value(rk.Key).Number().Raw()
-		case "array":
+		case "[]string":
 			length := int(object.Value(rk.Key).Array().Length().Raw())
 
 			if length == 0 {
@@ -114,11 +117,8 @@ func (rks ResponseKeys) Scan(object *httpexpect.Object) {
 				}
 				rks[k].Value = strings
 			}
-
-		case "object":
-			continue
 		default:
-			rks[k].Value = object.Value(rk.Key).String().Raw()
+			continue
 		}
 	}
 }
@@ -139,7 +139,7 @@ func (rks ResponseKeys) GetStringValue(key string) string {
 			if rk.Value == nil {
 				return ""
 			}
-			switch strings.ToLower(rk.Type) {
+			switch reflect.TypeOf(rk.Value).String() {
 			case "string":
 				return rk.Value.(string)
 			}
@@ -154,8 +154,9 @@ func (rks ResponseKeys) GetStringArrayValue(key string) []string {
 			if rk.Value == nil {
 				return nil
 			}
-			switch strings.ToLower(rk.Type) {
-			case "array":
+			fmt.Printf("[]string %v:%v", rk.Value, reflect.TypeOf(rk.Value))
+			switch reflect.TypeOf(rk.Value).String() {
+			case "[]string":
 				return rk.Value.([]string)
 			}
 		}
@@ -169,7 +170,7 @@ func (rks ResponseKeys) GetUintValue(key string) uint {
 			if rk.Value == nil {
 				return 0
 			}
-			switch strings.ToLower(rk.Type) {
+			switch reflect.TypeOf(rk.Value).String() {
 			case "float64":
 				return uint(rk.Value.(float64))
 			case "int32":
@@ -190,7 +191,7 @@ func (rks ResponseKeys) GetIntValue(key string) int {
 			if rk.Value == nil {
 				return 0
 			}
-			switch strings.ToLower(rk.Type) {
+			switch reflect.TypeOf(rk.Value).String() {
 			case "float64":
 				return int(rk.Value.(float64))
 			case "int":
@@ -210,7 +211,7 @@ func (rks ResponseKeys) GetInt32Value(key string) int32 {
 			if rk.Value == nil {
 				return 0
 			}
-			switch strings.ToLower(rk.Type) {
+			switch reflect.TypeOf(rk.Value).String() {
 			case "float64":
 				return int32(rk.Value.(float64))
 			case "int32":
@@ -231,7 +232,7 @@ func (rks ResponseKeys) GetId() uint {
 			if rk.Value == nil {
 				return 0
 			}
-			switch strings.ToLower(rk.Type) {
+			switch reflect.TypeOf(rk.Value).String() {
 			case "float64":
 				return uint(rk.Value.(float64))
 			case "uint":

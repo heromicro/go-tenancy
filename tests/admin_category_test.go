@@ -38,14 +38,14 @@ func TestCategoryProcess(t *testing.T) {
 	defer DeleteCategory(auth, categoryId, http.StatusOK, "删除成功")
 	{
 		keys := base.ResponseKeys{
-			{Type: "uint", Key: "id", Value: categoryId},
-			{Type: "string", Key: "cateName", Value: data["cateName"]},
-			{Type: "int", Key: "status", Value: data["status"]},
-			{Type: "string", Key: "path", Value: data["path"]},
-			{Type: "int", Key: "sort", Value: data["sort"]},
-			{Type: "int", Key: "pid", Value: data["pid"]},
-			{Type: "string", Key: "pic", Value: data["pic"]},
-			{Type: "int", Key: "level", Value: data["level"]},
+			{Key: "id", Value: categoryId},
+			{Key: "cateName", Value: data["cateName"]},
+			{Key: "status", Value: data["status"]},
+			{Key: "path", Value: data["path"]},
+			{Key: "sort", Value: data["sort"]},
+			{Key: "pid", Value: data["pid"]},
+			{Key: "pic", Value: data["pic"]},
+			{Key: "level", Value: data["level"]},
 		}
 		url := "v1/admin/productCategory/getProductCategoryList"
 		base.GetList(auth, url, 0, keys, http.StatusOK, "获取成功")
@@ -68,14 +68,14 @@ func TestCategoryProcess(t *testing.T) {
 	{
 		url := fmt.Sprintf("v1/admin/productCategory/getProductCategoryById/%d", categoryId)
 		keys := base.ResponseKeys{
-			{Type: "uint", Key: "id", Value: categoryId},
-			{Type: "string", Key: "cateName", Value: update["cateName"]},
-			{Type: "int", Key: "status", Value: update["status"]},
-			{Type: "string", Key: "path", Value: update["path"]},
-			{Type: "int", Key: "sort", Value: update["sort"]},
-			{Type: "int", Key: "pid", Value: update["pid"]},
-			{Type: "string", Key: "pic", Value: update["pic"]},
-			{Type: "int", Key: "level", Value: update["level"]},
+			{Key: "id", Value: categoryId},
+			{Key: "cateName", Value: update["cateName"]},
+			{Key: "status", Value: update["status"]},
+			{Key: "path", Value: update["path"]},
+			{Key: "sort", Value: update["sort"]},
+			{Key: "pid", Value: update["pid"]},
+			{Key: "pic", Value: update["pic"]},
+			{Key: "level", Value: update["level"]},
 		}
 		base.GetById(auth, url, categoryId, nil, keys, http.StatusOK, "操作成功")
 	}

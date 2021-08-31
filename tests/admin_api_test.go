@@ -16,10 +16,10 @@ func TestApiList(t *testing.T) {
 
 	url := "v1/admin/api/getApiList"
 	pageKeys := base.ResponseKeys{
-		{Type: "int", Key: "pageSize", Value: 10},
-		{Type: "int", Key: "page", Value: 1},
-		{Type: "array", Key: "list", Value: nil},
-		{Type: "int", Key: "total", Value: source.BaseApisLen()},
+		{Key: "pageSize", Value: 10},
+		{Key: "page", Value: 1},
+		{Key: "list", Value: nil},
+		{Key: "total", Value: source.BaseApisLen()},
 	}
 	base.PostList(auth, url, base.PageRes, pageKeys, http.StatusOK, "获取成功")
 }
@@ -59,11 +59,11 @@ func TestApiProcess(t *testing.T) {
 	{
 		url := fmt.Sprintf("v1/admin/api/getApiById/%d", apiId)
 		keys := base.ResponseKeys{
-			{Type: "uint", Key: "id", Value: apiId},
-			{Type: "string", Key: "path", Value: update["path"]},
-			{Type: "string", Key: "method", Value: update["method"]},
-			{Type: "string", Key: "description", Value: update["description"]},
-			{Type: "string", Key: "apiGroup", Value: update["apiGroup"]},
+			{Key: "id", Value: apiId},
+			{Key: "path", Value: update["path"]},
+			{Key: "method", Value: update["method"]},
+			{Key: "description", Value: update["description"]},
+			{Key: "apiGroup", Value: update["apiGroup"]},
 		}
 		base.GetById(auth, url, apiId, nil, keys, http.StatusOK, "操作成功")
 	}
@@ -89,9 +89,9 @@ func TestApiRegisterError(t *testing.T) {
 func CreateApi(auth *httpexpect.Expect, create map[string]interface{}, status int, message string) (uint, string, string) {
 	url := "v1/admin/api/createApi"
 	keys := base.ResponseKeys{
-		{Type: "uint", Key: "id", Value: uint(0)},
-		{Type: "string", Key: "path", Value: ""},
-		{Type: "string", Key: "method", Value: ""},
+		{Key: "id", Value: uint(0)},
+		{Key: "path", Value: ""},
+		{Key: "method", Value: ""},
 	}
 	base.Create(auth, url, create, keys, status, message)
 	return keys.GetId(), keys.GetStringValue("path"), keys.GetStringValue("method")

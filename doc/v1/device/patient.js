@@ -2,7 +2,7 @@
  * @api {get} /v1/device/patient/getPatientList 患者列表
  * @apiVersion 0.0.1
  * @apiName 患者列表
- * @apiGroup 患者管理
+ * @apiGroup 患者管理-[床旁端]
  * @apiPermission device
  *
  * @apiDescription 获取医院患者数据
@@ -62,7 +62,7 @@
  * @api {get} /v1/device/patient/getPatientDetail 获取当前患者
  * @apiVersion 0.0.1
  * @apiName 获取当前患者
- * @apiGroup 患者管理
+ * @apiGroup 患者管理-[床旁端]
  * @apiPermission device
  *
  * @apiDescription 获取当前床旁设备患者

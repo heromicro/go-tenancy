@@ -40,32 +40,32 @@ func TestBrandProcess(t *testing.T) {
 	{
 		pageRes := map[string]interface{}{"page": 1, "pageSize": 10, "brandCategoryId": brandCategoryPid}
 		pageKeys := base.ResponseKeys{
-			{Type: "int", Key: "pageSize", Value: 10},
-			{Type: "int", Key: "page", Value: 1},
-			{Type: "array", Key: "list", Value: nil},
-			{Type: "int", Key: "total", Value: 0},
+			{Key: "pageSize", Value: 10},
+			{Key: "page", Value: 1},
+			{Key: "list", Value: nil},
+			{Key: "total", Value: 0},
 		}
 		brandList(auth, pageRes, pageKeys, http.StatusOK, "获取成功")
 	}
 	{
 		pageRes := map[string]interface{}{"page": 1, "pageSize": 10, "brandCategoryId": brandCategoryId}
 		pageKeys := base.ResponseKeys{
-			{Type: "int", Key: "pageSize", Value: 10},
-			{Type: "int", Key: "page", Value: 1},
-			{Type: "array", Key: "list", Value: []base.ResponseKeys{
+			{Key: "pageSize", Value: 10},
+			{Key: "page", Value: 1},
+			{Key: "list", Value: []base.ResponseKeys{
 				{
-					{Type: "uint", Key: "id", Value: brandId},
-					{Type: "int", Key: "status", Value: createBrand["status"]},
-					{Type: "int", Key: "sort", Value: createBrand["sort"]},
-					{Type: "uint", Key: "brandCategoryId", Value: createBrand["brandCategoryId"]},
-					{Type: "string", Key: "brandName", Value: createBrand["brandName"]},
-					{Type: "string", Key: "pic", Value: createBrand["pic"]},
-					{Type: "string", Key: "createdAt", Value: createBrand["createdAt"]},
-					{Type: "string", Key: "updatedAt", Value: createBrand["updatedAt"]},
+					{Key: "id", Value: brandId},
+					{Key: "status", Value: createBrand["status"]},
+					{Key: "sort", Value: createBrand["sort"]},
+					{Key: "brandCategoryId", Value: createBrand["brandCategoryId"]},
+					{Key: "brandName", Value: createBrand["brandName"]},
+					{Key: "pic", Value: createBrand["pic"]},
+					{Key: "createdAt", Value: createBrand["createdAt"]},
+					{Key: "updatedAt", Value: createBrand["updatedAt"]},
 				},
 			},
 			},
-			{Type: "int", Key: "total", Value: 1},
+			{Key: "total", Value: 1},
 		}
 		brandList(auth, pageRes, pageKeys, http.StatusOK, "获取成功")
 	}
@@ -82,12 +82,12 @@ func TestBrandProcess(t *testing.T) {
 
 	{
 		responseKeys := base.ResponseKeys{
-			{Type: "uint", Key: "id", Value: brandId},
-			{Type: "int", Key: "status", Value: updateBrand["status"]},
-			{Type: "int", Key: "sort", Value: updateBrand["sort"]},
-			{Type: "uint", Key: "brandCategoryId", Value: updateBrand["brandCategoryId"]},
-			{Type: "string", Key: "brandName", Value: updateBrand["brandName"]},
-			{Type: "string", Key: "pic", Value: updateBrand["pic"]},
+			{Key: "id", Value: brandId},
+			{Key: "status", Value: updateBrand["status"]},
+			{Key: "sort", Value: updateBrand["sort"]},
+			{Key: "brandCategoryId", Value: updateBrand["brandCategoryId"]},
+			{Key: "brandName", Value: updateBrand["brandName"]},
+			{Key: "pic", Value: updateBrand["pic"]},
 		}
 		url := fmt.Sprintf("v1/admin/brand/getBrandById/%d", brandId)
 		base.GetById(auth, url, brandId, nil, responseKeys, http.StatusOK, "操作成功")
@@ -131,7 +131,7 @@ func brandList(auth *httpexpect.Expect, pageRes map[string]interface{}, pageKeys
 
 func CreateBrand(auth *httpexpect.Expect, brandName string, brandCategoryId uint, status int, message string) (uint, map[string]interface{}) {
 	create := map[string]interface{}{
-		"brandName":       "冈本_client",
+		"brandName":       brandName,
 		"status":          g.StatusTrue,
 		"pic":             "http://qmplusimg.henrongyi.top/head.png",
 		"sort":            1,

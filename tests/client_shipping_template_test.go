@@ -14,7 +14,7 @@ func TestShippingTemplateList(t *testing.T) {
 	defer base.BaseLogOut(auth)
 	{
 
-		shipTempId,_ := CreateShippingTemplate(auth, "物流邮费模板_templist", http.StatusOK, "创建成功")
+		shipTempId, _ := CreateShippingTemplate(auth, "物流邮费模板_templist", http.StatusOK, "创建成功")
 		if shipTempId == 0 {
 			return
 		}
@@ -32,25 +32,25 @@ func TestShippingTemplateList(t *testing.T) {
 		{
 			Args: map[string]interface{}{"page": 1, "pageSize": 10, "name": ""},
 			ResponseKeys: base.ResponseKeys{
-				{Type: "int", Key: "pageSize", Value: 10},
-				{Type: "int", Key: "page", Value: 1},
-				{Type: "int", Key: "total", Value: 2},
+				{Key: "pageSize", Value: 10},
+				{Key: "page", Value: 1},
+				{Key: "total", Value: 2},
 			},
 		},
 		{
 			Args: map[string]interface{}{"page": 1, "pageSize": 10, "name": "物流"},
 			ResponseKeys: base.ResponseKeys{
-				{Type: "int", Key: "pageSize", Value: 10},
-				{Type: "int", Key: "page", Value: 1},
-				{Type: "int", Key: "total", Value: 1},
+				{Key: "pageSize", Value: 10},
+				{Key: "page", Value: 1},
+				{Key: "total", Value: 1},
 			},
 		},
 		{
 			Args: map[string]interface{}{"page": 1, "pageSize": 10, "name": "陕西"},
 			ResponseKeys: base.ResponseKeys{
-				{Type: "int", Key: "pageSize", Value: 10},
-				{Type: "int", Key: "page", Value: 1},
-				{Type: "int", Key: "total", Value: 1},
+				{Key: "pageSize", Value: 10},
+				{Key: "page", Value: 1},
+				{Key: "total", Value: 1},
 			},
 		},
 	}
@@ -94,13 +94,13 @@ func TestShippingTemplateProcess(t *testing.T) {
 	{
 		url := fmt.Sprintf("v1/merchant/shippingTemplate/getShippingTemplateById/%d", shipTempId)
 		keys := base.ResponseKeys{
-			{Type: "uint", Key: "id", Value: shipTempId},
-			{Type: "string", Key: "name", Value: update["name"]},
-			{Type: "int", Key: "type", Value: update["type"]},
-			{Type: "int", Key: "appoint", Value: update["appoint"]},
-			{Type: "int", Key: "undelivery", Value: update["undelivery"]},
-			{Type: "int", Key: "isDefault", Value: update["isDefault"]},
-			{Type: "int", Key: "sort", Value: update["sort"]},
+			{Key: "id", Value: shipTempId},
+			{Key: "name", Value: update["name"]},
+			{Key: "type", Value: update["type"]},
+			{Key: "appoint", Value: update["appoint"]},
+			{Key: "undelivery", Value: update["undelivery"]},
+			{Key: "isDefault", Value: update["isDefault"]},
+			{Key: "sort", Value: update["sort"]},
 		}
 		base.GetById(auth, url, shipTempId, nil, keys, http.StatusOK, "操作成功")
 	}

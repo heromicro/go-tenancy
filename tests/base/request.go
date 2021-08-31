@@ -8,8 +8,8 @@ import (
 
 var PageRes = map[string]interface{}{"page": 1, "pageSize": 10}
 var PageKeys = ResponseKeys{
-	{Type: "int", Key: "pageSize", Value: 10},
-	{Type: "int", Key: "page", Value: 1},
+	{Key: "pageSize", Value: 10},
+	{Key: "page", Value: 1},
 }
 
 func PostList(auth *httpexpect.Expect, url string, res map[string]interface{}, pageKeys ResponseKeys, status int, message string) {

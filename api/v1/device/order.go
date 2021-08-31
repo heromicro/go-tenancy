@@ -108,7 +108,7 @@ func PayOrder(ctx *gin.Context) {
 	}
 }
 
-// CancelOrder
+// CancelOrder 
 func CancelOrder(ctx *gin.Context) {
 	var req request.GetById
 	if errs := ctx.ShouldBindUri(&req); errs != nil {

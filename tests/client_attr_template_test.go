@@ -53,17 +53,17 @@ func TestAttrTemplateProcess(t *testing.T) {
 	{
 		url := fmt.Sprintf("v1/merchant/attrTemplate/getAttrTemplateById/%d", attrTemplateId)
 		keys := base.ResponseKeys{
-			{Type: "uint", Key: "id", Value: attrTemplateId},
-			{Type: "uint", Key: "sysTenancyId", Value: tenancyId},
-			{Type: "string", Key: "templateName", Value: update["templateName"]},
-			{Type: "notempty", Key: "createdAt", Value: update["createdAt"]},
-			{Type: "notempty", Key: "updatedAt", Value: update["updatedAt"]},
-			{Type: "array", Key: "templateValue", Value: base.ResponseKeys{
-				{Type: "string", Key: "value", Value: update["updatedAt"].([]map[string]interface{})[0]["value"]},
-				{Type: "string", Key: "detail", Value: update["updatedAt"].([]map[string]interface{})[0]["detail"].([]string)[0]},
+			{Key: "id", Value: attrTemplateId},
+			{Key: "sysTenancyId", Value: tenancyId},
+			{Key: "templateName", Value: update["templateName"]},
+			{Key: "createdAt", Value: update["createdAt"]},
+			{Key: "updatedAt", Value: update["updatedAt"]},
+			{Key: "templateValue", Value: base.ResponseKeys{
+				{Key: "value", Value: update["updatedAt"].([]map[string]interface{})[0]["value"]},
+				{Key: "detail", Value: update["updatedAt"].([]map[string]interface{})[0]["detail"].([]string)[0]},
 			}},
 		}
-		base.GetById(auth, url, attrTemplateId,nil, keys, http.StatusOK, "操作成功")
+		base.GetById(auth, url, attrTemplateId, nil, keys, http.StatusOK, "操作成功")
 	}
 
 }

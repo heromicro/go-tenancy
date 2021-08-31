@@ -2,7 +2,7 @@
  * @api {post} /v1/device/product/getProductList 商品列表
  * @apiVersion 0.0.1
  * @apiName 商品列表
- * @apiGroup 商品管理
+ * @apiGroup 商品管理-[床旁端]
  * @apiPermission device
  *
  * @apiDescription 获取商品列表数据
@@ -61,7 +61,7 @@
  * @api {get} /v1/device/product/getProductById/1 商品详情
  * @apiVersion 0.0.1
  * @apiName 商品详情
- * @apiGroup 商品管理
+ * @apiGroup 商品管理-[床旁端]
  * @apiPermission device
  *
  * @apiDescription 获取商品详情数据

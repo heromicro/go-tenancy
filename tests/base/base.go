@@ -151,9 +151,9 @@ func BaseLogOut(auth *httpexpect.Expect) {
 func CreateTenancy(auth *httpexpect.Expect, create map[string]interface{}, status int, message string) (uint, string, string) {
 	url := "v1/admin/tenancy/createTenancy"
 	res := ResponseKeys{
-		{Type: "uint", Key: "id", Value: uint(0)},
-		{Type: "string", Key: "uuid", Value: ""},
-		{Type: "string", Key: "username", Value: ""},
+		{Key: "id", Value: uint(0)},
+		{Key: "uuid", Value: ""},
+		{Key: "username", Value: ""},
 	}
 	Create(auth, url, create, res, status, message)
 	return res.GetId(), res.GetStringValue("username"), res.GetStringValue("uuid")

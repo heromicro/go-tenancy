@@ -5,6 +5,8 @@ import (
 	"net/http"
 	"testing"
 
+	"github.com/gavv/httpexpect"
+	"github.com/snowlyg/go-tenancy/g"
 	"github.com/snowlyg/go-tenancy/tests/base"
 )
 
@@ -18,129 +20,73 @@ func TestDeviceProductList(t *testing.T) {
 }
 
 func TestDeviceProductDetail(t *testing.T) {
-	auth := base.DeviceWithLoginTester(t)
-	defer base.BaseLogOut(auth)
 
-	url := fmt.Sprintf("v1/device/product/getProductById/%d", 1)
-	keys := base.ResponseKeys{}
-	base.GetById(auth, url, 0, nil, keys, http.StatusOK, "操作成功")
-	// obj := auth.GET(fmt.Sprintf("v1/device/product/getProductById/%d", 1)).
-	// 	Expect().Status(http.StatusOK).JSON().Object()
-	// obj.Keys().ContainsOnly("status", "data", "message")
-	// obj.Value("status").Number().Equal(200)
-	// obj.Value("message").String().Equal("操作成功")
-	// product := obj.Value("data").Object()
-	// product.Value("id").Number().Equal(1)
-	// product.Value("storeName").String().Equal("领立裁腰带短袖连衣裙")
-	// product.Value("storeInfo").String().Equal("短袖连衣裙")
-	// product.Value("keyword").String().Equal("连衣裙")
-	// product.Value("unitName").String().Equal("件")
-	// product.Value("sort").Number().Equal(40)
-	// product.Value("sales").Number().Equal(1)
-	// product.Value("price").Number().Equal(80)
-	// product.Value("otPrice").Number().Equal(100)
-	// product.Value("stock").Number().Equal(399)
-	// product.Value("isHot").Number().Equal(2)
-	// product.Value("isBenefit").Number().Equal(2)
-	// product.Value("isBest").Number().Equal(2)
-	// product.Value("isNew").Number().Equal(2)
-	// product.Value("isGood").Number().Equal(1)
-	// product.Value("productType").Number().Equal(2)
-	// product.Value("ficti").Number().Equal(100)
-	// product.Value("specType").Number().Equal(1)
-	// product.Value("rate").Number().Equal(5)
-	// product.Value("isGiftBag").Number().Equal(2)
-	// product.Value("image").String().Equal("http://127.0.0.1:8089/uploads/file/9a6a2e1231fb19517ed1de71206a0657.jpg")
-	// product.Value("tempId").Number().Equal(99)
-	// product.Value("sysTenancyId").Number().Equal(1)
-	// product.Value("sysBrandId").Number().Equal(2)
-	// product.Value("productCategoryId").Number().Equal(162)
-	// product.Value("sysTenancyName").String().Equal("宝安中心人民医院")
-	// product.Value("cateName").String().Equal("男士上衣")
-	// product.Value("brandName").String().Equal("苹果")
-	// product.Value("tempName").String().Equal("")
-	// product.Value("content").String().Equal("<p>好手机</p>")
-	// product.Value("sliderImage").String().Equal("http://127.0.0.1:8089/uploads/file/9a6a2e1231fb19517ed1de71206a0657.jpg,http://127.0.0.1:8089/uploads/file/9a6a2e1231fb19517ed1de71206a0657.jpg")
-	// product.Value("sliderImages").Array().First().String().Equal("http://127.0.0.1:8089/uploads/file/9a6a2e1231fb19517ed1de71206a0657.jpg")
-	// product.Value("sliderImages").Array().Last().String().Equal("http://127.0.0.1:8089/uploads/file/9a6a2e1231fb19517ed1de71206a0657.jpg")
-	// attr := product.Value("attr").Array()
-	// attr.Element(0).Object().Value("detail").Array().First().String().Equal("35")
-	// attr.Element(0).Object().Value("value").String().Equal("S")
-	// attr.Element(1).Object().Value("detail").Array().First().String().Equal("36")
-	// attr.Element(1).Object().Value("value").String().Equal("L")
-	// attr.Element(2).Object().Value("detail").Array().First().String().Equal("37")
-	// attr.Element(2).Object().Value("value").String().Equal("XL")
-	// attr.Element(3).Object().Value("detail").Array().First().String().Equal("38")
-	// attr.Element(3).Object().Value("value").String().Equal("XXL")
-	// attrValue := product.Value("attrValue").Array()
-	// attrValue.Element(0).Object().Value("sku").String().Equal("S")
-	// attrValue.Element(0).Object().Value("stock").Number().Equal(99)
-	// attrValue.Element(0).Object().Value("sales").Number().Equal(1)
-	// attrValue.Element(0).Object().Value("image").String().Equal("http://127.0.0.1:8089/uploads/file/9a6a2e1231fb19517ed1de71206a0657.jpg")
-	// attrValue.Element(0).Object().Value("barCode").String().Equal("123456")
-	// attrValue.Element(0).Object().Value("cost").Number().Equal(50)
-	// attrValue.Element(0).Object().Value("otPrice").Number().Equal(180)
-	// attrValue.Element(0).Object().Value("price").Number().Equal(160)
-	// attrValue.Element(0).Object().Value("volume").Number().Equal(1)
-	// attrValue.Element(0).Object().Value("weight").Number().Equal(1)
-	// attrValue.Element(0).Object().Value("extensionOne").Number().Equal(0)
-	// attrValue.Element(0).Object().Value("extensionTwo").Number().Equal(0)
-	// attrValue.Element(0).Object().Value("unique").String().NotEmpty()
-	// attrValue.Element(0).Object().Value("detail").Object().Value("尺寸").Equal("S")
-	// attrValue.Element(0).Object().Value("value0").Equal("S")
+	var brandId, shipTempId, cateId, tenancyCategoryId, productId, cartId uint
+	var uniques []string
+	var productType int32
+	var adminAuth, tenancyAuth, deviceAuth *httpexpect.Expect
 
-	// attrValue.Element(1).Object().Value("sku").String().Equal("L")
-	// attrValue.Element(1).Object().Value("stock").Number().Equal(100)
-	// attrValue.Element(1).Object().Value("sales").Number().Equal(0)
-	// attrValue.Element(1).Object().Value("image").String().Equal("http://127.0.0.1:8089/uploads/file/9a6a2e1231fb19517ed1de71206a0657.jpg")
-	// attrValue.Element(1).Object().Value("barCode").String().Equal("123456")
-	// attrValue.Element(1).Object().Value("cost").Number().Equal(50)
-	// attrValue.Element(1).Object().Value("otPrice").Number().Equal(180)
-	// attrValue.Element(1).Object().Value("price").Number().Equal(160)
-	// attrValue.Element(1).Object().Value("volume").Number().Equal(1)
-	// attrValue.Element(1).Object().Value("weight").Number().Equal(1)
-	// attrValue.Element(1).Object().Value("extensionOne").Number().Equal(0)
-	// attrValue.Element(1).Object().Value("extensionTwo").Number().Equal(0)
-	// attrValue.Element(1).Object().Value("unique").String().NotEmpty()
-	// attrValue.Element(1).Object().Value("detail").Object().Value("尺寸").Equal("L")
-	// attrValue.Element(1).Object().Value("value0").Equal("L")
+	adminAuth = base.BaseWithLoginTester(t)
+	defer base.BaseLogOut(adminAuth)
 
-	// attrValue.Element(2).Object().Value("sku").String().Equal("XL")
-	// attrValue.Element(2).Object().Value("stock").Number().Equal(100)
-	// attrValue.Element(2).Object().Value("sales").Number().Equal(0)
-	// attrValue.Element(2).Object().Value("image").String().Equal("http://127.0.0.1:8089/uploads/file/9a6a2e1231fb19517ed1de71206a0657.jpg")
-	// attrValue.Element(2).Object().Value("barCode").String().Equal("123456")
-	// attrValue.Element(2).Object().Value("cost").Number().Equal(50)
-	// attrValue.Element(2).Object().Value("otPrice").Number().Equal(180)
-	// attrValue.Element(2).Object().Value("price").Number().Equal(160)
-	// attrValue.Element(2).Object().Value("volume").Number().Equal(1)
-	// attrValue.Element(2).Object().Value("weight").Number().Equal(1)
-	// attrValue.Element(2).Object().Value("extensionOne").Number().Equal(0)
-	// attrValue.Element(2).Object().Value("extensionTwo").Number().Equal(0)
-	// attrValue.Element(2).Object().Value("unique").String().NotEmpty()
-	// attrValue.Element(2).Object().Value("detail").Object().Value("尺寸").Equal("XL")
-	// attrValue.Element(2).Object().Value("value0").Equal("XL")
+	tenancyAuth, _ = base.TenancyWithLoginTester(t)
+	defer base.BaseLogOut(tenancyAuth)
 
-	// attrValue.Element(3).Object().Value("sku").String().Equal("XXL")
-	// attrValue.Element(3).Object().Value("stock").Number().Equal(100)
-	// attrValue.Element(3).Object().Value("sales").Number().Equal(0)
-	// attrValue.Element(3).Object().Value("image").String().Equal("http://127.0.0.1:8089/uploads/file/9a6a2e1231fb19517ed1de71206a0657.jpg")
-	// attrValue.Element(3).Object().Value("barCode").String().Equal("123456")
-	// attrValue.Element(3).Object().Value("cost").Number().Equal(50)
-	// attrValue.Element(3).Object().Value("otPrice").Number().Equal(180)
-	// attrValue.Element(3).Object().Value("price").Number().Equal(160)
-	// attrValue.Element(3).Object().Value("volume").Number().Equal(1)
-	// attrValue.Element(3).Object().Value("weight").Number().Equal(1)
-	// attrValue.Element(3).Object().Value("extensionOne").Number().Equal(0)
-	// attrValue.Element(3).Object().Value("extensionTwo").Number().Equal(0)
-	// attrValue.Element(3).Object().Value("unique").String().NotEmpty()
-	// attrValue.Element(3).Object().Value("detail").Object().Value("尺寸").Equal("XXL")
-	// attrValue.Element(3).Object().Value("value0").Equal("XXL")
-	// product.Value("cateId").Number().Equal(162)
-	// product.Value("tenancyCategoryId").Array().Element(0).Number().Equal(174)
-	// product.Value("tenancyCategoryId").Array().Element(1).Number().Equal(173)
-	// product.Value("productCates").Array().Element(0).Object().Value("id").Number().Equal(174)
-	// product.Value("productCates").Array().Element(0).Object().Value("cateName").String().Equal("时尚女装")
-	// product.Value("productCates").Array().Element(1).Object().Value("id").Number().Equal(173)
-	// product.Value("productCates").Array().Element(1).Object().Value("cateName").String().Equal("品牌服饰")
+	deviceAuth = base.DeviceWithLoginTester(t)
+	defer base.BaseLogOut(deviceAuth)
+
+	brandCategoryPid, _ := CreateBrandCategory(adminAuth, "箱包服饰_product_detail", 0, http.StatusOK, "创建成功")
+	if brandCategoryPid == 0 {
+		t.Error("添加品牌父分类失败")
+		return
+	}
+	defer DeleteBrandCategory(adminAuth, brandCategoryPid)
+
+	brandCategoryId, _ := CreateBrandCategory(adminAuth, "精品服饰_product_detail", brandCategoryPid, http.StatusOK, "创建成功")
+	if brandCategoryId == 0 {
+		t.Error("添加品牌分类失败")
+		return
+	}
+	defer DeleteBrandCategory(adminAuth, brandCategoryId)
+
+	brandId, _ = CreateBrand(adminAuth, "冈本_product_detail", brandCategoryId, http.StatusOK, "创建成功")
+	if brandId == 0 {
+		t.Error("添加品牌失败")
+		return
+	}
+	defer DeleteBrand(adminAuth, brandId)
+
+	cateId, _ = CreateCategory(adminAuth, "数码产品_product_detail", http.StatusOK, "创建成功")
+	if cateId == 0 {
+		t.Error("添加分类失败")
+		return
+	}
+	defer DeleteCategory(adminAuth, cateId, http.StatusOK, "删除成功")
+
+	shipTempId, _ = CreateShippingTemplate(tenancyAuth, "ship_temp_name_物流邮费模板", http.StatusOK, "创建成功")
+	if shipTempId == 0 {
+		t.Error("添加物流模板失败")
+		return
+	}
+	defer DeleteShippingTemplate(tenancyAuth, shipTempId, http.StatusOK, "删除成功")
+
+	tenancyCategoryId, _ = ClientCreateCategory(tenancyAuth, "客户端数码产品_device_order", 0, http.StatusOK, "创建成功")
+	if tenancyCategoryId == 0 {
+		t.Error("添加商户分类失败")
+		return
+	}
+	defer DeleteClientCategory(tenancyAuth, tenancyCategoryId, http.StatusOK, "删除成功")
+
+	productId, uniques, productType, _ = CreateProduct(tenancyAuth, cartId, brandId, shipTempId, tenancyCategoryId, http.StatusOK, "创建成功")
+	if productId == 0 || len(uniques) == 0 || productType == 0 {
+		t.Errorf("添加商品失败 商品id:%d 规格:%+v,商品类型:%d", productId, uniques, productType)
+		return
+	}
+	defer DeleteProduct(tenancyAuth, productId, http.StatusOK, "删除成功")
+	ChangeProductIsShow(tenancyAuth, productId, g.StatusTrue, http.StatusOK, "设置成功")
+	url := fmt.Sprintf("v1/device/product/getProductById/%d", productId)
+	keys := base.ResponseKeys{
+		{Key: "id", Value: productId},
+	}
+	base.GetById(deviceAuth, url, 0, nil, keys, http.StatusOK, "操作成功")
 }

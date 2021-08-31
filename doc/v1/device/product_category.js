@@ -2,7 +2,7 @@
  * @api {get} /v1/device/productCategory/getProductCategoryList 商品分类列表
  * @apiVersion 0.0.1
  * @apiName 商品分类列表
- * @apiGroup 商品分类
+ * @apiGroup 商品分类管理-[床旁端]
  * @apiPermission device
  *
  * @apiDescription 获取商品分类数据

@@ -76,7 +76,7 @@ func Clean(ctx *gin.Context) {
 		response.FailWithMessage("清空TOKEN失败", ctx)
 		return
 	}
-	err := service.CleanToken(waitUse.ID)
+	err := service.CleanToken(waitUse.AuthorityType, waitUse.ID)
 	if err != nil {
 		g.TENANCY_LOG.Error("清空TOKEN失败", zap.Any("err", err))
 		response.FailWithMessage("清空TOKEN失败", ctx)

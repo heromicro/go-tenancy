@@ -253,7 +253,7 @@ define({ "api": [
     "title": "商品分类列表",
     "version": "0.0.1",
     "name": "商品分类列表",
-    "group": "商品分类",
+    "group": "商品分类管理-[床旁端]",
     "permission": [
       {
         "name": "device",
@@ -352,7 +352,7 @@ define({ "api": [
       ]
     },
     "filename": "v1/device/product_category.js",
-    "groupTitle": "商品分类",
+    "groupTitle": "商品分类管理-[床旁端]",
     "sampleRequest": [
       {
         "url": "http://127.0.0.1:8089/v1/device/productCategory/getProductCategoryList"
@@ -390,7 +390,7 @@ define({ "api": [
     "title": "商品列表",
     "version": "0.0.1",
     "name": "商品列表",
-    "group": "商品管理",
+    "group": "商品管理-[床旁端]",
     "permission": [
       {
         "name": "device",
@@ -542,7 +542,7 @@ define({ "api": [
       ]
     },
     "filename": "v1/device/product.js",
-    "groupTitle": "商品管理",
+    "groupTitle": "商品管理-[床旁端]",
     "sampleRequest": [
       {
         "url": "http://127.0.0.1:8089/v1/device/product/getProductList"
@@ -580,7 +580,7 @@ define({ "api": [
     "title": "商品详情",
     "version": "0.0.1",
     "name": "商品详情",
-    "group": "商品管理",
+    "group": "商品管理-[床旁端]",
     "permission": [
       {
         "name": "device",
@@ -910,7 +910,7 @@ define({ "api": [
       ]
     },
     "filename": "v1/device/product.js",
-    "groupTitle": "商品管理",
+    "groupTitle": "商品管理-[床旁端]",
     "sampleRequest": [
       {
         "url": "http://127.0.0.1:8089/v1/device/product/getProductById/1"
@@ -948,7 +948,7 @@ define({ "api": [
     "title": "患者列表",
     "version": "0.0.1",
     "name": "患者列表",
-    "group": "患者管理",
+    "group": "患者管理-[床旁端]",
     "permission": [
       {
         "name": "device",
@@ -1068,7 +1068,7 @@ define({ "api": [
       ]
     },
     "filename": "v1/device/patient.js",
-    "groupTitle": "患者管理",
+    "groupTitle": "患者管理-[床旁端]",
     "sampleRequest": [
       {
         "url": "http://127.0.0.1:8089/v1/device/patient/getPatientList"
@@ -1106,7 +1106,7 @@ define({ "api": [
     "title": "获取当前患者",
     "version": "0.0.1",
     "name": "获取当前患者",
-    "group": "患者管理",
+    "group": "患者管理-[床旁端]",
     "permission": [
       {
         "name": "device",
@@ -1226,7 +1226,7 @@ define({ "api": [
       ]
     },
     "filename": "v1/device/patient.js",
-    "groupTitle": "患者管理",
+    "groupTitle": "患者管理-[床旁端]",
     "sampleRequest": [
       {
         "url": "http://127.0.0.1:8089/v1/device/patient/getPatientDetail"
@@ -1264,7 +1264,7 @@ define({ "api": [
     "title": "取消订单",
     "version": "0.0.1",
     "name": "取消订单",
-    "group": "订单管理管理",
+    "group": "订单管理-[床旁端]",
     "permission": [
       {
         "name": "device",
@@ -1310,7 +1310,7 @@ define({ "api": [
       ]
     },
     "filename": "v1/device/order.js",
-    "groupTitle": "订单管理管理",
+    "groupTitle": "订单管理-[床旁端]",
     "sampleRequest": [
       {
         "url": "http://127.0.0.1:8089/v1/device/order/cancelOrder/1"
@@ -1348,7 +1348,7 @@ define({ "api": [
     "title": "我的订单",
     "version": "0.0.1",
     "name": "我的订单",
-    "group": "订单管理管理",
+    "group": "订单管理-[床旁端]",
     "permission": [
       {
         "name": "device",
@@ -1431,7 +1431,7 @@ define({ "api": [
       ]
     },
     "filename": "v1/device/order.js",
-    "groupTitle": "订单管理管理",
+    "groupTitle": "订单管理-[床旁端]",
     "sampleRequest": [
       {
         "url": "http://127.0.0.1:8089/v1/device/order/getOrderList"
@@ -1469,7 +1469,7 @@ define({ "api": [
     "title": "根据id获取订单详情",
     "version": "0.0.1",
     "name": "根据id获取订单详情",
-    "group": "订单管理管理",
+    "group": "订单管理-[床旁端]",
     "permission": [
       {
         "name": "device",
@@ -1764,7 +1764,7 @@ define({ "api": [
       ]
     },
     "filename": "v1/device/order.js",
-    "groupTitle": "订单管理管理",
+    "groupTitle": "订单管理-[床旁端]",
     "sampleRequest": [
       {
         "url": "http://127.0.0.1:8089/v1/device/order/getOrderById/1"
@@ -1802,7 +1802,7 @@ define({ "api": [
     "title": "用户下单数据",
     "version": "0.0.1",
     "name": "用户下单数据",
-    "group": "订单管理管理",
+    "group": "订单管理-[床旁端]",
     "permission": [
       {
         "name": "device",
@@ -1816,7 +1816,7 @@ define({ "api": [
         "group": "Body",
         "type": "Number[]",
         "optional": false,
-        "field": "cartIds",
+        "field": "ids",
         "description": "<p>购物车ids</p>"
       }
     ],
@@ -1931,7 +1931,7 @@ define({ "api": [
       ]
     },
     "filename": "v1/device/order.js",
-    "groupTitle": "订单管理管理",
+    "groupTitle": "订单管理-[床旁端]",
     "sampleRequest": [
       {
         "url": "http://127.0.0.1:8089/v1/device/order/checkOrder"
@@ -1969,7 +1969,7 @@ define({ "api": [
     "title": "用户结算订单",
     "version": "0.0.1",
     "name": "用户结算订单",
-    "group": "订单管理管理",
+    "group": "订单管理-[床旁端]",
     "permission": [
       {
         "name": "device",
@@ -2049,7 +2049,7 @@ define({ "api": [
       ]
     },
     "filename": "v1/device/order.js",
-    "groupTitle": "订单管理管理",
+    "groupTitle": "订单管理-[床旁端]",
     "sampleRequest": [
       {
         "url": "http://127.0.0.1:8089/v1/device/order/createOrder"
@@ -2087,7 +2087,7 @@ define({ "api": [
     "title": "重新获取支付二维码",
     "version": "0.0.1",
     "name": "重新获取支付二维码",
-    "group": "订单管理管理",
+    "group": "订单管理-[床旁端]",
     "permission": [
       {
         "name": "device",
@@ -2153,7 +2153,7 @@ define({ "api": [
       ]
     },
     "filename": "v1/device/order.js",
-    "groupTitle": "订单管理管理",
+    "groupTitle": "订单管理-[床旁端]",
     "sampleRequest": [
       {
         "url": "http://127.0.0.1:8089/v1/device/order/payOrder/1?orderType=1"
@@ -2191,7 +2191,7 @@ define({ "api": [
     "title": "修改购物车商品数量",
     "version": "0.0.1",
     "name": "修改购物车商品数量",
-    "group": "购物车管理",
+    "group": "购物车管理-[床旁端]",
     "permission": [
       {
         "name": "device",
@@ -2258,7 +2258,7 @@ define({ "api": [
       ]
     },
     "filename": "v1/device/cart.js",
-    "groupTitle": "购物车管理",
+    "groupTitle": "购物车管理-[床旁端]",
     "sampleRequest": [
       {
         "url": "http://127.0.0.1:8089/v1/device/cart/changeCartNum/1"
@@ -2296,7 +2296,7 @@ define({ "api": [
     "title": "删除购物车商品",
     "version": "0.0.1",
     "name": "删除购物车商品",
-    "group": "购物车管理",
+    "group": "购物车管理-[床旁端]",
     "permission": [
       {
         "name": "device",
@@ -2351,7 +2351,7 @@ define({ "api": [
       ]
     },
     "filename": "v1/device/cart.js",
-    "groupTitle": "购物车管理",
+    "groupTitle": "购物车管理-[床旁端]",
     "sampleRequest": [
       {
         "url": "http://127.0.0.1:8089/v1/device/cart/deleteCart"
@@ -2389,7 +2389,7 @@ define({ "api": [
     "title": "添加购物车",
     "version": "0.0.1",
     "name": "添加购物车",
-    "group": "购物车管理",
+    "group": "购物车管理-[床旁端]",
     "permission": [
       {
         "name": "device",
@@ -2559,7 +2559,7 @@ define({ "api": [
       }
     ],
     "filename": "v1/device/cart.js",
-    "groupTitle": "购物车管理",
+    "groupTitle": "购物车管理-[床旁端]",
     "sampleRequest": [
       {
         "url": "http://127.0.0.1:8089/v1/device/cart/createCart"
@@ -2597,7 +2597,7 @@ define({ "api": [
     "title": "获取购物车商品数",
     "version": "0.0.1",
     "name": "获取购物车商品数",
-    "group": "购物车管理",
+    "group": "购物车管理-[床旁端]",
     "permission": [
       {
         "name": "device",
@@ -2654,7 +2654,7 @@ define({ "api": [
       ]
     },
     "filename": "v1/device/cart.js",
-    "groupTitle": "购物车管理",
+    "groupTitle": "购物车管理-[床旁端]",
     "sampleRequest": [
       {
         "url": "http://127.0.0.1:8089/v1/device/cart/getProductCount"
@@ -2692,7 +2692,7 @@ define({ "api": [
     "title": "购物车商品列表",
     "version": "0.0.1",
     "name": "购物车商品列表",
-    "group": "购物车管理",
+    "group": "购物车管理-[床旁端]",
     "permission": [
       {
         "name": "device",
@@ -2777,7 +2777,7 @@ define({ "api": [
       ]
     },
     "filename": "v1/device/cart.js",
-    "groupTitle": "购物车管理",
+    "groupTitle": "购物车管理-[床旁端]",
     "sampleRequest": [
       {
         "url": "http://127.0.0.1:8089/v1/device/cart/getCartList"
