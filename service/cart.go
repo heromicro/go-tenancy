@@ -15,6 +15,7 @@ import (
 func CreateCart(req request.CreateCart) (model.Cart, error) {
 	var cart model.Cart
 	err := g.TENANCY_DB.Model(&model.Cart{}).
+		Where("patient_id = ?", req.PatientID).
 		Where("sys_user_id = ?", req.SysUserID).
 		Where("sys_tenancy_id = ?", req.SysTenancyID).
 		Where("product_id = ?", req.ProductID).
@@ -24,14 +25,15 @@ func CreateCart(req request.CreateCart) (model.Cart, error) {
 		Where("product_attr_unique = ?", req.ProductAttrUnique).
 		First(&cart).Error
 	if errors.Is(err, gorm.ErrRecordNotFound) { // 没有购物车商品直接新建
-		cart = model.Cart{BaseCart: model.BaseCart{
+		baseCart := model.BaseCart{
 			ProductType:       req.ProductType,
 			ProductAttrUnique: req.ProductAttrUnique,
 			CartNum:           req.CartNum,
 			IsPay:             g.StatusFalse,
 			IsNew:             req.IsNew,
 			IsFail:            g.StatusFalse,
-		}, SysUserID: req.SysUserID, SysTenancyID: req.SysTenancyID, ProductID: req.ProductID}
+		}
+		cart = model.Cart{BaseCart: baseCart, SysUserID: req.SysUserID, SysTenancyID: req.SysTenancyID, ProductID: req.ProductID, PatientID: req.PatientID}
 		err = g.TENANCY_DB.Model(&model.Cart{}).Create(&cart).Error
 		if err != nil {
 			return cart, err
@@ -88,11 +90,11 @@ func GetProductCount(userId, tenancyId uint) (int64, error) {
 }
 
 // GetCartList
-func GetCartList(tenancyId, userId uint, cartIds []uint) ([]response.CartList, []response.CartProduct, int64, error) {
+func GetCartList(tenancyId, userId, patientId uint, cartIds []uint) ([]response.CartList, []response.CartProduct, int64, error) {
 	cartList := []response.CartList{}
 	fails := []response.CartProduct{}
 	var count int64
-	cartProducts, err := GetCartProducts(tenancyId, userId, cartIds)
+	cartProducts, err := GetCartProducts(tenancyId, userId, patientId, cartIds)
 	if err != nil {
 		return cartList, fails, count, fmt.Errorf("get cart %w", err)
 	}

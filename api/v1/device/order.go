@@ -39,7 +39,7 @@ func CheckOrder(ctx *gin.Context) {
 		response.FailWithMessage(errs.Error(), ctx)
 		return
 	}
-	if order, err := service.CheckOrder(req.Ids, multi.GetTenancyId(ctx), multi.GetUserId(ctx)); err != nil {
+	if order, err := service.CheckOrder(req.Ids, multi.GetTenancyId(ctx), 0, multi.GetUserId(ctx)); err != nil {
 		g.TENANCY_LOG.Error("获取失败!", zap.Any("err", err))
 		response.FailWithMessage("获取失败:"+err.Error(), ctx)
 	} else {
@@ -62,6 +62,21 @@ func GetOrderById(ctx *gin.Context) {
 	}
 }
 
+// DeleteOrder
+func DeleteOrder(ctx *gin.Context) {
+	var req request.GetById
+	if errs := ctx.ShouldBindUri(&req); errs != nil {
+		response.FailWithMessage(errs.Error(), ctx)
+		return
+	}
+	if err := service.DeleteOrder(req.Id, multi.GetTenancyId(ctx), service.GetIsDelField(ctx)); err != nil {
+		g.TENANCY_LOG.Error("删除失败!", zap.Any("err", err))
+		response.FailWithMessage("删除失败:"+err.Error(), ctx)
+	} else {
+		response.OkWithMessage("删除成功", ctx)
+	}
+}
+
 // CreateOrder
 func CreateOrder(ctx *gin.Context) {
 	var req request.CreateOrder
@@ -69,7 +84,7 @@ func CreateOrder(ctx *gin.Context) {
 		response.FailWithMessage(errs.Error(), ctx)
 		return
 	}
-	if qrcode, orderId, err := service.CreateOrder(req, multi.GetTenancyId(ctx), multi.GetUserId(ctx), multi.GetTenancyName(ctx)); err != nil {
+	if qrcode, orderId, err := service.CreateOrder(req, multi.GetTenancyId(ctx), 0, multi.GetUserId(ctx), multi.GetTenancyName(ctx)); err != nil {
 		g.TENANCY_LOG.Error("获取失败!", zap.Any("err", err))
 		response.FailWithMessage("获取失败:"+err.Error(), ctx)
 	} else {
@@ -108,7 +123,7 @@ func PayOrder(ctx *gin.Context) {
 	}
 }
 
-// CancelOrder 
+// CancelOrder
 func CancelOrder(ctx *gin.Context) {
 	var req request.GetById
 	if errs := ctx.ShouldBindUri(&req); errs != nil {

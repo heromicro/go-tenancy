@@ -102,6 +102,7 @@ func TestDeviceOrderProcess(t *testing.T) {
 	var productType int32
 	var adminAuth, tenancyAuth, deviceAuth *httpexpect.Expect
 
+	
 	adminAuth = base.BaseWithLoginTester(t)
 	defer base.BaseLogOut(adminAuth)
 

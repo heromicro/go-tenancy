@@ -201,7 +201,7 @@ func DeleteOrder(ctx *gin.Context) {
 		response.FailWithMessage(errs.Error(), ctx)
 		return
 	}
-	if err := service.DeleteOrder(req.Id); err != nil {
+	if err := service.DeleteOrder(req.Id, multi.GetTenancyId(ctx), service.GetIsDelField(ctx)); err != nil {
 		g.TENANCY_LOG.Error("删除失败!", zap.Any("err", err))
 		response.FailWithMessage("删除失败:"+err.Error(), ctx)
 	} else {

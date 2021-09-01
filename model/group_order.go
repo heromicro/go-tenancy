@@ -26,5 +26,6 @@ type GroupOrder struct {
 	PayType  int       `gorm:"column:pay_type;type:tinyint(1);not null" json:"payType"`                     // 支付方式  1=微信 2=小程序 3=h5 4=余额  5=支付宝
 	IsRemind uint8     `gorm:"column:is_remind;type:tinyint unsigned;not null;default:2" json:"isRemind"`   // 是否提醒
 
+	PatientID uint `json:"patientId" form:"patientId" gorm:"column:patient_id;comment:患者"`
 	SysUserID uint `json:"sysUserId" form:"sysUserId" gorm:"column:sys_user_id;comment:关联标记"`
 }

@@ -264,7 +264,6 @@ func RemarkOrder(id uint, remark map[string]interface{}, ctx *gin.Context) error
 }
 
 func DeliveryOrder(id uint, delivery request.DeliveryOrder, ctx *gin.Context) error {
-
 	var changeMessage string
 	var deliveryName string
 	switch delivery.DeliveryType {
@@ -574,17 +573,17 @@ func UpdateOrder(id uint, order request.OrderRemarkAndUpdate, ctx *gin.Context) 
 }
 
 // DeleteOrder
-func DeleteOrder(id uint) error {
-	return g.TENANCY_DB.Model(&model.Order{}).Where("id = ?", id).Update("is_system_del", g.StatusTrue).Error
+func DeleteOrder(id, tenancyId uint, isDelField string) error {
+	return g.TENANCY_DB.Model(&model.Order{}).Where("id = ?", id).Update(isDelField, g.StatusTrue).Error
 }
 
-func CheckOrder(cartIds []uint, tenancyId, UserId uint) (response.CheckOrder, error) {
-	return GetOrderInfoByCartId(tenancyId, UserId, cartIds)
+func CheckOrder(cartIds []uint, tenancyId, userId, patientId uint) (response.CheckOrder, error) {
+	return GetOrderInfoByCartId(tenancyId, userId, patientId, cartIds)
 }
 
-func GetOrderInfoByCartId(tenancyId, userId uint, cartIds []uint) (response.CheckOrder, error) {
+func GetOrderInfoByCartId(tenancyId, userId, patientId uint, cartIds []uint) (response.CheckOrder, error) {
 	var res response.CheckOrder
-	list, fails, _, err := GetCartList(tenancyId, userId, cartIds)
+	list, fails, _, err := GetCartList(tenancyId, userId, patientId, cartIds)
 	if err != nil {
 		return res, fmt.Errorf("获取购物车信息 %w", err)
 	}
@@ -621,12 +620,12 @@ func GetOrderInfoByCartId(tenancyId, userId uint, cartIds []uint) (response.Chec
 }
 
 // CreateOrder 新建订单 生成订单组-》生成订单, 二维码需要 data:image/png;base64,
-func CreateOrder(req request.CreateOrder, tenancyId, userId uint, tenancyName string) ([]byte, uint, error) {
+func CreateOrder(req request.CreateOrder, tenancyId, userId, patientId uint, tenancyName string) ([]byte, uint, error) {
 	var png []byte
 
 	var order model.Order
 	// 床旁用户登录，userId 为患者id
-	patient, err := GetPatientById(userId, tenancyId)
+	patient, err := GetPatientById(patientId, tenancyId)
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return nil, 0, fmt.Errorf("患者不存在")
@@ -635,7 +634,7 @@ func CreateOrder(req request.CreateOrder, tenancyId, userId uint, tenancyName st
 		}
 	}
 	userAddress := fmt.Sprintf("%s-%s-%s床", tenancyName, patient.LocName, patient.BedNum)
-	orderInfo, err := GetOrderInfoByCartId(tenancyId, userId, req.CartIds)
+	orderInfo, err := GetOrderInfoByCartId(tenancyId, userId, patientId, req.CartIds)
 	if err != nil {
 		return nil, 0, err
 	}
@@ -663,6 +662,7 @@ func CreateOrder(req request.CreateOrder, tenancyId, userId uint, tenancyName st
 		TotalPostage: postagePrice,
 		PayPostage:   postagePrice,
 		Paid:         g.StatusFalse,
+		PatientID:    patientId,
 		SysUserID:    userId,
 		Cost:         orderCost,
 	}
@@ -689,6 +689,7 @@ func CreateOrder(req request.CreateOrder, tenancyId, userId uint, tenancyName st
 				Paid:         g.StatusFalse,
 				Cost:         orderCost,
 			},
+			PatientID:    patientId,
 			SysUserID:    userId,
 			SysTenancyID: tenancyId,
 			GroupOrderID: groupOrder.ID,
