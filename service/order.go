@@ -387,7 +387,6 @@ func GetOrdersProductById(orderProductIds []uint, req request.GetById) ([]respon
 		Where("order_id = ?", req.Id).
 		Where("refund_num > 0").
 		Where("id in ?", orderProductIds)
-	db = CheckTenancyIdAndUserId(db, req, "")
 	err := db.Find(&orderProducts).Error
 	if err != nil {
 		return orderProducts, err

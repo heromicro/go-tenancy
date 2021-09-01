@@ -16,10 +16,10 @@ type OrderAudit struct {
 }
 
 type CreateRefundOrder struct {
-	Ids           []uint  `json:"ids"  form:"ids"  binding:"required"`
-	RefundMessage string  `json:"refundMessage"  binding:"required"`
-	RefundPrice   float64 `json:"refundPrice"  binding:"required"`
-	RefundType    int     `json:"refundType"  binding:"required"`
-	Num           uint    `json:"num"  binding:"required"`
+	Ids           []uint  `json:"ids"  form:"ids"  binding:"required"` // 退款商品id
+	RefundMessage string  `json:"refundMessage"  binding:"required"`   // 退款原因
+	RefundPrice   float64 `json:"refundPrice"  binding:"required"`     // 退款金额
+	RefundType    int     `json:"refundType"  binding:"required"`      // 退款类型
+	Num           uint    `json:"num"  binding:"required"`             // 退款数量
 	Mark          string  `json:"mark"`
 }

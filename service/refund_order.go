@@ -537,43 +537,90 @@ func CheckRefundOrder(req request.GetById, orderPorductIds []uint) (response.Che
 	return checkRefundOrder, nil
 }
 
-func CreateRefundOrder(orderId, tenancyId, userId uint, req request.CreateRefundOrder) (uint, error) {
-	// order, err := GetOrderByOrderId(orderId, tenancyId, userId)
-	// if err != nil {
-	// 	return 0, err
-	// }
-	refundOrder := model.RefundOrder{
-		OrderID:      orderId,
-		SysUserID:    tenancyId,
-		SysTenancyID: tenancyId,
-		BaseRefundOrder: model.BaseRefundOrder{
-			RefundOrderSn: g.CreateOrderSn("R"),
-			// DeliveryType:       order.DeliveryType,
-			// DeliveryID:         order.DeliveryID,
-			// DeliveryMark:       order.DeliveryMark,
-			// DeliveryPics:       order.DeliveryPics,
-			// DeliveryPhone:      order.DeliveryPhone,
-			// MerDeliveryUser:    order.MerDeliveryUser,
-			// MerDeliveryAddress: order.MerDeliveryAddress,
-			// Phone:              order.Phone,
-			Mark:      req.Mark,
-			MerMark:   "",
-			AdminMark: "",
-			// Pics:               pics, // 图片
-			RefundType:    req.RefundType,
-			RefundMessage: req.RefundMessage,
-			RefundPrice:   req.RefundPrice,
-			RefundNum:     req.Num,
-			FailMessage:   "",
-			Status:        model.RefundStatusAudit,
-			StatusTime:    time.Now(),
-		},
+func CreateRefundOrder(reqId request.GetById, req request.CreateRefundOrder) (uint, error) {
+	var returnOrderId uint
+	order, err := GetOrderByOrderId(reqId)
+	if errors.Is(err, gorm.ErrRecordNotFound) {
+		return returnOrderId, fmt.Errorf("订单不存在或者已被删除")
 	}
-	err := g.TENANCY_DB.Model(&model.RefundOrder{}).Create(&refundOrder).Error
 	if err != nil {
-		return refundOrder.ID, err
+		return returnOrderId, err
 	}
-	return refundOrder.ID, nil
+	if order.Status == model.OrderStatusCancel {
+		return returnOrderId, fmt.Errorf("订单已经取消")
+	}
+	if order.Status == model.OrderStatusNoPay {
+		return returnOrderId, fmt.Errorf("订单未付款,请取消订单")
+	}
+	orderProducts, err := GetOrdersProductById(req.Ids, reqId)
+	if err != nil {
+		return returnOrderId, err
+	}
+	if len(orderProducts) == 0 {
+		return returnOrderId, fmt.Errorf("商品不存在或已退款")
+	}
+	if len(orderProducts) != len(req.Ids) {
+		return returnOrderId, fmt.Errorf("请选择正确的退款商品")
+	}
+	err = g.TENANCY_DB.Transaction(func(tx *gorm.DB) error {
+		refundOrder := model.RefundOrder{
+			OrderID:      reqId.Id,
+			PatientID:    reqId.PatientId,
+			SysUserID:    reqId.UserId,
+			SysTenancyID: reqId.TenancyId,
+			BaseRefundOrder: model.BaseRefundOrder{
+				RefundOrderSn: g.CreateOrderSn("R"),
+				Mark:          req.Mark,
+				MerMark:       "",
+				AdminMark:     "",
+				RefundType:    req.RefundType,
+				RefundMessage: req.RefundMessage,
+				RefundPrice:   req.RefundPrice,
+				RefundNum:     req.Num,
+				FailMessage:   "",
+				Status:        model.RefundStatusAudit,
+				StatusTime:    time.Now(),
+			},
+		}
+		err := tx.Model(&model.RefundOrder{}).Create(&refundOrder).Error
+		if err != nil {
+			return err
+		}
+
+		err = AddRefundOrderStatus(tx, refundOrder.ID, "create", "创建退款单")
+		if err != nil {
+			return fmt.Errorf("add refund order status %w", err)
+		}
+
+		var refundProducts []model.RefundProduct
+		for _, orderProduct := range orderProducts {
+			refundProduct := model.RefundProduct{
+				RefundOrderID:  refundOrder.ID,
+				OrderProductID: orderProduct.ProductID,
+				RefundNum:      orderProduct.ProductNum,
+			}
+			refundProducts = append(refundProducts, refundProduct)
+		}
+		err = CreateRefundProduct(tx, refundProducts)
+		if err != nil {
+			return err
+		}
+
+		returnOrderId = refundOrder.ID
+		return nil
+	})
+	if err != nil {
+		return returnOrderId, err
+	}
+	return returnOrderId, nil
+}
+
+func CreateRefundProduct(db *gorm.DB, refundProducts []model.RefundProduct) error {
+	err := db.Model(&model.RefundProduct{}).Create(&refundProducts).Error
+	if err != nil {
+		return fmt.Errorf("添加退款商品错误: %v", err)
+	}
+	return nil
 }
 
 // DeleteRefundOrder

@@ -150,6 +150,8 @@ func CheckRefundOrder(ctx *gin.Context) {
 		response.FailWithMessage(errs.Error(), ctx)
 		return
 	}
+
+	// 商品ID
 	var idsReq request.IdsReq
 	if err := ctx.ShouldBind(&idsReq); err != nil {
 		g.TENANCY_LOG.Error("参数校验不通过", zap.Any("err", err))
@@ -179,7 +181,7 @@ func RefundOrder(ctx *gin.Context) {
 		response.FailWithMessage("参数校验不通过", ctx)
 		return
 	}
-	if id, err := service.CreateRefundOrder(req.Id, multi.GetTenancyId(ctx), multi.GetUserId(ctx), createRefundOrder); err != nil {
+	if id, err := service.CreateRefundOrder(req, createRefundOrder); err != nil {
 		g.TENANCY_LOG.Error("操作失败!", zap.Any("err", err))
 		response.FailWithMessage("操作失败:"+err.Error(), ctx)
 	} else {

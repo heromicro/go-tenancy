@@ -305,6 +305,74 @@
  */
 
  /**
+ * @api {GET} /v1/device/order/checkRefundOrder/1 申请退款
+ * @apiVersion 0.0.1
+ * @apiName 申请退款
+ * @apiGroup 订单管理-[床旁端]
+ * @apiPermission device
+ *
+ * @apiDescription 用户支付的订单，可以申请退款
+ *   
+ * 
+ * @apiHeader {String} Authorization 接口需要带上此头信息
+ * @apiHeaderExample {Header} Header-Example
+ *     "Authorization: Bearer 5f048fe"
+ *
+ * @apiExample {bash} Curl example
+ * curl -H "Authorization: Bearer 5f048fe" -i http://127.0.0.1:8089/v1/device/order/checkRefundOrder/1
+ *
+ * @apiUse TokenError
+ *         
+ * @apiSuccess {Number} totalRefundPrice 退款金额
+ * @apiSuccess {Number} postagePrice 退回邮费
+ * @apiSuccess {Object} product 退款商品
+ *
+ * @apiSuccessExample Response:
+ *     HTTP/1.1 200 OK
+{
+  "status": 200,
+  "data": {
+    "totalRefundPrice": 2,
+    "postagePrice": 0,
+    "product": [
+      {
+        "id": 1,
+        "cartInfo": {
+          "product": {
+            "image": "http://127.0.0.1:8089/uploads/file/b39024efbc6de61976f585c8421c6bba_20210702150027.png",
+            "storeName": "是防守打法发",
+            "temp": {
+              "name": "",
+              "type": 0,
+              "appoint": 0,
+              "undelivery": 0,
+              "isDefault": 0,
+              "sort": 0
+            }
+          },
+          "productAttr": {
+            "price": 1,
+            "sku": "S"
+          }
+        },
+        "productSku": "S",
+        "isRefund": 0,
+        "productNum": 2,
+        "productType": 1,
+        "refundNum": 2,
+        "isReply": 2,
+        "productPrice": 1,
+        "orderID": 1,
+        "productId": 1
+      }
+    ],
+    "status": 1
+  },
+  "message": "操作成功"
+}
+ */
+
+ /**
  * @api {post} /v1/device/order/getOrderList 我的订单
  * @apiVersion 0.0.1
  * @apiName 我的订单
@@ -451,5 +519,38 @@
               "total": 12
           },
           "message": "获取成功"
+ *     }
+ */
+
+
+ /**
+ * @api {GET} /v1/device/order/refundOrder/1 提交退款
+ * @apiVersion 0.0.1
+ * @apiName 提交退款
+ * @apiGroup 订单管理-[床旁端]
+ * @apiPermission device
+ *
+ * @apiDescription 用户支付的订单，用户提交退款申请
+ *   
+ * 
+ * @apiHeader {String} Authorization 接口需要带上此头信息
+ * @apiHeaderExample {Header} Header-Example
+ *     "Authorization: Bearer 5f048fe"
+ *
+ * @apiExample {bash} Curl example
+ * curl -H "Authorization: Bearer 5f048fe" -i http://127.0.0.1:8089/v1/device/order/refundOrder/1
+ *
+ * @apiUse TokenError
+ *         
+ * 
+ *
+ * @apiSuccessExample Response:
+ *     HTTP/1.1 200 OK
+ *     {
+        "status": 200,
+        "data": {
+          "id":1,
+        },
+        "message": "操作成功" 
  *     }
  */

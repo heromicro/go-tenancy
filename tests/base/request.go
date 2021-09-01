@@ -72,8 +72,12 @@ func GetById(auth *httpexpect.Expect, url string, id uint, query map[string]inte
 	}
 }
 
-func ScanById(auth *httpexpect.Expect, url string, id uint, keys ResponseKeys, status int, message string) {
-	obj := auth.GET(url).Expect().Status(http.StatusOK).JSON().Object()
+func ScanById(auth *httpexpect.Expect, url string, id uint, query map[string]interface{}, keys ResponseKeys, status int, message string) {
+	req := auth.GET(url)
+	if query != nil {
+		req = req.WithQueryObject(query)
+	}
+	obj := req.Expect().Status(http.StatusOK).JSON().Object()
 	obj.Keys().ContainsOnly("status", "data", "message")
 	obj.Value("status").Number().Equal(status)
 	obj.Value("message").String().Equal(message)
