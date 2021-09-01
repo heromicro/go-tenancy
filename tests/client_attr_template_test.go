@@ -18,7 +18,6 @@ func TestGetAttrTemplateList(t *testing.T) {
 }
 
 func TestAttrTemplateProcess(t *testing.T) {
-
 	data := map[string]interface{}{
 		"templateName": "fsdaf_data",
 		"templateValue": []map[string]interface{}{
@@ -58,9 +57,11 @@ func TestAttrTemplateProcess(t *testing.T) {
 			{Key: "templateName", Value: update["templateName"]},
 			{Key: "createdAt", Value: update["createdAt"]},
 			{Key: "updatedAt", Value: update["updatedAt"]},
-			{Key: "templateValue", Value: base.ResponseKeys{
-				{Key: "value", Value: update["updatedAt"].([]map[string]interface{})[0]["value"]},
-				{Key: "detail", Value: update["updatedAt"].([]map[string]interface{})[0]["detail"].([]string)[0]},
+			{Key: "templateValue", Value: []base.ResponseKeys{
+				{
+					{Key: "value", Value: update["templateValue"].([]map[string]interface{})[0]["value"]},
+					{Key: "detail", Value: update["templateValue"].([]map[string]interface{})[0]["detail"].([]string)},
+				},
 			}},
 		}
 		base.GetById(auth, url, attrTemplateId, nil, keys, http.StatusOK, "操作成功")
@@ -75,7 +76,9 @@ func DeleteAttrTemplate(auth *httpexpect.Expect, id uint, status int, message st
 
 func CreateAttrTemplate(auth *httpexpect.Expect, create map[string]interface{}, status int, message string) uint {
 	url := "v1/merchant/attrTemplate/createAttrTemplate"
-	keys := base.ResponseKeys{}
+	keys := base.ResponseKeys{
+		{Key: "id", Value: 0},
+	}
 	base.Create(auth, url, create, keys, status, message)
 	return keys.GetId()
 }

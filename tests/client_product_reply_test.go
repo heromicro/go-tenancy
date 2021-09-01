@@ -5,6 +5,8 @@ import (
 	"net/http"
 	"testing"
 
+	"github.com/gavv/httpexpect"
+	"github.com/snowlyg/go-tenancy/g"
 	"github.com/snowlyg/go-tenancy/tests/base"
 )
 
@@ -74,16 +76,77 @@ func productReplyClientlist(t *testing.T, params map[string]interface{}, length 
 }
 
 func TestClientProductReply(t *testing.T) {
-	auth, _ := base.TenancyWithLoginTester(t)
-	defer base.BaseLogOut(auth)
+	var brandId, shipTempId, cateId, tenancyCategoryId, productId, cartId uint
+	var uniques []string
+	var productType int32
+	var adminAuth, tenancyAuth, deviceAuth *httpexpect.Expect
 
-	obj := auth.GET("v1/merchant/productReply/replyMap/1").
+	adminAuth = base.BaseWithLoginTester(t)
+	defer base.BaseLogOut(adminAuth)
+
+	tenancyAuth, _ = base.TenancyWithLoginTester(t)
+	defer base.BaseLogOut(tenancyAuth)
+
+	deviceAuth = base.DeviceWithLoginTester(t)
+	defer base.BaseLogOut(deviceAuth)
+
+	brandCategoryPid, _ := CreateBrandCategory(adminAuth, "箱包服饰_product_detail", 0, http.StatusOK, "创建成功")
+	if brandCategoryPid == 0 {
+		t.Error("添加品牌父分类失败")
+		return
+	}
+	defer DeleteBrandCategory(adminAuth, brandCategoryPid)
+
+	brandCategoryId, _ := CreateBrandCategory(adminAuth, "精品服饰_product_detail", brandCategoryPid, http.StatusOK, "创建成功")
+	if brandCategoryId == 0 {
+		t.Error("添加品牌分类失败")
+		return
+	}
+	defer DeleteBrandCategory(adminAuth, brandCategoryId)
+
+	brandId, _ = CreateBrand(adminAuth, "冈本_product_detail", brandCategoryId, http.StatusOK, "创建成功")
+	if brandId == 0 {
+		t.Error("添加品牌失败")
+		return
+	}
+	defer DeleteBrand(adminAuth, brandId)
+
+	cateId, _ = CreateCategory(adminAuth, "数码产品_product_detail", http.StatusOK, "创建成功")
+	if cateId == 0 {
+		t.Error("添加分类失败")
+		return
+	}
+	defer DeleteCategory(adminAuth, cateId, http.StatusOK, "删除成功")
+
+	shipTempId, _ = CreateShippingTemplate(tenancyAuth, "ship_temp_name_物流邮费模板", http.StatusOK, "创建成功")
+	if shipTempId == 0 {
+		t.Error("添加物流模板失败")
+		return
+	}
+	defer DeleteShippingTemplate(tenancyAuth, shipTempId, http.StatusOK, "删除成功")
+
+	tenancyCategoryId, _ = ClientCreateCategory(tenancyAuth, "客户端数码产品_device_order", 0, http.StatusOK, "创建成功")
+	if tenancyCategoryId == 0 {
+		t.Error("添加商户分类失败")
+		return
+	}
+	defer DeleteClientCategory(tenancyAuth, tenancyCategoryId, http.StatusOK, "删除成功")
+
+	productId, uniques, productType, _ = CreateProduct(tenancyAuth, cartId, brandId, shipTempId, tenancyCategoryId, http.StatusOK, "创建成功")
+	if productId == 0 || len(uniques) == 0 || productType == 0 {
+		t.Errorf("添加商品失败 商品id:%d 规格:%+v,商品类型:%d", productId, uniques, productType)
+		return
+	}
+	defer DeleteProduct(tenancyAuth, productId, http.StatusOK, "删除成功")
+	ChangeProductIsShow(tenancyAuth, productId, g.StatusTrue, http.StatusOK, "设置成功")
+
+	obj := tenancyAuth.GET(fmt.Sprintf("v1/merchant/productReply/replyMap/%d", productId)).
 		Expect().Status(http.StatusOK).JSON().Object()
 	obj.Keys().ContainsOnly("status", "data", "message")
 	obj.Value("status").Number().Equal(200)
 	obj.Value("message").String().Equal("操作成功")
 
-	obj = auth.POST("v1/merchant/productReply/reply/1").
+	obj = tenancyAuth.POST(fmt.Sprintf("v1/merchant/productReply/reply/%d", productId)).
 		WithJSON(map[string]interface{}{"content": "pageSize"}).
 		Expect().Status(http.StatusOK).JSON().Object()
 	obj.Keys().ContainsOnly("status", "data", "message")

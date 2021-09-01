@@ -10,93 +10,28 @@ import (
 )
 
 func TestTenancyList(t *testing.T) {
-	t.SkipNow()
-	// ml := 3
-	// // 当天时间大于 15 号，当月数量为 4
-	// if time.Now().Day() > 15 {
-	// 	ml = 4
-	// }
-
-	// year, month, _ := time.Now().Date()
-	// date := fmt.Sprintf("%d/%02d/01-%d/%02d/30", year, month, year, month)
-	params := []base.Param{
-		// {name: "no_date", args: map[string]interface{}{"page": 1, "pageSize": 10, "status": "1", "keyword": "", "date": ""}, length: 4},
-		// {name: "today", args: map[string]interface{}{"page": 1, "pageSize": 10, "status": "1", "keyword": "", "date": "today"}, length: 1},
-		// {name: "yesterday", args: map[string]interface{}{"page": 1, "pageSize": 10, "status": "1", "keyword": "", "date": "yesterday"}, length: 1},
-		// {name: "lately7", args: map[string]interface{}{"page": 1, "pageSize": 10, "status": "1", "keyword": "", "date": "lately7"}, length: 3},
-		// {name: "lately30", args: map[string]interface{}{"page": 1, "pageSize": 10, "status": "1", "keyword": "", "date": "lately30"}, length: 4},
-		// {name: "month", args: map[string]interface{}{"page": 1, "pageSize": 10, "status": "1", "keyword": "", "date": "month"}, length: ml},
-		// {name: "year", args: map[string]interface{}{"page": 1, "pageSize": 10, "status": "1", "keyword": "", "date": "year"}, length: 4},
-		// {name: "status_2", args: map[string]interface{}{"page": 1, "pageSize": 10, "status": "2", "keyword": "", "date": ""}, length: 1},
-		// {name: "status_1", args: map[string]interface{}{"page": 1, "pageSize": 10, "status": "1", "keyword": "", "date": date}, length: ml},
-	}
-
-	for _, param := range params {
-		fmt.Print(param)
-		// list(t, param.args, param.length)
-	}
-}
-
-func list(t *testing.T, params map[string]interface{}, length int) {
 	auth := base.BaseWithLoginTester(t)
 	defer base.BaseLogOut(auth)
-	obj := auth.POST("v1/admin/tenancy/getTenancyList").
-		WithJSON(params).
-		Expect().Status(http.StatusOK).JSON().Object()
-	obj.Keys().ContainsOnly("status", "data", "message")
-	obj.Value("status").Number().Equal(200)
-	obj.Value("message").String().Equal("获取成功")
 
-	data := obj.Value("data").Object()
-	data.Keys().ContainsOnly("list", "total", "page", "pageSize")
-	data.Value("pageSize").Number().Equal(10)
-	data.Value("page").Number().Equal(1)
-	data.Value("total").Number().Ge(0)
-
-	list := data.Value("list").Array()
-	list.Length().Equal(length)
-	first := list.First().Object()
-	first.Keys().ContainsOnly(
-		"id",
-		"sales",
-		"serviceScore",
-		"Avatar",
-		"sort",
-		"isAudit",
-		"servicePhone",
-		"careCount",
-		"isBest",
-		"tele",
-		"address",
-		"Keyword",
-		"postageScore",
-		"mark",
-		"name",
-		"status",
-		"Banner",
-		"productScore",
-		"State",
-		"Info",
-		"sysRegionCode",
-		"businessTime",
-		"isTrader",
-		"copyProductNum",
-		"createdAt",
-		"updatedAt",
-		"uuid",
-	)
-	first.Value("id").Number().Ge(0)
+	url := "v1/admin/tenancy/getTenancyList"
+	pageKeys := base.ResponseKeys{
+		{Key: "pageSize", Value: 10},
+		{Key: "page", Value: 1},
+		{Key: "list", Value: nil},
+		{Key: "total", Value: 0},
+	}
+	base.PostList(auth, url, base.PageRes, pageKeys, http.StatusOK, "获取成功")
 }
 
 func TestTenancyByRegion(t *testing.T) {
 	auth := base.BaseWithLoginTester(t)
 	defer base.BaseLogOut(auth)
-	obj := auth.GET("v1/admin/tenancy/getTenancies/1").
-		Expect().Status(http.StatusOK).JSON().Object()
-	obj.Keys().ContainsOnly("status", "data", "message")
-	obj.Value("status").Number().Equal(200)
-	obj.Value("message").String().Equal("获取成功")
-	obj.Value("data").Array().Length().Ge(1)
+	tenancyId, _, _ := base.CreateTenancy(auth, "bafvetyy", http.StatusOK, "创建成功")
+	if tenancyId == 0 {
+		t.Fatal("创建失败")
+	}
+	defer base.DeleteTenancy(auth, tenancyId)
+	base.Get(auth, "v1/admin/tenancy/getTenancies/1", http.StatusOK, "获取成功")
 }
 
 func TestLoginTenancy(t *testing.T) {
@@ -115,37 +50,32 @@ func TestLoginTenancy(t *testing.T) {
 func TestGetTenancyCount(t *testing.T) {
 	auth := base.BaseWithLoginTester(t)
 	defer base.BaseLogOut(auth)
+
+	tenancyId, _, _ := base.CreateTenancy(auth, "bafvetyy", http.StatusOK, "创建成功")
+	if tenancyId == 0 {
+		t.Fatal("创建失败")
+	}
+	defer base.DeleteTenancy(auth, tenancyId)
+
 	obj := auth.GET("v1/admin/tenancy/getTenancyCount").
 		Expect().Status(http.StatusOK).JSON().Object()
 	obj.Keys().ContainsOnly("status", "data", "message")
 	obj.Value("status").Number().Equal(200)
 	obj.Value("message").String().Equal("获取成功")
-	obj.Value("data").Object().Value("invalid").Equal(1)
-	obj.Value("data").Object().Value("valid").Equal(4)
+	obj.Value("data").Object().Value("invalid").Equal(0)
+	obj.Value("data").Object().Value("valid").Equal(2)
 }
 
 func TestTenancyProcess(t *testing.T) {
-	data := map[string]interface{}{
-		"username":      "bafvetyy",
-		"name":          "宝安妇女儿童医院",
-		"tele":          "0755-23568911",
-		"address":       "xxx街道666号",
-		"businessTime":  "08:30-17:30",
-		"status":        g.StatusTrue,
-		"sysRegionCode": 1,
-	}
 	auth := base.BaseWithLoginTester(t)
 	defer base.BaseLogOut(auth)
-	obj := auth.POST("v1/admin/tenancy/createTenancy").
-		WithJSON(data).
-		Expect().Status(http.StatusOK).JSON().Object()
-	obj.Keys().ContainsOnly("status", "data", "message")
-	obj.Value("status").Number().Equal(200)
-	obj.Value("message").String().Equal("创建成功")
 
-	tenancy := obj.Value("data").Object()
-	tenancy.Value("id").Number().Ge(0)
-	tenancyId := tenancy.Value("id").Number().Raw()
+	tenancyId, _, _ := base.CreateTenancy(auth, "bafvetyy", http.StatusOK, "创建成功")
+	if tenancyId == 0 {
+		t.Fatal("创建失败")
+	}
+	defer base.DeleteTenancy(auth, tenancyId)
+
 	if tenancyId > 0 {
 		update := map[string]interface{}{
 			"username":      "bafvetyy",
@@ -157,13 +87,13 @@ func TestTenancyProcess(t *testing.T) {
 			"sysRegionCode": 3,
 		}
 
-		obj = auth.PUT(fmt.Sprintf("v1/admin/tenancy/updateTenancy/%d", int(tenancyId))).
+		obj := auth.PUT(fmt.Sprintf("v1/admin/tenancy/updateTenancy/%d", int(tenancyId))).
 			WithJSON(update).
 			Expect().Status(http.StatusOK).JSON().Object()
 		obj.Keys().ContainsOnly("status", "data", "message")
 		obj.Value("status").Number().Equal(200)
 		obj.Value("message").String().Equal("更新成功")
-		tenancy = obj.Value("data").Object()
+		tenancy := obj.Value("data").Object()
 
 		tenancy.Value("name").String().Equal(update["name"].(string))
 		tenancy.Value("tele").String().Equal(update["tele"].(string))
@@ -235,41 +165,24 @@ func TestTenancyProcess(t *testing.T) {
 		obj.Keys().ContainsOnly("status", "data", "message")
 		obj.Value("status").Number().Equal(200)
 		obj.Value("message").String().Equal("设置成功")
-
-		// setUserAuthority
-		obj = auth.DELETE(fmt.Sprintf("v1/admin/tenancy/deleteTenancy/%d", int(tenancyId))).
-			Expect().Status(http.StatusOK).JSON().Object()
-		obj.Keys().ContainsOnly("status", "data", "message")
-		obj.Value("status").Number().Equal(200)
-		obj.Value("message").String().Equal("删除成功")
-
 	}
 }
 func TestTenancyRegisterError(t *testing.T) {
-	data := map[string]interface{}{
-		"username":      "bafvetyy",
-		"name":          "宝安中心人民医院",
-		"tele":          "0755-23568911",
-		"address":       "xxx街道666号",
-		"businessTime":  "08:30-17:30",
-		"status":        g.StatusTrue,
-		"sysRegionCode": 1,
-	}
+
 	auth := base.BaseWithLoginTester(t)
 	defer base.BaseLogOut(auth)
 	{
-		tenancyId, _, _ := base.CreateTenancy(auth, data, http.StatusOK, "创建成功")
+		tenancyId, _, _ := base.CreateTenancy(auth, "bafvetyy", http.StatusOK, "创建成功")
 		if tenancyId == 0 {
 			t.Fatal("创建失败")
 		}
 		defer base.DeleteTenancy(auth, tenancyId)
 	}
 	{
-		tenancyId, _, _ := base.CreateTenancy(auth, data, http.StatusBadRequest, "添加失败:商户名称已被注冊")
-		if tenancyId == 0 {
-			t.Fatal("创建失败")
+		tenancyId, _, _ := base.CreateTenancy(auth, "bafvetyy", http.StatusBadRequest, "添加失败:商户名称已被注冊")
+		if tenancyId > 0 {
+			defer base.DeleteTenancy(auth, tenancyId)
 		}
-		defer base.DeleteTenancy(auth, tenancyId)
 	}
 }
 

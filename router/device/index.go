@@ -39,7 +39,7 @@ func InitDeviceRouter(Router *gin.RouterGroup) {
 		OrderRouter.GET("/cancelOrder/:id", device.CancelOrder)
 		OrderRouter.POST("/checkRefundOrder/:id", device.CheckRefundOrder)
 		OrderRouter.POST("/refundOrder/:id", device.RefundOrder)
-		OrderRouter.POST("/deleteOrder/:id", device.DeleteOrder)
+		OrderRouter.DELETE("/deleteOrder/:id", device.DeleteOrder)
 	}
 	// 患者管理
 	PatientRouter := Router.Group("/patient")

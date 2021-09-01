@@ -9,88 +9,18 @@ import (
 )
 
 func TestProductList(t *testing.T) {
-	t.SkipNow()
-	params := []base.Param{
-		// {args: map[string]interface{}{"page": 1, "pageSize": 10, "type": "1"}, length: 3},
-		// {args: map[string]interface{}{"page": 1, "pageSize": 10, "type": "2"}, length: 1},
-		// {args: map[string]interface{}{"page": 1, "pageSize": 10, "type": "6"}, length: 1},
-		// {args: map[string]interface{}{"page": 1, "pageSize": 10, "type": "7"}, length: 1},
-	}
-	for _, param := range params {
-		fmt.Print(param)
-		// productlist(t, param.args, param.length)
-	}
-}
-
-func productlist(t *testing.T, params map[string]interface{}, length int) {
 	auth := base.BaseWithLoginTester(t)
 	defer base.BaseLogOut(auth)
 
-	obj := auth.POST("v1/admin/product/getProductList").
-		WithJSON(params).
-		Expect().Status(http.StatusOK).JSON().Object()
-	obj.Keys().ContainsOnly("status", "data", "message")
-	obj.Value("status").Number().Equal(200)
-	obj.Value("message").String().Equal("获取成功")
-
-	data := obj.Value("data").Object()
-	data.Keys().ContainsOnly("list", "total", "page", "pageSize")
-	data.Value("pageSize").Number().Equal(10)
-	data.Value("page").Number().Equal(1)
-	data.Value("total").Number().Equal(length)
-
-	list := data.Value("list").Array()
-	list.Length().Ge(0)
-	first := list.First().Object()
-	first.Keys().ContainsOnly(
-		"id",
-		"storeName",
-		"storeInfo",
-		"keyword",
-		"barCode",
-		"isShow",
-		"status",
-		"unitName",
-		"sort",
-		"rank",
-		"sales",
-		"price",
-		"cost",
-		"otPrice",
-		"stock",
-		"isHot",
-		"isBenefit",
-		"isBest",
-		"isNew",
-		"isGood",
-		"productType",
-		"ficti",
-		"browse",
-		"codePath",
-		"videoLink",
-		"specType",
-		"productCates",
-		"refusal",
-		"rate",
-		"replyCount",
-		"isGiftBag",
-		"careCount",
-		"image",
-		"oldId",
-		"tempId",
-		"sysTenancyId",
-		"sysTenancyName",
-		"cateName",
-		"brandName",
-		"sysBrandId",
-		"productCategoryId",
-		"createdAt",
-		"updatedAt",
-	)
-	first.Value("id").Number().Ge(0)
-
+	url := "v1/admin/product/getProductList"
+	pageKeys := base.ResponseKeys{
+		{Key: "pageSize", Value: 10},
+		{Key: "page", Value: 1},
+		{Key: "list", Value: nil},
+		{Key: "total", Value: 0},
+	}
+	base.PostList(auth, url, base.PageRes, pageKeys, http.StatusOK, "获取成功")
 }
-
 func TestGetProductFilter(t *testing.T) {
 	auth := base.BaseWithLoginTester(t)
 	defer base.BaseLogOut(auth)
@@ -99,9 +29,60 @@ func TestGetProductFilter(t *testing.T) {
 }
 
 func TestProductProcess(t *testing.T) {
-	productId := 1
-	auth := base.BaseWithLoginTester(t)
-	defer base.BaseLogOut(auth)
+	var brandId, shipTempId, cateId, tenancyCategoryId uint
+
+	adminAuth := base.BaseWithLoginTester(t)
+	defer base.BaseLogOut(adminAuth)
+
+	brandCategoryPid, _ := CreateBrandCategory(adminAuth, "箱包服饰_client", 0, http.StatusOK, "创建成功")
+	if brandCategoryPid == 0 {
+		return
+	}
+	defer DeleteBrandCategory(adminAuth, brandCategoryPid)
+
+	brandCategoryId, _ := CreateBrandCategory(adminAuth, "精品服饰_client", brandCategoryPid, http.StatusOK, "创建成功")
+	if brandCategoryId == 0 {
+		return
+	}
+	defer DeleteBrandCategory(adminAuth, brandCategoryId)
+
+	brandId, _ = CreateBrand(adminAuth, "冈本_client", brandCategoryId, http.StatusOK, "创建成功")
+	if brandId == 0 {
+		t.Errorf("添加品牌失败")
+		return
+	}
+	defer DeleteBrand(adminAuth, brandId)
+
+	cateId, _ = CreateCategory(adminAuth, "数码产品_client", http.StatusOK, "创建成功")
+	if cateId == 0 {
+		t.Errorf("添加分类失败")
+		return
+	}
+	defer DeleteCategory(adminAuth, cateId, http.StatusOK, "删除成功")
+
+	clientAuth, _ := base.TenancyWithLoginTester(t)
+	defer base.BaseLogOut(clientAuth)
+
+	shipTempId, _ = CreateShippingTemplate(clientAuth, "物流邮费模板_client", http.StatusOK, "创建成功")
+	if shipTempId == 0 {
+		t.Errorf("添加物流模板失败")
+		return
+	}
+	defer DeleteShippingTemplate(clientAuth, shipTempId, http.StatusOK, "删除成功")
+
+	tenancyCategoryId, _ = ClientCreateCategory(clientAuth, "客户端数码产品_client", 0, http.StatusOK, "创建成功")
+	if tenancyCategoryId == 0 {
+		t.Errorf("添加商户分类失败")
+		return
+	}
+	defer DeleteClientCategory(clientAuth, tenancyCategoryId, http.StatusOK, "删除成功")
+
+	productId, _, _, _ := CreateProduct(clientAuth, cateId, brandId, shipTempId, tenancyCategoryId, http.StatusOK, "创建成功")
+	if productId == 0 {
+		t.Errorf("添加商品失败")
+		return
+	}
+	defer DeleteProduct(clientAuth, productId, http.StatusOK, "删除成功")
 
 	update := map[string]interface{}{
 		"storeName": "领立裁腰带短袖连衣裙",
@@ -112,28 +93,28 @@ func TestProductProcess(t *testing.T) {
 		"content":   "dsfsafasfasfas",
 	}
 
-	obj := auth.PUT(fmt.Sprintf("v1/admin/product/updateProduct/%d", productId)).
+	obj := adminAuth.PUT(fmt.Sprintf("v1/admin/product/updateProduct/%d", productId)).
 		WithJSON(update).
 		Expect().Status(http.StatusOK).JSON().Object()
 	obj.Keys().ContainsOnly("status", "data", "message")
 	obj.Value("status").Number().Equal(200)
 	obj.Value("message").String().Equal("更新成功")
 
-	obj = auth.POST("v1/admin/product/changeProductStatus").
-		WithJSON(map[string]interface{}{"id": productId, "status": 3}).
+	obj = adminAuth.POST("v1/admin/product/changeProductStatus").
+		WithJSON(map[string]interface{}{"id": []uint{productId}, "status": 3}).
 		Expect().Status(http.StatusOK).JSON().Object()
 	obj.Keys().ContainsOnly("status", "data", "message")
 	obj.Value("status").Number().Equal(200)
 	obj.Value("message").String().Equal("设置成功")
 
-	obj = auth.POST("v1/admin/product/changeMutilProductStatus").
-		WithJSON(map[string]interface{}{"id": []int{productId}, "status": 3}).
+	obj = adminAuth.POST("v1/admin/product/changeMutilProductStatus").
+		WithJSON(map[string]interface{}{"id": []uint{productId}, "status": 3}).
 		Expect().Status(http.StatusOK).JSON().Object()
 	obj.Keys().ContainsOnly("status", "data", "message")
 	obj.Value("status").Number().Equal(200)
 	obj.Value("message").String().Equal("设置成功")
 
-	obj = auth.GET(fmt.Sprintf("v1/admin/product/getProductById/%d", productId)).
+	obj = adminAuth.GET(fmt.Sprintf("v1/admin/product/getProductById/%d", productId)).
 		Expect().Status(http.StatusOK).JSON().Object()
 	obj.Keys().ContainsOnly("status", "data", "message")
 	obj.Value("status").Number().Equal(200)

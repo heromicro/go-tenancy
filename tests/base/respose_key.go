@@ -35,7 +35,6 @@ func IdKeys() ResponseKeys {
 
 func (rks ResponseKeys) Test(object *httpexpect.Object) {
 	for _, rk := range rks {
-		object.Keys().Contains(rk.Key)
 		if rk.Value == nil {
 			continue
 		}
@@ -52,10 +51,7 @@ func (rks ResponseKeys) Test(object *httpexpect.Object) {
 			object.Value(rk.Key).Number().Equal(rk.Value.(uint))
 		case "int":
 			object.Value(rk.Key).Number().Equal(rk.Value.(int))
-		// case "object":
-		// 	continue
-		case "[]ResponseKeys":
-
+		case "[]base.ResponseKeys":
 			object.Value(rk.Key).Array().Length().Equal(len(rk.Value.([]ResponseKeys)))
 			length := int(object.Value(rk.Key).Array().Length().Raw())
 			if length > 0 && len(rk.Value.([]ResponseKeys)) == length {
@@ -64,7 +60,6 @@ func (rks ResponseKeys) Test(object *httpexpect.Object) {
 				}
 			}
 		case "[]uint":
-
 			object.Value(rk.Key).Array().Length().Equal(len(rk.Value.([]uint)))
 			length := int(object.Value(rk.Key).Array().Length().Raw())
 			if length > 0 && len(rk.Value.([]uint)) == length {

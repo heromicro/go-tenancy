@@ -101,7 +101,8 @@ func GetOrderById(ctx *gin.Context) {
 		response.FailWithMessage(errs.Error(), ctx)
 		return
 	}
-	if order, err := service.GetOrderDetailById(req.Id, multi.GetTenancyId(ctx), 0, service.GetIsDelField(ctx)); err != nil {
+	req.TenancyId = multi.GetTenancyId(ctx)
+	if order, err := service.GetOrderDetailById(req, service.GetIsDelField(ctx)); err != nil {
 		g.TENANCY_LOG.Error("获取失败!", zap.Any("err", err))
 		response.FailWithMessage("获取失败:"+err.Error(), ctx)
 	} else {

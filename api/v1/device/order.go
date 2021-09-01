@@ -54,7 +54,9 @@ func GetOrderById(ctx *gin.Context) {
 		response.FailWithMessage(errs.Error(), ctx)
 		return
 	}
-	if order, err := service.GetOrderDetailById(req.Id, multi.GetTenancyId(ctx), multi.GetUserId(ctx), service.GetIsDelField(ctx)); err != nil {
+	req.TenancyId = multi.GetTenancyId(ctx)
+	req.PatientId = multi.GetUserId(ctx)
+	if order, err := service.GetOrderDetailById(req, service.GetIsDelField(ctx)); err != nil {
 		g.TENANCY_LOG.Error("获取失败!", zap.Any("err", err))
 		response.FailWithMessage("获取失败:"+err.Error(), ctx)
 	} else {
@@ -106,8 +108,9 @@ func PayOrder(ctx *gin.Context) {
 		response.FailWithMessage("参数校验不通过", ctx)
 		return
 	}
-
-	err := service.CheckOrderStatusBeforePay(req.Id, multi.GetTenancyId(ctx), multi.GetUserId(ctx))
+	req.TenancyId = multi.GetTenancyId(ctx)
+	req.PatientId = multi.GetUserId(ctx)
+	err := service.CheckOrderStatusBeforePay(req)
 	if err != nil {
 		g.TENANCY_LOG.Error("获取失败!", zap.Any("err", err))
 		response.FailWithMessage("获取失败:"+err.Error(), ctx)
@@ -130,7 +133,9 @@ func CancelOrder(ctx *gin.Context) {
 		response.FailWithMessage(errs.Error(), ctx)
 		return
 	}
-	if err := service.CancelOrder(req.Id, multi.GetTenancyId(ctx), multi.GetUserId(ctx)); err != nil {
+	req.TenancyId = multi.GetTenancyId(ctx)
+	req.PatientId = multi.GetUserId(ctx)
+	if err := service.CancelOrder(req); err != nil {
 		g.TENANCY_LOG.Error("操作失败!", zap.Any("err", err))
 		response.FailWithMessage("操作失败:"+err.Error(), ctx)
 	} else {
@@ -151,8 +156,9 @@ func CheckRefundOrder(ctx *gin.Context) {
 		response.FailWithMessage("参数校验不通过", ctx)
 		return
 	}
-
-	if refundOrder, err := service.CheckRefundOrder(req.Id, multi.GetTenancyId(ctx), multi.GetUserId(ctx), idsReq.Ids); err != nil {
+	req.PatientId = multi.GetUserId(ctx)
+	req.TenancyId = multi.GetTenancyId(ctx)
+	if refundOrder, err := service.CheckRefundOrder(req, idsReq.Ids); err != nil {
 		g.TENANCY_LOG.Error("操作失败!", zap.Any("err", err))
 		response.FailWithMessage("操作失败:"+err.Error(), ctx)
 	} else {

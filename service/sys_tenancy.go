@@ -246,7 +246,10 @@ func GetTenanciesInfoList(info request.TenancyPageInfo) ([]response.SysTenancy, 
 // GetTenanciesByRegion
 func GetTenanciesByRegion(p_code string) ([]response.SysTenancy, error) {
 	tenancyList := []response.SysTenancy{}
-	err := g.TENANCY_DB.Model(&model.SysTenancy{}).Where("sys_region_code = ?", p_code).Find(&tenancyList).Error
+	err := g.TENANCY_DB.Model(&model.SysTenancy{}).
+		Joins("left join sys_users on sys_users.sys_tenancy_id = sys_tenancies.id").
+		Select("sys_tenancies.*,sys_users.username as username").
+		Where("sys_tenancies.sys_region_code = ?", p_code).Find(&tenancyList).Error
 	return tenancyList, err
 }
 

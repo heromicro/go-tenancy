@@ -84,6 +84,7 @@ func TestDeviceProductDetail(t *testing.T) {
 	}
 	defer DeleteProduct(tenancyAuth, productId, http.StatusOK, "删除成功")
 	ChangeProductIsShow(tenancyAuth, productId, g.StatusTrue, http.StatusOK, "设置成功")
+	
 	url := fmt.Sprintf("v1/device/product/getProductById/%d", productId)
 	keys := base.ResponseKeys{
 		{Key: "id", Value: productId},

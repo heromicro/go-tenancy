@@ -306,7 +306,8 @@ func GetRefundPriceByOrderIds(ids []uint, isDelField string) (float64, error) {
 }
 
 func checkRefundPrice(refundOrder model.RefundOrder, isDelField string) (float64, error) {
-	order, err := GetOrderByOrderId(refundOrder.OrderID, refundOrder.SysTenancyID, refundOrder.SysUserID)
+	getById := request.GetById{Id: refundOrder.OrderID, TenancyId: refundOrder.SysTenancyID, PatientId: refundOrder.PatientID, UserId: refundOrder.SysUserID}
+	order, err := GetOrderByOrderId(getById)
 	if err != nil {
 		return 0, fmt.Errorf("get order %w", err)
 	}
@@ -500,9 +501,9 @@ func UpdateRefundOrderById(db *gorm.DB, refundOrderId uint, data map[string]inte
 	return nil
 }
 
-func CheckRefundOrder(orderId, tenancyId, userId uint, orderPorductIds []uint) (response.CheckRefundOrder, error) {
+func CheckRefundOrder(req request.GetById, orderPorductIds []uint) (response.CheckRefundOrder, error) {
 	var checkRefundOrder response.CheckRefundOrder
-	order, err := GetOrderByOrderId(orderId, tenancyId, userId)
+	order, err := GetOrderByOrderId(req)
 	if errors.Is(err, gorm.ErrRecordNotFound) {
 		return checkRefundOrder, fmt.Errorf("订单不存在或者已被删除")
 	}
@@ -516,7 +517,7 @@ func CheckRefundOrder(orderId, tenancyId, userId uint, orderPorductIds []uint) (
 		return checkRefundOrder, fmt.Errorf("订单未付款,请取消订单")
 	}
 
-	orderProducts, err := GetOrdersProductById(orderPorductIds, orderId, tenancyId, userId)
+	orderProducts, err := GetOrdersProductById(orderPorductIds, req)
 	if err != nil {
 		return checkRefundOrder, err
 	}

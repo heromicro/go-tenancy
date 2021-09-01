@@ -93,19 +93,10 @@ func DeviceWithLoginTester(t *testing.T) *httpexpect.Expect {
 	uuid, _ := cache.GetCacheString(g.TENANCY_CONFIG.Mysql.Dbname + ":uuid")
 	username, _ := cache.GetCacheString(g.TENANCY_CONFIG.Mysql.Dbname + ":username")
 	if uuid == "" {
-		data := map[string]interface{}{
-			"username":      "tenancy_hospital",
-			"name":          "多商户平台直营医院",
-			"tele":          "0755-23568911",
-			"address":       "xxx街道666号",
-			"businessTime":  "08:30-17:30",
-			"status":        g.StatusTrue,
-			"sysRegionCode": 1,
-		}
 		auth := BaseWithLoginTester(t)
 		defer BaseLogOut(auth)
 
-		_, username, uuid = CreateTenancy(auth, data, http.StatusOK, "创建成功")
+		_, username, uuid = CreateTenancy(auth, "tenancy_hospital", http.StatusOK, "创建成功")
 		cache.SetCache(g.TENANCY_CONFIG.Mysql.Dbname+":uuid", uuid, 0)
 		cache.SetCache(g.TENANCY_CONFIG.Mysql.Dbname+":username", username, 0)
 	}
@@ -148,14 +139,23 @@ func BaseLogOut(auth *httpexpect.Expect) {
 	obj.Value("message").String().Equal("退出登录")
 }
 
-func CreateTenancy(auth *httpexpect.Expect, create map[string]interface{}, status int, message string) (uint, string, string) {
+func CreateTenancy(auth *httpexpect.Expect, username string, status int, message string) (uint, string, string) {
+	data := map[string]interface{}{
+		"username":      username,
+		"name":          "宝安妇女儿童医院",
+		"tele":          "0755-23568911",
+		"address":       "xxx街道666号",
+		"businessTime":  "08:30-17:30",
+		"status":        g.StatusTrue,
+		"sysRegionCode": 1,
+	}
 	url := "v1/admin/tenancy/createTenancy"
 	res := ResponseKeys{
 		{Key: "id", Value: uint(0)},
 		{Key: "uuid", Value: ""},
 		{Key: "username", Value: ""},
 	}
-	Create(auth, url, create, res, status, message)
+	Create(auth, url, data, res, status, message)
 	return res.GetId(), res.GetStringValue("username"), res.GetStringValue("uuid")
 }
 

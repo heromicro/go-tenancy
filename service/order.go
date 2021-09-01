@@ -201,13 +201,13 @@ func getOrderConditionByStatus(status string) response.OrderCondition {
 	return conditions[0]
 }
 
-func GetOrderByOrderId(orderId, tenancyId, userId uint) (model.Order, error) {
+func GetOrderByOrderId(req request.GetById) (model.Order, error) {
 	var order model.Order
 	db := g.TENANCY_DB.Model(&model.Order{}).
-		Where("id = ?", orderId).
+		Where("id = ?", req.Id).
 		Where("is_system_del = ?", g.StatusFalse).
 		Where("is_del = ?", g.StatusFalse)
-	db = CheckTenancyIdAndUserId(db, tenancyId, userId, "")
+	db = CheckTenancyIdAndUserId(db, req, "")
 	err := db.First(&order).Error
 	if err != nil {
 		return order, err
@@ -215,7 +215,7 @@ func GetOrderByOrderId(orderId, tenancyId, userId uint) (model.Order, error) {
 	return order, nil
 }
 
-func GetOrderDetailById(id, tenancyId, userId uint, isDelField string) (response.OrderDetail, error) {
+func GetOrderDetailById(req request.GetById, isDelField string) (response.OrderDetail, error) {
 	var order response.OrderDetail
 	db := g.TENANCY_DB.Model(&model.Order{}).
 		Select("orders.*,general_infos.nick_name as user_nick_name").
@@ -227,9 +227,9 @@ func GetOrderDetailById(id, tenancyId, userId uint, isDelField string) (response
 		db = db.Where("orders."+isDelField, g.StatusFalse)
 	}
 
-	db = CheckTenancyIdAndUserId(db, tenancyId, userId, "orders.")
+	db = CheckTenancyIdAndUserId(db, req, "orders.")
 
-	err := db.Where("orders.id = ?", id).
+	err := db.Where("orders.id = ?", req.Id).
 		First(&order).Error
 	if err != nil {
 		return order, err
@@ -381,13 +381,13 @@ func GetOrderInfoList(info request.OrderPageInfo, ctx *gin.Context) ([]response.
 	return orderList, stat, total, nil
 }
 
-func GetOrdersProductById(orderProductIds []uint, orderId, tenancyId, userId uint) ([]response.OrderProduct, error) {
+func GetOrdersProductById(orderProductIds []uint, req request.GetById) ([]response.OrderProduct, error) {
 	orderProducts := []response.OrderProduct{}
 	db := g.TENANCY_DB.Model(&model.OrderProduct{}).
-		Where("order_id = ?", orderId).
+		Where("order_id = ?", req.Id).
 		Where("refund_num > 0").
 		Where("id in ?", orderProductIds)
-	db = CheckTenancyIdAndUserId(db, tenancyId, userId, "")
+	db = CheckTenancyIdAndUserId(db, req, "")
 	err := db.Find(&orderProducts).Error
 	if err != nil {
 		return orderProducts, err
@@ -755,8 +755,8 @@ func CreateOrder(req request.CreateOrder, tenancyId, userId, patientId uint, ten
 	return png, order.ID, nil
 }
 
-func CheckOrderStatusBeforePay(orderId, tenancyId, userId uint) error {
-	order, err := GetOrderByOrderId(orderId, tenancyId, userId)
+func CheckOrderStatusBeforePay(req request.GetById) error {
+	order, err := GetOrderByOrderId(req)
 	if errors.Is(err, gorm.ErrRecordNotFound) {
 		return fmt.Errorf("订单不存在或者已被删除")
 	}
@@ -891,8 +891,8 @@ func ChangeOrderStatusByOrderId(orderId uint, changeData map[string]interface{},
 	return nil
 }
 
-func CancelOrder(orderId, tenancyId, userId uint) error {
-	order, err := GetOrderByOrderId(orderId, tenancyId, userId)
+func CancelOrder(req request.GetById) error {
+	order, err := GetOrderByOrderId(req)
 	if errors.Is(err, gorm.ErrRecordNotFound) {
 		return fmt.Errorf("订单不存在或者已被删除")
 	}
@@ -906,7 +906,7 @@ func CancelOrder(orderId, tenancyId, userId uint) error {
 		return fmt.Errorf("订单已付款,请执行退款操作")
 	}
 	changeData := map[string]interface{}{"status": model.OrderStatusCancel}
-	err = ChangeOrderStatusByOrderId(orderId, changeData, "cancel", "取消订单")
+	err = ChangeOrderStatusByOrderId(req.Id, changeData, "cancel", "取消订单")
 	if err != nil {
 		return err
 	}

@@ -5,7 +5,6 @@ import (
 	"net/http"
 	"testing"
 
-	"github.com/snowlyg/go-tenancy/g"
 	"github.com/snowlyg/go-tenancy/tests/base"
 )
 
@@ -304,16 +303,7 @@ func TestUserBatchSetUserGroup(t *testing.T) {
 func TestCuserUserSelect(t *testing.T) {
 	adminAuth := base.BaseWithLoginTester(t)
 	defer base.BaseLogOut(adminAuth)
-	data := map[string]interface{}{
-		"username":      "bafvetyy_cuser_select",
-		"name":          "宝安中心人民医院",
-		"tele":          "0755-23568911",
-		"address":       "xxx街道666号",
-		"businessTime":  "08:30-17:30",
-		"status":        g.StatusTrue,
-		"sysRegionCode": 1,
-	}
-	tenancyId, _, _ := base.CreateTenancy(adminAuth, data, http.StatusOK, "创建成功")
+	tenancyId, _, _ := base.CreateTenancy(adminAuth, "bafvetyy_cuser_select", http.StatusOK, "创建成功")
 	if tenancyId == 0 {
 		t.Fatal("创建失败")
 	}
@@ -326,16 +316,7 @@ func TestCuserUserSelect(t *testing.T) {
 func TestAdminPatientSelect(t *testing.T) {
 	adminAuth := base.BaseWithLoginTester(t)
 	defer base.BaseLogOut(adminAuth)
-	data := map[string]interface{}{
-		"username":      "bafvetyy_cuser_select",
-		"name":          "宝安中心人民医院",
-		"tele":          "0755-23568911",
-		"address":       "xxx街道666号",
-		"businessTime":  "08:30-17:30",
-		"status":        g.StatusTrue,
-		"sysRegionCode": 1,
-	}
-	tenancyId, _, _ := base.CreateTenancy(adminAuth, data, http.StatusOK, "创建成功")
+	tenancyId, _, _ := base.CreateTenancy(adminAuth, "bafvetyy_cuser_select", http.StatusOK, "创建成功")
 	if tenancyId == 0 {
 		t.Fatal("创建失败")
 	}

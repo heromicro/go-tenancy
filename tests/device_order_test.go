@@ -102,7 +102,6 @@ func TestDeviceOrderProcess(t *testing.T) {
 	var productType int32
 	var adminAuth, tenancyAuth, deviceAuth *httpexpect.Expect
 
-	
 	adminAuth = base.BaseWithLoginTester(t)
 	defer base.BaseLogOut(adminAuth)
 
@@ -176,7 +175,8 @@ func TestDeviceOrderProcess(t *testing.T) {
 		t.Error("添加订单失败")
 		return
 	}
-
+	defer DeleteClientOrder(tenancyAuth, orderId, http.StatusOK, "删除成功")
+	defer DeleteDeviceOrder(deviceAuth, orderId, http.StatusOK, "删除成功")
 	getOrderByIdKeys := base.ResponseKeys{
 		{Key: "id", Value: orderId},
 	}
@@ -197,4 +197,9 @@ func CreateOrder(auth *httpexpect.Expect, create map[string]interface{}, status 
 	keys := base.IdKeys()
 	base.Create(auth, url, create, keys, status, message)
 	return keys.GetId()
+}
+
+func DeleteDeviceOrder(auth *httpexpect.Expect, id uint, status int, message string) {
+	url := fmt.Sprintf("v1/device/order/deleteOrder/%d", id)
+	base.Delete(auth, url, status, message)
 }
