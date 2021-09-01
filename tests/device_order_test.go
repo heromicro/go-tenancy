@@ -277,8 +277,6 @@ func TestDeviceOrderProcessForCheckReturnOrder(t *testing.T) {
 	defer DeleteClientOrder(tenancyAuth, orderId, http.StatusOK, "删除成功")
 	defer DeleteDeviceOrder(deviceAuth, orderId, http.StatusOK, "删除成功")
 
-	// TODO:支付订单
-
 	// 申请退款
 	data := map[string]interface{}{
 		"ids": []uint{productId},
@@ -287,14 +285,30 @@ func TestDeviceOrderProcessForCheckReturnOrder(t *testing.T) {
 
 	getOrderByIdKeys := base.ResponseKeys{
 		{Key: "orderSn", Value: ""},
+		{Key: "orderProduct",
+			Value: []base.ResponseKeys{
+				{
+					{Key: "id", Value: 0},
+				},
+			},
+		},
 	}
 	base.ScanById(deviceAuth, fmt.Sprintf("v1/device/order/getOrderById/%d", orderId), orderId, nil, getOrderByIdKeys, http.StatusOK, "操作成功")
 	orderSn := getOrderByIdKeys.GetStringValue("orderSn")
+	orderProducts := getOrderByIdKeys.GetResponseKeysValue("orderProduct")
+	if len(orderProducts) == 0 {
+		t.Error("添加订单失败:订单产品为空")
+		return
+	}
+	orderProductId := orderProducts[0].GetId()
 	changeData := map[string]interface{}{
 		"status":   model.OrderStatusNoDeliver,
 		"pay_type": model.PayTypeAlipay,
 		"pay_time": time.Now(),
 		"paid":     g.StatusTrue,
+	}
+	data = map[string]interface{}{
+		"ids": []uint{orderProductId},
 	}
 	_, err := service.ChangeOrderPayNotifyByOrderSn(changeData, orderSn, "pay_success", "订单支付成功")
 	if err != nil {
@@ -389,9 +403,22 @@ func TestDeviceOrderProcessForReturnOrder(t *testing.T) {
 
 	getOrderByIdKeys := base.ResponseKeys{
 		{Key: "orderSn", Value: ""},
+		{Key: "orderProduct",
+			Value: []base.ResponseKeys{
+				{
+					{Key: "id", Value: 0},
+				},
+			},
+		},
 	}
 	base.ScanById(deviceAuth, fmt.Sprintf("v1/device/order/getOrderById/%d", orderId), orderId, nil, getOrderByIdKeys, http.StatusOK, "操作成功")
 	orderSn := getOrderByIdKeys.GetStringValue("orderSn")
+	orderProducts := getOrderByIdKeys.GetResponseKeysValue("orderProduct")
+	if len(orderProducts) == 0 {
+		t.Error("添加订单失败:订单产品为空")
+		return
+	}
+	orderProductId := orderProducts[0].GetId()
 	changeData := map[string]interface{}{
 		"status":   model.OrderStatusNoDeliver,
 		"pay_type": model.PayTypeAlipay,
@@ -403,7 +430,7 @@ func TestDeviceOrderProcessForReturnOrder(t *testing.T) {
 		t.Errorf("%s 订单支付失败%v", orderSn, err.Error())
 	}
 	data := map[string]interface{}{
-		"ids":           []uint{productId},
+		"ids":           []uint{orderProductId},
 		"refundMessage": "地址错了",
 		"RefundPrice":   1.0,
 		"RefundType":    1,

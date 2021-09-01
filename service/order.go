@@ -229,11 +229,23 @@ func GetOrderDetailById(req request.GetById, isDelField string) (response.OrderD
 
 	db = CheckTenancyIdAndUserId(db, req, "orders.")
 
-	err := db.Where("orders.id = ?", req.Id).
-		First(&order).Error
+	err := db.Where("orders.id = ?", req.Id).First(&order).Error
 	if err != nil {
 		return order, err
 	}
+
+	orderProducts, err := GetOrderProductsByOrderIds([]uint{order.ID})
+	if err != nil {
+		return order, err
+	}
+
+	order.OrderProduct = []response.OrderProduct{}
+	for _, orderProduct := range orderProducts {
+		if order.ID == orderProduct.OrderID {
+			order.OrderProduct = append(order.OrderProduct, orderProduct)
+		}
+	}
+
 	return order, nil
 }
 
@@ -381,7 +393,7 @@ func GetOrderInfoList(info request.OrderPageInfo, ctx *gin.Context) ([]response.
 	return orderList, stat, total, nil
 }
 
-func GetOrdersProductById(orderProductIds []uint, req request.GetById) ([]response.OrderProduct, error) {
+func GetOrdersProductByProductIds(orderProductIds []uint, req request.GetById) ([]response.OrderProduct, error) {
 	orderProducts := []response.OrderProduct{}
 	db := g.TENANCY_DB.Model(&model.OrderProduct{}).
 		Where("order_id = ?", req.Id).

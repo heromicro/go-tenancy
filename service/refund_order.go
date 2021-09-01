@@ -517,7 +517,7 @@ func CheckRefundOrder(req request.GetById, orderPorductIds []uint) (response.Che
 		return checkRefundOrder, fmt.Errorf("订单未付款,请取消订单")
 	}
 
-	orderProducts, err := GetOrdersProductById(orderPorductIds, req)
+	orderProducts, err := GetOrdersProductByProductIds(orderPorductIds, req)
 	if err != nil {
 		return checkRefundOrder, err
 	}
@@ -552,7 +552,7 @@ func CreateRefundOrder(reqId request.GetById, req request.CreateRefundOrder) (ui
 	if order.Status == model.OrderStatusNoPay {
 		return returnOrderId, fmt.Errorf("订单未付款,请取消订单")
 	}
-	orderProducts, err := GetOrdersProductById(req.Ids, reqId)
+	orderProducts, err := GetOrdersProductByProductIds(req.Ids, reqId)
 	if err != nil {
 		return returnOrderId, err
 	}

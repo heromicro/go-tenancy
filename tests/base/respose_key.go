@@ -1,7 +1,6 @@
 package base
 
 import (
-	"fmt"
 	"reflect"
 
 	"github.com/gavv/httpexpect"
@@ -98,6 +97,14 @@ func (rks ResponseKeys) Scan(object *httpexpect.Object) {
 			rks[k].Value = int32(object.Value(rk.Key).Number().Raw())
 		case "float64":
 			rks[k].Value = object.Value(rk.Key).Number().Raw()
+		case "[]base.ResponseKeys":
+			object.Value(rk.Key).Array().Length().Equal(len(rk.Value.([]ResponseKeys)))
+			length := int(object.Value(rk.Key).Array().Length().Raw())
+			if length > 0 && len(rk.Value.([]ResponseKeys)) == length {
+				for i := 0; i < length; i++ {
+					rk.Value.([]ResponseKeys)[i].Scan(object.Value(rk.Key).Array().Element(i).Object())
+				}
+			}
 		case "[]string":
 			length := int(object.Value(rk.Key).Array().Length().Raw())
 
@@ -149,10 +156,24 @@ func (rks ResponseKeys) GetStringArrayValue(key string) []string {
 			if rk.Value == nil {
 				return nil
 			}
-			fmt.Printf("[]string %v:%v", rk.Value, reflect.TypeOf(rk.Value))
 			switch reflect.TypeOf(rk.Value).String() {
 			case "[]string":
 				return rk.Value.([]string)
+			}
+		}
+	}
+	return nil
+}
+
+func (rks ResponseKeys) GetResponseKeysValue(key string) []ResponseKeys {
+	for _, rk := range rks {
+		if key == rk.Key {
+			if rk.Value == nil {
+				return nil
+			}
+			switch reflect.TypeOf(rk.Value).String() {
+			case "[]base.ResponseKeys":
+				return rk.Value.([]ResponseKeys)
 			}
 		}
 	}

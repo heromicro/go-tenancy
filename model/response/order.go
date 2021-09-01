@@ -37,11 +37,12 @@ type OrderCondition struct {
 type OrderDetail struct {
 	TenancyResponse
 	model.BaseOrder
-	SysUserID        uint   `json:"sysUserId" form:"sysUserId"`
-	SysTenancyID     uint   `json:"sysTenancyId"`
-	GroupOrderID     int    `json:"groupOrderId"`
-	ReconciliationID uint8  `json:"reconciliationId"`
-	UserNickName     string `json:"userNickName" form:"userNickName"`
+	SysUserID        uint           `json:"sysUserId" form:"sysUserId"`
+	SysTenancyID     uint           `json:"sysTenancyId"`
+	GroupOrderID     int            `json:"groupOrderId"`
+	ReconciliationID uint8          `json:"reconciliationId"`
+	UserNickName     string         `json:"userNickName" form:"userNickName"`
+	OrderProduct     []OrderProduct `gorm:"-" json:"orderProduct"`
 }
 
 type CheckOrder struct {
