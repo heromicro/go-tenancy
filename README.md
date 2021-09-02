@@ -21,6 +21,7 @@ If you don't have a QQ account, you can into the [iris-go-tenancy/community](htt
   ```shell
   cd resource/doc/ | apidoc -i v1/ -o apidoc/ -t template/
   ```
+- 访问 http://127.0.0.1/doc
 
 ###### 价格逻辑
 
@@ -44,10 +45,6 @@ If you don't have a QQ account, you can into the [iris-go-tenancy/community](htt
 
 
 ###### 接口测试
-
-POSTMAN 
-- 测试导入地址 https://www.getpostman.com/collections/07881b7e98c809fa20cf
-- 环境导入文件 [多商户运营平台.postman_environment.json](./多商户运营平台.postman_environment.json)
 
 GO TEST 
 
