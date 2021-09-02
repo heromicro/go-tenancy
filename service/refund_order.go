@@ -12,6 +12,7 @@ import (
 	"github.com/snowlyg/go-tenancy/model"
 	"github.com/snowlyg/go-tenancy/model/request"
 	"github.com/snowlyg/go-tenancy/model/response"
+	"github.com/snowlyg/go-tenancy/utils/param"
 	"github.com/snowlyg/multi"
 	"gorm.io/gorm"
 )
@@ -254,7 +255,7 @@ func GetRefundOrderRecord(id uint, info request.PageInfo) ([]model.RefundStatus,
 func GetRefundOrderRemarkMap(id uint, ctx *gin.Context) (Form, error) {
 	var form Form
 	var formStr string
-	refundOrder, err := GetRefundOrderByID(id, GetIsDelField(ctx))
+	refundOrder, err := GetRefundOrderById(id, GetIsDelField(ctx))
 	if err != nil {
 		return Form{}, err
 	}
@@ -280,9 +281,20 @@ func GetRefundOrderMap(id uint, ctx *gin.Context) (Form, error) {
 	return form, err
 }
 
-func GetRefundOrderByID(id uint, isDelField string) (model.RefundOrder, error) {
+// GetRefundOrderById
+func GetRefundOrderById(id uint, isDelField string) (model.RefundOrder, error) {
 	var refundOrder model.RefundOrder
 	db := g.TENANCY_DB.Model(&model.RefundOrder{}).Where("id = ?", id)
+	if isDelField != "" {
+		db = db.Where(isDelField, g.StatusFalse)
+	}
+	err := db.First(&refundOrder).Error
+	return refundOrder, err
+}
+
+func GetRefundOrderByIds(ids []uint, isDelField string) (model.RefundOrder, error) {
+	var refundOrder model.RefundOrder
+	db := g.TENANCY_DB.Model(&model.RefundOrder{}).Where("id in ?", ids)
 	if isDelField != "" {
 		db = db.Where(isDelField, g.StatusFalse)
 	}
@@ -343,14 +355,14 @@ func GetOtherRefundOrderIds(orderId, refundOrderId uint) ([]uint, error) {
 	return ids, nil
 }
 
-func AuditRefundOrder(id uint, audit request.OrderAudit, isDelField string) error {
-	refundOrder, err := GetRefundOrderByID(id, isDelField)
+func AuditRefundOrder(id uint, audit request.OrderAudit, isDelField, refundAgreeMsg string) error {
+	refundOrder, err := GetRefundOrderById(id, isDelField)
 	if err != nil {
 		return fmt.Errorf("get refund order %w", err)
 	}
 
 	if audit.Status == model.RefundStatusAgree {
-		err := agreeRefundOrder(refundOrder, isDelField)
+		err := agreeRefundOrder(refundOrder, isDelField, refundAgreeMsg)
 		if err != nil {
 			return err
 		}
@@ -436,7 +448,7 @@ func GetRefundProductCountByRefundOrderIds(refundOrderIds []uint, refundProductI
 //       1.1.1 是 , 如果退款数量 等于 购买数量 is_refund = 3 全退退款 不等于 is_refund = 2 部分退款
 //       1.1.2 否, is_refund = 1 退款中
 //    1.2 退款退货 is_refund = 1
-func agreeRefundOrder(refundOrder model.RefundOrder, isDelField string) error {
+func agreeRefundOrder(refundOrder model.RefundOrder, isDelField, refundAgreeMsg string) error {
 	status := refundOrder.Status
 	refundOrderIds, err := GetOtherRefundOrderIds(refundOrder.OrderID, refundOrder.ID)
 	if err != nil {
@@ -484,7 +496,7 @@ func agreeRefundOrder(refundOrder model.RefundOrder, isDelField string) error {
 			fmt.Printf("refundPrice %f", refundPrice)
 		} else if refundOrder.RefundType == model.RefundTypeAll {
 			status = model.RefundStatusAgree
-			err := addRefundOrderStatus(tx, refundOrder.ID, "refund_agree", "退款申请已通过，请将商品寄回")
+			err := addRefundOrderStatus(tx, refundOrder.ID, "refund_agree", refundAgreeMsg)
 			if err != nil {
 				return fmt.Errorf("add refund order status %w", err)
 			}
@@ -634,6 +646,26 @@ func CreateRefundProduct(db *gorm.DB, refundProducts []model.RefundProduct) erro
 // DeleteRefundOrder
 func DeleteRefundOrder(id uint) error {
 	return g.TENANCY_DB.Model(&model.RefundOrder{}).Where("id = ?", id).Update("is_system_del", g.StatusTrue).Error
+}
+
+// GetRefundOrderAutoAgree 获取超时退款单
+func GetRefundOrderAutoAgree() ([]model.RefundOrder, error) {
+	whereCreatedAt := fmt.Sprintf("now() > SUBDATE(created_at,interval -%s DAY)", param.GetRefundOrderAutoAgreeTime())
+	refundOrder := []model.RefundOrder{}
+	err := g.TENANCY_DB.Model(&model.RefundOrder{}).
+		Where("status = ?", model.RefundStatusAudit).
+		Where(whereCreatedAt).
+		Find(&refundOrder).Error
+	if err != nil {
+		return refundOrder, fmt.Errorf("获取超时退款单错误: %v", err)
+	}
+	return refundOrder, nil
+}
+
+func AutoAgreeRefundOrders(refundOrders []model.RefundOrder) {
+	for _, refundOrder := range refundOrders {
+		agreeRefundOrder(refundOrder, "", "退款成功[自动]")
+	}
 }
 
 func addRefundOrderStatus(db *gorm.DB, id uint, cahngeType, changeMessage string) error {

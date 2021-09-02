@@ -19,10 +19,12 @@ func GetConfigValueByKey(configKey string) (string, error) {
 	return configValue.Value, nil
 }
 
+// GetSeitURL 网站地址
 func GetSeitURL() (string, error) {
 	return GetConfigValueByKey("site_url")
 }
 
+// 支付回调地址
 func GetPayNotifyUrl(notifyType string) (string, error) {
 	seitUrl, err := GetSeitURL()
 	if err != nil {
@@ -31,13 +33,17 @@ func GetPayNotifyUrl(notifyType string) (string, error) {
 	return fmt.Sprintf("%s/%s/%s", seitUrl, "v1/pay/notify", notifyType), nil
 }
 
+// GetTenancyDefaultPassword 商户默认密码
 func GetTenancyDefaultPassword() (string, error) {
 	return GetConfigValueByKey("tenancy_admin_password")
 }
+
+// GetSeitName 网站名称
 func GetSeitName() (string, error) {
 	return GetConfigValueByKey("site_name")
 }
 
+// 网站模式
 func GetSeitMode() (string, error) {
 	return GetConfigValueByKey("site_open")
 }

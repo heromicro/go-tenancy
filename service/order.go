@@ -853,12 +853,13 @@ func GetNoPayOrders() ([]model.Order, error) {
 	return orders, nil
 }
 
-func GetNoPayOver15MinuteOrders() ([]model.Order, error) {
+func GetNoPayOrderAutoClose() ([]model.Order, error) {
+	whereCreatedAt := fmt.Sprintf("now() > SUBDATE(created_at,interval -%s minute)", param.GetOrderAutoCloseTime())
 	orders := []model.Order{}
 	err := g.TENANCY_DB.Model(&model.Order{}).
 		Where("paid = ?", g.StatusFalse).
 		Where("status = ?", model.OrderStatusNoPay).
-		Where("now() > SUBDATE(created_at,interval -15 minute)").
+		Where(whereCreatedAt).
 		Where("is_del = ?", g.StatusFalse).
 		Where("is_system_del = ?", g.StatusFalse).
 		Find(&orders).Error

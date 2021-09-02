@@ -10,8 +10,8 @@ import (
 
 type Timer interface {
 	GetTasks() []timeTask
-	AddTaskByFunc(taskName string, spec string, task func()) (cron.EntryID, error)
-	AddTaskByJob(taskName string, spec string, job interface{ Run() }) (cron.EntryID, error)
+	AddTaskByFunc(taskName, spec, desc string, task func()) (cron.EntryID, error)
+	AddTaskByJob(taskName, spec, desc string, job interface{ Run() }) (cron.EntryID, error)
 	FindCron(taskName string) (*timeTask, error)
 	StartTask(taskName string) error
 	StopTask(taskName string) error
@@ -30,14 +30,14 @@ type timeTask struct {
 	Id        cron.EntryID `json:"id"`
 	Name      string       `json:"name"`
 	Spec      string       `json:"spec"`
-	EntriyLen int          `json:"entriyLen"`
+	Desc      string       `json:"desc"`
 	Running   bool         `json:"running"`
 	Corn      *cron.Cron   `json:"cron"`
 	CreatedAt time.Time    `json:"createdAt"`
 }
 
 // AddTaskByFunc 通过函数的方法添加任务
-func (t *timer) AddTaskByFunc(taskName string, spec string, task func()) (cron.EntryID, error) {
+func (t *timer) AddTaskByFunc(taskName, spec, desc string, task func()) (cron.EntryID, error) {
 	t.Lock()
 	defer t.Unlock()
 	for _, task := range t.taskList {
@@ -45,7 +45,7 @@ func (t *timer) AddTaskByFunc(taskName string, spec string, task func()) (cron.E
 			return 0, fmt.Errorf("任务 %s 已经存在", taskName)
 		}
 	}
-	timeTask := timeTask{Name: taskName, Spec: spec, Corn: cron.New(cron.WithSeconds()), CreatedAt: time.Now()}
+	timeTask := timeTask{Name: taskName, Spec: spec, Desc: desc, Corn: cron.New(cron.WithSeconds()), CreatedAt: time.Now()}
 	id, err := timeTask.Corn.AddFunc(spec, task)
 	timeTask.Corn.Start()
 	timeTask.Id = id
@@ -55,7 +55,7 @@ func (t *timer) AddTaskByFunc(taskName string, spec string, task func()) (cron.E
 }
 
 // AddTaskByJob 通过接口的方法添加任务
-func (t *timer) AddTaskByJob(taskName string, spec string, job interface{ Run() }) (cron.EntryID, error) {
+func (t *timer) AddTaskByJob(taskName, spec, desc string, job interface{ Run() }) (cron.EntryID, error) {
 	t.Lock()
 	defer t.Unlock()
 	for _, task := range t.taskList {
@@ -63,7 +63,7 @@ func (t *timer) AddTaskByJob(taskName string, spec string, job interface{ Run() 
 			return 0, fmt.Errorf("任务 %s 已经存在", taskName)
 		}
 	}
-	timeTask := timeTask{Name: taskName, Spec: spec, Corn: cron.New(cron.WithSeconds()), CreatedAt: time.Now()}
+	timeTask := timeTask{Name: taskName, Spec: spec, Desc: desc, Corn: cron.New(cron.WithSeconds()), CreatedAt: time.Now()}
 	id, err := timeTask.Corn.AddJob(spec, job)
 	timeTask.Corn.Start()
 	timeTask.Id = id

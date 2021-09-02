@@ -23,18 +23,18 @@ func Timer() {
 	if g.TENANCY_CONFIG.Timer.Start {
 		for _, detail := range g.TENANCY_CONFIG.Timer.Detail {
 			go func(detail config.Detail) {
-				g.TENANCY_Timer.AddTaskByFunc("ClearDB", g.TENANCY_CONFIG.Timer.Spec, func() {
+				g.TENANCY_Timer.AddTaskByFunc("ClearDB", g.TENANCY_CONFIG.Timer.Spec, "清除操作记录日志", func() {
 					err := utils.ClearTable(g.TENANCY_DB, detail.TableName, detail.CompareField, detail.Interval)
 					if err != nil {
-						g.TENANCY_LOG.Info("清楚操作记录日志", zap.String("错误", err.Error()))
+						g.TENANCY_LOG.Info("清除操作记录日志", zap.String("错误", err.Error()))
 					}
 				})
 			}(detail)
 		}
 
 		// 订单过期自动取消
-		g.TENANCY_Timer.AddTaskByFunc("CheckOrdersPayStatus", EveryMinute, func() {
-			orders, err := service.GetNoPayOver15MinuteOrders()
+		g.TENANCY_Timer.AddTaskByFunc("NoPayOrderAutoClose", EveryMinute, "订单过期自动取消", func() {
+			orders, err := service.GetNoPayOrderAutoClose()
 			if err != nil {
 				g.TENANCY_LOG.Info("订单过期自动取消", zap.String("获取订单错误", err.Error()))
 				return
@@ -55,8 +55,21 @@ func Timer() {
 			}
 		})
 
+		// 商户自动处理退款订单
+		g.TENANCY_Timer.AddTaskByFunc("RefundOrderAutoAgree", EveryMinute, "商户自动处理退款订单", func() {
+			refundOrders, err := service.GetRefundOrderAutoAgree()
+			if err != nil {
+				g.TENANCY_LOG.Info("商户自动处理退款订单", zap.String("获取退款订单错误", err.Error()))
+				return
+			}
+			if len(refundOrders) == 0 {
+				return
+			}
+			service.AutoAgreeRefundOrders(refundOrders)
+		})
+
 		// 定时获取微信平台证书
-		g.TENANCY_Timer.AddTaskByFunc("CheckOrdersPayStatus", EveryTeenHour, func() {
+		g.TENANCY_Timer.AddTaskByFunc("CheckOrdersPayStatus", EveryTeenHour, "定时获取微信平台证书", func() {
 			wechatConf, err := param.GetWechatPayConfig()
 			if err != nil {
 				g.TENANCY_LOG.Info("定时获取微信平台证书", zap.String("获取微信支付配置错误", err.Error()))

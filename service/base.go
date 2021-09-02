@@ -91,10 +91,10 @@ func GetIsDelField(ctx *gin.Context) string {
 	if multi.IsAdmin(ctx) {
 		return ""
 	} else if multi.IsTenancy(ctx) {
-		return "is_system_del"
+		return "is_system_del = ?"
 	}
 	// 用户删除
-	return "is_del"
+	return "is_del  = ?"
 }
 
 // 是否是 c用户
