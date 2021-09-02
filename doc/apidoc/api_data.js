@@ -1465,6 +1465,134 @@ define({ "api": [
   },
   {
     "type": "GET",
+    "url": "/v1/device/order/refundOrder/1",
+    "title": "提交退款",
+    "version": "0.0.1",
+    "name": "提交退款",
+    "group": "订单管理-[床旁端]",
+    "permission": [
+      {
+        "name": "device",
+        "title": "床旁设备授权",
+        "description": "<p>床旁设备授权，区分设备所在医院</p> <p>床旁设备请求平台接口之前都需要获取授权，并将授权凭证放置在头部信息中。</p>"
+      }
+    ],
+    "description": "<p>用户支付的订单，用户提交退款申请</p>",
+    "body": [
+      {
+        "group": "Body",
+        "type": "Array",
+        "optional": false,
+        "field": "ids",
+        "description": "<p>订单商品id</p>"
+      },
+      {
+        "group": "Body",
+        "type": "String",
+        "optional": false,
+        "field": "refundMessage",
+        "description": "<p>退款原因</p>"
+      },
+      {
+        "group": "Body",
+        "type": "Number",
+        "optional": false,
+        "field": "RefundPrice",
+        "description": "<p>退款金额</p>"
+      },
+      {
+        "group": "Body",
+        "type": "Number",
+        "optional": false,
+        "field": "RefundType",
+        "description": "<p>退款类型 1：退款，2：退款退货</p>"
+      },
+      {
+        "group": "Body",
+        "type": "Number",
+        "optional": false,
+        "field": "Num",
+        "description": "<p>退款数量</p>"
+      },
+      {
+        "group": "Body",
+        "type": "String",
+        "optional": true,
+        "field": "Mark",
+        "description": "<p>备注</p>"
+      }
+    ],
+    "header": {
+      "fields": {
+        "Header": [
+          {
+            "group": "Header",
+            "type": "String",
+            "optional": false,
+            "field": "Authorization",
+            "description": "<p>接口需要带上此头信息</p>"
+          }
+        ]
+      },
+      "examples": [
+        {
+          "title": "Header-Example",
+          "content": "\"Authorization: Bearer 5f048fe\"",
+          "type": "Header"
+        }
+      ]
+    },
+    "examples": [
+      {
+        "title": "Curl example",
+        "content": "curl -H \"Authorization: Bearer 5f048fe\" -i http://127.0.0.1:8089/v1/device/order/refundOrder/1",
+        "type": "bash"
+      }
+    ],
+    "success": {
+      "examples": [
+        {
+          "title": "Response:",
+          "content": "HTTP/1.1 200 OK\n{\n    \"status\": 200,\n    \"data\": {\n      \"id\":1,\n    },\n    \"message\": \"操作成功\" \n}",
+          "type": "json"
+        }
+      ]
+    },
+    "filename": "v1/device/order.js",
+    "groupTitle": "订单管理-[床旁端]",
+    "sampleRequest": [
+      {
+        "url": "http://127.0.0.1:8089/v1/device/order/refundOrder/1"
+      }
+    ],
+    "error": {
+      "fields": {
+        "Error 4xx": [
+          {
+            "group": "Error 4xx",
+            "optional": false,
+            "field": "status",
+            "description": "<p>4001 授权错误时返回的状态码，得到次状态码需要重新授权。</p>"
+          },
+          {
+            "group": "Error 4xx",
+            "optional": false,
+            "field": "message",
+            "description": "<p>授权失败的具体描述信息</p>"
+          }
+        ]
+      },
+      "examples": [
+        {
+          "title": "Response (example):",
+          "content": "HTTP/1.1 200 OK\n{\n      \"status\": 4001,\n      \"data\": {},\n      \"message\": \"mutil: invalid token\"\n}",
+          "type": "json"
+        }
+      ]
+    }
+  },
+  {
+    "type": "GET",
     "url": "/v1/device/order/getOrderById/1",
     "title": "根据id获取订单详情",
     "version": "0.0.1",
@@ -2053,6 +2181,124 @@ define({ "api": [
     "sampleRequest": [
       {
         "url": "http://127.0.0.1:8089/v1/device/order/createOrder"
+      }
+    ],
+    "error": {
+      "fields": {
+        "Error 4xx": [
+          {
+            "group": "Error 4xx",
+            "optional": false,
+            "field": "status",
+            "description": "<p>4001 授权错误时返回的状态码，得到次状态码需要重新授权。</p>"
+          },
+          {
+            "group": "Error 4xx",
+            "optional": false,
+            "field": "message",
+            "description": "<p>授权失败的具体描述信息</p>"
+          }
+        ]
+      },
+      "examples": [
+        {
+          "title": "Response (example):",
+          "content": "HTTP/1.1 200 OK\n{\n      \"status\": 4001,\n      \"data\": {},\n      \"message\": \"mutil: invalid token\"\n}",
+          "type": "json"
+        }
+      ]
+    }
+  },
+  {
+    "type": "GET",
+    "url": "/v1/device/order/checkRefundOrder/1",
+    "title": "申请退款",
+    "version": "0.0.1",
+    "name": "申请退款",
+    "group": "订单管理-[床旁端]",
+    "permission": [
+      {
+        "name": "device",
+        "title": "床旁设备授权",
+        "description": "<p>床旁设备授权，区分设备所在医院</p> <p>床旁设备请求平台接口之前都需要获取授权，并将授权凭证放置在头部信息中。</p>"
+      }
+    ],
+    "description": "<p>用户支付的订单，可以申请退款</p>",
+    "body": [
+      {
+        "group": "Body",
+        "type": "Array",
+        "optional": false,
+        "field": "ids",
+        "description": "<p>订单商品集合id</p>"
+      }
+    ],
+    "header": {
+      "fields": {
+        "Header": [
+          {
+            "group": "Header",
+            "type": "String",
+            "optional": false,
+            "field": "Authorization",
+            "description": "<p>接口需要带上此头信息</p>"
+          }
+        ]
+      },
+      "examples": [
+        {
+          "title": "Header-Example",
+          "content": "\"Authorization: Bearer 5f048fe\"",
+          "type": "Header"
+        }
+      ]
+    },
+    "examples": [
+      {
+        "title": "Curl example",
+        "content": "curl -H \"Authorization: Bearer 5f048fe\" -i http://127.0.0.1:8089/v1/device/order/checkRefundOrder/1",
+        "type": "bash"
+      }
+    ],
+    "success": {
+      "fields": {
+        "Success 200": [
+          {
+            "group": "Success 200",
+            "type": "Number",
+            "optional": false,
+            "field": "totalRefundPrice",
+            "description": "<p>退款金额</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Number",
+            "optional": false,
+            "field": "postagePrice",
+            "description": "<p>退回邮费</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Object",
+            "optional": false,
+            "field": "product",
+            "description": "<p>退款商品</p>"
+          }
+        ]
+      },
+      "examples": [
+        {
+          "title": "Response:",
+          "content": "    HTTP/1.1 200 OK\n{\n  \"status\": 200,\n  \"data\": {\n    \"totalRefundPrice\": 2,\n    \"postagePrice\": 0,\n    \"product\": [\n      {\n        \"id\": 1,\n        \"cartInfo\": {\n          \"product\": {\n            \"image\": \"http://127.0.0.1:8089/uploads/file/b39024efbc6de61976f585c8421c6bba_20210702150027.png\",\n            \"storeName\": \"是防守打法发\",\n            \"temp\": {\n              \"name\": \"\",\n              \"type\": 0,\n              \"appoint\": 0,\n              \"undelivery\": 0,\n              \"isDefault\": 0,\n              \"sort\": 0\n            }\n          },\n          \"productAttr\": {\n            \"price\": 1,\n            \"sku\": \"S\"\n          }\n        },\n        \"productSku\": \"S\",\n        \"isRefund\": 0,\n        \"productNum\": 2,\n        \"productType\": 1,\n        \"refundNum\": 2,\n        \"isReply\": 2,\n        \"productPrice\": 1,\n        \"orderID\": 1,\n        \"productId\": 1\n      }\n    ],\n    \"status\": 1\n  },\n  \"message\": \"操作成功\"\n}",
+          "type": "json"
+        }
+      ]
+    },
+    "filename": "v1/device/order.js",
+    "groupTitle": "订单管理-[床旁端]",
+    "sampleRequest": [
+      {
+        "url": "http://127.0.0.1:8089/v1/device/order/checkRefundOrder/1"
       }
     ],
     "error": {

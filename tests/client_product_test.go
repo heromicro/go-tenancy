@@ -13,24 +13,8 @@ import (
 func TestClientProductList(t *testing.T) {
 	auth, _ := base.TenancyWithLoginTester(t)
 	defer base.BaseLogOut(auth)
-	params := []base.Param{
-		// {args: map[string]interface{}{"page": 1, "pageSize": 10, "type": "1"}, length: 3},
-		// {args: map[string]interface{}{"page": 1, "pageSize": 10, "type": "1", "keyword": "领立"}, length: 1},
-		// {args: map[string]interface{}{"page": 1, "pageSize": 10, "type": "1", "isGiftBag": "1"}, length: 0},
-		// {args: map[string]interface{}{"page": 1, "pageSize": 10, "type": "1", "cateId": 185}, length: 0},
-		// {args: map[string]interface{}{"page": 1, "pageSize": 10, "type": "1", "tenancyCategoryId": 174}, length: 1},
-		// {args: map[string]interface{}{"page": 1, "pageSize": 10, "type": "2"}, length: 1},
-		// {args: map[string]interface{}{"page": 1, "pageSize": 10, "type": "3"}, length: 1},
-		// {args: map[string]interface{}{"page": 1, "pageSize": 10, "type": "4"}, length: 1},
-		// {args: map[string]interface{}{"page": 1, "pageSize": 10, "type": "5"}, length: 1},
-		// {args: map[string]interface{}{"page": 1, "pageSize": 10, "type": "6"}, length: 1},
-		// {args: map[string]interface{}{"page": 1, "pageSize": 10, "type": "7"}, length: 1},
-	}
-	for _, param := range params {
-		fmt.Print(param)
-		url := "v1/merchant/product/getProductList"
-		base.PostList(auth, url, base.PageRes, base.PageKeys, http.StatusOK, "获取成功")
-	}
+	url := "v1/merchant/product/getProductList"
+	base.PostList(auth, url, base.PageRes, base.PageKeys, http.StatusOK, "获取成功")
 }
 
 func TestGetClientProductFilter(t *testing.T) {

@@ -312,7 +312,9 @@
  * @apiPermission device
  *
  * @apiDescription 用户支付的订单，可以申请退款
- *   
+ *
+ * @apiBody {Array} ids 订单商品集合id
+ *    
  * 
  * @apiHeader {String} Authorization 接口需要带上此头信息
  * @apiHeaderExample {Header} Header-Example
@@ -522,7 +524,6 @@
  *     }
  */
 
-
  /**
  * @api {GET} /v1/device/order/refundOrder/1 提交退款
  * @apiVersion 0.0.1
@@ -531,7 +532,14 @@
  * @apiPermission device
  *
  * @apiDescription 用户支付的订单，用户提交退款申请
- *   
+ *  
+ * @apiBody {Array} ids 订单商品id
+ * @apiBody {String} refundMessage 退款原因
+ * @apiBody {Number} RefundPrice 退款金额 
+ * @apiBody {Number} RefundType 退款类型 1：退款，2：退款退货
+ * @apiBody {Number} Num 退款数量 
+ * @apiBody {String} [Mark] 备注 
+ *  
  * 
  * @apiHeader {String} Authorization 接口需要带上此头信息
  * @apiHeaderExample {Header} Header-Example
@@ -543,7 +551,6 @@
  * @apiUse TokenError
  *         
  * 
- *
  * @apiSuccessExample Response:
  *     HTTP/1.1 200 OK
  *     {
