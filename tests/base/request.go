@@ -61,8 +61,12 @@ func Update(auth *httpexpect.Expect, url string, update map[string]interface{}, 
 	obj.Value("message").String().Equal(message)
 }
 
-func Get(auth *httpexpect.Expect, url string, status int, message string, keys ...ResponseKeys) {
-	obj := auth.GET(url).Expect().Status(http.StatusOK).JSON().Object()
+func Get(auth *httpexpect.Expect, url string, query map[string]interface{}, status int, message string, keys ...ResponseKeys) {
+	req := auth.GET(url)
+	if query != nil {
+		req = req.WithQueryObject(query)
+	}
+	obj := req.Expect().Status(http.StatusOK).JSON().Object()
 	obj.Keys().ContainsOnly("status", "data", "message")
 	obj.Value("status").Number().Equal(status)
 	obj.Value("message").String().Equal(message)
@@ -81,18 +85,6 @@ func Get(auth *httpexpect.Expect, url string, status int, message string, keys .
 		}
 		ks.Test(obj.Value("data").Array().Element(m).Object())
 	}
-}
-
-func GetById(auth *httpexpect.Expect, url string, query map[string]interface{}, keys ResponseKeys, status int, message string) {
-	req := auth.GET(url)
-	if query != nil {
-		req = req.WithQueryObject(query)
-	}
-	obj := req.Expect().Status(http.StatusOK).JSON().Object()
-	obj.Keys().ContainsOnly("status", "data", "message")
-	obj.Value("status").Number().Equal(status)
-	obj.Value("message").String().Equal(message)
-	keys.Test(obj.Value("data").Object())
 }
 
 func ScanById(auth *httpexpect.Expect, url string, id uint, query map[string]interface{}, keys ResponseKeys, status int, message string) {

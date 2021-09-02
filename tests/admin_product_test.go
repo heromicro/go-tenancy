@@ -25,7 +25,7 @@ func TestGetProductFilter(t *testing.T) {
 	auth := base.BaseWithLoginTester(t)
 	defer base.BaseLogOut(auth)
 	url := "v1/admin/product/getProductFilter"
-	base.Get(auth, url, http.StatusOK, "获取成功")
+	base.Get(auth, url, nil, http.StatusOK, "获取成功")
 }
 
 func TestProductProcess(t *testing.T) {

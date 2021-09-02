@@ -183,16 +183,16 @@ func TestDeviceOrderProcessForCancelOrder(t *testing.T) {
 	getOrderByIdKeys := base.ResponseKeys{
 		{Key: "id", Value: orderId},
 	}
-	base.GetById(deviceAuth, fmt.Sprintf("v1/device/order/getOrderById/%d", orderId), nil, getOrderByIdKeys, http.StatusOK, "操作成功")
+	base.Get(deviceAuth, fmt.Sprintf("v1/device/order/getOrderById/%d", orderId), nil, http.StatusOK, "操作成功", getOrderByIdKeys)
 
 	payOrderKeys := base.ResponseKeys{
 		{Key: "qrcode", Value: "notempty"},
 	}
 	// 重新支付订单
-	base.GetById(deviceAuth, fmt.Sprintf("v1/device/order/payOrder/%d", orderId), map[string]interface{}{"orderType": createOrderData["orderType"]}, payOrderKeys, http.StatusOK, "获取成功")
+	base.Get(deviceAuth, fmt.Sprintf("v1/device/order/payOrder/%d", orderId), map[string]interface{}{"orderType": createOrderData["orderType"]}, http.StatusOK, "获取成功", payOrderKeys)
 
 	// 取消订单
-	base.Get(deviceAuth, fmt.Sprintf("v1/device/order/cancelOrder/%d", orderId), http.StatusOK, "操作成功")
+	base.Get(deviceAuth, fmt.Sprintf("v1/device/order/cancelOrder/%d", orderId), nil, http.StatusOK, "操作成功")
 }
 
 func TestDeviceOrderProcessForCheckReturnOrder(t *testing.T) {
@@ -429,16 +429,11 @@ func TestDeviceOrderProcessForReturnOrder(t *testing.T) {
 	if err != nil {
 		t.Errorf("%s 订单支付失败%v", orderSn, err.Error())
 	}
-	data := map[string]interface{}{
-		"ids":           []uint{orderProductId},
-		"refundMessage": "地址错了",
-		"RefundPrice":   1.0,
-		"RefundType":    1,
-		"Num":           1,
-		"Mark":          "",
+	refundOrder := CreateRefundOrder(deviceAuth, orderId, []uint{orderProductId}, http.StatusOK, "操作成功")
+	if refundOrder == 0 {
+		t.Error("添加提交退款申请失败")
+		return
 	}
-	// 提交退款
-	base.Post(deviceAuth, fmt.Sprintf("v1/device/order/refundOrder/%d", orderId), data, http.StatusOK, "操作成功")
 }
 
 func CreateOrder(auth *httpexpect.Expect, create map[string]interface{}, status int, message string) uint {

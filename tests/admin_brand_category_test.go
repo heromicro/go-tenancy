@@ -51,26 +51,27 @@ func TestBrandCategoryProcess(t *testing.T) {
 				"level":    1,
 				"pid":      1,
 			}
-			rkeys := base.ResponseKeys{
-				{Key: "id", Value: brandCategoryId},
-				{Key: "pid", Value: update["pid"]},
-				{Key: "status", Value: update["status"]},
-				{Key: "sort", Value: update["sort"]},
-				{Key: "level", Value: update["level"]},
-				{Key: "cateName", Value: update["cateName"]},
-				{Key: "path", Value: update["path"]},
-				{Key: "createdAt", Value: update["createdAt"]},
-				{Key: "updatedAt", Value: update["updatedAt"]},
-				{Key: "children", Value: nil},
-			}
+
 			{
 				url := fmt.Sprintf("v1/admin/brandCategory/updateBrandCategory/%d", brandCategoryId)
 				base.Update(auth, url, update, http.StatusOK, "更新成功")
 			}
 
 			{
+				rkeys := base.ResponseKeys{
+					{Key: "id", Value: brandCategoryId},
+					{Key: "pid", Value: update["pid"]},
+					{Key: "status", Value: update["status"]},
+					{Key: "sort", Value: update["sort"]},
+					{Key: "level", Value: update["level"]},
+					{Key: "cateName", Value: update["cateName"]},
+					{Key: "path", Value: update["path"]},
+					{Key: "createdAt", Value: update["createdAt"]},
+					{Key: "updatedAt", Value: update["updatedAt"]},
+					{Key: "children", Value: nil},
+				}
 				url := fmt.Sprintf("v1/admin/brandCategory/getBrandCategoryById/%d", brandCategoryId)
-				base.GetById(auth, url, nil, rkeys, http.StatusOK, "操作成功")
+				base.Get(auth, url, nil, http.StatusOK, "操作成功", rkeys)
 			}
 
 			{
@@ -81,12 +82,12 @@ func TestBrandCategoryProcess(t *testing.T) {
 
 			{
 				url := "v1/admin/brandCategory/getCreateBrandCategoryMap"
-				base.Get(auth, url, http.StatusOK, "获取成功")
+				base.Get(auth, url, nil, http.StatusOK, "获取成功")
 			}
 
 			{
 				url := fmt.Sprintf("v1/admin/brandCategory/getUpdateBrandCategoryMap/%d", int(brandCategoryId))
-				base.Get(auth, url, http.StatusOK, "获取成功")
+				base.Get(auth, url, nil, http.StatusOK, "获取成功")
 			}
 		}
 	}

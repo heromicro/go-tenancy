@@ -64,7 +64,7 @@ func TestAttrTemplateProcess(t *testing.T) {
 				},
 			}},
 		}
-		base.GetById(auth, url, nil, keys, http.StatusOK, "操作成功")
+		base.Get(auth, url, nil, http.StatusOK, "操作成功", keys)
 	}
 
 }

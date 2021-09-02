@@ -357,9 +357,6 @@ func GetOrderInfoList(info request.OrderPageInfo, ctx *gin.Context) ([]response.
 		return orderList, stat, total, err
 	}
 
-	if info.SysUserId > 0 {
-		db.Where("orders.sys_user_id = ?", info.SysUserId)
-	}
 	err = db.Count(&total).Error
 	if err != nil {
 		return orderList, stat, total, err
@@ -448,6 +445,14 @@ func getOrderSearch(info request.OrderPageInfo, ctx *gin.Context, db *gorm.DB) (
 		if info.SysTenancyId > 0 {
 			db = db.Where("orders.sys_tenancy_id = ?", info.SysTenancyId)
 		}
+	}
+
+	if info.SysUserId > 0 {
+		db.Where("orders.sys_user_id = ?", info.SysUserId)
+	}
+
+	if info.PatientId > 0 {
+		db.Where("orders.patient_id = ?", info.PatientId)
 	}
 
 	if info.Date != "" {

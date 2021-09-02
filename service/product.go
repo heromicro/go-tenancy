@@ -665,10 +665,10 @@ func GetProductInfoList(info request.ProductPageInfo, tenancyId uint, isTenancy,
 	return productList, total, err
 }
 
-func UpdateOrderProductIsRefund(db *gorm.DB, orderProductId uint, isRefund uint8) error {
-	err := db.Model(&model.OrderProduct{}).Where("id = ?", orderProductId).Update("is_refund", isRefund).Error
+func UpdateOrderProduct(db *gorm.DB, orderProductId uint, data map[string]interface{}) error {
+	err := db.Model(&model.OrderProduct{}).Where("id = ?", orderProductId).Updates(data).Error
 	if err != nil {
-		return fmt.Errorf("update order product is_refund %w", err)
+		return fmt.Errorf("update order product %w", err)
 	}
 	return nil
 }

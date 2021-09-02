@@ -89,5 +89,5 @@ func TestDeviceProductDetail(t *testing.T) {
 	keys := base.ResponseKeys{
 		{Key: "id", Value: productId},
 	}
-	base.GetById(deviceAuth, url, nil, keys, http.StatusOK, "操作成功")
+	base.Get(deviceAuth, url, nil, http.StatusOK, "操作成功", keys)
 }

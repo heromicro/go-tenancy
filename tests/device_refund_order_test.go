@@ -4,39 +4,24 @@ import (
 	"fmt"
 	"net/http"
 	"testing"
+	"time"
 
 	"github.com/gavv/httpexpect"
 	"github.com/snowlyg/go-tenancy/g"
+	"github.com/snowlyg/go-tenancy/model"
+	"github.com/snowlyg/go-tenancy/service"
 	"github.com/snowlyg/go-tenancy/tests/base"
 )
 
-func TestOrderList(t *testing.T) {
-	auth := base.BaseWithLoginTester(t)
+func TestDeviceRefundOrderList(t *testing.T) {
+	auth := base.DeviceWithLoginTester(t)
 	defer base.BaseLogOut(auth)
 
-	url := "v1/admin/order/getOrderList"
-	pageKeys := base.ResponseKeys{
-		{Key: "pageSize", Value: 10},
-		{Key: "page", Value: 1},
-		{Key: "list", Value: nil},
-		{Key: "stat", Value: nil},
-		{Key: "total", Value: 0},
-	}
-	base.PostList(auth, url, base.PageRes, pageKeys, http.StatusOK, "获取成功")
+	url := "v1/device/refundOrder/getRefundOrderList"
+	base.PostList(auth, url, base.PageRes, base.PageKeys, http.StatusOK, "获取成功")
 }
 
-func TestGetOrderFilter(t *testing.T) {
-	auth := base.BaseWithLoginTester(t)
-	defer base.BaseLogOut(auth)
-	obj := auth.GET("v1/admin/order/getOrderChart").
-		Expect().Status(http.StatusOK).JSON().Object()
-	obj.Keys().ContainsOnly("status", "data", "message")
-	obj.Value("status").Number().Equal(200)
-	obj.Value("message").String().Equal("操作成功")
-
-}
-
-func TestOrderDetail(t *testing.T) {
+func TestDeviceRefundOrderProcess(t *testing.T) {
 	var brandId, shipTempId, cateId, tenancyCategoryId, productId, cartId, orderId uint
 	var uniques []string
 	var productType int32
@@ -118,8 +103,53 @@ func TestOrderDetail(t *testing.T) {
 	defer DeleteClientOrder(tenancyAuth, orderId, http.StatusOK, "删除成功")
 	defer DeleteDeviceOrder(deviceAuth, orderId, http.StatusOK, "删除成功")
 
-	keys := base.ResponseKeys{
-		{Key: "id", Value: orderId},
+	getOrderByIdKeys := base.ResponseKeys{
+		{Key: "orderSn", Value: ""},
+		{Key: "orderProduct",
+			Value: []base.ResponseKeys{
+				{
+					{Key: "id", Value: 0},
+				},
+			},
+		},
 	}
-	base.Get(adminAuth, fmt.Sprintf("v1/admin/order/getOrderById/%d", orderId), nil, http.StatusOK, "操作成功", keys)
+	base.ScanById(deviceAuth, fmt.Sprintf("v1/device/order/getOrderById/%d", orderId), orderId, nil, getOrderByIdKeys, http.StatusOK, "操作成功")
+	orderSn := getOrderByIdKeys.GetStringValue("orderSn")
+	orderProducts := getOrderByIdKeys.GetResponseKeysValue("orderProduct")
+	if len(orderProducts) == 0 {
+		t.Error("添加订单失败:订单产品为空")
+		return
+	}
+	orderProductId := orderProducts[0].GetId()
+	changeData := map[string]interface{}{
+		"status":   model.OrderStatusNoDeliver,
+		"pay_type": model.PayTypeAlipay,
+		"pay_time": time.Now(),
+		"paid":     g.StatusTrue,
+	}
+	_, err := service.ChangeOrderPayNotifyByOrderSn(changeData, orderSn, "pay_success", "订单支付成功")
+	if err != nil {
+		t.Errorf("%s 订单支付失败%v", orderSn, err.Error())
+	}
+	refundOrder := CreateRefundOrder(deviceAuth, orderId, []uint{orderProductId}, http.StatusOK, "操作成功")
+	if refundOrder == 0 {
+		t.Error("添加提交退款申请失败")
+		return
+	}
+	base.Get(deviceAuth, fmt.Sprintf("v1/device/refundOrder/getRefundOrderById/%d", refundOrder), nil, http.StatusOK, "操作成功")
+}
+
+func CreateRefundOrder(auth *httpexpect.Expect, orderId uint, ids []uint, status int, message string) uint {
+	data := map[string]interface{}{
+		"ids":           ids,
+		"refundMessage": "地址错了",
+		"RefundPrice":   1.0,
+		"RefundType":    1,
+		"Num":           1,
+		"Mark":          "",
+	}
+	keys := base.IdKeys()
+	// 提交退款
+	base.Create(auth, fmt.Sprintf("v1/device/order/refundOrder/%d", orderId), data, keys, http.StatusOK, "操作成功")
+	return keys.GetId()
 }

@@ -55,6 +55,14 @@ func getRefundOrderSearch(info request.RefundOrderPageInfo, ctx *gin.Context, db
 		db = db.Where("orders.order_sn like ?", info.OrderSn+"%")
 	}
 
+	if info.SysUserId > 0 {
+		db.Where("orders.sys_user_id = ?", info.SysUserId)
+	}
+
+	if info.PatientId > 0 {
+		db.Where("orders.patient_id = ?", info.PatientId)
+	}
+
 	if info.RefundOrderSn != "" {
 		db = db.Where("refund_orders.refund_order_sn like ?", info.RefundOrderSn+"%")
 	}
@@ -393,13 +401,13 @@ func refuseRefundOrder(refundOrder model.RefundOrder, failMessage string) error 
 				}
 			}
 			refundProduct.OrderProduct.IsRefund = isRefund
-			err := tx.Model(&model.OrderProduct{}).Where("id = ?", refundProduct.OrderProduct.ID).Updates(map[string]interface{}{"is_refund": isRefund, "refund_num": refundNum}).Error
+			err := UpdateOrderProduct(tx, refundProduct.OrderProduct.ID, map[string]interface{}{"is_refund": isRefund, "refund_num": refundNum})
 			if err != nil {
 				return fmt.Errorf("update refund product is_refund %w", err)
 			}
 		}
 		status = model.RefundStatusRefuse
-		err := tx.Model(&model.RefundOrder{}).Where("id = ?", refundOrder.ID).Updates(map[string]interface{}{"status": status, "status_time": time.Now(), "fail_message": failMessage}).Error
+		err := UpdateRefundOrderById(tx, refundOrder.ID, map[string]interface{}{"status": status, "status_time": time.Now(), "fail_message": failMessage})
 		if err != nil {
 			return fmt.Errorf("update refund order status %w", err)
 		}
@@ -463,9 +471,9 @@ func agreeRefundOrder(refundOrder model.RefundOrder, isDelField string) error {
 				}
 			}
 			refundProduct.OrderProduct.IsRefund = isRefund
-			err := UpdateOrderProductIsRefund(tx, refundProduct.OrderProduct.ID, isRefund)
+			err := UpdateOrderProduct(tx, refundProduct.OrderProduct.ID, map[string]interface{}{"is_refund": isRefund})
 			if err != nil {
-				return fmt.Errorf("update refund product is_refund %w", err)
+				return err
 			}
 		}
 
@@ -476,14 +484,14 @@ func agreeRefundOrder(refundOrder model.RefundOrder, isDelField string) error {
 			fmt.Printf("refundPrice %f", refundPrice)
 		} else if refundOrder.RefundType == model.RefundTypeAll {
 			status = model.RefundStatusAgree
-			err := AddRefundOrderStatus(tx, refundOrder.ID, "refund_agree", "退款申请已通过，请将商品寄回")
+			err := addRefundOrderStatus(tx, refundOrder.ID, "refund_agree", "退款申请已通过，请将商品寄回")
 			if err != nil {
 				return fmt.Errorf("add refund order status %w", err)
 			}
 		}
-		err := tx.Model(&model.RefundOrder{}).Where("id = ?", refundOrder.ID).Updates(map[string]interface{}{"status": status, "status_time": time.Now()}).Error
+		err := UpdateRefundOrderById(tx, refundOrder.ID, map[string]interface{}{"status": status, "status_time": time.Now()})
 		if err != nil {
-			return fmt.Errorf("update refund order status %w", err)
+			return err
 		}
 		return nil
 	})
@@ -587,7 +595,7 @@ func CreateRefundOrder(reqId request.GetById, req request.CreateRefundOrder) (ui
 			return err
 		}
 
-		err = AddRefundOrderStatus(tx, refundOrder.ID, "create", "创建退款单")
+		err = addRefundOrderStatus(tx, refundOrder.ID, "create", "创建退款单")
 		if err != nil {
 			return fmt.Errorf("add refund order status %w", err)
 		}
@@ -628,7 +636,7 @@ func DeleteRefundOrder(id uint) error {
 	return g.TENANCY_DB.Model(&model.RefundOrder{}).Where("id = ?", id).Update("is_system_del", g.StatusTrue).Error
 }
 
-func AddRefundOrderStatus(db *gorm.DB, id uint, cahngeType, changeMessage string) error {
+func addRefundOrderStatus(db *gorm.DB, id uint, cahngeType, changeMessage string) error {
 	status := model.RefundStatus{
 		RefundOrderID: id,
 		ChangeType:    cahngeType,

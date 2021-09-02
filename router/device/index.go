@@ -41,6 +41,12 @@ func InitDeviceRouter(Router *gin.RouterGroup) {
 		OrderRouter.POST("/refundOrder/:id", device.RefundOrder)
 		OrderRouter.DELETE("/deleteOrder/:id", device.DeleteOrder)
 	}
+	// 退款
+	RefundOrderRouter := Router.Group("/refundOrder")
+	{
+		RefundOrderRouter.POST("/getRefundOrderList", device.GetRefundOrderList)
+		RefundOrderRouter.GET("/getRefundOrderById/:id", device.GetRefundOrderById)
+	}
 	// 患者管理
 	PatientRouter := Router.Group("/patient")
 	{

@@ -79,8 +79,8 @@ type BaseOrder struct {
 	VerifyTime     time.Time `gorm:"column:verify_time;type:timestamp" json:"verifyTime"`                                             // 核销时间
 	ActivityType   int32     `gorm:"column:activity_type;type:tinyint unsigned;not null;default:1" json:"activityType"`               // 1：普通 2:秒杀 3:预售 4:助力
 	Cost           float64   `gorm:"column:cost;type:decimal(8,2) unsigned;not null" json:"cost"`                                     // 成本价
-	IsDel          int       `gorm:"column:is_del;type:tinyint unsigned;not null;default:2" json:"isDel"`                             // 是否删除
-	IsSystemDel    int       `gorm:"column:is_system_del;type:tinyint(1);default:2" json:"isSystemDel"`                               // 后台是否删除
+	IsDel          int       `gorm:"column:is_del;type:tinyint unsigned;not null;default:2" json:"isDel"`                             // 用户是否删除
+	IsSystemDel    int       `gorm:"column:is_system_del;type:tinyint(1);default:2" json:"isSystemDel"`                               // 商户删除
 }
 
 // OrderStatus 订单操作记录表

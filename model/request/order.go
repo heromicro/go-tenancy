@@ -7,6 +7,7 @@ type OrderPageInfo struct {
 	PageSize     int    `json:"pageSize" form:"pageSize" binding:"required"`
 	SysTenancyId uint   `json:"sysTenancyId" form:"sysTenancyId"`
 	SysUserId    uint   `json:"sysUserId" form:"sysUserId"`
+	PatientId    uint   `json:"patientId" form:"patientId"`
 	Date         string `json:"date" form:"date"`
 	IsTrader     string `json:"isTrader" form:"isTrader"`
 	Keywords     string `json:"keywords" form:"keywords"`

@@ -37,7 +37,7 @@ func TestDeviceGetProductCount(t *testing.T) {
 	auth := base.DeviceWithLoginTester(t)
 	defer base.BaseLogOut(auth)
 	url := "v1/device/cart/getProductCount"
-	base.Get(auth, url, http.StatusOK, "获取成功")
+	base.Get(auth, url, nil, http.StatusOK, "获取成功")
 }
 
 func DeleteCart(auth *httpexpect.Expect, data map[string]interface{}, status int, message string) {

@@ -23,14 +23,14 @@ func TestClientCategorySelect(t *testing.T) {
 	defer base.BaseLogOut(auth)
 
 	url := "v1/merchant/productCategory/getProductCategorySelect"
-	base.Get(auth, url, http.StatusOK, "获取成功")
+	base.Get(auth, url, nil, http.StatusOK, "获取成功")
 }
 
 func TestGetAdminCategorySelect(t *testing.T) {
 	auth, _ := base.TenancyWithLoginTester(t)
 	defer base.BaseLogOut(auth)
 	url := "v1/merchant/productCategory/getAdminProductCategorySelect"
-	base.Get(auth, url, http.StatusOK, "获取成功")
+	base.Get(auth, url, nil, http.StatusOK, "获取成功")
 }
 
 func TestClientCategoryProcess(t *testing.T) {
@@ -71,7 +71,7 @@ func TestClientCategoryProcess(t *testing.T) {
 			{Key: "pid", Value: update["pid"]},
 			{Key: "level", Value: update["level"]},
 		}
-		base.GetById(auth, url, nil, keys, http.StatusOK, "操作成功")
+		base.Get(auth, url, nil, http.StatusOK, "操作成功", keys)
 	}
 
 	{
@@ -85,11 +85,11 @@ func TestClientCategoryProcess(t *testing.T) {
 
 	{
 		url := "v1/merchant/productCategory/getCreateProductCategoryMap"
-		base.Get(auth, url, http.StatusOK, "获取成功")
+		base.Get(auth, url, nil, http.StatusOK, "获取成功")
 	}
 	{
 		url := fmt.Sprintf("v1/merchant/productCategory/getUpdateProductCategoryMap/%d", cateId)
-		base.Get(auth, url, http.StatusOK, "获取成功")
+		base.Get(auth, url, nil, http.StatusOK, "获取成功")
 	}
 
 }

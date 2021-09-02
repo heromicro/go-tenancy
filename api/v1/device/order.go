@@ -17,7 +17,7 @@ func GetOrderList(ctx *gin.Context) {
 		response.FailWithMessage(errs.Error(), ctx)
 		return
 	}
-	pageInfo.SysUserId = multi.GetUserId(ctx)
+	pageInfo.PatientId = multi.GetUserId(ctx)
 	pageInfo.SysTenancyId = multi.GetTenancyId(ctx)
 	if list, stat, total, err := service.GetOrderInfoList(pageInfo, ctx); err != nil {
 		g.TENANCY_LOG.Error("获取失败!", zap.Any("err", err))

@@ -31,7 +31,7 @@ func TestTenancyByRegion(t *testing.T) {
 		t.Fatal("创建失败")
 	}
 	defer base.DeleteTenancy(auth, tenancyId)
-	base.Get(auth, "v1/admin/tenancy/getTenancies/1", http.StatusOK, "获取成功")
+	base.Get(auth, "v1/admin/tenancy/getTenancies/1", nil, http.StatusOK, "获取成功")
 }
 
 func TestLoginTenancy(t *testing.T) {
@@ -190,5 +190,5 @@ func TestTenancySelect(t *testing.T) {
 	auth := base.BaseWithLoginTester(t)
 	defer base.BaseLogOut(auth)
 	url := "v1/admin/tenancy/getTenancySelect"
-	base.Get(auth, url, http.StatusOK, "获取成功")
+	base.Get(auth, url, nil, http.StatusOK, "获取成功")
 }

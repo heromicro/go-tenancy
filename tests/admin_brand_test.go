@@ -90,7 +90,7 @@ func TestBrandProcess(t *testing.T) {
 			{Key: "pic", Value: updateBrand["pic"]},
 		}
 		url := fmt.Sprintf("v1/admin/brand/getBrandById/%d", brandId)
-		base.GetById(auth, url, nil, responseKeys, http.StatusOK, "操作成功")
+		base.Get(auth, url, nil, http.StatusOK, "操作成功", responseKeys)
 	}
 
 	{
@@ -104,11 +104,11 @@ func TestBrandProcess(t *testing.T) {
 
 	{
 		url := "v1/admin/brand/getCreateBrandMap"
-		base.Get(auth, url, http.StatusOK, "获取成功")
+		base.Get(auth, url, nil, http.StatusOK, "获取成功")
 	}
 	{
 		url := fmt.Sprintf("v1/admin/brand/getUpdateBrandMap/%d", brandId)
-		base.Get(auth, url, http.StatusOK, "获取成功")
+		base.Get(auth, url, nil, http.StatusOK, "获取成功")
 	}
 }
 

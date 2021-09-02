@@ -310,7 +310,7 @@ func TestCuserUserSelect(t *testing.T) {
 	defer base.DeleteTenancy(adminAuth, tenancyId)
 
 	url := fmt.Sprintf("v1/admin/cuser/getGeneralSelect/%d", tenancyId)
-	base.Get(adminAuth, url, http.StatusOK, "获取成功")
+	base.Get(adminAuth, url, nil, http.StatusOK, "获取成功")
 }
 
 func TestAdminPatientSelect(t *testing.T) {
@@ -323,5 +323,5 @@ func TestAdminPatientSelect(t *testing.T) {
 	defer base.DeleteTenancy(adminAuth, tenancyId)
 
 	url := fmt.Sprintf("v1/admin/patient/getPatientSelect/%d", tenancyId)
-	base.Get(adminAuth, url, http.StatusOK, "获取成功")
+	base.Get(adminAuth, url, nil, http.StatusOK, "获取成功")
 }

@@ -153,7 +153,7 @@ func TestClientProductProcess(t *testing.T) {
 		{Key: "sliderImages", Value: update["sliderImages"]},
 	}
 	url := fmt.Sprintf("v1/merchant/product/getProductById/%d", productId)
-	base.GetById(clientAuth, url, nil, keys, http.StatusOK, "操作成功")
+	base.Get(clientAuth, url, nil, http.StatusOK, "操作成功", keys)
 
 	ChangeProductIsShow(clientAuth, productId, g.StatusTrue, http.StatusOK, "设置成功")
 	ChangeProductIsShow(clientAuth, productId, g.StatusFalse, http.StatusOK, "设置成功")
@@ -227,5 +227,5 @@ func ChangeProductIsShow(auth *httpexpect.Expect, id uint, isShow, status int, m
 
 func RestoreProduct(auth *httpexpect.Expect, id uint, status int, message string) {
 	url := fmt.Sprintf("v1/merchant/product/restoreProduct/%d", id)
-	base.Get(auth, url, status, message)
+	base.Get(auth, url, nil, status, message)
 }

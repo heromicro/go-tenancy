@@ -23,7 +23,7 @@ func TestCategorySelect(t *testing.T) {
 	defer base.BaseLogOut(auth)
 
 	url := "v1/admin/productCategory/getProductCategorySelect"
-	base.Get(auth, url, http.StatusOK, "获取成功")
+	base.Get(auth, url, nil, http.StatusOK, "获取成功")
 }
 
 func TestCategoryProcess(t *testing.T) {
@@ -80,7 +80,7 @@ func TestCategoryProcess(t *testing.T) {
 			{Key: "pic", Value: update["pic"]},
 			{Key: "level", Value: update["level"]},
 		}
-		base.GetById(auth, url, nil, keys, http.StatusOK, "操作成功")
+		base.Get(auth, url, nil, http.StatusOK, "操作成功", keys)
 	}
 
 	{
@@ -90,12 +90,12 @@ func TestCategoryProcess(t *testing.T) {
 
 	{
 		url := "v1/admin/productCategory/getCreateProductCategoryMap"
-		base.Get(auth, url, http.StatusOK, "获取成功")
+		base.Get(auth, url, nil, http.StatusOK, "获取成功")
 	}
 
 	{
 		url := fmt.Sprintf("v1/admin/productCategory/getUpdateProductCategoryMap/%d", categoryId)
-		base.Get(auth, url, http.StatusOK, "获取成功")
+		base.Get(auth, url, nil, http.StatusOK, "获取成功")
 	}
 
 }

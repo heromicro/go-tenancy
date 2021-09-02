@@ -65,7 +65,7 @@ func TestShippingTemplateSelect(t *testing.T) {
 	defer base.BaseLogOut(auth)
 
 	url := "v1/merchant/shippingTemplate/getShippingTemplateSelect"
-	base.Get(auth, url, http.StatusOK, "获取成功")
+	base.Get(auth, url, nil, http.StatusOK, "获取成功")
 }
 
 func TestShippingTemplateProcess(t *testing.T) {
@@ -102,7 +102,7 @@ func TestShippingTemplateProcess(t *testing.T) {
 			{Key: "isDefault", Value: update["isDefault"]},
 			{Key: "sort", Value: update["sort"]},
 		}
-		base.GetById(auth, url, nil, keys, http.StatusOK, "操作成功")
+		base.Get(auth, url, nil, http.StatusOK, "操作成功", keys)
 	}
 }
 
