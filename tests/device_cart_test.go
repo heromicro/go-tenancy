@@ -47,7 +47,7 @@ func DeleteCart(auth *httpexpect.Expect, data map[string]interface{}, status int
 
 func cartList(auth *httpexpect.Expect, pageRes map[string]interface{}, pageKeys base.ResponseKeys, status int, message string) {
 	url := "v1/device/cart/getCartList"
-	base.GetList(auth, url, 0, nil, status, message)
+	base.GetList(auth, url, status, message)
 }
 
 func CreateCart(auth *httpexpect.Expect, create map[string]interface{}, status int, message string) uint {

@@ -53,7 +53,7 @@ func TestProductProcess(t *testing.T) {
 	}
 	defer DeleteBrand(adminAuth, brandId)
 
-	cateId, _ = CreateCategory(adminAuth, "数码产品_client", http.StatusOK, "创建成功")
+	cateId, _ = CreateCategory(adminAuth, "数码产品_client", 0, http.StatusOK, "创建成功")
 	if cateId == 0 {
 		t.Errorf("添加分类失败")
 		return

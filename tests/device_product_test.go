@@ -56,7 +56,7 @@ func TestDeviceProductDetail(t *testing.T) {
 	}
 	defer DeleteBrand(adminAuth, brandId)
 
-	cateId, _ = CreateCategory(adminAuth, "数码产品_product_detail", http.StatusOK, "创建成功")
+	cateId, _ = CreateCategory(adminAuth, "数码产品_product_detail", 0, http.StatusOK, "创建成功")
 	if cateId == 0 {
 		t.Error("添加分类失败")
 		return
@@ -84,10 +84,10 @@ func TestDeviceProductDetail(t *testing.T) {
 	}
 	defer DeleteProduct(tenancyAuth, productId, http.StatusOK, "删除成功")
 	ChangeProductIsShow(tenancyAuth, productId, g.StatusTrue, http.StatusOK, "设置成功")
-	
+
 	url := fmt.Sprintf("v1/device/product/getProductById/%d", productId)
 	keys := base.ResponseKeys{
 		{Key: "id", Value: productId},
 	}
-	base.GetById(deviceAuth, url, 0, nil, keys, http.StatusOK, "操作成功")
+	base.GetById(deviceAuth, url, nil, keys, http.StatusOK, "操作成功")
 }

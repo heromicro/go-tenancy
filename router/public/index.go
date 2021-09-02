@@ -23,8 +23,8 @@ func InitPayRouter(Router *gin.RouterGroup) {
 func InitInitRouter(Router *gin.RouterGroup) {
 	ApiRouter := Router.Group("/init")
 	{
-		ApiRouter.POST("/initdb", public.InitDB)  // 创建Api
-		ApiRouter.GET("/checkdb", public.CheckDB) // 创建Api
+		ApiRouter.POST("/initdb", public.InitDB)  // 初始化
+		ApiRouter.GET("/checkdb", public.CheckDB) // 检测初始化
 	}
 }
 
@@ -38,5 +38,6 @@ func InitPublicRouter(Router *gin.RouterGroup) {
 		BaseRouter.GET("/captcha", public.Captcha)
 		BaseRouter.GET("/region/:p_code", public.Region)
 		BaseRouter.GET("/getRegionList", public.RegionList)
+		BaseRouter.GET("/getRefundMessage", public.GetRefundMessage)
 	}
 }

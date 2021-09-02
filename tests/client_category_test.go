@@ -15,7 +15,7 @@ func TestClientCategoryList(t *testing.T) {
 	defer base.BaseLogOut(auth)
 
 	url := "v1/merchant/productCategory/getProductCategoryList"
-	base.GetList(auth, url, 0, nil, http.StatusOK, "获取成功")
+	base.GetList(auth, url, http.StatusOK, "获取成功")
 }
 
 func TestClientCategorySelect(t *testing.T) {
@@ -71,7 +71,7 @@ func TestClientCategoryProcess(t *testing.T) {
 			{Key: "pid", Value: update["pid"]},
 			{Key: "level", Value: update["level"]},
 		}
-		base.GetById(auth, url, cateId, nil, keys, http.StatusOK, "操作成功")
+		base.GetById(auth, url, nil, keys, http.StatusOK, "操作成功")
 	}
 
 	{

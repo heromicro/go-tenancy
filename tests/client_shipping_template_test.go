@@ -102,7 +102,7 @@ func TestShippingTemplateProcess(t *testing.T) {
 			{Key: "isDefault", Value: update["isDefault"]},
 			{Key: "sort", Value: update["sort"]},
 		}
-		base.GetById(auth, url, shipTempId, nil, keys, http.StatusOK, "操作成功")
+		base.GetById(auth, url, nil, keys, http.StatusOK, "操作成功")
 	}
 }
 

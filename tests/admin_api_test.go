@@ -27,7 +27,7 @@ func TestAllApi(t *testing.T) {
 	auth := base.BaseWithLoginTester(t)
 	defer base.BaseLogOut(auth)
 	url := "v1/admin/api/getAllApis"
-	base.GetList(auth, url, 0, nil, http.StatusOK, "获取成功")
+	base.GetList(auth, url, http.StatusOK, "获取成功")
 }
 
 func TestApiProcess(t *testing.T) {
@@ -65,7 +65,7 @@ func TestApiProcess(t *testing.T) {
 			{Key: "description", Value: update["description"]},
 			{Key: "apiGroup", Value: update["apiGroup"]},
 		}
-		base.GetById(auth, url, apiId, nil, keys, http.StatusOK, "操作成功")
+		base.GetById(auth, url, nil, keys, http.StatusOK, "操作成功")
 	}
 
 }

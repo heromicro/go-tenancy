@@ -57,7 +57,7 @@ func TestDeviceCheckOrder(t *testing.T) {
 	}
 	defer DeleteBrand(adminAuth, brandId)
 
-	cateId, _ = CreateCategory(adminAuth, "数码产品_device_check_order", http.StatusOK, "创建成功")
+	cateId, _ = CreateCategory(adminAuth, "数码产品_device_check_order", 0, http.StatusOK, "创建成功")
 	if cateId == 0 {
 		t.Error("添加分类失败")
 		return
@@ -134,7 +134,7 @@ func TestDeviceOrderProcessForCancelOrder(t *testing.T) {
 	}
 	defer DeleteBrand(adminAuth, brandId)
 
-	cateId, _ = CreateCategory(adminAuth, "数码产品_device_process", http.StatusOK, "创建成功")
+	cateId, _ = CreateCategory(adminAuth, "数码产品_device_process", 0, http.StatusOK, "创建成功")
 	if cateId == 0 {
 		t.Error("添加分类失败")
 		return
@@ -183,13 +183,13 @@ func TestDeviceOrderProcessForCancelOrder(t *testing.T) {
 	getOrderByIdKeys := base.ResponseKeys{
 		{Key: "id", Value: orderId},
 	}
-	base.GetById(deviceAuth, fmt.Sprintf("v1/device/order/getOrderById/%d", orderId), orderId, nil, getOrderByIdKeys, http.StatusOK, "操作成功")
+	base.GetById(deviceAuth, fmt.Sprintf("v1/device/order/getOrderById/%d", orderId), nil, getOrderByIdKeys, http.StatusOK, "操作成功")
 
 	payOrderKeys := base.ResponseKeys{
 		{Key: "qrcode", Value: "notempty"},
 	}
 	// 重新支付订单
-	base.GetById(deviceAuth, fmt.Sprintf("v1/device/order/payOrder/%d", orderId), orderId, map[string]interface{}{"orderType": createOrderData["orderType"]}, payOrderKeys, http.StatusOK, "获取成功")
+	base.GetById(deviceAuth, fmt.Sprintf("v1/device/order/payOrder/%d", orderId), map[string]interface{}{"orderType": createOrderData["orderType"]}, payOrderKeys, http.StatusOK, "获取成功")
 
 	// 取消订单
 	base.Get(deviceAuth, fmt.Sprintf("v1/device/order/cancelOrder/%d", orderId), http.StatusOK, "操作成功")
@@ -230,7 +230,7 @@ func TestDeviceOrderProcessForCheckReturnOrder(t *testing.T) {
 	}
 	defer DeleteBrand(adminAuth, brandId)
 
-	cateId, _ = CreateCategory(adminAuth, "数码产品_device_process", http.StatusOK, "创建成功")
+	cateId, _ = CreateCategory(adminAuth, "数码产品_device_process", 0, http.StatusOK, "创建成功")
 	if cateId == 0 {
 		t.Error("添加分类失败")
 		return
@@ -354,7 +354,7 @@ func TestDeviceOrderProcessForReturnOrder(t *testing.T) {
 	}
 	defer DeleteBrand(adminAuth, brandId)
 
-	cateId, _ = CreateCategory(adminAuth, "数码产品_device_process", http.StatusOK, "创建成功")
+	cateId, _ = CreateCategory(adminAuth, "数码产品_device_process", 0, http.StatusOK, "创建成功")
 	if cateId == 0 {
 		t.Error("添加分类失败")
 		return

@@ -95,7 +95,7 @@
  */
 
 
-    /**
+/**
  * @api {get} /v1/auth/logout 退出登录
  * @apiVersion 0.0.1
  * @apiName 退出登录
@@ -120,4 +120,33 @@
          "data": {},
          "message": "退出登录"
  *     }
+ */
+
+/**
+ * @api {get} /v1/public/getRefundMessage 获取退款原因
+ * @apiVersion 0.0.1
+ * @apiName 获取退款原因
+ * @apiGroup 公共方法
+ * @apiPermission device
+ *
+ * @apiDescription 获取后台配置的退款原因
+ *
+ * @apiHeader {String} Authorization 接口需要带上此头信息
+ * @apiHeaderExample {Header} Header-Example
+ *     "Authorization: Bearer 5f048fe"
+ *
+ * @apiExample {bash} Curl example
+ * curl -H "Authorization: Bearer 5f048fe" -i http://127.0.0.1:8089/v1/public/getRefundMessage
+ *
+ * @apiUse TokenError
+ *
+ * @apiSuccessExample Response:
+ *     HTTP/1.1 200 OK
+        {
+          "status": 200,
+          "data": {
+            "refundMessage": ["收货地址填错了", "与描述不符", "信息填错了", "重新拍", "收到商品损坏了", "未按预定时间发货", "其它原因"]
+          },
+          "message": "获取成功"
+        }
  */

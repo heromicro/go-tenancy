@@ -80,7 +80,7 @@ func TestClientOrderDetail(t *testing.T) {
 	}
 	defer DeleteBrand(adminAuth, brandId)
 
-	cateId, _ = CreateCategory(adminAuth, "数码产品_device_process", http.StatusOK, "创建成功")
+	cateId, _ = CreateCategory(adminAuth, "数码产品_device_process", 0, http.StatusOK, "创建成功")
 	if cateId == 0 {
 		t.Error("添加分类失败")
 		return
@@ -167,7 +167,7 @@ func TestClientOrderRecord(t *testing.T) {
 	}
 	defer DeleteBrand(adminAuth, brandId)
 
-	cateId, _ = CreateCategory(adminAuth, "数码产品_device_process", http.StatusOK, "创建成功")
+	cateId, _ = CreateCategory(adminAuth, "数码产品_device_process", 0, http.StatusOK, "创建成功")
 	if cateId == 0 {
 		t.Error("添加分类失败")
 		return
@@ -284,7 +284,7 @@ func TestClientOrderRemark(t *testing.T) {
 	}
 	defer DeleteBrand(adminAuth, brandId)
 
-	cateId, _ = CreateCategory(adminAuth, "数码产品_device_process", http.StatusOK, "创建成功")
+	cateId, _ = CreateCategory(adminAuth, "数码产品_device_process", 0, http.StatusOK, "创建成功")
 	if cateId == 0 {
 		t.Error("添加分类失败")
 		return
@@ -380,7 +380,7 @@ func TestClientOrderEdit(t *testing.T) {
 	}
 	defer DeleteBrand(adminAuth, brandId)
 
-	cateId, _ = CreateCategory(adminAuth, "数码产品_device_process", http.StatusOK, "创建成功")
+	cateId, _ = CreateCategory(adminAuth, "数码产品_device_process", 0, http.StatusOK, "创建成功")
 	if cateId == 0 {
 		t.Error("添加分类失败")
 		return

@@ -20,15 +20,25 @@ func PostList(auth *httpexpect.Expect, url string, res map[string]interface{}, p
 	pageKeys.Test(obj.Value("data").Object())
 }
 
-func GetList(auth *httpexpect.Expect, url string, id uint, keys ResponseKeys, status int, message string) {
+func GetList(auth *httpexpect.Expect, url string, status int, message string, keys ...ResponseKeys) {
 	obj := auth.GET(url).Expect().Status(http.StatusOK).JSON().Object()
 	obj.Keys().ContainsOnly("status", "data", "message")
 	obj.Value("status").Number().Equal(status)
 	obj.Value("message").String().Equal(message)
-	if id > 0 {
-		obj.Value("data").Array().Length().Equal(1)
-		first := obj.Value("data").Array().First().Object()
-		keys.Test(first)
+	if len(keys) == 0 {
+		return
+	}
+	//返回单个数据
+	if len(keys) == 1 {
+		keys[0].Test(obj.Value("data").Object())
+		return
+	}
+	// 返回数组数据
+	for m, ks := range keys {
+		if ks == nil {
+			return
+		}
+		ks.Test(obj.Value("data").Array().Element(m).Object())
 	}
 }
 
@@ -51,14 +61,29 @@ func Update(auth *httpexpect.Expect, url string, update map[string]interface{}, 
 	obj.Value("message").String().Equal(message)
 }
 
-func Get(auth *httpexpect.Expect, url string, status int, message string) {
+func Get(auth *httpexpect.Expect, url string, status int, message string, keys ...ResponseKeys) {
 	obj := auth.GET(url).Expect().Status(http.StatusOK).JSON().Object()
 	obj.Keys().ContainsOnly("status", "data", "message")
 	obj.Value("status").Number().Equal(status)
 	obj.Value("message").String().Equal(message)
+	if len(keys) == 0 {
+		return
+	}
+	//返回单个数据
+	if len(keys) == 1 {
+		keys[0].Test(obj.Value("data").Object())
+		return
+	}
+	// 返回数组数据
+	for m, ks := range keys {
+		if ks == nil {
+			return
+		}
+		ks.Test(obj.Value("data").Array().Element(m).Object())
+	}
 }
 
-func GetById(auth *httpexpect.Expect, url string, id uint, query map[string]interface{}, keys ResponseKeys, status int, message string) {
+func GetById(auth *httpexpect.Expect, url string, query map[string]interface{}, keys ResponseKeys, status int, message string) {
 	req := auth.GET(url)
 	if query != nil {
 		req = req.WithQueryObject(query)
@@ -67,9 +92,7 @@ func GetById(auth *httpexpect.Expect, url string, id uint, query map[string]inte
 	obj.Keys().ContainsOnly("status", "data", "message")
 	obj.Value("status").Number().Equal(status)
 	obj.Value("message").String().Equal(message)
-	if id > 0 {
-		keys.Test(obj.Value("data").Object())
-	}
+	keys.Test(obj.Value("data").Object())
 }
 
 func ScanById(auth *httpexpect.Expect, url string, id uint, query map[string]interface{}, keys ResponseKeys, status int, message string) {

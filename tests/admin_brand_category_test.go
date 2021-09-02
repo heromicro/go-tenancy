@@ -14,7 +14,7 @@ func TestBrandCategoryList(t *testing.T) {
 	auth := base.BaseWithLoginTester(t)
 	defer base.BaseLogOut(auth)
 	url := "v1/admin/brandCategory/getBrandCategoryList"
-	base.GetList(auth, url, 0, nil, http.StatusOK, "获取成功")
+	base.GetList(auth, url, http.StatusOK, "获取成功")
 }
 
 func TestBrandCategoryProcess(t *testing.T) {
@@ -25,18 +25,21 @@ func TestBrandCategoryProcess(t *testing.T) {
 	if brandCategoryId > 0 {
 		defer DeleteBrandCategory(auth, brandCategoryId)
 		{
-			rkeys := base.ResponseKeys{
-				{Key: "id", Value: brandCategoryId},
-				{Key: "pid", Value: create["pid"]},
-				{Key: "status", Value: create["status"]},
-				{Key: "sort", Value: create["sort"]},
-				{Key: "level", Value: create["level"]},
-				{Key: "cateName", Value: create["cateName"]},
-				{Key: "path", Value: create["path"]},
-				{Key: "children", Value: nil},
+			rkeys := []base.ResponseKeys{
+				{
+					{Key: "id", Value: brandCategoryId},
+					{Key: "pid", Value: create["pid"]},
+					{Key: "status", Value: create["status"]},
+					{Key: "sort", Value: create["sort"]},
+					{Key: "level", Value: create["level"]},
+					{Key: "cateName", Value: create["cateName"]},
+					{Key: "path", Value: create["path"]},
+					{Key: "children", Value: nil},
+				},
+				nil,
 			}
 			url := "v1/admin/brandCategory/getBrandCategoryList"
-			base.GetList(auth, url, brandCategoryId, rkeys, http.StatusOK, "获取成功")
+			base.GetList(auth, url, http.StatusOK, "获取成功", rkeys...)
 		}
 
 		if brandCategoryId > 0 {
@@ -67,7 +70,7 @@ func TestBrandCategoryProcess(t *testing.T) {
 
 			{
 				url := fmt.Sprintf("v1/admin/brandCategory/getBrandCategoryById/%d", brandCategoryId)
-				base.GetById(auth, url, brandCategoryId, nil, rkeys, http.StatusOK, "操作成功")
+				base.GetById(auth, url, nil, rkeys, http.StatusOK, "操作成功")
 			}
 
 			{

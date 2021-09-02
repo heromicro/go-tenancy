@@ -11,5 +11,5 @@ func TestDeviceProductCategoryList(t *testing.T) {
 	auth := base.DeviceWithLoginTester(t)
 	defer base.BaseLogOut(auth)
 	url := "v1/device/productCategory/getProductCategoryList"
-	base.GetList(auth, url, 0, nil, http.StatusOK, "获取成功")
+	base.GetList(auth, url, http.StatusOK, "获取成功")
 }

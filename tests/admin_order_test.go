@@ -71,7 +71,7 @@ func TestOrderDetail(t *testing.T) {
 	}
 	defer DeleteBrand(adminAuth, brandId)
 
-	cateId, _ = CreateCategory(adminAuth, "数码产品_device_process", http.StatusOK, "创建成功")
+	cateId, _ = CreateCategory(adminAuth, "数码产品_device_process", 0, http.StatusOK, "创建成功")
 	if cateId == 0 {
 		t.Error("添加分类失败")
 		return
@@ -121,5 +121,5 @@ func TestOrderDetail(t *testing.T) {
 	keys := base.ResponseKeys{
 		{Key: "id", Value: orderId},
 	}
-	base.GetById(adminAuth, fmt.Sprintf("v1/admin/order/getOrderById/%d", orderId), orderId, nil, keys, http.StatusOK, "操作成功")
+	base.GetById(adminAuth, fmt.Sprintf("v1/admin/order/getOrderById/%d", orderId), nil, keys, http.StatusOK, "操作成功")
 }

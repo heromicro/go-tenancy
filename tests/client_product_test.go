@@ -54,7 +54,7 @@ func TestClientProductProcess(t *testing.T) {
 	}
 	defer DeleteBrand(adminAuth, brandId)
 
-	cateId, _ = CreateCategory(adminAuth, "数码产品_client", http.StatusOK, "创建成功")
+	cateId, _ = CreateCategory(adminAuth, "数码产品_client", 0, http.StatusOK, "创建成功")
 	if cateId == 0 {
 		t.Errorf("添加分类失败")
 		return
@@ -153,7 +153,7 @@ func TestClientProductProcess(t *testing.T) {
 		{Key: "sliderImages", Value: update["sliderImages"]},
 	}
 	url := fmt.Sprintf("v1/merchant/product/getProductById/%d", productId)
-	base.GetById(clientAuth, url, productId, nil, keys, http.StatusOK, "操作成功")
+	base.GetById(clientAuth, url, nil, keys, http.StatusOK, "操作成功")
 
 	ChangeProductIsShow(clientAuth, productId, g.StatusTrue, http.StatusOK, "设置成功")
 	ChangeProductIsShow(clientAuth, productId, g.StatusFalse, http.StatusOK, "设置成功")

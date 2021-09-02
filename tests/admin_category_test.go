@@ -15,7 +15,7 @@ func TestCategoryList(t *testing.T) {
 	defer base.BaseLogOut(auth)
 
 	url := "v1/admin/productCategory/getProductCategoryList"
-	base.GetList(auth, url, 0, nil, http.StatusOK, "获取成功")
+	base.GetList(auth, url, http.StatusOK, "获取成功")
 }
 
 func TestCategorySelect(t *testing.T) {
@@ -30,25 +30,28 @@ func TestCategoryProcess(t *testing.T) {
 	auth := base.BaseWithLoginTester(t)
 	defer base.BaseLogOut(auth)
 
-	categoryId, data := CreateCategory(auth, "数码产品", http.StatusOK, "创建成功")
+	categoryId, data := CreateCategory(auth, "数码产品", 0, http.StatusOK, "创建成功")
 	if categoryId == 0 {
 		t.Errorf("添加分类失败")
 		return
 	}
 	defer DeleteCategory(auth, categoryId, http.StatusOK, "删除成功")
 	{
-		keys := base.ResponseKeys{
-			{Key: "id", Value: categoryId},
-			{Key: "cateName", Value: data["cateName"]},
-			{Key: "status", Value: data["status"]},
-			{Key: "path", Value: data["path"]},
-			{Key: "sort", Value: data["sort"]},
-			{Key: "pid", Value: data["pid"]},
-			{Key: "pic", Value: data["pic"]},
-			{Key: "level", Value: data["level"]},
+		keys := []base.ResponseKeys{
+			{
+				{Key: "id", Value: categoryId},
+				{Key: "cateName", Value: data["cateName"]},
+				{Key: "status", Value: data["status"]},
+				{Key: "path", Value: data["path"]},
+				{Key: "sort", Value: data["sort"]},
+				{Key: "pid", Value: data["pid"]},
+				{Key: "pic", Value: data["pic"]},
+				{Key: "level", Value: data["level"]},
+			},
+			nil,
 		}
 		url := "v1/admin/productCategory/getProductCategoryList"
-		base.GetList(auth, url, 0, keys, http.StatusOK, "获取成功")
+		base.GetList(auth, url, http.StatusOK, "获取成功", keys...)
 	}
 
 	update := map[string]interface{}{
@@ -77,7 +80,7 @@ func TestCategoryProcess(t *testing.T) {
 			{Key: "pic", Value: update["pic"]},
 			{Key: "level", Value: update["level"]},
 		}
-		base.GetById(auth, url, categoryId, nil, keys, http.StatusOK, "操作成功")
+		base.GetById(auth, url, nil, keys, http.StatusOK, "操作成功")
 	}
 
 	{
@@ -102,21 +105,21 @@ func TestCategoryRegisterError(t *testing.T) {
 	defer base.BaseLogOut(auth)
 
 	msg := "Key: 'ProductCategory.BaseProductCategory.CateName' Error:Field validation for 'CateName' failed on the 'required' tag"
-	categoryId, _ := CreateCategory(auth, "", http.StatusBadRequest, msg)
+	categoryId, _ := CreateCategory(auth, "", 0, http.StatusBadRequest, msg)
 	if categoryId == 0 {
 		return
 	}
 	defer DeleteCategory(auth, categoryId, http.StatusOK, "删除成功")
 }
 
-func CreateCategory(auth *httpexpect.Expect, cateName string, status int, message string) (uint, map[string]interface{}) {
+func CreateCategory(auth *httpexpect.Expect, cateName string, pid, status int, message string) (uint, map[string]interface{}) {
 	create := map[string]interface{}{
 		"cateName": cateName,
 		"status":   g.StatusTrue,
 		"path":     "http://qmplusimg.henrongyi.top/head.png",
 		"sort":     1,
 		"level":    1,
-		"pid":      1,
+		"pid":      pid,
 		"pic":      "http://qmplusimg.henrongyi.top/head.png",
 	}
 	url := "v1/admin/productCategory/createProductCategory"

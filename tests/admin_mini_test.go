@@ -76,7 +76,7 @@ func TestMiniProcess(t *testing.T) {
 			{Key: "appSecret", Value: update["appSecret"]},
 			{Key: "remark", Value: update["remark"]},
 		}
-		base.GetById(auth, url, miniId, nil, keys, http.StatusOK, "操作成功")
+		base.GetById(auth, url, nil, keys, http.StatusOK, "操作成功")
 	}
 }
 
