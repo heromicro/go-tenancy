@@ -166,7 +166,7 @@
  * @apiSuccess {Number} paid 支付状态 1支付，2未支付
  * @apiSuccess {String} payTime 支付时间
  * @apiSuccess {Number} payType 支付方式  1=微信 2=小程序 3=h5 4=余额 5=支付宝
- * @apiSuccess {Number} status 订单状态（0：待付款 1:待发货 2：待收货 3：待评价 4：已完成 5：已退款 6：已取消）
+ * @apiSuccess {Number} status 订单状态（0：待付款 1:待发货 2：待收货 3：待评价 4：已完成 5：已退款 ）
  * @apiSuccess {Number} deliveryType 发货类型(0:未发货 1:发货 2: 送货 3: 虚拟)
  * @apiSuccess {String} deliveryName 快递名称/送货人姓名
  * @apiSuccess {String} deliveryId  快递单号/手机号
@@ -385,7 +385,7 @@
  *   
  * @apiBody {Number} pageSize 页数
  * @apiBody {Number} page 页码
- * @apiBody {String} status 订单状态0：待付款 1:待发货 2：待收货 3：待评价 4：已完成 5：已退款 6：已取消 
+ * @apiBody {String} status 订单状态0：待付款 1:待发货 2：待收货 3：待评价 4：已完成 5：已退款 
  * @apiBody {String} date 日期：today，yesterday，lately7，lately30，month，year或者日期范围:2021/08/01-2021/08/05 
  * @apiBody {String} orderType 订单类型 
  * 

@@ -19,6 +19,7 @@ import (
 	"gorm.io/gorm"
 )
 
+// DeliveryOrderMap 发货表单
 func DeliveryOrderMap(id uint, ctx *gin.Context) (Form, error) {
 	var form Form
 	formStr := `{"rule":[{"type":"radio","field":"deliveryType","value":1,"title":"发货类型","props":{},"control":[{"value":1,"rule":[{"type":"select","field":"deliveryName","value":"","title":"快递名称","props":{"multiple":false,"placeholder":"请选择快递名称"},"options":[]},{"type":"input","field":"deliveryId","value":"","title":"快递单号","props":{"type":"text","placeholder":"请输入快递单号"},"validate":[{"message":"请输入快递单号","required":true,"type":"string","trigger":"change"}]}]},{"value":2,"rule":[{"type":"input","field":"deliveryName","value":"","title":"送货人姓名","props":{"type":"text","placeholder":"请输入送货人姓名"},"validate":[{"message":"请输入送货人姓名","required":true,"type":"string","trigger":"change"}]},{"type":"input","field":"deliveryId","value":"","title":"手机号","props":{"type":"text","placeholder":"请输入手机号"},"validate":[{"message":"请输入手机号","required":true,"type":"string","trigger":"change"}]}]},{"value":3,"rule":[]}],"options":[{"value":1,"label":"发货"},{"value":2,"label":"送货"},{"value":3,"label":"无需物流"}]}],"action":"","method":"POST","title":"添加发货信息","config":{}}`
@@ -36,6 +37,7 @@ func DeliveryOrderMap(id uint, ctx *gin.Context) (Form, error) {
 	return form, err
 }
 
+// GetOrderRemarkMap 备注表单
 func GetOrderRemarkMap(id uint, ctx *gin.Context) (Form, error) {
 	var form Form
 	var formStr string
@@ -53,6 +55,7 @@ func GetOrderRemarkMap(id uint, ctx *gin.Context) (Form, error) {
 	return form, err
 }
 
+// GetEditOrderMap 编辑表单
 func GetEditOrderMap(id uint, ctx *gin.Context) (Form, error) {
 	var form Form
 	var formStr string
@@ -70,18 +73,15 @@ func GetEditOrderMap(id uint, ctx *gin.Context) (Form, error) {
 	return form, err
 }
 
+// GetOrderRemarkAndUpdateByID 获取订单备注和价格
 func GetOrderRemarkAndUpdateByID(id uint, ctx *gin.Context) (request.OrderRemarkAndUpdate, error) {
 	var order request.OrderRemarkAndUpdate
 	db := g.TENANCY_DB.Model(&model.Order{}).Select("remark,total_price,pay_price,total_postage").Where("id = ?", id)
-	isDelField := GetIsDelField(ctx)
-	if isDelField != "" {
-		db = db.Where(isDelField, g.StatusFalse)
-	}
 	err := db.First(&order).Error
 	return order, err
 }
 
-// getOrderCount
+// getOrderCount 订单数量
 func getOrderCount(name string, ctx *gin.Context) (int64, error) {
 	var count int64
 	wheres := getOrderConditions()
@@ -97,12 +97,6 @@ func getOrderCount(name string, ctx *gin.Context) (int64, error) {
 					}
 				}
 			}
-
-			isDelField := GetIsDelField(ctx)
-			if isDelField != "" {
-				db = db.Where(isDelField, g.StatusFalse)
-			}
-
 			if multi.IsTenancy(ctx) {
 				db = CheckTenancyId(db, multi.GetTenancyId(ctx), "")
 			}
@@ -117,6 +111,7 @@ func getOrderCount(name string, ctx *gin.Context) (int64, error) {
 	return count, nil
 }
 
+// GetFilter 订单过滤数量
 func GetFilter(ctx *gin.Context) ([]map[string]interface{}, error) {
 	charts := []map[string]interface{}{
 		{"count": 0, "orderType": "", "title": "全部"},
@@ -130,10 +125,6 @@ func GetFilter(ctx *gin.Context) ([]map[string]interface{}, error) {
 		}
 		var count int64
 		db := g.TENANCY_DB.Model(&model.Order{})
-		isDelField := GetIsDelField(ctx)
-		if isDelField != "" {
-			db = db.Where(isDelField, g.StatusFalse)
-		}
 		if multi.IsTenancy(ctx) {
 			db = CheckTenancyId(db, multi.GetTenancyId(ctx), "")
 		}
@@ -144,12 +135,12 @@ func GetFilter(ctx *gin.Context) ([]map[string]interface{}, error) {
 		} else {
 			chart["count"] = count
 		}
-
 	}
 
 	return charts, nil
 }
 
+// GetChart 订单分类抬头
 func GetChart(ctx *gin.Context) (map[string]interface{}, error) {
 	charts := map[string]interface{}{
 		"all":        0,
@@ -179,18 +170,18 @@ func GetChart(ctx *gin.Context) (map[string]interface{}, error) {
 func getOrderConditions() []response.OrderCondition {
 	conditions := []response.OrderCondition{
 		{Name: "all", Type: "0", Conditions: nil},
-		{Name: "unpaid", Type: "1", Conditions: map[string]interface{}{"paid": g.StatusFalse, "is_del": g.StatusFalse}},
-		{Name: "unshipped", Type: "2", Conditions: map[string]interface{}{"paid": g.StatusTrue, "status": model.OrderStatusNoDeliver, "is_del": g.StatusTrue}},
-		{Name: "untake", Type: "3", Conditions: map[string]interface{}{"status": model.OrderStatusNoReceive, "is_del": g.StatusFalse}},
-		{Name: "unevaluate", Type: "4", Conditions: map[string]interface{}{"status": model.OrderStatusNoComment, "is_del": g.StatusFalse}},
-		{Name: "complete", Type: "5", Conditions: map[string]interface{}{"status": model.OrderStatusFinish, "is_del": g.StatusFalse}},
-		{Name: "refund", Type: "6", Conditions: map[string]interface{}{"status": model.OrderStatusRefund, "is_del": g.StatusFalse}},
-		{Name: "del", Type: "7", Conditions: map[string]interface{}{"is_del": g.StatusTrue}},
+		{Name: "unpaid", Type: "1", Conditions: map[string]interface{}{"paid": g.StatusFalse, "is_cancel": g.StatusFalse}},
+		{Name: "unshipped", Type: "2", Conditions: map[string]interface{}{"paid": g.StatusTrue, "status": model.OrderStatusNoDeliver, "is_cancel": g.StatusTrue}},
+		{Name: "untake", Type: "3", Conditions: map[string]interface{}{"status": model.OrderStatusNoReceive, "is_cancel": g.StatusFalse}},
+		{Name: "unevaluate", Type: "4", Conditions: map[string]interface{}{"status": model.OrderStatusNoComment, "is_cancel": g.StatusFalse}},
+		{Name: "complete", Type: "5", Conditions: map[string]interface{}{"status": model.OrderStatusFinish, "is_cancel": g.StatusFalse}},
+		{Name: "refund", Type: "6", Conditions: map[string]interface{}{"status": model.OrderStatusRefund, "is_cancel": g.StatusFalse}},
+		{Name: "del", Type: "7", Conditions: map[string]interface{}{"is_cancel": g.StatusTrue}},
 	}
 	return conditions
 }
 
-// getOrderConditionByStatus
+// getOrderConditionByStatus 获取查询条件
 func getOrderConditionByStatus(status string) response.OrderCondition {
 	conditions := getOrderConditions()
 	for _, condition := range conditions {
@@ -201,12 +192,11 @@ func getOrderConditionByStatus(status string) response.OrderCondition {
 	return conditions[0]
 }
 
+// GetOrderByOrderId 获取订单
 func GetOrderByOrderId(req request.GetById) (model.Order, error) {
 	var order model.Order
 	db := g.TENANCY_DB.Model(&model.Order{}).
-		Where("id = ?", req.Id).
-		Where("is_system_del = ?", g.StatusFalse).
-		Where("is_del = ?", g.StatusFalse)
+		Where("id = ?", req.Id)
 	db = CheckTenancyIdAndUserId(db, req, "")
 	err := db.First(&order).Error
 	if err != nil {
@@ -215,17 +205,14 @@ func GetOrderByOrderId(req request.GetById) (model.Order, error) {
 	return order, nil
 }
 
-func GetOrderDetailById(req request.GetById, isDelField string) (response.OrderDetail, error) {
+// GetOrderDetailById 订单详情，包括关联数据
+func GetOrderDetailById(req request.GetById) (response.OrderDetail, error) {
 	var order response.OrderDetail
 	db := g.TENANCY_DB.Model(&model.Order{}).
 		Select("orders.*,general_infos.nick_name as user_nick_name").
 		Joins("left join sys_users on orders.sys_user_id = sys_users.id").
 		Joins("left join general_infos on general_infos.sys_user_id = sys_users.id").
 		Joins(fmt.Sprintf("left join sys_authorities on sys_authorities.authority_id = sys_users.authority_id and sys_authorities.authority_type = %d", multi.GeneralAuthority))
-
-	if isDelField != "" {
-		db = db.Where("orders."+isDelField, g.StatusFalse)
-	}
 
 	db = CheckTenancyIdAndUserId(db, req, "orders.")
 
@@ -249,6 +236,7 @@ func GetOrderDetailById(req request.GetById, isDelField string) (response.OrderD
 	return order, nil
 }
 
+// GetOrderRecord 订单操作记录
 func GetOrderRecord(id uint, info request.PageInfo) ([]model.OrderStatus, int64, error) {
 	var orderRecord []model.OrderStatus
 	var total int64
@@ -266,15 +254,12 @@ func GetOrderRecord(id uint, info request.PageInfo) ([]model.OrderStatus, int64,
 	return orderRecord, total, nil
 }
 
+// RemarkOrder  备注订单
 func RemarkOrder(id uint, remark map[string]interface{}, ctx *gin.Context) error {
-	db := g.TENANCY_DB.Model(&model.Order{})
-	isDelField := GetIsDelField(ctx)
-	if isDelField != "" {
-		db = db.Where(isDelField, g.StatusFalse)
-	}
-	return db.Where("id = ?", id).Updates(remark).Error
+	return UpdateOrderById(g.TENANCY_DB, id, remark)
 }
 
+// DeliveryOrder 发货
 func DeliveryOrder(id uint, delivery request.DeliveryOrder, ctx *gin.Context) error {
 	var changeMessage string
 	var deliveryName string
@@ -305,12 +290,7 @@ func DeliveryOrder(id uint, delivery request.DeliveryOrder, ctx *gin.Context) er
 		"delivery_type": delivery.DeliveryType,
 		"status":        model.OrderStatusNoReceive,
 	}
-	db := g.TENANCY_DB.Model(&model.Order{})
-	isDelField := GetIsDelField(ctx)
-	if isDelField != "" {
-		db = db.Where(isDelField, g.StatusFalse)
-	}
-	err := db.Where("id = ?", id).Updates(orderDelivery).Error
+	err := UpdateOrderById(g.TENANCY_DB, id, orderDelivery)
 	if err != nil {
 		return fmt.Errorf("update order info %w", err)
 	}
@@ -328,7 +308,7 @@ func DeliveryOrder(id uint, delivery request.DeliveryOrder, ctx *gin.Context) er
 	return nil
 }
 
-// GetOrderInfoList
+// GetOrderInfoList 订单列表
 func GetOrderInfoList(info request.OrderPageInfo, ctx *gin.Context) ([]response.OrderList, []map[string]interface{}, int64, error) {
 	stat := []map[string]interface{}{
 		{"className": "el-icon-s-goods", "count": 0, "field": "件", "name": "已支付订单数量"},
@@ -390,6 +370,7 @@ func GetOrderInfoList(info request.OrderPageInfo, ctx *gin.Context) ([]response.
 	return orderList, stat, total, nil
 }
 
+// GetOrdersProductByProductIds 订单产品
 func GetOrdersProductByProductIds(orderProductIds []uint, req request.GetById) ([]response.OrderProduct, error) {
 	orderProducts := []response.OrderProduct{}
 	db := g.TENANCY_DB.Model(&model.OrderProduct{}).
@@ -403,6 +384,7 @@ func GetOrdersProductByProductIds(orderProductIds []uint, req request.GetById) (
 	return orderProducts, nil
 }
 
+// GetTotalRefundPrice 退款总价
 func GetTotalRefundPrice(products []response.OrderProduct) float64 {
 	totalRefundPrice := decimal.NewFromInt(0)
 	for _, product := range products {
@@ -414,6 +396,7 @@ func GetTotalRefundPrice(products []response.OrderProduct) float64 {
 	return price
 }
 
+// GetOrderProductsByOrderIds 获取多个订单的产品
 func GetOrderProductsByOrderIds(orderIds []uint) ([]response.OrderProduct, error) {
 	orderProducts := []response.OrderProduct{}
 	err := g.TENANCY_DB.Model(&model.OrderProduct{}).Where("order_id in ?", orderIds).Find(&orderProducts).Error
@@ -423,6 +406,7 @@ func GetOrderProductsByOrderIds(orderIds []uint) ([]response.OrderProduct, error
 	return orderProducts, nil
 }
 
+// getOrderSearch
 func getOrderSearch(info request.OrderPageInfo, ctx *gin.Context, db *gorm.DB) (*gorm.DB, error) {
 	if info.Status != "" {
 		cond := getOrderConditionByStatus(info.Status)
@@ -480,10 +464,6 @@ func getOrderSearch(info request.OrderPageInfo, ctx *gin.Context, db *gorm.DB) (
 
 	if info.Username != "" {
 		db = db.Where(g.TENANCY_DB.Where("orders.order_sn like ?", info.Keywords+"%").Or("orders.real_name like ?", info.Keywords+"%").Or("orders.user_phone like ?", info.Keywords+"%"))
-	}
-	isDelField := GetIsDelField(ctx)
-	if isDelField != "" {
-		db = db.Where("orders."+isDelField, g.StatusFalse)
 	}
 	return db, nil
 }
@@ -574,29 +554,55 @@ func getStat(info request.OrderPageInfo, ctx *gin.Context, stat []map[string]int
 	return stat, nil
 }
 
-// UpdateOrder
-func UpdateOrder(id uint, order request.OrderRemarkAndUpdate, ctx *gin.Context) error {
-	db := g.TENANCY_DB.Model(&model.Order{}).Where("id = ?", id)
-	isDelField := GetIsDelField(ctx)
-	if isDelField != "" {
-		db = db.Where(isDelField, g.StatusFalse)
+// GetOrdersByGroupOrderId 根据订单组获取订单
+func GetOrdersByGroupOrderId(groupOrderId uint) ([]model.Order, error) {
+	orders := []model.Order{}
+	err := g.TENANCY_DB.Model(&model.Order{}).Where("group_order_id = ?", groupOrderId).Find(&orders).Error
+	if err != nil {
+		return orders, fmt.Errorf("获取订单错误 %w	", err)
 	}
-	return db.Updates(map[string]interface{}{
+	return orders, nil
+}
+
+// ChangeOrder 修改订单备注和
+func ChangeOrder(id uint, order request.OrderRemarkAndUpdate, ctx *gin.Context) error {
+	data := map[string]interface{}{
 		"pay_price":     order.PayPrice,
 		"total_price":   order.TotalPrice,
 		"total_postage": order.TotalPostage,
-	}).Error
+	}
+	return UpdateOrderById(g.TENANCY_DB, id, data)
 }
 
-// DeleteOrder
-func DeleteOrder(id, tenancyId uint, isDelField string) error {
-	return g.TENANCY_DB.Model(&model.Order{}).Where("id = ?", id).Update(isDelField, g.StatusTrue).Error
+// UpdateOrderById 更新订单
+func UpdateOrderById(db *gorm.DB, id uint, data map[string]interface{}) error {
+	err := db.Model(&model.Order{}).Where("id = ?", id).Updates(data).Error
+	if err != nil {
+		return fmt.Errorf("更新订单错误 %w", err)
+	}
+	return nil
 }
 
+// GetNoPayOrdersByOrderSn 根据订单号获取未支付订单
+func GetNoPayOrdersByOrderSn(orderSn string) ([]model.Order, error) {
+	orders := []model.Order{}
+	err := g.TENANCY_DB.Model(&model.Order{}).Where("order_sn = ?", orderSn).
+		Where("is_system_del = ?", g.StatusFalse).
+		Where("is_cancel = ?", g.StatusFalse).
+		Where("status = ?", model.OrderStatusNoPay).
+		Find(&orders).Error
+	if err != nil {
+		return nil, err
+	}
+	return orders, nil
+}
+
+// CheckOrder 结算订单
 func CheckOrder(cartIds []uint, tenancyId, userId, patientId uint) (response.CheckOrder, error) {
 	return GetOrderInfoByCartId(tenancyId, userId, patientId, cartIds)
 }
 
+// GetOrderInfoByCartId 根据购物车获取订单信息
 func GetOrderInfoByCartId(tenancyId, userId, patientId uint, cartIds []uint) (response.CheckOrder, error) {
 	var res response.CheckOrder
 	list, fails, _, err := GetCartList(tenancyId, userId, patientId, cartIds)
@@ -635,7 +641,10 @@ func GetOrderInfoByCartId(tenancyId, userId, patientId uint, cartIds []uint) (re
 	return res, nil
 }
 
-// CreateOrder 新建订单 生成订单组-》生成订单, 二维码需要 data:image/png;base64,
+// CreateOrder 新建订单
+// - 生成订单组
+// - 生成订单
+// - 二维码需要 data:image/png;base64,
 func CreateOrder(req request.CreateOrder, tenancyId, userId, patientId uint, tenancyName string) ([]byte, uint, error) {
 	var png []byte
 
@@ -684,7 +693,7 @@ func CreateOrder(req request.CreateOrder, tenancyId, userId, patientId uint, ten
 	}
 	err = g.TENANCY_DB.Transaction(func(tx *gorm.DB) error {
 		// 订单组
-		err := tx.Model(&model.GroupOrder{}).Create(&groupOrder).Error
+		err := CreateGroupOrder(tx, groupOrder)
 		if err != nil {
 			return err
 		}
@@ -737,19 +746,37 @@ func CreateOrder(req request.CreateOrder, tenancyId, userId, patientId uint, ten
 				},
 			}
 			ci, _ := json.Marshal(&cartInfo)
-			orderProduct := model.OrderProduct{OrderID: order.ID, SysUserID: userId, CartID: cartProduct.Id, ProductID: cartProduct.ProductID, CartInfo: string(ci), BaseOrderProduct: model.BaseOrderProduct{ProductSku: cartProduct.AttrValue.Sku, IsRefund: 0, ProductNum: cartProduct.CartNum, ProductType: model.GeneralSale, RefundNum: cartProduct.CartNum, IsReply: g.StatusFalse, ProductPrice: cartProduct.AttrValue.Price}}
+			orderProduct := model.OrderProduct{
+				OrderID:   order.ID,
+				SysUserID: userId,
+				CartID:    cartProduct.Id,
+				ProductID: cartProduct.ProductID,
+				CartInfo:  string(ci),
+				BaseOrderProduct: model.BaseOrderProduct{
+					ProductSku:   cartProduct.AttrValue.Sku,
+					Unique:       cartProduct.AttrValue.Unique,
+					IsRefund:     g.StatusFalse,
+					ProductNum:   cartProduct.CartNum,
+					ProductType:  model.GeneralSale,
+					RefundNum:    cartProduct.CartNum,
+					IsReply:      g.StatusFalse,
+					ProductPrice: cartProduct.AttrValue.Price,
+				},
+			}
 			orderProducts = append(orderProducts, orderProduct)
 		}
 		err = tx.Create(&orderProducts).Error
 		if err != nil {
 			return err
 		}
+
 		// 减库存
 		for _, cartProduct := range orderInfo.Products {
-			stock := cartProduct.AttrValue.Stock - cartProduct.CartNum
-			err = tx.Model(&model.ProductAttrValue{}).Where("`unique` = ?", cartProduct.AttrValue.Unique).Update("stock", stock).Error
-			if err != nil {
-				return fmt.Errorf("生成订单-减库存错误 %w", err)
+			if err = DecStock(tx, cartProduct.ProductID, cartProduct.CartNum); err != nil {
+				return err
+			}
+			if err = DecSkuStock(tx, cartProduct.ProductID, cartProduct.AttrValue.Unique, cartProduct.CartNum); err != nil {
+				return err
 			}
 		}
 
@@ -771,23 +798,22 @@ func CreateOrder(req request.CreateOrder, tenancyId, userId, patientId uint, ten
 	return png, order.ID, nil
 }
 
-func CheckOrderStatusBeforePay(req request.GetById) error {
+// CheckOrderStatusBeforePay 订单状态检测
+func CheckOrderStatusBeforePay(req request.GetById) (model.Order, error) {
 	order, err := GetOrderByOrderId(req)
 	if errors.Is(err, gorm.ErrRecordNotFound) {
-		return fmt.Errorf("订单不存在或者已被删除")
+		return order, fmt.Errorf("订单不存在或者已被删除")
 	}
 	if err != nil {
-		return err
-	}
-	if order.Status == model.OrderStatusCancel {
-		return fmt.Errorf("订单已经取消")
+		return order, err
 	}
 	if order.Status != model.OrderStatusNoPay {
-		return fmt.Errorf("订单已付款,请勿重复操作")
+		return order, fmt.Errorf("订单已付款,请勿重复操作")
 	}
-	return nil
+	return order, nil
 }
 
+// GetQrCode 生成支付二维码
 func GetQrCode(orderId, tenancyId, userId uint, orderType int) ([]byte, error) {
 	seitURL, err := param.GetSeitURL()
 	if err != nil {
@@ -806,6 +832,7 @@ func GetQrCode(orderId, tenancyId, userId uint, orderType int) ([]byte, error) {
 	return png, nil
 }
 
+// GetThisMonthOrdersByUserId 获取用户当月订单
 func GetThisMonthOrdersByUserId(userId uint) ([]model.Order, error) {
 	orders := []model.Order{}
 	err := g.TENANCY_DB.Model(&model.Order{}).
@@ -813,7 +840,7 @@ func GetThisMonthOrdersByUserId(userId uint) ([]model.Order, error) {
 		Where("DATE_FORMAT(`created_at`,'%Y%m')=DATE_FORMAT(CURDATE(),'%Y%m')").
 		Where("paid = ?", g.StatusTrue).
 		Not("status = ?", model.OrderStatusRefund).
-		Where("is_del = ?", g.StatusFalse).
+		Where("is_cancel = ?", g.StatusFalse).
 		Where("is_system_del = ?", g.StatusFalse).
 		Find(&orders).Error
 	if err != nil {
@@ -822,6 +849,7 @@ func GetThisMonthOrdersByUserId(userId uint) ([]model.Order, error) {
 	return orders, nil
 }
 
+// GetThisMonthOrderPriceByUserId 获取用户当月支付金额
 func GetThisMonthOrderPriceByUserId(userId uint) (response.GeneralUserDetail, error) {
 	var user response.GeneralUserDetail
 	err := g.TENANCY_DB.Model(&model.Order{}).
@@ -830,7 +858,7 @@ func GetThisMonthOrderPriceByUserId(userId uint) (response.GeneralUserDetail, er
 		Where("DATE_FORMAT(`created_at`,'%Y%m')=DATE_FORMAT(CURDATE(),'%Y%m')").
 		Where("paid = ?", g.StatusTrue).
 		Not("status = ?", model.OrderStatusRefund).
-		Where("is_del = ?", g.StatusFalse).
+		Where("is_cancel = ?", g.StatusFalse).
 		Where("is_system_del = ?", g.StatusFalse).
 		Find(&user).Error
 	if err != nil {
@@ -839,12 +867,13 @@ func GetThisMonthOrderPriceByUserId(userId uint) (response.GeneralUserDetail, er
 	return user, nil
 }
 
+// GetNoPayOrders 获取未支付订单
 func GetNoPayOrders() ([]model.Order, error) {
 	orders := []model.Order{}
 	err := g.TENANCY_DB.Model(&model.Order{}).
 		Where("paid = ?", g.StatusFalse).
 		Where("status = ?", model.OrderStatusNoPay).
-		Where("is_del = ?", g.StatusFalse).
+		Where("is_cancel = ?", g.StatusFalse).
 		Where("is_system_del = ?", g.StatusFalse).
 		Find(&orders).Error
 	if err != nil {
@@ -853,22 +882,7 @@ func GetNoPayOrders() ([]model.Order, error) {
 	return orders, nil
 }
 
-func GetNoPayOrderAutoClose() ([]model.Order, error) {
-	whereCreatedAt := fmt.Sprintf("now() > SUBDATE(created_at,interval -%s minute)", param.GetOrderAutoCloseTime())
-	orders := []model.Order{}
-	err := g.TENANCY_DB.Model(&model.Order{}).
-		Where("paid = ?", g.StatusFalse).
-		Where("status = ?", model.OrderStatusNoPay).
-		Where(whereCreatedAt).
-		Where("is_del = ?", g.StatusFalse).
-		Where("is_system_del = ?", g.StatusFalse).
-		Find(&orders).Error
-	if err != nil {
-		return orders, err
-	}
-	return orders, nil
-}
-
+// CreateOrderStatus  新建订单状态
 func CreateOrderStatus(db *gorm.DB, orderStatus model.OrderStatus) error {
 	err := db.Create(&orderStatus).Error
 	if err != nil {
@@ -877,21 +891,14 @@ func CreateOrderStatus(db *gorm.DB, orderStatus model.OrderStatus) error {
 	return nil
 }
 
-func UpdateOrderStatusByOrderId(db *gorm.DB, orderId uint, changeData map[string]interface{}) error {
-	err := db.Model(&model.Order{}).
-		Where("id = ?", orderId).
-		Where("is_system_del = ?", g.StatusFalse).
-		Where("is_del = ?", g.StatusFalse).
-		Updates(changeData).Error
+// ChangeOrderStatusByOrderId 修改订单状态
+func ChangeOrderStatusByOrderId(orderId uint, changeData map[string]interface{}, changeType, changeMessage string) error {
+	orderProducts, err := GetOrderProductsByOrderIds([]uint{orderId})
 	if err != nil {
 		return err
 	}
-	return nil
-}
-
-func ChangeOrderStatusByOrderId(orderId uint, changeData map[string]interface{}, changeType, changeMessage string) error {
-	err := g.TENANCY_DB.Transaction(func(tx *gorm.DB) error {
-		err := UpdateOrderStatusByOrderId(tx, orderId, changeData)
+	err = g.TENANCY_DB.Transaction(func(tx *gorm.DB) error {
+		err := UpdateOrderById(tx, orderId, changeData)
 		if err != nil {
 			return err
 		}
@@ -900,6 +907,19 @@ func ChangeOrderStatusByOrderId(orderId uint, changeData map[string]interface{},
 		if err != nil {
 			return err
 		}
+
+		if changeType == "cancel" {
+			// 退回库存
+			for _, cartProduct := range orderProducts {
+				if err = IncStock(tx, cartProduct.ProductID, cartProduct.ProductNum); err != nil {
+					return err
+				}
+				if err = IncSkuStock(tx, cartProduct.ProductID, cartProduct.Unique, cartProduct.ProductNum); err != nil {
+					return err
+				}
+			}
+		}
+
 		return nil
 	})
 	if err != nil {
@@ -908,21 +928,14 @@ func ChangeOrderStatusByOrderId(orderId uint, changeData map[string]interface{},
 	return nil
 }
 
+// CancelOrder 用户取消订单
 func CancelOrder(req request.GetById) error {
-	order, err := GetOrderByOrderId(req)
-	if errors.Is(err, gorm.ErrRecordNotFound) {
-		return fmt.Errorf("订单不存在或者已被删除")
-	}
+	_, err := CheckOrderStatusBeforePay(req)
 	if err != nil {
 		return err
 	}
-	if order.Status == model.OrderStatusCancel {
-		return fmt.Errorf("订单已经取消，请勿重复操作")
-	}
-	if order.Status != model.OrderStatusNoPay {
-		return fmt.Errorf("订单已付款,请执行退款操作")
-	}
-	changeData := map[string]interface{}{"status": model.OrderStatusCancel}
+
+	changeData := map[string]interface{}{"is_cancel": g.StatusTrue}
 	err = ChangeOrderStatusByOrderId(req.Id, changeData, "cancel", "取消订单")
 	if err != nil {
 		return err
@@ -930,19 +943,21 @@ func CancelOrder(req request.GetById) error {
 	return nil
 }
 
-func GetNoPayOrdersByOrderSn(orderSn string) ([]model.Order, error) {
-	orders := []model.Order{}
-	err := g.TENANCY_DB.Model(&model.Order{}).Where("order_sn = ?", orderSn).
-		Where("is_system_del = ?", g.StatusFalse).
-		Where("is_del = ?", g.StatusFalse).
-		Where("status = ?", model.OrderStatusNoPay).
-		Find(&orders).Error
+// DeleteOrder 商户取消订单
+func DeleteOrder(req request.GetById) error {
+	_, err := CheckOrderStatusBeforePay(req)
 	if err != nil {
-		return nil, err
+		return err
 	}
-	return orders, nil
+	changeData := map[string]interface{}{"is_system_del": g.StatusTrue}
+	err = UpdateOrderById(g.TENANCY_DB, req.Id, changeData)
+	if err != nil {
+		return err
+	}
+	return nil
 }
 
+// ChangeOrderPayNotifyByOrderSn 修改支付状态
 func ChangeOrderPayNotifyByOrderSn(changeData map[string]interface{}, orderSn, changeType, changeMessage string) (model.Payload, error) {
 	var palyload model.Payload
 	orders, err := GetNoPayOrdersByOrderSn(orderSn)
@@ -968,18 +983,10 @@ func ChangeOrderPayNotifyByOrderSn(changeData map[string]interface{}, orderSn, c
 	return palyload, nil
 }
 
-func CancelNoPayOrders(orderIds []uint, orderStatues []model.OrderStatus) error {
-	return g.TENANCY_DB.Transaction(func(tx *gorm.DB) error {
-		err := tx.Model(&model.Order{}).
-			Where("id in ?", orderIds).
-			Update("status", model.OrderStatusCancel).Error
-		if err != nil {
-			return fmt.Errorf("更新订单状态 %w", err)
-		}
-		err = tx.Create(&orderStatues).Error
-		if err != nil {
-			return fmt.Errorf("生产订单操作记录 %w", err)
-		}
-		return nil
-	})
+func UpdateOrderProduct(db *gorm.DB, orderProductId uint, data map[string]interface{}) error {
+	err := db.Model(&model.OrderProduct{}).Where("id = ?", orderProductId).Updates(data).Error
+	if err != nil {
+		return fmt.Errorf("update order product %w", err)
+	}
+	return nil
 }

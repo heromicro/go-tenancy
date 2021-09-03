@@ -125,7 +125,7 @@ func TestClientOrderDetail(t *testing.T) {
 		return
 	}
 	defer DeleteClientOrder(tenancyAuth, orderId, http.StatusOK, "删除成功")
-	defer DeleteDeviceOrder(deviceAuth, orderId, http.StatusOK, "删除成功")
+	
 	obj := tenancyAuth.GET(fmt.Sprintf("v1/merchant/order/getOrderById/%d", orderId)).
 		Expect().Status(http.StatusOK).JSON().Object()
 	obj.Keys().ContainsOnly("status", "data", "message")
@@ -212,7 +212,7 @@ func TestClientOrderRecord(t *testing.T) {
 		return
 	}
 	defer DeleteClientOrder(tenancyAuth, orderId, http.StatusOK, "删除成功")
-	defer DeleteDeviceOrder(deviceAuth, orderId, http.StatusOK, "删除成功")
+
 
 	obj := tenancyAuth.POST(fmt.Sprintf("v1/merchant/order/getOrderRecord/%d", orderId)).
 		WithJSON(map[string]interface{}{
@@ -329,7 +329,7 @@ func TestClientOrderRemark(t *testing.T) {
 		return
 	}
 	defer DeleteClientOrder(tenancyAuth, orderId, http.StatusOK, "删除成功")
-	defer DeleteDeviceOrder(deviceAuth, orderId, http.StatusOK, "删除成功")
+
 
 	obj := tenancyAuth.GET(fmt.Sprintf("v1/merchant/order/getOrderRemarkMap/%d", orderId)).
 		Expect().Status(http.StatusOK).JSON().Object()
@@ -425,7 +425,6 @@ func TestClientOrderEdit(t *testing.T) {
 		return
 	}
 	defer DeleteClientOrder(tenancyAuth, orderId, http.StatusOK, "删除成功")
-	defer DeleteDeviceOrder(deviceAuth, orderId, http.StatusOK, "删除成功")
 
 	obj := tenancyAuth.GET(fmt.Sprintf("v1/merchant/order/getEditOrderMap/%d", orderId)).
 		WithJSON(map[string]interface{}{"remark": "remark"}).

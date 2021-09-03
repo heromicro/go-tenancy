@@ -179,7 +179,7 @@ func TestDeviceOrderProcessForCancelOrder(t *testing.T) {
 		return
 	}
 	defer DeleteClientOrder(tenancyAuth, orderId, http.StatusOK, "删除成功")
-	defer DeleteDeviceOrder(deviceAuth, orderId, http.StatusOK, "删除成功")
+
 	getOrderByIdKeys := base.ResponseKeys{
 		{Key: "id", Value: orderId},
 	}
@@ -275,7 +275,6 @@ func TestDeviceOrderProcessForCheckReturnOrder(t *testing.T) {
 		return
 	}
 	defer DeleteClientOrder(tenancyAuth, orderId, http.StatusOK, "删除成功")
-	defer DeleteDeviceOrder(deviceAuth, orderId, http.StatusOK, "删除成功")
 
 	// 申请退款
 	data := map[string]interface{}{
@@ -399,7 +398,6 @@ func TestDeviceOrderProcessForReturnOrder(t *testing.T) {
 		return
 	}
 	defer DeleteClientOrder(tenancyAuth, orderId, http.StatusOK, "删除成功")
-	defer DeleteDeviceOrder(deviceAuth, orderId, http.StatusOK, "删除成功")
 
 	getOrderByIdKeys := base.ResponseKeys{
 		{Key: "orderSn", Value: ""},
@@ -441,9 +439,4 @@ func CreateOrder(auth *httpexpect.Expect, create map[string]interface{}, status 
 	keys := base.IdKeys()
 	base.Create(auth, url, create, keys, status, message)
 	return keys.GetId()
-}
-
-func DeleteDeviceOrder(auth *httpexpect.Expect, id uint, status int, message string) {
-	url := fmt.Sprintf("v1/device/order/deleteOrder/%d", id)
-	base.Delete(auth, url, status, message)
 }

@@ -6,7 +6,8 @@ import (
 	"github.com/snowlyg/go-tenancy/g"
 )
 
-// GroupOrder 用户订单表
+// GroupOrder 用户订单组
+// 跨商户生成的多个订单在同一个订单组
 type GroupOrder struct {
 	g.TENANCY_MODEL
 
@@ -24,7 +25,8 @@ type GroupOrder struct {
 	Paid     int       `gorm:"index:paid;column:paid;type:tinyint unsigned;not null;default:0" json:"paid"` // 是否支付
 	PayTime  time.Time `gorm:"column:pay_time;type:timestamp" json:"payTime"`                               // 支付时间
 	PayType  int       `gorm:"column:pay_type;type:tinyint(1);not null" json:"payType"`                     // 支付方式  1=微信 2=小程序 3=h5 4=余额  5=支付宝
-	IsRemind uint8     `gorm:"column:is_remind;type:tinyint unsigned;not null;default:2" json:"isRemind"`   // 是否提醒
+	IsRemind int       `gorm:"column:is_remind;type:tinyint unsigned;not null;default:2" json:"isRemind"`   // 是否提醒
+	IsCancel int       `gorm:"column:is_cancel;type:tinyint unsigned;not null;default:2" json:"isCancel"`   //取消订单
 
 	PatientID uint `json:"patientId" form:"patientId" gorm:"column:patient_id;comment:患者"`
 	SysUserID uint `json:"sysUserId" form:"sysUserId" gorm:"column:sys_user_id;comment:关联标记"`

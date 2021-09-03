@@ -97,7 +97,7 @@ func RemarkRefundOrder(ctx *gin.Context) {
 		response.FailWithMessage(errs.Error(), ctx)
 		return
 	}
-	if err := service.RemarkRefundOrder(req.Id, remark, service.GetIsDelField(ctx)); err != nil {
+	if err := service.RemarkRefundOrder(req.Id, remark); err != nil {
 		g.TENANCY_LOG.Error("操作失败!", zap.Any("err", err))
 		response.FailWithMessage("操作失败:"+err.Error(), ctx)
 	} else {
@@ -117,7 +117,7 @@ func AuditRefundOrder(ctx *gin.Context) {
 		response.FailWithMessage(errs.Error(), ctx)
 		return
 	}
-	if err := service.AuditRefundOrder(req.Id, audit, service.GetIsDelField(ctx), "退款成功["+multi.GetUsername(ctx)+"]"); err != nil {
+	if err := service.AuditRefundOrder(req.Id, audit, "退款成功["+multi.GetUsername(ctx)+"]"); err != nil {
 		g.TENANCY_LOG.Error("操作失败!", zap.Any("err", err))
 		response.FailWithMessage("操作失败:"+err.Error(), ctx)
 	} else {

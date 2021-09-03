@@ -56,26 +56,11 @@ func GetOrderById(ctx *gin.Context) {
 	}
 	req.TenancyId = multi.GetTenancyId(ctx)
 	req.PatientId = multi.GetUserId(ctx)
-	if order, err := service.GetOrderDetailById(req, service.GetIsDelField(ctx)); err != nil {
+	if order, err := service.GetOrderDetailById(req); err != nil {
 		g.TENANCY_LOG.Error("获取失败!", zap.Any("err", err))
 		response.FailWithMessage("获取失败:"+err.Error(), ctx)
 	} else {
 		response.OkWithData(order, ctx)
-	}
-}
-
-// DeleteOrder
-func DeleteOrder(ctx *gin.Context) {
-	var req request.GetById
-	if errs := ctx.ShouldBindUri(&req); errs != nil {
-		response.FailWithMessage(errs.Error(), ctx)
-		return
-	}
-	if err := service.DeleteOrder(req.Id, multi.GetTenancyId(ctx), service.GetIsDelField(ctx)); err != nil {
-		g.TENANCY_LOG.Error("删除失败!", zap.Any("err", err))
-		response.FailWithMessage("删除失败:"+err.Error(), ctx)
-	} else {
-		response.OkWithMessage("删除成功", ctx)
 	}
 }
 
@@ -110,7 +95,7 @@ func PayOrder(ctx *gin.Context) {
 	}
 	req.TenancyId = multi.GetTenancyId(ctx)
 	req.PatientId = multi.GetUserId(ctx)
-	err := service.CheckOrderStatusBeforePay(req)
+	_, err := service.CheckOrderStatusBeforePay(req)
 	if err != nil {
 		g.TENANCY_LOG.Error("获取失败!", zap.Any("err", err))
 		response.FailWithMessage("获取失败:"+err.Error(), ctx)

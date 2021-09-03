@@ -115,8 +115,6 @@ func TestOrderDetail(t *testing.T) {
 		t.Error("添加订单失败")
 		return
 	}
-	defer DeleteClientOrder(tenancyAuth, orderId, http.StatusOK, "删除成功")
-	defer DeleteDeviceOrder(deviceAuth, orderId, http.StatusOK, "删除成功")
 
 	keys := base.ResponseKeys{
 		{Key: "id", Value: orderId},

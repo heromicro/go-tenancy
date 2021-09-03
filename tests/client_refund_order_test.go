@@ -126,7 +126,7 @@ func TestClientRefundOrderRemark(t *testing.T) {
 		return
 	}
 	defer DeleteClientOrder(tenancyAuth, orderId, http.StatusOK, "删除成功")
-	defer DeleteDeviceOrder(deviceAuth, orderId, http.StatusOK, "删除成功")
+
 
 	getOrderByIdKeys := base.ResponseKeys{
 		{Key: "orderSn", Value: ""},
@@ -255,7 +255,7 @@ func TestClientRefundOrderAudit(t *testing.T) {
 		return
 	}
 	defer DeleteClientOrder(tenancyAuth, orderId, http.StatusOK, "删除成功")
-	defer DeleteDeviceOrder(deviceAuth, orderId, http.StatusOK, "删除成功")
+
 
 	getOrderByIdKeys := base.ResponseKeys{
 		{Key: "orderSn", Value: ""},

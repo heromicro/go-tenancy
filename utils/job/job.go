@@ -3,13 +3,11 @@ package job
 import (
 	"fmt"
 	"path/filepath"
-	"time"
 
 	"github.com/chindeo/pkg/file"
 	"github.com/go-pay/gopay/wechat/v3"
 	"github.com/snowlyg/go-tenancy/config"
 	"github.com/snowlyg/go-tenancy/g"
-	"github.com/snowlyg/go-tenancy/model"
 	"github.com/snowlyg/go-tenancy/service"
 	"github.com/snowlyg/go-tenancy/utils"
 	"github.com/snowlyg/go-tenancy/utils/param"
@@ -34,22 +32,17 @@ func Timer() {
 
 		// 订单过期自动取消
 		g.TENANCY_Timer.AddTaskByFunc("NoPayOrderAutoClose", EveryMinute, "订单过期自动取消", func() {
-			orders, err := service.GetNoPayOrderAutoClose()
+			groupOrderIds, err := service.GetNoPayGroupOrderAutoClose(false)
 			if err != nil {
 				g.TENANCY_LOG.Info("订单过期自动取消", zap.String("获取订单错误", err.Error()))
 				return
 			}
-			if len(orders) == 0 {
+			if len(groupOrderIds) == 0 {
 				return
 			}
-			var orderIds []uint
-			var orderStatues []model.OrderStatus
-			for _, order := range orders {
-				orderIds = append(orderIds, order.ID)
-				orderStatus := model.OrderStatus{ChangeType: "cancel", ChangeMessage: "取消订单[自动]", ChangeTime: time.Now(), OrderID: order.ID}
-				orderStatues = append(orderStatues, orderStatus)
+			for _, groupOrderId := range groupOrderIds {
+				service.CancelNoPayGroupOrders(groupOrderId)
 			}
-			err = service.CancelNoPayOrders(orderIds, orderStatues)
 			if err != nil {
 				g.TENANCY_LOG.Info("订单过期自动取消", zap.String("订单状态更新错误", err.Error()))
 			}
@@ -67,6 +60,29 @@ func Timer() {
 			}
 			service.AutoAgreeRefundOrders(refundOrders)
 		})
+
+		// 用户订单自动收货
+		// g.TENANCY_Timer.AddTaskByFunc("OrderAutoAgree", EveryMinute, "用户订单自动收货", func() {
+		// 	orders, err := service.GetNoPayOrderAutoClose()
+		// 	if err != nil {
+		// 		g.TENANCY_LOG.Info("用户订单自动收货", zap.String("获取订单错误", err.Error()))
+		// 		return
+		// 	}
+		// 	if len(orders) == 0 {
+		// 		return
+		// 	}
+		// 	var orderIds []uint
+		// 	var orderStatues []model.OrderStatus
+		// 	for _, order := range orders {
+		// 		orderIds = append(orderIds, order.ID)
+		// 		orderStatus := model.OrderStatus{ChangeType: "cancel", ChangeMessage: "取消订单[自动]", ChangeTime: time.Now(), OrderID: order.ID}
+		// 		orderStatues = append(orderStatues, orderStatus)
+		// 	}
+		// 	err = service.CancelNoPayOrders(orderIds, orderStatues)
+		// 	if err != nil {
+		// 		g.TENANCY_LOG.Info("用户订单自动收货", zap.String("订单状态更新错误", err.Error()))
+		// 	}
+		// })
 
 		// 定时获取微信平台证书
 		g.TENANCY_Timer.AddTaskByFunc("CheckOrdersPayStatus", EveryTeenHour, "定时获取微信平台证书", func() {

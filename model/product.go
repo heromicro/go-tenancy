@@ -43,11 +43,11 @@ type BaseProduct struct {
 	UnitName    string  `gorm:"column:unit_name;type:varchar(16);not null" json:"unitName" `                      // 单位名
 	Sort        int16   `gorm:"index;column:sort;type:smallint;not null;default:0" json:"sort"`                   // 排序
 	Rank        int16   `gorm:"column:rank;type:smallint;not null;default:0" json:"rank"`                         // 总后台排序
-	Sales       uint32  `gorm:"index:sales;column:sales;type:mediumint unsigned;not null;default:0" json:"sales"` // 销量
+	Sales       int64   `gorm:"index:sales;column:sales;type:mediumint unsigned;not null;default:0" json:"sales"` // 销量
 	Price       float64 `gorm:"column:price;type:decimal(10,2) unsigned;default:0.00" json:"price" `              // 最低价格
 	Cost        float64 `gorm:"column:cost;type:decimal(10,2);default:0.00" json:"cost" `                         // 成本价
 	OtPrice     float64 `gorm:"column:ot_price;type:decimal(10,2);default:0.00" json:"otPrice" `                  // 原价
-	Stock       uint    `gorm:"column:stock;type:int unsigned;default:0" json:"stock" `                           // 总库存
+	Stock       int64   `gorm:"column:stock;type:int unsigned;default:0" json:"stock" `                           // 总库存
 	IsHot       int     `gorm:"column:is_hot;type:tinyint unsigned;not null;default:0" json:"isHot"`              // 是否热卖
 	IsBenefit   int     `gorm:"column:is_benefit;type:tinyint unsigned;not null;default:0" json:"isBenefit"`      // 促销单品
 	IsBest      int     `gorm:"column:is_best;type:tinyint unsigned;not null;default:0" json:"isBest"`            // 是否精品
@@ -138,8 +138,8 @@ type BaseProductAttrValue struct {
 	Price   float64 `gorm:"column:price;type:decimal(8,2) unsigned;not null" json:"price"`          // 价格
 	Volume  float64 `gorm:"column:volume;type:decimal(8,2);not null;default:0.00" json:"volume"`    // 体积
 	Weight  float64 `gorm:"column:weight;type:decimal(8,2);not null;default:0.00" json:"weight"`    // 重量
+	Unique  string  `gorm:"index;column:unique;type:char(12);not null;default:''" json:"unique"`    // 唯一值
 
-	ExtensionOne float64 `gorm:"column:extension_one;type:decimal(8,2);default:0.00" json:"extensionOne"` // 一级佣金
-	ExtensionTwo float64 `gorm:"column:extension_two;type:decimal(8,2);default:0.00" json:"extensionTwo"` // 二级佣金
-	Unique       string  `gorm:"index;column:unique;type:char(12);not null;default:''" json:"unique"`     // 唯一值
+	// ExtensionOne float64 `gorm:"column:extension_one;type:decimal(8,2);default:0.00" json:"extensionOne"` // 一级佣金
+	// ExtensionTwo float64 `gorm:"column:extension_two;type:decimal(8,2);default:0.00" json:"extensionTwo"` // 二级佣金
 }

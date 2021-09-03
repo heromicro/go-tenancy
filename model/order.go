@@ -22,7 +22,7 @@ const (
 	PayTypeAlipay      //支付宝
 )
 
-// 0:待付款 1:待发货 2：待收货 3：待评价 4：已完成 5：已退款 6:已取消 10:待付尾款 11:尾款过期未付
+// 0:待付款 1:待发货 2：待收货 3：待评价 4：已完成 5：已退款  10:待付尾款 11:尾款过期未付
 const (
 	OrderStatusNoPay     int = iota //待付款
 	OrderStatusNoDeliver            //待发货
@@ -30,7 +30,6 @@ const (
 	OrderStatusNoComment            //待评价
 	OrderStatusFinish               //已完成
 	OrderStatusRefund               //已退款
-	OrderStatusCancel               //已取消
 )
 
 const (
@@ -68,7 +67,7 @@ type BaseOrder struct {
 	Paid           int       `gorm:"column:paid;type:tinyint unsigned;not null;default:2" json:"paid"`                                // 支付状态
 	PayTime        time.Time `gorm:"column:pay_time;type:timestamp" json:"payTime"`                                                   // 支付时间
 	PayType        int       `gorm:"column:pay_type;type:tinyint(1);not null" json:"payType"`                                         // 支付方式  1=微信 2=小程序 3=h5 4=余额 5=支付宝
-	Status         int       `gorm:"column:status;type:tinyint(1);not null;default:0" json:"status"`                                  // 订单状态（0：待付款 1:待发货 2：待收货 3：待评价 4：已完成 5：已退款 6：已取消）
+	Status         int       `gorm:"column:status;type:tinyint(1);not null;default:0" json:"status"`                                  // 订单状态（0：待付款 1:待发货 2：待收货 3：待评价 4：已完成 5：已退款）
 	DeliveryType   int       `gorm:"column:delivery_type;type:varchar(32)" json:"deliveryType"`                                       // 发货类型(1:发货 2: 送货 3: 虚拟)
 	DeliveryName   string    `gorm:"column:delivery_name;type:varchar(64)" json:"deliveryName"`                                       // 快递名称/送货人姓名
 	DeliveryID     string    `gorm:"column:delivery_id;type:varchar(64)" json:"deliveryId"`                                           // 快递单号/手机号
@@ -79,7 +78,7 @@ type BaseOrder struct {
 	VerifyTime     time.Time `gorm:"column:verify_time;type:timestamp" json:"verifyTime"`                                             // 核销时间
 	ActivityType   int32     `gorm:"column:activity_type;type:tinyint unsigned;not null;default:1" json:"activityType"`               // 1：普通 2:秒杀 3:预售 4:助力
 	Cost           float64   `gorm:"column:cost;type:decimal(8,2) unsigned;not null" json:"cost"`                                     // 成本价
-	IsDel          int       `gorm:"column:is_del;type:tinyint unsigned;not null;default:2" json:"isDel"`                             // 用户是否删除
+	IsCancel       int       `gorm:"column:is_cancel;type:tinyint unsigned;not null;default:2" json:"isCancel"`                       // 用户是否取消
 	IsSystemDel    int       `gorm:"column:is_system_del;type:tinyint(1);default:2" json:"isSystemDel"`                               // 商户删除
 }
 
@@ -129,11 +128,11 @@ type OrderProduct struct {
 
 type BaseOrderProduct struct {
 	ProductSku   string  `gorm:"column:product_sku;type:char(12);not null" json:"productSku"`                   // 商品 sku
-	IsRefund     uint8   `gorm:"column:is_refund;type:tinyint unsigned;not null;default:0" json:"isRefund"`     // 是否退款   0:未退款 1:退款中 2:部分退款 3=全退
+	Unique       string  `gorm:"index;column:unique;type:char(12);not null;default:''" json:"unique"`           // 唯一值
+	IsRefund     int     `gorm:"column:is_refund;type:tinyint unsigned;not null;default:0" json:"isRefund"`     // 是否退款   0:未退款 1:退款中 2:部分退款 3=全退
 	ProductNum   int64   `gorm:"column:product_num;type:int unsigned;not null;default:0" json:"productNum"`     // 购买数量
 	ProductType  int32   `gorm:"column:product_type;type:int;not null;default:0" json:"productType"`            // 1.普通商品 2.秒杀商品,3.预售商品
 	RefundNum    int64   `gorm:"column:refund_num;type:int unsigned;not null;default:0" json:"refundNum"`       // 可申请退货数量
 	IsReply      int     `gorm:"column:is_reply;type:tinyint unsigned;not null;default:2" json:"isReply"`       // 是否评价
 	ProductPrice float64 `gorm:"column:product_price;type:decimal(10,2) unsigned;not null" json:"productPrice"` // 商品金额
-
 }

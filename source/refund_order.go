@@ -14,7 +14,7 @@ var RefundOrder = new(refundOrder)
 type refundOrder struct{}
 
 var refundOrders = []model.RefundOrder{
-	{BaseRefundOrder: model.BaseRefundOrder{RefundOrderSn: g.CreateOrderSn("R"), RefundType: 1, RefundMessage: "收货地址填错了", RefundPrice: 89.00, RefundNum: 1, Status: model.RefundStatusAudit, StatusTime: time.Now(), IsDel: g.StatusFalse, IsSystemDel: g.StatusFalse}, OrderID: 1, SysUserID: 3, SysTenancyID: 1},
+	{BaseRefundOrder: model.BaseRefundOrder{RefundOrderSn: g.CreateOrderSn("R"), RefundType: 1, RefundMessage: "收货地址填错了", RefundPrice: 89.00, RefundNum: 1, Status: model.RefundStatusAudit, StatusTime: time.Now(), IsCancel: g.StatusFalse, IsSystemDel: g.StatusFalse}, OrderID: 1, SysUserID: 3, SysTenancyID: 1},
 }
 
 var refundProducts = []model.RefundProduct{

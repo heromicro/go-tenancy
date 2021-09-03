@@ -150,7 +150,7 @@ func InitOrderRouter(Router *gin.RouterGroup) {
 		OrderRouter.POST("/getOrderRecord/:id", client.GetOrderRecord)
 		OrderRouter.POST("/deliveryOrder/:id", client.DeliveryOrder)
 		OrderRouter.POST("/remarkOrder/:id", client.RemarkOrder)
-		OrderRouter.POST("/updateOrder/:id", client.UpdateOrder)
+		OrderRouter.POST("/updateOrder/:id", client.ChangeOrder)
 		OrderRouter.DELETE("/deleteOrder/:id", client.DeleteOrder)
 	}
 }

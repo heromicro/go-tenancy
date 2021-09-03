@@ -176,13 +176,14 @@ func CreateProduct(req request.CreateProduct, tenancyId uint) (uint, []string, i
 	return product.ID, uniques, product.ProductType, nil
 }
 
-// UpdateProduct
-func UpdateProduct(req request.UpdateProduct, id uint, ctx *gin.Context) error {
+// ChangeProduct
+func ChangeProduct(req request.UpdateProduct, id uint, ctx *gin.Context) error {
 	// 更新商品重新审核，并下架
 	tenancyId := multi.GetTenancyId(ctx)
 	err := g.TENANCY_DB.Transaction(func(tx *gorm.DB) error {
 		if multi.IsAdmin(ctx) {
-			if err := tx.Model(&model.Product{}).Where("id = ?", id).Updates(map[string]interface{}{"store_name": req.StoreName, "is_benefit": req.IsBenefit, "is_best": req.IsBest, "is_hot": req.IsHot, "is_new": req.IsNew, "rank": req.Rank}).Error; err != nil {
+			data := map[string]interface{}{"store_name": req.StoreName, "is_benefit": req.IsBenefit, "is_best": req.IsBest, "is_hot": req.IsHot, "is_new": req.IsNew, "rank": req.Rank}
+			if err := UpdateProduct(tx, id, data); err != nil {
 				return err
 			}
 		} else if multi.IsTenancy(ctx) {
@@ -201,7 +202,7 @@ func UpdateProduct(req request.UpdateProduct, id uint, ctx *gin.Context) error {
 			product.IsShow = g.StatusFalse
 			product.ProductCategoryID = req.CateId
 			product.SliderImage = strings.Join(req.SliderImages, ",")
-			if err := tx.Where("id = ?", id).Updates(&product).Error; err != nil {
+			if err := tx.Model(&model.Product{}).Where("id = ?", id).Updates(&product).Error; err != nil {
 				return err
 			}
 			_, err = SetProductAttrValue(tx, true, id, req.ProductType, req.AttrValue)
@@ -230,6 +231,15 @@ func UpdateProduct(req request.UpdateProduct, id uint, ctx *gin.Context) error {
 	return err
 }
 
+// UpdateProduct 更新产品信息
+func UpdateProduct(db *gorm.DB, id uint, data map[string]interface{}) error {
+	if err := db.Model(&model.Product{}).Where("id = ?", id).Updates(&data).Error; err != nil {
+		return fmt.Errorf("更新产品信息错误 %w", err)
+	}
+	return nil
+}
+
+// GetProductAttrValues 产品规格
 func GetProductAttrValues(productIds []uint, uniques []string) ([]model.ProductAttrValue, error) {
 	attrValues := []model.ProductAttrValue{}
 	db := g.TENANCY_DB.Model(&model.ProductAttrValue{})
@@ -246,6 +256,7 @@ func GetProductAttrValues(productIds []uint, uniques []string) ([]model.ProductA
 	return attrValues, nil
 }
 
+// SetProductAttrValue 设置产品规格
 func SetProductAttrValue(tx *gorm.DB, isUpdate bool, productId uint, productType int32, reqAttrValue []request.ProductAttrValue) ([]string, error) {
 	uniques := []string{}
 	if isUpdate {
@@ -665,14 +676,6 @@ func GetProductInfoList(info request.ProductPageInfo, tenancyId uint, isTenancy,
 	return productList, total, err
 }
 
-func UpdateOrderProduct(db *gorm.DB, orderProductId uint, data map[string]interface{}) error {
-	err := db.Model(&model.OrderProduct{}).Where("id = ?", orderProductId).Updates(data).Error
-	if err != nil {
-		return fmt.Errorf("update order product %w", err)
-	}
-	return nil
-}
-
 func GetProductSelect(tenancyId uint) ([]response.SelectOption, error) {
 	selects := []response.SelectOption{
 		{ID: 0, Name: "请选择"},
@@ -685,4 +688,40 @@ func GetProductSelect(tenancyId uint) ([]response.SelectOption, error) {
 		Find(&userSelects).Error
 	selects = append(selects, userSelects...)
 	return selects, err
+}
+
+// UpdateProductAttrValue 更新商品规格
+func UpdateProductAttrValue(db *gorm.DB, productId uint, unique string, data map[string]interface{}) error {
+	err := db.Model(&model.ProductAttrValue{}).
+		Where("id = ?", productId).
+		Where("unique = ?", unique).
+		Updates(&data).Error
+	if err != nil {
+		return fmt.Errorf("更新商品规格错误 %w", err)
+	}
+	return nil
+}
+
+// IncStock 回退商品库存
+func IncStock(db *gorm.DB, id uint, inc int64) error {
+	data := map[string]interface{}{"stock": gorm.Expr("stock+?", inc), "": gorm.Expr("sales-?", inc)}
+	return UpdateProduct(db, id, data)
+}
+
+// DecStock 减去商品库存
+func DecStock(db *gorm.DB, id uint, dec int64) error {
+	data := map[string]interface{}{"stock": gorm.Expr("stock-?", dec), "": gorm.Expr("sales+?", dec)}
+	return UpdateProduct(db, id, data)
+}
+
+// IncSkuStock 回退商品规格库存
+func IncSkuStock(db *gorm.DB, id uint, unique string, inc int64) error {
+	data := map[string]interface{}{"stock": gorm.Expr("stock+?", inc), "": gorm.Expr("sales-?", inc)}
+	return UpdateProductAttrValue(db, id, unique, data)
+}
+
+// DecSkuStock 减去商品规格库存
+func DecSkuStock(db *gorm.DB, id uint, unique string, dec int64) error {
+	data := map[string]interface{}{"stock": gorm.Expr("stock-?", dec), "": gorm.Expr("sales+?", dec)}
+	return UpdateProductAttrValue(db, id, unique, data)
 }

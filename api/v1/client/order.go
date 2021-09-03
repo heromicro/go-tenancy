@@ -102,7 +102,7 @@ func GetOrderById(ctx *gin.Context) {
 		return
 	}
 	req.TenancyId = multi.GetTenancyId(ctx)
-	if order, err := service.GetOrderDetailById(req, service.GetIsDelField(ctx)); err != nil {
+	if order, err := service.GetOrderDetailById(req); err != nil {
 		g.TENANCY_LOG.Error("获取失败!", zap.Any("err", err))
 		response.FailWithMessage("获取失败:"+err.Error(), ctx)
 	} else {
@@ -155,7 +155,7 @@ func DeliveryOrder(ctx *gin.Context) {
 	}
 }
 
-// UpdateOrder
+// RemarkOrder
 func RemarkOrder(ctx *gin.Context) {
 	var req request.GetById
 	if errs := ctx.ShouldBindUri(&req); errs != nil {
@@ -175,8 +175,8 @@ func RemarkOrder(ctx *gin.Context) {
 	}
 }
 
-// UpdateOrder
-func UpdateOrder(ctx *gin.Context) {
+// ChangeOrder
+func ChangeOrder(ctx *gin.Context) {
 	var req request.GetById
 	if errs := ctx.ShouldBindUri(&req); errs != nil {
 		response.FailWithMessage(errs.Error(), ctx)
@@ -187,7 +187,7 @@ func UpdateOrder(ctx *gin.Context) {
 		response.FailWithMessage(errs.Error(), ctx)
 		return
 	}
-	if err := service.UpdateOrder(req.Id, order, ctx); err != nil {
+	if err := service.ChangeOrder(req.Id, order, ctx); err != nil {
 		g.TENANCY_LOG.Error("操作失败!", zap.Any("err", err))
 		response.FailWithMessage("操作失败:"+err.Error(), ctx)
 	} else {
@@ -202,7 +202,7 @@ func DeleteOrder(ctx *gin.Context) {
 		response.FailWithMessage(errs.Error(), ctx)
 		return
 	}
-	if err := service.DeleteOrder(req.Id, multi.GetTenancyId(ctx), service.GetIsDelField(ctx)); err != nil {
+	if err := service.DeleteOrder(req); err != nil {
 		g.TENANCY_LOG.Error("删除失败!", zap.Any("err", err))
 		response.FailWithMessage("删除失败:"+err.Error(), ctx)
 	} else {

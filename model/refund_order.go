@@ -55,7 +55,7 @@ type BaseRefundOrder struct {
 	Status             int       `gorm:"column:status;type:tinyint(1);not null;default:1" json:"status"`                         // 状态 1:待审核 2:待退货 3:待收货 4:已退款 5:审核未通过
 	StatusTime         time.Time `gorm:"column:status_time;type:timestamp;not null;default:CURRENT_TIMESTAMP" json:"statusTime"` // 状态改变时间
 
-	IsDel       int `gorm:"column:is_del;type:tinyint unsigned;not null;default:2" json:"isDel"`
+	IsCancel    int `gorm:"column:is_cancel;type:tinyint unsigned;not null;default:2" json:"isCancel"`
 	IsSystemDel int `gorm:"column:is_system_del;type:tinyint(1);default:2" json:"isSystemDel"` // 商户删除
 }
 
