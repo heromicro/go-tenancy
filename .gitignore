@@ -22,3 +22,4 @@ tests/resource/favicon.ico
 *.exe
 *.crt
 *.txt
+*.zip
