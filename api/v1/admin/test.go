@@ -52,7 +52,7 @@ func MqttTest(ctx *gin.Context) {
 	}
 	if err := service.SendMqttMsgs("tenancy_notify_test", payload, 2); err != nil {
 		g.TENANCY_LOG.Error("测试失败!", zap.Any("err", err))
-		response.FailWithMessage("测试失败", ctx)
+		response.FailWithMessage(err.Error(), ctx)
 	} else {
 		response.OkWithMessage("测试成功", ctx)
 	}

@@ -141,6 +141,9 @@ func SendMqttMsgs(topic string, payload model.Payload, qos byte) error {
 	if err != nil {
 		return err
 	}
+	if len(mqtts) == 0 {
+		return errors.New("请添加mqtt客户端")
+	}
 	for _, mqtt := range mqtts {
 		content, _ := json.Marshal(payload)
 		err := mqtt.MqttPublish(topic, string(content), qos)

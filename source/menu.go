@@ -133,7 +133,7 @@ var menus = []model.SysBaseMenu{
 	{TENANCY_MODEL: g.TENANCY_MODEL{ID: 687}, Pid: 678, Path: "/110/678/", Icon: "", MenuName: "充值金额配置", Route: "//adminpromoter/bank/69", Params: "", Sort: 0, Hidden: 1, IsTenancy: 2, IsMenu: 1},
 	{TENANCY_MODEL: g.TENANCY_MODEL{ID: 688}, Pid: 63, Path: "/110/63/", Icon: "", MenuName: "登录页幻灯片", Route: "/admin/promoter/bank/77", Params: "", Sort: 0, Hidden: 1, IsTenancy: 2, IsMenu: 1},
 	{TENANCY_MODEL: g.TENANCY_MODEL{ID: 689}, Pid: 110, Path: "/110/", Icon: "", MenuName: "测试页面", Route: "/test", Params: "", Sort: 0, Hidden: 2, IsTenancy: 2, IsMenu: 1},
-	{TENANCY_MODEL: g.TENANCY_MODEL{ID: 690}, Pid: 689, Path: "/110/689/", Icon: "", MenuName: "支付测试", Route: "/admin/test/pay", Params: "", Sort: 0, Hidden: 2, IsTenancy: 2, IsMenu: 1},
+	{TENANCY_MODEL: g.TENANCY_MODEL{ID: 690}, Pid: 689, Path: "/110/689/", Icon: "", MenuName: "功能测试", Route: "/admin/test/pay", Params: "", Sort: 0, Hidden: 2, IsTenancy: 2, IsMenu: 1},
 	{TENANCY_MODEL: g.TENANCY_MODEL{ID: 691}, Pid: 110, Path: "/110/", Icon: "", MenuName: "MQTT管理", Route: "/mqtt", Params: "", Sort: 0, Hidden: 2, IsTenancy: 2, IsMenu: 1},
 	{TENANCY_MODEL: g.TENANCY_MODEL{ID: 692}, Pid: 691, Path: "/110/691/", Icon: "", MenuName: "MQTT客户端", Route: "/admin/mqtt/list", Params: "", Sort: 0, Hidden: 2, IsTenancy: 2, IsMenu: 1},
 	{TENANCY_MODEL: g.TENANCY_MODEL{ID: 693}, Pid: 691, Path: "/110/691/", Icon: "", MenuName: "MQTT消息日志", Route: "/admin/mqtt/record", Params: "", Sort: 0, Hidden: 2, IsTenancy: 2, IsMenu: 1},

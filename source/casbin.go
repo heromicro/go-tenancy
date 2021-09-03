@@ -181,7 +181,6 @@ var carbines = []gormadapter.CasbinRule{
 	{Ptype: "p", V0: AdminAuthorityId, V1: "/v1/admin/job/getJobList", V2: "GET"},
 	{Ptype: "p", V0: AdminAuthorityId, V1: "/v1/admin/job/startJob/:name", V2: "GET"},
 	{Ptype: "p", V0: AdminAuthorityId, V1: "/v1/admin/job/stopJob/:name", V2: "GET"},
-	{Ptype: "p", V0: AdminAuthorityId, V1: "/v1/admin/job/deleteJob/:name", V2: "GET"},
 
 	// 品牌
 	{Ptype: "p", V0: AdminAuthorityId, V1: "/v1/admin/brand/getCreateBrandMap", V2: "GET"},

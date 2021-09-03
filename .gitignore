@@ -15,7 +15,7 @@ tests/config.yaml
 latest_log
 main
 tests/resource/favicon.ico
-.air.toml
+
 
 # ext
 *.log
@@ -23,3 +23,6 @@ tests/resource/favicon.ico
 *.crt
 *.txt
 *.zip
+*.toml
+
+

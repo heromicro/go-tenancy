@@ -331,7 +331,6 @@ func InitJobRouter(Router *gin.RouterGroup) {
 		JobRouter.GET("/getJobList", admin.GetJobList)
 		JobRouter.GET("/startJob/:name", admin.StartJob)
 		JobRouter.GET("/stopJob/:name", admin.StopJob)
-		JobRouter.DELETE("/deleteJob/:name", admin.DeleteJob)
 	}
 }
 

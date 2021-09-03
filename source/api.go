@@ -160,7 +160,6 @@ var baseApis = []model.SysApi{
 	{Path: "/v1/admin/job/getJobList", Description: "定时任务列表", ApiGroup: "job", Method: "GET"},
 	{Path: "/v1/admin/job/startJob/:name", Description: "启动定时任务", ApiGroup: "job", Method: "GET"},
 	{Path: "/v1/admin/job/stopJob/:name", Description: "停止定时任务", ApiGroup: "job", Method: "GET"},
-	{Path: "/v1/admin/job/deleteJob/:name", Description: "移除定时任务", ApiGroup: "job", Method: "GET"},
 
 	//商品分类
 	{Path: "/v1/admin/productCategory/getCreateProductCategoryMap", Description: "商品分类添加表单", ApiGroup: "category", Method: "POST"},
