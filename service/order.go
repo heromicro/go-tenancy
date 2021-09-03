@@ -583,6 +583,15 @@ func UpdateOrderById(db *gorm.DB, id uint, data map[string]interface{}) error {
 	return nil
 }
 
+// UpdateOrderByIds 批量更新订单
+func UpdateOrderByIds(db *gorm.DB, ids []uint, data map[string]interface{}) error {
+	err := db.Model(&model.Order{}).Where("id in ?", ids).Updates(data).Error
+	if err != nil {
+		return fmt.Errorf("批量更新订单 %w", err)
+	}
+	return nil
+}
+
 // GetNoPayOrdersByOrderSn 根据订单号获取未支付订单
 func GetNoPayOrdersByOrderSn(orderSn string) ([]model.Order, error) {
 	orders := []model.Order{}
@@ -989,4 +998,39 @@ func UpdateOrderProduct(db *gorm.DB, orderProductId uint, data map[string]interf
 		return fmt.Errorf("update order product %w", err)
 	}
 	return nil
+}
+
+func GetOrderAutoAgree() ([]uint, error) {
+	whereCreatedAt := fmt.Sprintf("now() > SUBDATE(pay_time,interval -%s DAY)", param.GetOrderAutoTakeOrderTime())
+	orderIds := []uint{}
+	err := g.TENANCY_DB.Model(&model.Order{}).
+		Where("paid = ?", g.StatusTrue).
+		Where("status = ?", model.OrderStatusNoReceive).
+		Where(whereCreatedAt).
+		Find(&orderIds).Error
+	if err != nil {
+		return orderIds, err
+	}
+	return orderIds, nil
+}
+
+// AutoTakeOrders 自动收货
+func AutoTakeOrders(orderIds []uint) error {
+	var orderStatues []model.OrderStatus
+	for _, orderId := range orderIds {
+		orderStatus := model.OrderStatus{ChangeType: "take", ChangeMessage: "已收货", ChangeTime: time.Now(), OrderID: orderId}
+		orderStatues = append(orderStatues, orderStatus)
+	}
+	return g.TENANCY_DB.Transaction(func(tx *gorm.DB) error {
+		err := UpdateOrderByIds(tx, orderIds, map[string]interface{}{"status": model.OrderStatusNoComment})
+		if err != nil {
+			return err
+		}
+
+		err = tx.Model(&model.OrderStatus{}).Create(&orderStatues).Error
+		if err != nil {
+			return fmt.Errorf("生成订单操作记录 %w", err)
+		}
+		return nil
+	})
 }

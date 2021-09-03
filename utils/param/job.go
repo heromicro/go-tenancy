@@ -25,8 +25,8 @@ func GetRefundOrderAutoAgreeTime() string {
 	return autoAgreeTime
 }
 
-// GetRefundOrderAutoTakeOrderTime 订单自动收货时间(天)
-func GetRefundOrderAutoTakeOrderTime() string {
+// GetOrderAutoTakeOrderTime 订单自动收货时间(天)
+func GetOrderAutoTakeOrderTime() string {
 	autoTakeOrderTime, err := GetConfigValueByKey("auto_take_order_timer")
 	g.TENANCY_LOG.Error("订单自动收货时间", zap.String("错误", err.Error()))
 	if autoTakeOrderTime == "" {

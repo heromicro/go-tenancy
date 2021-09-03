@@ -62,27 +62,20 @@ func Timer() {
 		})
 
 		// 用户订单自动收货
-		// g.TENANCY_Timer.AddTaskByFunc("OrderAutoAgree", EveryMinute, "用户订单自动收货", func() {
-		// 	orders, err := service.GetNoPayOrderAutoClose()
-		// 	if err != nil {
-		// 		g.TENANCY_LOG.Info("用户订单自动收货", zap.String("获取订单错误", err.Error()))
-		// 		return
-		// 	}
-		// 	if len(orders) == 0 {
-		// 		return
-		// 	}
-		// 	var orderIds []uint
-		// 	var orderStatues []model.OrderStatus
-		// 	for _, order := range orders {
-		// 		orderIds = append(orderIds, order.ID)
-		// 		orderStatus := model.OrderStatus{ChangeType: "cancel", ChangeMessage: "取消订单[自动]", ChangeTime: time.Now(), OrderID: order.ID}
-		// 		orderStatues = append(orderStatues, orderStatus)
-		// 	}
-		// 	err = service.CancelNoPayOrders(orderIds, orderStatues)
-		// 	if err != nil {
-		// 		g.TENANCY_LOG.Info("用户订单自动收货", zap.String("订单状态更新错误", err.Error()))
-		// 	}
-		// })
+		g.TENANCY_Timer.AddTaskByFunc("OrderAutoAgree", EveryMinute, "用户订单自动收货", func() {
+			orderIds, err := service.GetOrderAutoAgree()
+			if err != nil {
+				g.TENANCY_LOG.Info("用户订单自动收货", zap.String("获取订单错误", err.Error()))
+				return
+			}
+			if len(orderIds) == 0 {
+				return
+			}
+			err = service.AutoTakeOrders(orderIds)
+			if err != nil {
+				g.TENANCY_LOG.Info("用户订单自动收货", zap.String("订单状态更新错误", err.Error()))
+			}
+		})
 
 		// 定时获取微信平台证书
 		g.TENANCY_Timer.AddTaskByFunc("CheckOrdersPayStatus", EveryTeenHour, "定时获取微信平台证书", func() {

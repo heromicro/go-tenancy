@@ -69,22 +69,20 @@ func CancelNoPayGroupOrders(groupOrderId uint) error {
 	if len(orders) == 0 {
 		return errors.New("订单数据错误")
 	}
+	var orderIds []uint
+	var orderStatues []model.OrderStatus
+	for _, order := range orders {
+		orderIds = append(orderIds, order.ID)
+		orderStatus := model.OrderStatus{ChangeType: "cancel", ChangeMessage: "取消订单[自动]", ChangeTime: time.Now(), OrderID: order.ID}
+		orderStatues = append(orderStatues, orderStatus)
+	}
 	return g.TENANCY_DB.Transaction(func(tx *gorm.DB) error {
 		data := map[string]interface{}{"is_cancel": g.StatusTrue}
 		err := UpdateGroupOrderById(tx, groupOrderId, data)
 		if err != nil {
 			return err
 		}
-		var orderStatues []model.OrderStatus
-		for _, order := range orders {
-			err := UpdateOrderById(tx, order.ID, map[string]interface{}{"is_cancel": g.StatusTrue})
-			if err != nil {
-				return err
-			}
-			orderStatus := model.OrderStatus{ChangeType: "cancel", ChangeMessage: "取消订单[自动]", ChangeTime: time.Now(), OrderID: order.ID}
-			orderStatues = append(orderStatues, orderStatus)
-		}
-
+		UpdateOrderByIds(tx, orderIds, map[string]interface{}{"is_cancel": g.StatusTrue})
 		err = tx.Model(&model.OrderStatus{}).Create(&orderStatues).Error
 		if err != nil {
 			return fmt.Errorf("生成订单操作记录 %w", err)
