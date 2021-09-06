@@ -56,7 +56,7 @@ func TestShippingTemplateList(t *testing.T) {
 	}
 	for _, param := range params {
 		url := "v1/merchant/shippingTemplate/getShippingTemplateList"
-		base.PostList(auth, url, param.Args, param.ResponseKeys, http.StatusOK, "获取成功")
+		base.PostList(auth, url, param.Args, http.StatusOK, "获取成功", param.ResponseKeys)
 	}
 }
 

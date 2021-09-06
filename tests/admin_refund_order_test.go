@@ -18,7 +18,7 @@ func TestRefundOrderList(t *testing.T) {
 		{Key: "total", Value: 0},
 	}
 	url := "v1/merchant/refundOrder/getRefundOrderList"
-	base.PostList(auth, url, base.PageRes, pageKeys, http.StatusOK, "获取成功")
+	base.PostList(auth, url, base.PageRes, http.StatusOK, "获取成功", pageKeys)
 }
 
 func refundOrderlist(t *testing.T, params map[string]interface{}, length int) {

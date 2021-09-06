@@ -463,7 +463,7 @@ func GetProductByID(id, tenancyId uint, isCuser bool) (response.ProductDetail, e
 	db := g.TENANCY_DB.Model(&model.Product{})
 	if isCuser {
 		// 用户端成本价
-		db = db.Where("products.is_show = ?", g.StatusTrue).Where("products.status = ?", model.SuccessProductStatus).Select("products.id,products.store_name,products.store_info,products.keyword,products.ficti,products.unit_name,products.sort,products.sales,products.price,products.ot_price,products.stock,products.is_hot,products.is_benefit,products.is_best,products.is_new,products.is_good,products.product_type,products.spec_type,products.rate,products.is_gift_bag,products.image,products.temp_id,products.sys_tenancy_id,products.sys_brand_id,products.product_category_id,products.slider_image,sys_tenancies.name as sys_tenancy_name,sys_brands.brand_name as brand_name,product_categories.cate_name as cate_name,product_contents.content as content,shipping_templates.name as temp_name")
+		db = db.Where("products.is_show = ?", g.StatusTrue).Where("products.status = ?", model.SuccessProductStatus).Select("products.id,products.store_name,products.store_info,products.keyword,products.ficti,products.unit_name,products.sort,products.sales,products.price,products.ot_price,products.stock,products.is_hot,products.is_benefit,products.is_best,products.is_new,products.is_good,products.product_type,products.spec_type,products.rate,products.image,products.temp_id,products.sys_tenancy_id,products.sys_brand_id,products.product_category_id,products.slider_image,sys_tenancies.name as sys_tenancy_name,sys_brands.brand_name as brand_name,product_categories.cate_name as cate_name,product_contents.content as content,shipping_templates.name as temp_name")
 	} else {
 		db = db.Select("products.*,sys_tenancies.name as sys_tenancy_name,sys_brands.brand_name as brand_name,product_categories.cate_name as cate_name,product_contents.content as content,shipping_templates.name as temp_name")
 	}
@@ -654,10 +654,6 @@ func GetProductInfoList(info request.ProductPageInfo, tenancyId uint, isTenancy,
 	if info.CateId > 0 {
 		db = db.Where("products.product_category_id = ?", info.CateId)
 	}
-	// 平台分类id
-	if info.IsGiftBag != "" {
-		db = db.Where("products.is_gift_bag = ?", info.IsGiftBag)
-	}
 
 	err := db.Count(&total).Error
 	if err != nil {
@@ -694,7 +690,7 @@ func GetProductSelect(tenancyId uint) ([]response.SelectOption, error) {
 func UpdateProductAttrValue(db *gorm.DB, productId uint, unique string, data map[string]interface{}) error {
 	err := db.Model(&model.ProductAttrValue{}).
 		Where("id = ?", productId).
-		Where("unique = ?", unique).
+		Where("`unique` = ?", unique).
 		Updates(&data).Error
 	if err != nil {
 		return fmt.Errorf("更新商品规格错误 %w", err)
@@ -704,24 +700,24 @@ func UpdateProductAttrValue(db *gorm.DB, productId uint, unique string, data map
 
 // IncStock 回退商品库存
 func IncStock(db *gorm.DB, id uint, inc int64) error {
-	data := map[string]interface{}{"stock": gorm.Expr("stock+?", inc), "": gorm.Expr("sales-?", inc)}
+	data := map[string]interface{}{"stock": gorm.Expr("stock+?", inc), "sales": gorm.Expr("sales-(IF(sales >?,?,0))", inc, inc)}
 	return UpdateProduct(db, id, data)
 }
 
 // DecStock 减去商品库存
 func DecStock(db *gorm.DB, id uint, dec int64) error {
-	data := map[string]interface{}{"stock": gorm.Expr("stock-?", dec), "": gorm.Expr("sales+?", dec)}
+	data := map[string]interface{}{"stock": gorm.Expr("stock-(IF(stock >?,?,0))", dec, dec), "sales": gorm.Expr("sales+?", dec)}
 	return UpdateProduct(db, id, data)
 }
 
 // IncSkuStock 回退商品规格库存
 func IncSkuStock(db *gorm.DB, id uint, unique string, inc int64) error {
-	data := map[string]interface{}{"stock": gorm.Expr("stock+?", inc), "": gorm.Expr("sales-?", inc)}
+	data := map[string]interface{}{"stock": gorm.Expr("stock+?", inc), "sales": gorm.Expr("sales-(IF(sales >?,?,0))", inc, inc)}
 	return UpdateProductAttrValue(db, id, unique, data)
 }
 
 // DecSkuStock 减去商品规格库存
 func DecSkuStock(db *gorm.DB, id uint, unique string, dec int64) error {
-	data := map[string]interface{}{"stock": gorm.Expr("stock-?", dec), "": gorm.Expr("sales+?", dec)}
+	data := map[string]interface{}{"stock": gorm.Expr("stock-(IF(stock >?,?,0))", dec, dec), "sales": gorm.Expr("sales+?", dec)}
 	return UpdateProductAttrValue(db, id, unique, data)
 }

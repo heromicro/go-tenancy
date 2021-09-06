@@ -14,7 +14,7 @@ func TestMiniList(t *testing.T) {
 	defer base.BaseLogOut(auth)
 
 	url := "v1/admin/mini/getMiniList"
-	base.PostList(auth, url, base.PageRes, base.PageKeys, http.StatusOK, "获取成功")
+	base.PostList(auth, url, base.PageRes, http.StatusOK, "获取成功", base.PageKeys)
 }
 
 func TestMiniProcess(t *testing.T) {
@@ -51,7 +51,7 @@ func TestMiniProcess(t *testing.T) {
 			},
 			{Key: "total", Value: 1},
 		}
-		base.PostList(auth, url, base.PageRes, pageKeys, http.StatusOK, "获取成功")
+		base.PostList(auth, url, base.PageRes, http.StatusOK, "获取成功", pageKeys)
 	}
 
 	update := map[string]interface{}{

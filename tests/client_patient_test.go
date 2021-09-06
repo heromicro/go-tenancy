@@ -12,5 +12,5 @@ func TestClientPatientList(t *testing.T) {
 	defer base.BaseLogOut(auth)
 
 	url := "v1/merchant/patient/getPatientList"
-	base.PostList(auth, url, base.PageRes, base.PageKeys, http.StatusOK, "获取成功")
+	base.PostList(auth, url, base.PageRes, http.StatusOK, "获取成功", base.PageKeys)
 }

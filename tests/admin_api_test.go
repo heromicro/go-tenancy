@@ -21,7 +21,7 @@ func TestApiList(t *testing.T) {
 		{Key: "list", Value: nil},
 		{Key: "total", Value: source.BaseApisLen()},
 	}
-	base.PostList(auth, url, base.PageRes, pageKeys, http.StatusOK, "获取成功")
+	base.PostList(auth, url, base.PageRes, http.StatusOK, "获取成功", pageKeys)
 }
 func TestAllApi(t *testing.T) {
 	auth := base.BaseWithLoginTester(t)

@@ -9,7 +9,6 @@ type ProductPageInfo struct {
 	Type              string `json:"type" form:"type"`
 	CateId            int    `json:"cateId" form:"cateId"`
 	Keyword           string `json:"keyword" form:"keyword"`
-	IsGiftBag         string `json:"isGiftBag" form:"isGiftBag"`
 }
 
 type UpdateProduct struct {

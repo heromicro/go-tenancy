@@ -5,27 +5,54 @@ import (
 	"net/http"
 	"testing"
 
+	"github.com/gavv/httpexpect"
 	"github.com/snowlyg/go-tenancy/tests/base"
 )
+
+func ProductList(auth *httpexpect.Expect, res map[string]interface{}, status int, message string, keys ...base.ResponseKeys) {
+	url := "v1/admin/product/getProductList"
+	base.PostList(auth, url, base.PageRes, http.StatusOK, "获取成功", keys...)
+}
 
 func TestProductList(t *testing.T) {
 	auth := base.BaseWithLoginTester(t)
 	defer base.BaseLogOut(auth)
 
-	url := "v1/admin/product/getProductList"
 	pageKeys := base.ResponseKeys{
 		{Key: "pageSize", Value: 10},
 		{Key: "page", Value: 1},
 		{Key: "list", Value: nil},
 		{Key: "total", Value: 0},
 	}
-	base.PostList(auth, url, base.PageRes, pageKeys, http.StatusOK, "获取成功")
+	ProductList(auth, base.PageRes, http.StatusOK, "获取成功", pageKeys)
 }
 func TestGetProductFilter(t *testing.T) {
 	auth := base.BaseWithLoginTester(t)
 	defer base.BaseLogOut(auth)
 	url := "v1/admin/product/getProductFilter"
-	base.Get(auth, url, nil, http.StatusOK, "获取成功")
+	pageKeys := []base.ResponseKeys{
+		{
+			{Key: "type", Value: 1},
+			{Key: "name", Value: "出售中"},
+			{Key: "count", Value: 0},
+		},
+		{
+			{Key: "type", Value: 2},
+			{Key: "name", Value: "仓库中"},
+			{Key: "count", Value: 0},
+		},
+		{
+			{Key: "type", Value: 6},
+			{Key: "name", Value: "待审核"},
+			{Key: "count", Value: 0},
+		},
+		{
+			{Key: "type", Value: 7},
+			{Key: "name", Value: "审核未通过"},
+			{Key: "count", Value: 0},
+		},
+	}
+	base.Get(auth, url, nil, http.StatusOK, "获取成功", pageKeys...)
 }
 
 func TestProductProcess(t *testing.T) {
@@ -34,23 +61,13 @@ func TestProductProcess(t *testing.T) {
 	adminAuth := base.BaseWithLoginTester(t)
 	defer base.BaseLogOut(adminAuth)
 
-	brandCategoryPid, _ := CreateBrandCategory(adminAuth, "箱包服饰_client", 0, http.StatusOK, "创建成功")
-	if brandCategoryPid == 0 {
-		return
-	}
+	brandCategoryPid, _ := CreateBrandCategory(t, adminAuth, "箱包服饰_client", 0, http.StatusOK, "创建成功")
 	defer DeleteBrandCategory(adminAuth, brandCategoryPid)
 
-	brandCategoryId, _ := CreateBrandCategory(adminAuth, "精品服饰_client", brandCategoryPid, http.StatusOK, "创建成功")
-	if brandCategoryId == 0 {
-		return
-	}
+	brandCategoryId, _ := CreateBrandCategory(t, adminAuth, "精品服饰_client", brandCategoryPid, http.StatusOK, "创建成功")
 	defer DeleteBrandCategory(adminAuth, brandCategoryId)
 
-	brandId, _ = CreateBrand(adminAuth, "冈本_client", brandCategoryId, http.StatusOK, "创建成功")
-	if brandId == 0 {
-		t.Errorf("添加品牌失败")
-		return
-	}
+	brandId, _ = CreateBrand(t, adminAuth, "冈本_client", brandCategoryId, http.StatusOK, "创建成功")
 	defer DeleteBrand(adminAuth, brandId)
 
 	cateId, _ = CreateCategory(adminAuth, "数码产品_client", 0, http.StatusOK, "创建成功")

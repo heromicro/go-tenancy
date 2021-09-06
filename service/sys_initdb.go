@@ -102,7 +102,7 @@ func InitDB(conf request.InitDB) error {
 		conf.Env = "pro"
 	}
 	if conf.Addr == 0 {
-		conf.Addr = 80
+		conf.Addr = 8089
 	}
 
 	if conf.CacheType == "redis" {

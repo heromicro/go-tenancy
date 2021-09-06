@@ -20,23 +20,13 @@ func TestBrandProcess(t *testing.T) {
 	auth := base.BaseWithLoginTester(t)
 	defer base.BaseLogOut(auth)
 
-	brandCategoryPid, _ := CreateBrandCategory(auth, "箱包服饰", 0, http.StatusOK, "创建成功")
-	if brandCategoryPid == 0 {
-		return
-	}
+	brandCategoryPid, _ := CreateBrandCategory(t, auth, "箱包服饰", 0, http.StatusOK, "创建成功")
 	defer DeleteBrandCategory(auth, brandCategoryPid)
 
-	brandCategoryId, _ := CreateBrandCategory(auth, "精品服饰", brandCategoryPid, http.StatusOK, "创建成功")
-	if brandCategoryId == 0 {
-		t.Errorf("添加品牌分类失败")
-		return
-	}
+	brandCategoryId, _ := CreateBrandCategory(t, auth, "精品服饰", brandCategoryPid, http.StatusOK, "创建成功")
 	defer DeleteBrandCategory(auth, brandCategoryId)
-	brandId, createBrand := CreateBrand(auth, "冈本", brandCategoryId, http.StatusOK, "创建成功")
-	if brandId == 0 {
-		t.Errorf("添加品牌失败")
-		return
-	}
+	
+	brandId, createBrand := CreateBrand(t, auth, "冈本", brandCategoryId, http.StatusOK, "创建成功")
 	{
 		pageRes := map[string]interface{}{"page": 1, "pageSize": 10, "brandCategoryId": brandCategoryPid}
 		pageKeys := base.ResponseKeys{
@@ -117,19 +107,18 @@ func TestBrandRegisterError(t *testing.T) {
 	auth := base.BaseWithLoginTester(t)
 	defer base.BaseLogOut(auth)
 	msg := "Key: 'SysBrand.BrandName' Error:Field validation for 'BrandName' failed on the 'required' tag"
-	brandId, _ := CreateBrand(auth, "", 0, http.StatusBadRequest, msg)
-	if brandId == 0 {
-		return
+	brandId, _ := CreateBrand(t, auth, "", 0, http.StatusBadRequest, msg)
+	if brandId > 0 {
+		defer DeleteBrand(auth, brandId)
 	}
-	defer DeleteBrand(auth, brandId)
 }
 
 func brandList(auth *httpexpect.Expect, pageRes map[string]interface{}, pageKeys base.ResponseKeys, status int, message string) {
 	url := "v1/admin/brand/getBrandList"
-	base.PostList(auth, url, pageRes, pageKeys, status, message)
+	base.PostList(auth, url, pageRes, status, message, pageKeys)
 }
 
-func CreateBrand(auth *httpexpect.Expect, brandName string, brandCategoryId uint, status int, message string) (uint, map[string]interface{}) {
+func CreateBrand(t *testing.T, auth *httpexpect.Expect, brandName string, brandCategoryId uint, status int, message string) (uint, map[string]interface{}) {
 	create := map[string]interface{}{
 		"brandName":       brandName,
 		"status":          g.StatusTrue,
@@ -140,7 +129,11 @@ func CreateBrand(auth *httpexpect.Expect, brandName string, brandCategoryId uint
 	url := "v1/admin/brand/createBrand"
 	res := base.IdKeys()
 	base.Create(auth, url, create, res, status, message)
-	return res.GetId(), create
+	brandId := res.GetId()
+	if brandId == 0 && brandName != "" {
+		t.Fatal("添加品牌失败")
+	}
+	return brandId, create
 }
 
 func DeleteBrand(auth *httpexpect.Expect, id uint) {

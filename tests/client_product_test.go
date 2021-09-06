@@ -14,7 +14,7 @@ func TestClientProductList(t *testing.T) {
 	auth, _ := base.TenancyWithLoginTester(t)
 	defer base.BaseLogOut(auth)
 	url := "v1/merchant/product/getProductList"
-	base.PostList(auth, url, base.PageRes, base.PageKeys, http.StatusOK, "获取成功")
+	base.PostList(auth, url, base.PageRes, http.StatusOK, "获取成功", base.PageKeys)
 }
 
 func TestGetClientProductFilter(t *testing.T) {
@@ -35,23 +35,14 @@ func TestClientProductProcess(t *testing.T) {
 	adminAuth := base.BaseWithLoginTester(t)
 	defer base.BaseLogOut(adminAuth)
 
-	brandCategoryPid, _ := CreateBrandCategory(adminAuth, "箱包服饰_client", 0, http.StatusOK, "创建成功")
-	if brandCategoryPid == 0 {
-		return
-	}
+	brandCategoryPid, _ := CreateBrandCategory(t, adminAuth, "箱包服饰_client", 0, http.StatusOK, "创建成功")
 	defer DeleteBrandCategory(adminAuth, brandCategoryPid)
 
-	brandCategoryId, _ := CreateBrandCategory(adminAuth, "精品服饰_client", brandCategoryPid, http.StatusOK, "创建成功")
-	if brandCategoryId == 0 {
-		return
-	}
+	brandCategoryId, _ := CreateBrandCategory(t, adminAuth, "精品服饰_client", brandCategoryPid, http.StatusOK, "创建成功")
+
 	defer DeleteBrandCategory(adminAuth, brandCategoryId)
 
-	brandId, _ = CreateBrand(adminAuth, "冈本_client", brandCategoryId, http.StatusOK, "创建成功")
-	if brandId == 0 {
-		t.Errorf("添加品牌失败")
-		return
-	}
+	brandId, _ = CreateBrand(t, adminAuth, "冈本_client", brandCategoryId, http.StatusOK, "创建成功")
 	defer DeleteBrand(adminAuth, brandId)
 
 	cateId, _ = CreateCategory(adminAuth, "数码产品_client", 0, http.StatusOK, "创建成功")
@@ -104,12 +95,11 @@ func TestClientProductProcess(t *testing.T) {
 				"weight":  1,
 			},
 		},
-		"cateId":    183,
-		"content":   "<p>是的发生的发sadsdfsdfsdf</p>",
-		"image":     "http://127.0.0.1:8089/uploads/file/b39024efbc6de61976f585c8421c6bba_20210702150027.png",
-		"isGiftBag": g.StatusTrue,
-		"isGood":    g.StatusFalse,
-		"keyword":   "sdfdsfsdfsdf",
+		"cateId":  183,
+		"content": "<p>是的发生的发sadsdfsdfsdf</p>",
+		"image":   "http://127.0.0.1:8089/uploads/file/b39024efbc6de61976f585c8421c6bba_20210702150027.png",
+		"isGood":  g.StatusFalse,
+		"keyword": "sdfdsfsdfsdf",
 		"sliderImages": []string{
 			"http://127.0.0.1:8089/uploads/file/b39024efbc6de61976f585c8421c6bba_20210702150027.png",
 			"http://127.0.0.1:8089/uploads/file/0701aa317da5a004fbf6111545678a6c_20210702150036.png",
@@ -147,7 +137,6 @@ func TestClientProductProcess(t *testing.T) {
 		{Key: "sliderImage", Value: update["sliderImage"]},
 		{Key: "content", Value: update["content"]},
 		{Key: "image", Value: update["image"]},
-		{Key: "isGiftBag", Value: update["isGiftBag"]},
 		{Key: "isGood", Value: update["isGood"]},
 		{Key: "attrValue", Value: update["attrValue"]},
 		{Key: "sliderImages", Value: update["sliderImages"]},
@@ -183,12 +172,11 @@ func CreateProduct(auth *httpexpect.Expect, cateId, brandId, shipTempId, tenancy
 				"weight":  1,
 			},
 		},
-		"cateId":    cateId,
-		"content":   "<p>是的发生的发sad</p>",
-		"image":     "http://127.0.0.1:8089/uploads/file/b39024efbc6de61976f585c8421c6bba_20210702150027.png",
-		"isGiftBag": 2,
-		"isGood":    1,
-		"keyword":   "sdfdsfsdfsdf",
+		"cateId":  cateId,
+		"content": "<p>是的发生的发sad</p>",
+		"image":   "http://127.0.0.1:8089/uploads/file/b39024efbc6de61976f585c8421c6bba_20210702150027.png",
+		"isGood":  1,
+		"keyword": "sdfdsfsdfsdf",
 		"sliderImages": []string{
 			"http://127.0.0.1:8089/uploads/file/b39024efbc6de61976f585c8421c6bba_20210702150027.png",
 			"http://127.0.0.1:8089/uploads/file/0701aa317da5a004fbf6111545678a6c_20210702150036.png",

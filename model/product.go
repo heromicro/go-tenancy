@@ -63,7 +63,6 @@ type BaseProduct struct {
 	Rate        float64 `gorm:"column:rate;type:decimal(2,1);default:5.0" json:"rate"`                            // 评价分数
 	ReplyCount  uint    `gorm:"column:reply_count;type:int unsigned;default:0" json:"replyCount"`                 // 评论数
 
-	IsGiftBag int    `gorm:"column:is_gift_bag;type:tinyint;default:2" json:"isGiftBag"`     // 是否为礼包
 	CareCount int    `gorm:"column:care_count;type:int;not null;default:0" json:"careCount"` // 收藏数
 	Image     string `gorm:"column:image;type:varchar(256);not null" json:"image"`           // 商品图片
 

@@ -20,7 +20,7 @@ func TestTenancyList(t *testing.T) {
 		{Key: "list", Value: nil},
 		{Key: "total", Value: 0},
 	}
-	base.PostList(auth, url, base.PageRes, pageKeys, http.StatusOK, "获取成功")
+	base.PostList(auth, url, base.PageRes, http.StatusOK, "获取成功", pageKeys)
 }
 
 func TestTenancyByRegion(t *testing.T) {

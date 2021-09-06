@@ -273,17 +273,11 @@ func GetUserOrderList(ctx *gin.Context) {
 		return
 	}
 	pageInfo.SysUserId = req.Id
-	if list, stat, total, err := service.GetOrderInfoList(pageInfo, ctx); err != nil {
+	if ginH, err := service.GetOrderInfoList(pageInfo, ctx); err != nil {
 		g.TENANCY_LOG.Error("获取失败!", zap.Any("err", err))
 		response.FailWithMessage("获取失败:"+err.Error(), ctx)
 	} else {
-		response.OkWithDetailed(gin.H{
-			"stat":     stat,
-			"list":     list,
-			"total":    total,
-			"page":     pageInfo.Page,
-			"pageSize": pageInfo.PageSize,
-		}, "获取成功", ctx)
+		response.OkWithDetailed(ginH, "获取成功", ctx)
 	}
 }
 

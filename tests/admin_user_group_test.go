@@ -13,7 +13,7 @@ func TestUserGroupList(t *testing.T) {
 	auth := base.BaseWithLoginTester(t)
 	defer base.BaseLogOut(auth)
 	url := "v1/admin/userGroup/getUserGroupList"
-	base.PostList(auth, url,base.PageRes, base.PageKeys, http.StatusOK, "获取成功")
+	base.PostList(auth, url, base.PageRes, http.StatusOK, "获取成功", base.PageKeys)
 }
 
 func TestUserGroupProcess(t *testing.T) {

@@ -14,8 +14,7 @@ func TestCategoryList(t *testing.T) {
 	auth := base.BaseWithLoginTester(t)
 	defer base.BaseLogOut(auth)
 
-	url := "v1/admin/productCategory/getProductCategoryList"
-	base.GetList(auth, url, http.StatusOK, "获取成功")
+	CategoryList(auth, http.StatusOK, "获取成功")
 }
 
 func TestCategorySelect(t *testing.T) {
@@ -50,8 +49,7 @@ func TestCategoryProcess(t *testing.T) {
 			},
 			nil,
 		}
-		url := "v1/admin/productCategory/getProductCategoryList"
-		base.GetList(auth, url, http.StatusOK, "获取成功", keys...)
+		CategoryList(auth, http.StatusOK, "获取成功", keys...)
 	}
 
 	update := map[string]interface{}{
@@ -131,4 +129,9 @@ func CreateCategory(auth *httpexpect.Expect, cateName string, pid, status int, m
 func DeleteCategory(auth *httpexpect.Expect, id uint, status int, message string) {
 	url := fmt.Sprintf("v1/admin/productCategory/deleteProductCategory/%d", id)
 	base.Delete(auth, url, status, message)
+}
+
+func CategoryList(auth *httpexpect.Expect, status int, message string, keys ...base.ResponseKeys) {
+	url := "v1/admin/productCategory/getProductCategoryList"
+	base.GetList(auth, url, http.StatusOK, "获取成功", keys...)
 }

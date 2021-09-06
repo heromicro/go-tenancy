@@ -33,7 +33,6 @@ type CartInfoProduct struct {
 	UnitName    string                     `json:"unitName,omitempty" `
 	Price       float64                    `json:"price,omitempty" `
 	TempID      uint                       `json:"tempId,omitempty"`
-	IsGiftBag   int                        `json:"isGiftBag,omitempty"` // 是否为礼包
 	ProductType int32                      `json:"productType,omitempty"`
 	Temp        model.BaseShippingTemplate `json:"temp,omitempty"`
 }

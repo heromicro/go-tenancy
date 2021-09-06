@@ -309,7 +309,8 @@ func DeliveryOrder(id uint, delivery request.DeliveryOrder, ctx *gin.Context) er
 }
 
 // GetOrderInfoList 订单列表
-func GetOrderInfoList(info request.OrderPageInfo, ctx *gin.Context) ([]response.OrderList, []map[string]interface{}, int64, error) {
+func GetOrderInfoList(info request.OrderPageInfo, ctx *gin.Context) (gin.H, error) {
+
 	stat := []map[string]interface{}{
 		{"className": "el-icon-s-goods", "count": 0, "field": "件", "name": "已支付订单数量"},
 		{"className": "el-icon-s-order", "count": 0, "field": "元", "name": "实际支付金额"},
@@ -329,21 +330,21 @@ func GetOrderInfoList(info request.OrderPageInfo, ctx *gin.Context) ([]response.
 
 	db, err := getOrderSearch(info, ctx, db)
 	if err != nil {
-		return orderList, stat, total, err
+		return nil, err
 	}
 
 	stat, err = getStat(info, ctx, stat)
 	if err != nil {
-		return orderList, stat, total, err
+		return nil, err
 	}
 
 	err = db.Count(&total).Error
 	if err != nil {
-		return orderList, stat, total, err
+		return nil, err
 	}
 	err = db.Limit(limit).Offset(offset).Find(&orderList).Error
 	if err != nil {
-		return orderList, stat, total, err
+		return nil, err
 	}
 
 	if len(orderList) > 0 {
@@ -354,7 +355,7 @@ func GetOrderInfoList(info request.OrderPageInfo, ctx *gin.Context) ([]response.
 
 		orderProducts, err := GetOrderProductsByOrderIds(orderIds)
 		if err != nil {
-			return orderList, stat, total, err
+			return nil, err
 		}
 
 		for i := 0; i < len(orderList); i++ {
@@ -366,8 +367,14 @@ func GetOrderInfoList(info request.OrderPageInfo, ctx *gin.Context) ([]response.
 			}
 		}
 	}
-
-	return orderList, stat, total, nil
+	ginH := gin.H{
+		"stat":     stat,
+		"list":     orderList,
+		"total":    total,
+		"page":     info.Page,
+		"pageSize": info.PageSize,
+	}
+	return ginH, nil
 }
 
 // GetOrdersProductByProductIds 订单产品

@@ -12,12 +12,26 @@ var PageKeys = ResponseKeys{
 	{Key: "page", Value: 1},
 }
 
-func PostList(auth *httpexpect.Expect, url string, res map[string]interface{}, pageKeys ResponseKeys, status int, message string) {
+func PostList(auth *httpexpect.Expect, url string, res map[string]interface{}, status int, message string, keys ...ResponseKeys) {
 	obj := auth.POST(url).WithJSON(res).Expect().Status(http.StatusOK).JSON().Object()
 	obj.Keys().ContainsOnly("status", "data", "message")
 	obj.Value("status").Number().Equal(status)
 	obj.Value("message").String().Equal(message)
-	pageKeys.Test(obj.Value("data").Object())
+	if len(keys) == 0 {
+		return
+	}
+	//返回单个数据
+	if len(keys) == 1 {
+		keys[0].Test(obj.Value("data").Object())
+		return
+	}
+	// 返回数组数据
+	for m, ks := range keys {
+		if ks == nil {
+			return
+		}
+		ks.Test(obj.Value("data").Array().Element(m).Object())
+	}
 }
 
 func GetList(auth *httpexpect.Expect, url string, status int, message string, keys ...ResponseKeys) {

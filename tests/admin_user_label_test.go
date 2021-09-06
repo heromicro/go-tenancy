@@ -13,7 +13,7 @@ func TestUserLabelList(t *testing.T) {
 	defer base.BaseLogOut(auth)
 
 	url := "v1/admin/userLabel/getUserLabelList"
-	base.PostList(auth, url, base.PageRes, base.PageKeys, http.StatusOK, "获取成功")
+	base.PostList(auth, url, base.PageRes, http.StatusOK, "获取成功", base.PageKeys)
 }
 
 func TestUserLabelProcess(t *testing.T) {

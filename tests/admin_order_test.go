@@ -22,7 +22,7 @@ func TestOrderList(t *testing.T) {
 		{Key: "stat", Value: nil},
 		{Key: "total", Value: 0},
 	}
-	base.PostList(auth, url, base.PageRes, pageKeys, http.StatusOK, "获取成功")
+	base.PostList(auth, url, base.PageRes, http.StatusOK, "获取成功", pageKeys)
 }
 
 func TestGetOrderFilter(t *testing.T) {
@@ -50,25 +50,14 @@ func TestOrderDetail(t *testing.T) {
 
 	deviceAuth = base.DeviceWithLoginTester(t)
 	defer base.BaseLogOut(deviceAuth)
-	brandCategoryPid, _ := CreateBrandCategory(adminAuth, "箱包服饰_device_process", 0, http.StatusOK, "创建成功")
-	if brandCategoryPid == 0 {
-		t.Error("添加品牌分类父分类失败")
-		return
-	}
+	brandCategoryPid, _ := CreateBrandCategory(t,adminAuth, "箱包服饰_device_process", 0, http.StatusOK, "创建成功")
 	defer DeleteBrandCategory(adminAuth, brandCategoryPid)
 
-	brandCategoryId, _ := CreateBrandCategory(adminAuth, "精品服饰_device_process", brandCategoryPid, http.StatusOK, "创建成功")
-	if brandCategoryId == 0 {
-		t.Error("添加品牌分类失败")
-		return
-	}
+	brandCategoryId, _ := CreateBrandCategory(t,adminAuth, "精品服饰_device_process", brandCategoryPid, http.StatusOK, "创建成功")
+	
 	defer DeleteBrandCategory(adminAuth, brandCategoryId)
 
-	brandId, _ = CreateBrand(adminAuth, "冈本_device_process", brandCategoryId, http.StatusOK, "创建成功")
-	if brandId == 0 {
-		t.Error("添加品牌失败")
-		return
-	}
+	brandId, _ = CreateBrand(t, adminAuth, "冈本_device_process", brandCategoryId, http.StatusOK, "创建成功")
 	defer DeleteBrand(adminAuth, brandId)
 
 	cateId, _ = CreateCategory(adminAuth, "数码产品_device_process", 0, http.StatusOK, "创建成功")
