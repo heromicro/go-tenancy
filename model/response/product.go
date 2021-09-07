@@ -30,6 +30,7 @@ type ProductDetail struct {
 	SliderImage    string                     `json:"sliderImage"`           // 轮播图
 	SliderImages   []string                   `gorm:"-" json:"sliderImages"` // 轮播图
 	AttrValue      []request.ProductAttrValue `gorm:"-" json:"attrValue"`
+	Attr           []request.ProductAttr      `gorm:"-" json:"attr"`
 	CateId         uint                       `gorm:"-" json:"cateId"`            // 平台分类id
 	CategoryIds    []uint                     `gorm:"-" json:"tenancyCategoryId"` // 商户分类
 	ProductCates   []ProductCate              `gorm:"-" json:"productCates"`      // 商户分类

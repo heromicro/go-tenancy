@@ -1,6 +1,9 @@
 package request
 
-import "github.com/snowlyg/go-tenancy/model"
+import (
+	"github.com/snowlyg/go-tenancy/model"
+	"gorm.io/datatypes"
+)
 
 type ProductPageInfo struct {
 	Page              int    `json:"page" form:"page" binding:"required"`
@@ -37,12 +40,17 @@ type CreateProduct struct {
 	CateId       uint               `json:"cateId"`            // 平台分类id
 	CategoryIds  []uint             `json:"tenancyCategoryId"` // 平台分类id
 	Content      string             `json:"content"`           // 商品内容
-	AttrValue    []ProductAttrValue `json:"attrValue"`         // 商品内容
+	AttrValue    []ProductAttrValue `json:"attrValue"`         // 商品规格
+	Attr         []ProductAttr      `json:"attr"`              // 商品规格
 }
 
 type ProductAttrValue struct {
 	ProductID uint `json:"productId"` // 商品id
 	model.BaseProductAttrValue
-	Detail map[string]interface{} `json:"detail"`
-	Value0 string                 `json:"value0"`
+	Detail datatypes.JSON `json:"detail"`
+	Value0 string         `json:"value"`
+}
+type ProductAttr struct {
+	Detail datatypes.JSON `json:"detail"`
+	Value  string         `json:"value"`
 }

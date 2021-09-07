@@ -126,6 +126,15 @@ type ProductAttrValue struct {
 	ProductID uint  `gorm:"index:product_id;column:product_id;type:int;not null" json:"productId"` // 商品id
 }
 
+// ProductAttr 商品属性值表
+type ProductAttr struct {
+	g.TENANCY_MODEL
+	AttrName   string `gorm:"column:attr_name;type:varchar(32);not null" json:"attrName"`            // 属性名
+	AttrValues string `gorm:"column:attr_values;type:varchar(2000);not null" json:"attrValues"`      // 属性值
+	Type       int32  `gorm:"column:type;type:tinyint(1);default:1" json:"type"`                     // 活动类型 1=商品
+	ProductID  uint   `gorm:"index:product_id;column:product_id;type:int;not null" json:"productId"` // 商品id
+}
+
 type BaseProductAttrValue struct {
 	Sku     string  `gorm:"index:sku;column:sku;type:varchar(128);not null" json:"sku"`             // 商品属性索引值 (attr_value|attr_value[|....])
 	Stock   int64   `gorm:"column:stock;type:int unsigned;not null" json:"stock"`                   // 属性对应的库存

@@ -240,18 +240,10 @@ func TestClientOrderRemark(t *testing.T) {
 
 	deviceAuth = base.DeviceWithLoginTester(t)
 	defer base.BaseLogOut(deviceAuth)
-	brandCategoryPid, _ := CreateBrandCategory(adminAuth, "箱包服饰_device_process", 0, http.StatusOK, "创建成功")
-	if brandCategoryPid == 0 {
-		t.Error("添加品牌分类父分类失败")
-		return
-	}
+	brandCategoryPid, _ := CreateBrandCategory(t, adminAuth, "箱包服饰_device_process", 0, http.StatusOK, "创建成功")
 	defer DeleteBrandCategory(adminAuth, brandCategoryPid)
 
-	brandCategoryId, _ := CreateBrandCategory(adminAuth, "精品服饰_device_process", brandCategoryPid, http.StatusOK, "创建成功")
-	if brandCategoryId == 0 {
-		t.Error("添加品牌分类失败")
-		return
-	}
+	brandCategoryId, _ := CreateBrandCategory(t, adminAuth, "精品服饰_device_process", brandCategoryPid, http.StatusOK, "创建成功")
 	defer DeleteBrandCategory(adminAuth, brandCategoryId)
 
 	brandId, _ = CreateBrand(t, adminAuth, "冈本_device_process", brandCategoryId, http.StatusOK, "创建成功")
@@ -331,11 +323,11 @@ func TestClientOrderEdit(t *testing.T) {
 
 	deviceAuth = base.DeviceWithLoginTester(t)
 	defer base.BaseLogOut(deviceAuth)
-	brandCategoryPid, _ := CreateBrandCategory(t,adminAuth, "箱包服饰_device_process", 0, http.StatusOK, "创建成功")
+	brandCategoryPid, _ := CreateBrandCategory(t, adminAuth, "箱包服饰_device_process", 0, http.StatusOK, "创建成功")
 	defer DeleteBrandCategory(adminAuth, brandCategoryPid)
 
-	brandCategoryId, _ := CreateBrandCategory(t,adminAuth, "精品服饰_device_process", brandCategoryPid, http.StatusOK, "创建成功")
-	
+	brandCategoryId, _ := CreateBrandCategory(t, adminAuth, "精品服饰_device_process", brandCategoryPid, http.StatusOK, "创建成功")
+
 	defer DeleteBrandCategory(adminAuth, brandCategoryId)
 
 	brandId, _ = CreateBrand(t, adminAuth, "冈本_device_process", brandCategoryId, http.StatusOK, "创建成功")

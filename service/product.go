@@ -118,8 +118,7 @@ func getProductConditionByType(tenancyId uint, isTenancy bool, t int) response.P
 }
 
 // CreateProduct
-func CreateProduct(req request.CreateProduct, tenancyId uint) (uint, []string, int32, error) {
-	uniques := []string{}
+func CreateProduct(req request.CreateProduct, tenancyId uint) (uint, error) {
 	product := model.Product{
 		BaseProduct: req.BaseProduct,
 		SliderImage: strings.Join(req.SliderImages, ","),
@@ -134,7 +133,7 @@ func CreateProduct(req request.CreateProduct, tenancyId uint) (uint, []string, i
 
 	tenancy, err := GetTenancyByID(tenancyId)
 	if err != nil {
-		return product.ID, uniques, product.ProductType, err
+		return product.ID, err
 	}
 
 	// 开启商品审核的商家，审核商品
@@ -162,7 +161,7 @@ func CreateProduct(req request.CreateProduct, tenancyId uint) (uint, []string, i
 			return fmt.Errorf("set product content  %w", err)
 		}
 
-		uniques, err = SetProductAttrValue(tx, true, product.ID, req.ProductType, req.AttrValue)
+		err = SetProductAttrValue(tx, product.ID, req.ProductType, req.AttrValue, req.Attr)
 		if err != nil {
 			return fmt.Errorf("set product attr %w", err)
 		}
@@ -170,10 +169,10 @@ func CreateProduct(req request.CreateProduct, tenancyId uint) (uint, []string, i
 		return nil
 	})
 	if err != nil {
-		return product.ID, uniques, product.ProductType, err
+		return product.ID, err
 	}
 
-	return product.ID, uniques, product.ProductType, nil
+	return product.ID, nil
 }
 
 // ChangeProduct
@@ -205,7 +204,7 @@ func ChangeProduct(req request.UpdateProduct, id uint, ctx *gin.Context) error {
 			if err := tx.Model(&model.Product{}).Where("id = ?", id).Updates(&product).Error; err != nil {
 				return err
 			}
-			_, err = SetProductAttrValue(tx, true, id, req.ProductType, req.AttrValue)
+			err = SetProductAttrValue(tx, id, req.ProductType, req.AttrValue, req.Attr)
 			if err != nil {
 				return fmt.Errorf("set product attr %w", err)
 			}
@@ -256,39 +255,77 @@ func GetProductAttrValues(productIds []uint, uniques []string) ([]model.ProductA
 	return attrValues, nil
 }
 
-// SetProductAttrValue 设置产品规格
-func SetProductAttrValue(tx *gorm.DB, isUpdate bool, productId uint, productType int32, reqAttrValue []request.ProductAttrValue) ([]string, error) {
-	uniques := []string{}
-	if isUpdate {
-		err := tx.Where("product_id = ?", productId).Delete(&model.ProductAttrValue{}).Error
-		if err != nil {
-			return uniques, fmt.Errorf("create product attr %w", err)
-		}
+// GetProductAttrs 产品规格
+func GetProductAttrs(productIds []uint) ([]model.ProductAttr, error) {
+	attrs := []model.ProductAttr{}
+	db := g.TENANCY_DB.Model(&model.ProductAttr{})
+	if len(productIds) > 0 {
+		db = db.Where("product_id in ?", productIds)
 	}
+	err := db.Find(&attrs).Error
+	if err != nil {
+		return attrs, fmt.Errorf("get product attr  %w", err)
+	}
+	return attrs, nil
+}
+
+// SetProductAttrValue 设置产品规格
+func SetProductAttrValue(tx *gorm.DB, productId uint, productType int32, reqAttrValue []request.ProductAttrValue, reqAttr []request.ProductAttr) error {
+	err := tx.Unscoped().Where("product_id = ?", productId).Delete(&model.ProductAttrValue{}).Error
+	if err != nil {
+		return fmt.Errorf("delete product attr value %w", err)
+	}
+
 	productAttrValues := []model.ProductAttrValue{}
 	for _, attrValue := range reqAttrValue {
-		detail, err := json.Marshal(attrValue.Detail)
+		unique, err := file.Md5Byte([]byte(fmt.Sprintf("%s:%d", attrValue.Detail.String(), productId)))
 		if err != nil {
-			return uniques, fmt.Errorf("json product attr value detail marshal %w", err)
-		}
-		unique, err := file.Md5Byte([]byte(fmt.Sprintf("%s%d", string(detail), productId)))
-		if err != nil {
-			return uniques, fmt.Errorf("get product attr value unique %w", err)
+			return fmt.Errorf("get product attr value unique %w", err)
 		}
 		unique = fmt.Sprintf("%s%d", unique[12:23], productType)
-		uniques = append(uniques, unique)
 		attrValue.BaseProductAttrValue.Sku = attrValue.Value0
 		attrValue.BaseProductAttrValue.Unique = unique
-		productAttrValue := model.ProductAttrValue{ProductID: productId, BaseProductAttrValue: attrValue.BaseProductAttrValue, Detail: string(detail), Type: productType}
+		productAttrValue := model.ProductAttrValue{
+			ProductID:            productId,
+			BaseProductAttrValue: attrValue.BaseProductAttrValue,
+			Detail:               attrValue.Detail.String(),
+			Type:                 productType,
+		}
 		productAttrValues = append(productAttrValues, productAttrValue)
 	}
 
-	err := tx.Model(&model.ProductAttrValue{}).Create(&productAttrValues).Error
+	err = tx.Model(&model.ProductAttrValue{}).Create(&productAttrValues).Error
 	if err != nil {
-		return uniques, fmt.Errorf("create product attr value %w", err)
+		return fmt.Errorf("create product attr value %w", err)
 	}
 
-	return uniques, nil
+	err = tx.Unscoped().Where("product_id = ?", productId).Delete(&model.ProductAttr{}).Error
+	if err != nil {
+		return fmt.Errorf("delete product attr %w", err)
+	}
+
+	productAttrs := []model.ProductAttr{}
+	for _, attr := range reqAttr {
+		if attr.Detail == nil || attr.Value == "" {
+			continue
+		}
+		productAttr := model.ProductAttr{
+			ProductID:  productId,
+			AttrName:   attr.Value,
+			AttrValues: attr.Detail.String(),
+			Type:       productType,
+		}
+		productAttrs = append(productAttrs, productAttr)
+	}
+
+	if len(productAttrs) > 0 {
+		err = tx.Model(&model.ProductAttr{}).Create(&productAttrs).Error
+		if err != nil {
+			return fmt.Errorf("create product attr value %w", err)
+		}
+	}
+
+	return nil
 }
 
 func GetProductCategoryIdsById(id uint) ([]uint, error) {
@@ -500,6 +537,25 @@ func GetProductByID(id, tenancyId uint, isCuser bool) (response.ProductDetail, e
 		}
 	}
 	product.AttrValue = productAttrValues
+
+	attrs, err := GetProductAttrs([]uint{id})
+	if err != nil {
+		return product, err
+	}
+	productAttrs := []request.ProductAttr{}
+	if len(attrs) > 0 {
+		for _, attr := range attrs {
+			productAttr := request.ProductAttr{Value: attr.AttrName}
+			if attr.AttrValues != "" {
+				err := json.Unmarshal([]byte(attr.AttrValues), &productAttr.Detail)
+				if err != nil {
+					return product, fmt.Errorf("json product attr detail marshal %w", err)
+				}
+			}
+			productAttrs = append(productAttrs, productAttr)
+		}
+	}
+	product.Attr = productAttrs
 
 	product.CateId = product.ProductCategoryID
 	product.SliderImages = strings.Split(product.SliderImage, ",")

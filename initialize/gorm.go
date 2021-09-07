@@ -1,13 +1,9 @@
 package initialize
 
 import (
-	"os"
-
 	"github.com/snowlyg/go-tenancy/g"
 	"github.com/snowlyg/go-tenancy/initialize/internal"
-	"github.com/snowlyg/go-tenancy/model"
 
-	"go.uber.org/zap"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 	"gorm.io/gorm/logger"
@@ -21,75 +17,6 @@ func Gorm() *gorm.DB {
 	default:
 		return GormMysql()
 	}
-}
-
-// MysqlTables 注册数据库表专用
-func MysqlTables(db *gorm.DB) {
-	err := db.AutoMigrate(
-		model.SysUser{},
-		model.AdminInfo{},
-		model.GeneralInfo{},
-		model.SysAuthority{},
-		model.SysApi{},
-		model.SysBaseMenu{},
-		model.SysOperationRecord{},
-		model.SysTenancy{},
-		model.SysRegion{},
-		model.SysMini{},
-		model.SysConfigCategory{},
-		model.SysConfig{},
-		model.SysConfigValue{},
-		model.SysBrandCategory{},
-		model.SysBrand{},
-		model.Patient{},
-
-		model.TenancyMedia{},
-		model.ProductCategory{},
-		model.AttrTemplate{},
-		model.Product{},
-		model.ProductProductCate{},
-		model.ProductContent{},
-		model.ProductAttrValue{},
-		model.ProductReply{},
-		model.ShippingTemplate{},
-		model.ShippingTemplateFree{},
-		model.ShippingTemplateRegion{},
-		model.ShippingTemplateUndelivery{},
-
-		model.Cart{},
-		model.Express{},
-
-		model.Order{},
-		model.OrderStatus{},
-		model.OrderReceipt{},
-		model.OrderProduct{},
-		model.GroupOrder{},
-		model.CartOrder{},
-
-		model.RefundOrder{},
-		model.RefundProduct{},
-		model.RefundStatus{},
-
-		model.UserAddress{},
-		model.UserReceipt{},
-		model.UserBill{},
-		model.UserExtract{},
-		model.UserGroup{},
-		model.UserLabel{},
-		model.UserUserLabel{},
-		model.LabelRule{},
-		model.UserMerchant{},
-		model.UserRecharge{},
-		model.UserRelation{},
-		model.UserVisit{},
-		model.Mqtt{},
-		model.MqttRecord{},
-	)
-	if err != nil {
-		g.TENANCY_LOG.Error("register table failed", zap.Any("err", err))
-		os.Exit(0)
-	}
-	g.TENANCY_LOG.Info("register table success")
 }
 
 // GormMysql 初始化Mysql数据库

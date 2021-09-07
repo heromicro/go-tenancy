@@ -115,7 +115,7 @@ func CreateBrandCategory(t *testing.T, auth *httpexpect.Expect, cateName string,
 	res := base.IdKeys()
 	base.Create(auth, url, create, res, status, message)
 	brandCategoryId := res.GetId()
-	if brandCategoryId == 0 {
+	if brandCategoryId == 0 && cateName != "" {
 		t.Fatal("品牌分类添加错误")
 	}
 	return brandCategoryId, create

@@ -170,19 +170,48 @@ func InitDB(conf request.InitDB) error {
 		g.TENANCY_DB = db
 	}
 
-	err := g.TENANCY_DB.AutoMigrate(
+	err := MysqlTables(g.TENANCY_DB)
+	if err != nil {
+		refreshConfig()
+		return err
+	}
+	err = initDB(
+		source.Admin,
+		source.Api,
+		source.AuthorityMenu,
+		source.Authority,
+		source.AuthoritiesMenus,
+		source.Casbin,
+		source.DataAuthorities,
+		source.BaseMenu,
+		source.Region,
+		source.Config,
+		source.SysConfigCategory,
+		source.SysConfigValue,
+	)
+	if err != nil {
+		refreshConfig()
+		return err
+	}
+	writeConfig()
+	return nil
+}
+
+// MysqlTables 注册数据库表专用
+func MysqlTables(db *gorm.DB) error {
+	err := db.AutoMigrate(
 		model.SysUser{},
 		model.AdminInfo{},
 		model.GeneralInfo{},
 		model.SysAuthority{},
 		model.SysApi{},
 		model.SysBaseMenu{},
-		model.SysRegion{},
 		model.SysOperationRecord{},
 		model.SysTenancy{},
+		model.SysRegion{},
 		model.SysMini{},
-		model.SysConfig{},
 		model.SysConfigCategory{},
+		model.SysConfig{},
 		model.SysConfigValue{},
 		model.SysBrandCategory{},
 		model.SysBrand{},
@@ -195,6 +224,7 @@ func InitDB(conf request.InitDB) error {
 		model.ProductProductCate{},
 		model.ProductContent{},
 		model.ProductAttrValue{},
+		model.ProductAttr{},
 		model.ProductReply{},
 		model.ShippingTemplate{},
 		model.ShippingTemplateFree{},
@@ -203,6 +233,7 @@ func InitDB(conf request.InitDB) error {
 
 		model.Cart{},
 		model.Express{},
+
 		model.Order{},
 		model.OrderStatus{},
 		model.OrderReceipt{},
@@ -230,27 +261,9 @@ func InitDB(conf request.InitDB) error {
 		model.MqttRecord{},
 	)
 	if err != nil {
-		refreshConfig()
+		g.TENANCY_LOG.Error("register table failed", zap.Any("err", err))
 		return err
 	}
-	err = initDB(
-		source.Admin,
-		source.Api,
-		source.AuthorityMenu,
-		source.Authority,
-		source.AuthoritiesMenus,
-		source.Casbin,
-		source.DataAuthorities,
-		source.BaseMenu,
-		source.Region,
-		source.Config,
-		source.SysConfigCategory,
-		source.SysConfigValue,
-	)
-	if err != nil {
-		refreshConfig()
-		return err
-	}
-	writeConfig()
+	g.TENANCY_LOG.Info("register table success")
 	return nil
 }

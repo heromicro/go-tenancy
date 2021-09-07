@@ -20,4 +20,5 @@ type CartProduct struct {
 	IsFail            int                      `json:"isFail"`
 	ProductAttrUnique string                   `json:"productAttrUnique"` // 商品属性
 	AttrValue         request.ProductAttrValue `gorm:"-" json:"attrValue"`
+	Attr              request.ProductAttr      `gorm:"-" json:"attr"`
 }

@@ -167,7 +167,7 @@ func CreateProduct(auth *httpexpect.Expect, cateId, brandId, shipTempId, tenancy
 				"otPrice": 1,
 				"price":   1,
 				"stock":   1,
-				"value0":  "S",
+				"value":   "S",
 				"volume":  1,
 				"weight":  1,
 			},

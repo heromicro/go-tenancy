@@ -28,14 +28,12 @@ func CreateProduct(ctx *gin.Context) {
 		return
 	}
 
-	if id, uniques, productType, err := service.CreateProduct(product, multi.GetTenancyId(ctx)); err != nil {
+	if id, err := service.CreateProduct(product, multi.GetTenancyId(ctx)); err != nil {
 		g.TENANCY_LOG.Error("创建失败!", zap.Any("err", err))
 		response.FailWithMessage("添加失败:"+err.Error(), ctx)
 	} else {
 		response.OkWithDetailed(gin.H{
-			"id":          id,
-			"uniques":     uniques,
-			"productType": productType,
+			"id": id,
 		}, "创建成功", ctx)
 	}
 }
