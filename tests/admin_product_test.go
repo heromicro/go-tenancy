@@ -94,7 +94,7 @@ func TestProductProcess(t *testing.T) {
 	}
 	defer DeleteClientCategory(clientAuth, tenancyCategoryId, http.StatusOK, "删除成功")
 
-	productId, _, _, _ := CreateProduct(clientAuth, cateId, brandId, shipTempId, tenancyCategoryId, http.StatusOK, "创建成功")
+	productId, _ := CreateProduct(clientAuth, cateId, brandId, shipTempId, tenancyCategoryId, http.StatusOK, "创建成功")
 	if productId == 0 {
 		t.Errorf("添加商品失败")
 		return

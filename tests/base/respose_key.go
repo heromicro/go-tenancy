@@ -2,6 +2,7 @@ package base
 
 import (
 	"reflect"
+	"strings"
 
 	"github.com/gavv/httpexpect"
 )
@@ -16,6 +17,7 @@ type ResponseKeys []ResponseKey
 type ResponseKey struct {
 	Key   string
 	Value interface{}
+	Type  string
 }
 
 func (rks ResponseKeys) Keys() []string {
@@ -39,17 +41,29 @@ func (rks ResponseKeys) Test(object *httpexpect.Object) {
 		}
 		switch reflect.TypeOf(rk.Value).String() {
 		case "string":
-			if rk.Value.(string) == "notempty" {
+			if strings.ToLower(rk.Type) == "notempty" {
 				object.Value(rk.Key).String().NotEmpty()
 			} else {
 				object.Value(rk.Key).String().Equal(rk.Value.(string))
 			}
 		case "float64":
-			object.Value(rk.Key).Number().Equal(rk.Value.(float64))
+			if strings.ToLower(rk.Type) == "ge" {
+				object.Value(rk.Key).Number().Ge(rk.Value.(float64))
+			} else {
+				object.Value(rk.Key).Number().Equal(rk.Value.(float64))
+			}
 		case "uint":
-			object.Value(rk.Key).Number().Equal(rk.Value.(uint))
+			if strings.ToLower(rk.Type) == "ge" {
+				object.Value(rk.Key).Number().Ge(rk.Value.(uint))
+			} else {
+				object.Value(rk.Key).Number().Equal(rk.Value.(uint))
+			}
 		case "int":
-			object.Value(rk.Key).Number().Equal(rk.Value.(int))
+			if strings.ToLower(rk.Type) == "ge" {
+				object.Value(rk.Key).Number().Ge(rk.Value.(int))
+			} else {
+				object.Value(rk.Key).Number().Equal(rk.Value.(int))
+			}
 		case "[]base.ResponseKeys":
 			object.Value(rk.Key).Array().Length().Equal(len(rk.Value.([]ResponseKeys)))
 			length := int(object.Value(rk.Key).Array().Length().Raw())
@@ -84,6 +98,9 @@ func (rks ResponseKeys) Test(object *httpexpect.Object) {
 func (rks ResponseKeys) Scan(object *httpexpect.Object) {
 	for k, rk := range rks {
 		if !Exist(object, rk.Key) {
+			continue
+		}
+		if rk.Value == nil {
 			continue
 		}
 		switch reflect.TypeOf(rk.Value).String() {
@@ -136,6 +153,19 @@ func Exist(object *httpexpect.Object, key string) bool {
 }
 
 func (rks ResponseKeys) GetStringValue(key string) string {
+
+	if strings.Contains(key, ".") {
+		keys := strings.Split(key, ".")
+		if len(keys) != 2 {
+			return ""
+		}
+		res := rks.GetResponseKeysValue(keys[0])
+		if len(res) == 0 {
+			return ""
+		}
+		return res[0].GetStringValue(keys[1])
+	}
+
 	for _, rk := range rks {
 		if key == rk.Key {
 			if rk.Value == nil {

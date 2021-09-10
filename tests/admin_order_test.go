@@ -20,7 +20,7 @@ func TestOrderList(t *testing.T) {
 		{Key: "page", Value: 1},
 		{Key: "list", Value: nil},
 		{Key: "stat", Value: nil},
-		{Key: "total", Value: 0},
+		{Key: "total", Value: 0, Type: "ge"},
 	}
 	base.PostList(auth, url, base.PageRes, http.StatusOK, "获取成功", pageKeys)
 }
@@ -38,7 +38,7 @@ func TestGetOrderFilter(t *testing.T) {
 
 func TestOrderDetail(t *testing.T) {
 	var brandId, shipTempId, cateId, tenancyCategoryId, productId, cartId, orderId uint
-	var uniques []string
+	var unique string
 	var productType int32
 	var adminAuth, tenancyAuth, deviceAuth *httpexpect.Expect
 
@@ -50,11 +50,11 @@ func TestOrderDetail(t *testing.T) {
 
 	deviceAuth = base.DeviceWithLoginTester(t)
 	defer base.BaseLogOut(deviceAuth)
-	brandCategoryPid, _ := CreateBrandCategory(t,adminAuth, "箱包服饰_device_process", 0, http.StatusOK, "创建成功")
+	brandCategoryPid, _ := CreateBrandCategory(t, adminAuth, "箱包服饰_device_process", 0, http.StatusOK, "创建成功")
 	defer DeleteBrandCategory(adminAuth, brandCategoryPid)
 
-	brandCategoryId, _ := CreateBrandCategory(t,adminAuth, "精品服饰_device_process", brandCategoryPid, http.StatusOK, "创建成功")
-	
+	brandCategoryId, _ := CreateBrandCategory(t, adminAuth, "精品服饰_device_process", brandCategoryPid, http.StatusOK, "创建成功")
+
 	defer DeleteBrandCategory(adminAuth, brandCategoryId)
 
 	brandId, _ = CreateBrand(t, adminAuth, "冈本_device_process", brandCategoryId, http.StatusOK, "创建成功")
@@ -81,16 +81,21 @@ func TestOrderDetail(t *testing.T) {
 	}
 	defer DeleteClientCategory(tenancyAuth, tenancyCategoryId, http.StatusOK, "删除成功")
 
-	productId, uniques, productType, _ = CreateProduct(tenancyAuth, cartId, brandId, shipTempId, tenancyCategoryId, http.StatusOK, "创建成功")
-	if productId == 0 || len(uniques) == 0 || productType == 0 {
-		t.Errorf("添加商品失败 商品id:%d 规格:%+v,商品类型:%d", productId, uniques, productType)
+	productId, productData := CreateProduct(tenancyAuth, cartId, brandId, shipTempId, tenancyCategoryId, http.StatusOK, "创建成功")
+	if productId == 0 {
+		t.Errorf("添加商品失败 商品id:%d ", productId)
 		return
 	}
 	defer DeleteProduct(tenancyAuth, productId, http.StatusOK, "删除成功")
 
+	unique, productType = GetProduct(tenancyAuth, productId, productData)
+	if len(unique) == 0 || productType == 0 {
+		t.Errorf("添加商品失败规格:%+v,商品类型:%d", unique, productType)
+	}
+
 	ChangeProductIsShow(tenancyAuth, productId, g.StatusTrue, http.StatusOK, "设置成功")
 
-	createCartData := map[string]interface{}{"cartNum": 2, "isNew": 2, "productAttrUnique": uniques[0], "productId": productId, "productType": productType}
+	createCartData := map[string]interface{}{"cartNum": 2, "isNew": 2, "productAttrUnique": unique, "productId": productId, "productType": productType}
 	cartId = CreateCart(deviceAuth, createCartData, http.StatusOK, "创建成功")
 	if cartId == 0 {
 		t.Error("添加购物车失败")

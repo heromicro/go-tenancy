@@ -22,7 +22,7 @@ func TestDeviceProductList(t *testing.T) {
 func TestDeviceProductDetail(t *testing.T) {
 
 	var brandId, shipTempId, cateId, tenancyCategoryId, productId, cartId uint
-	var uniques []string
+	var unique string
 	var productType int32
 	var adminAuth, tenancyAuth, deviceAuth *httpexpect.Expect
 
@@ -65,12 +65,18 @@ func TestDeviceProductDetail(t *testing.T) {
 	}
 	defer DeleteClientCategory(tenancyAuth, tenancyCategoryId, http.StatusOK, "删除成功")
 
-	productId, uniques, productType, _ = CreateProduct(tenancyAuth, cartId, brandId, shipTempId, tenancyCategoryId, http.StatusOK, "创建成功")
-	if productId == 0 || len(uniques) == 0 || productType == 0 {
-		t.Errorf("添加商品失败 商品id:%d 规格:%+v,商品类型:%d", productId, uniques, productType)
+	productId, productData := CreateProduct(tenancyAuth, cartId, brandId, shipTempId, tenancyCategoryId, http.StatusOK, "创建成功")
+	if productId == 0 {
+		t.Errorf("添加商品失败 商品id:%d ", productId)
 		return
 	}
 	defer DeleteProduct(tenancyAuth, productId, http.StatusOK, "删除成功")
+
+	unique, productType = GetProduct(tenancyAuth, productId, productData)
+	if len(unique) == 0 || productType == 0 {
+		t.Errorf("添加商品失败规格:%+v,商品类型:%d", unique, productType)
+	}
+
 	ChangeProductIsShow(tenancyAuth, productId, g.StatusTrue, http.StatusOK, "设置成功")
 
 	url := fmt.Sprintf("v1/device/product/getProductById/%d", productId)

@@ -69,7 +69,7 @@ func TestClientProductProcess(t *testing.T) {
 	}
 	defer DeleteClientCategory(clientAuth, tenancyCategoryId, http.StatusOK, "删除成功")
 
-	productId, _, _, _ := CreateProduct(clientAuth, cateId, brandId, shipTempId, tenancyCategoryId, http.StatusOK, "创建成功")
+	productId, _ := CreateProduct(clientAuth, cateId, brandId, shipTempId, tenancyCategoryId, http.StatusOK, "创建成功")
 	if productId == 0 {
 		t.Errorf("添加商品失败")
 		return
@@ -152,7 +152,39 @@ func TestClientProductProcess(t *testing.T) {
 
 }
 
-func CreateProduct(auth *httpexpect.Expect, cateId, brandId, shipTempId, tenancyCategoryId uint, status int, message string) (uint, []string, int32, map[string]interface{}) {
+func GetProduct(auth *httpexpect.Expect, id uint, update map[string]interface{}) (uniques string, productType int32) {
+	keys := base.ResponseKeys{
+		{Key: "id", Value: id},
+		{Key: "sort", Value: update["sort"]},
+		{Key: "specType", Value: update["specType"]},
+		{Key: "sysBrandId", Value: update["sysBrandId"]},
+		{Key: "tenancyCategoryId", Value: update["tenancyCategoryId"]},
+		{Key: "tempId", Value: update["tempId"]},
+		{Key: "cateId", Value: update["cateId"]},
+		{Key: "storeInfo", Value: update["storeInfo"]},
+		{Key: "storeName", Value: update["storeName"]},
+		{Key: "unitName", Value: update["unitName"]},
+		{Key: "videoLink", Value: update["videoLink"]},
+		{Key: "keyword", Value: update["keyword"]},
+		{Key: "barCode", Value: update["barCode"]},
+		{Key: "sliderImage", Value: update["sliderImage"]},
+		{Key: "content", Value: update["content"]},
+		{Key: "image", Value: update["image"]},
+		{Key: "isGood", Value: update["isGood"]},
+		{Key: "attrValue", Value: update["attrValue"]},
+		{Key: "sliderImages", Value: update["sliderImages"]},
+		{Key: "attrValue", Value: []base.ResponseKeys{
+			{{Key: "unique", Value: ""}},
+		}},
+		{Key: "productType", Value: 0},
+	}
+
+	url := fmt.Sprintf("v1/merchant/product/getProductById/%d", id)
+	base.ScanById(auth, url, nil, http.StatusOK, "操作成功", keys)
+	return keys.GetStringValue("attrValue.unique"), keys.GetInt32Value("productType")
+}
+
+func CreateProduct(auth *httpexpect.Expect, cateId, brandId, shipTempId, tenancyCategoryId uint, status int, message string) (uint, map[string]interface{}) {
 	createProduct := map[string]interface{}{
 		"attrValue": []map[string]interface{}{
 			{
@@ -194,12 +226,10 @@ func CreateProduct(auth *httpexpect.Expect, cateId, brandId, shipTempId, tenancy
 	}
 	res := base.ResponseKeys{
 		{Key: "id", Value: uint(0)},
-		{Key: "uniques", Value: []string{}},
-		{Key: "productType", Value: 0},
 	}
 	url := "v1/merchant/product/createProduct"
 	base.Create(auth, url, createProduct, res, status, message)
-	return res.GetId(), res.GetStringArrayValue("uniques"), res.GetInt32Value("productType"), createProduct
+	return res.GetId(), createProduct
 }
 
 func DeleteProduct(auth *httpexpect.Expect, id uint, status int, message string) {

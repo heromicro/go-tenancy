@@ -20,7 +20,7 @@ func TestClientOrderList(t *testing.T) {
 		{Key: "page", Value: 1},
 		{Key: "list", Value: nil},
 		{Key: "stat", Value: nil},
-		{Key: "total", Value: 0},
+		{Key: "total", Value: 0, Type: "ge"},
 	}
 	base.PostList(auth, url, base.PageRes, http.StatusOK, "获取成功", pageKeys)
 }
@@ -47,7 +47,7 @@ func TestGetClientOrderFilter(t *testing.T) {
 
 func TestClientOrderDetail(t *testing.T) {
 	var brandId, shipTempId, cateId, tenancyCategoryId, productId, cartId, orderId uint
-	var uniques []string
+	var unique string
 	var productType int32
 	var adminAuth, tenancyAuth, deviceAuth *httpexpect.Expect
 
@@ -90,16 +90,20 @@ func TestClientOrderDetail(t *testing.T) {
 	}
 	defer DeleteClientCategory(tenancyAuth, tenancyCategoryId, http.StatusOK, "删除成功")
 
-	productId, uniques, productType, _ = CreateProduct(tenancyAuth, cartId, brandId, shipTempId, tenancyCategoryId, http.StatusOK, "创建成功")
-	if productId == 0 || len(uniques) == 0 || productType == 0 {
-		t.Errorf("添加商品失败 商品id:%d 规格:%+v,商品类型:%d", productId, uniques, productType)
+	productId, productData := CreateProduct(tenancyAuth, cartId, brandId, shipTempId, tenancyCategoryId, http.StatusOK, "创建成功")
+	if productId == 0 {
+		t.Errorf("添加商品失败 商品id:%d", productId)
 		return
 	}
 	defer DeleteProduct(tenancyAuth, productId, http.StatusOK, "删除成功")
 
+	unique, productType = GetProduct(tenancyAuth, productId, productData)
+	if len(unique) == 0 || productType == 0 {
+		t.Errorf("添加商品失败规格:%+v,商品类型:%d", unique, productType)
+	}
 	ChangeProductIsShow(tenancyAuth, productId, g.StatusTrue, http.StatusOK, "设置成功")
 
-	createCartData := map[string]interface{}{"cartNum": 2, "isNew": 2, "productAttrUnique": uniques[0], "productId": productId, "productType": productType}
+	createCartData := map[string]interface{}{"cartNum": 2, "isNew": 2, "productAttrUnique": unique, "productId": productId, "productType": productType}
 	cartId = CreateCart(deviceAuth, createCartData, http.StatusOK, "创建成功")
 	if cartId == 0 {
 		t.Error("添加购物车失败")
@@ -123,7 +127,7 @@ func TestClientOrderDetail(t *testing.T) {
 }
 func TestClientOrderRecord(t *testing.T) {
 	var brandId, shipTempId, cateId, tenancyCategoryId, productId, cartId, orderId uint
-	var uniques []string
+	var unique string
 	var productType int32
 	var adminAuth, tenancyAuth, deviceAuth *httpexpect.Expect
 
@@ -166,16 +170,21 @@ func TestClientOrderRecord(t *testing.T) {
 	}
 	defer DeleteClientCategory(tenancyAuth, tenancyCategoryId, http.StatusOK, "删除成功")
 
-	productId, uniques, productType, _ = CreateProduct(tenancyAuth, cartId, brandId, shipTempId, tenancyCategoryId, http.StatusOK, "创建成功")
-	if productId == 0 || len(uniques) == 0 || productType == 0 {
-		t.Errorf("添加商品失败 商品id:%d 规格:%+v,商品类型:%d", productId, uniques, productType)
+	productId, productData := CreateProduct(tenancyAuth, cartId, brandId, shipTempId, tenancyCategoryId, http.StatusOK, "创建成功")
+	if productId == 0 {
+		t.Errorf("添加商品失败 商品id:%d", productId)
 		return
 	}
 	defer DeleteProduct(tenancyAuth, productId, http.StatusOK, "删除成功")
 
+	unique, productType = GetProduct(tenancyAuth, productId, productData)
+	if len(unique) == 0 || productType == 0 {
+		t.Errorf("添加商品失败规格:%+v,商品类型:%d", unique, productType)
+	}
+
 	ChangeProductIsShow(tenancyAuth, productId, g.StatusTrue, http.StatusOK, "设置成功")
 
-	createCartData := map[string]interface{}{"cartNum": 2, "isNew": 2, "productAttrUnique": uniques[0], "productId": productId, "productType": productType}
+	createCartData := map[string]interface{}{"cartNum": 2, "isNew": 2, "productAttrUnique": unique, "productId": productId, "productType": productType}
 	cartId = CreateCart(deviceAuth, createCartData, http.StatusOK, "创建成功")
 	if cartId == 0 {
 		t.Error("添加购物车失败")
@@ -228,7 +237,7 @@ func TestClientOrderDelivery(t *testing.T) {
 }
 func TestClientOrderRemark(t *testing.T) {
 	var brandId, shipTempId, cateId, tenancyCategoryId, productId, cartId, orderId uint
-	var uniques []string
+	var unique string
 	var productType int32
 	var adminAuth, tenancyAuth, deviceAuth *httpexpect.Expect
 
@@ -270,16 +279,21 @@ func TestClientOrderRemark(t *testing.T) {
 	}
 	defer DeleteClientCategory(tenancyAuth, tenancyCategoryId, http.StatusOK, "删除成功")
 
-	productId, uniques, productType, _ = CreateProduct(tenancyAuth, cartId, brandId, shipTempId, tenancyCategoryId, http.StatusOK, "创建成功")
-	if productId == 0 || len(uniques) == 0 || productType == 0 {
-		t.Errorf("添加商品失败 商品id:%d 规格:%+v,商品类型:%d", productId, uniques, productType)
+	productId, productData := CreateProduct(tenancyAuth, cartId, brandId, shipTempId, tenancyCategoryId, http.StatusOK, "创建成功")
+	if productId == 0 {
+		t.Errorf("添加商品失败 商品id:%d ", productId)
 		return
 	}
 	defer DeleteProduct(tenancyAuth, productId, http.StatusOK, "删除成功")
 
+	unique, productType = GetProduct(tenancyAuth, productId, productData)
+	if len(unique) == 0 || productType == 0 {
+		t.Errorf("添加商品失败规格:%+v,商品类型:%d", unique, productType)
+	}
+
 	ChangeProductIsShow(tenancyAuth, productId, g.StatusTrue, http.StatusOK, "设置成功")
 
-	createCartData := map[string]interface{}{"cartNum": 2, "isNew": 2, "productAttrUnique": uniques[0], "productId": productId, "productType": productType}
+	createCartData := map[string]interface{}{"cartNum": 2, "isNew": 2, "productAttrUnique": unique, "productId": productId, "productType": productType}
 	cartId = CreateCart(deviceAuth, createCartData, http.StatusOK, "创建成功")
 	if cartId == 0 {
 		t.Error("添加购物车失败")
@@ -311,7 +325,7 @@ func TestClientOrderRemark(t *testing.T) {
 
 func TestClientOrderEdit(t *testing.T) {
 	var brandId, shipTempId, cateId, tenancyCategoryId, productId, cartId, orderId uint
-	var uniques []string
+	var unique string
 	var productType int32
 	var adminAuth, tenancyAuth, deviceAuth *httpexpect.Expect
 
@@ -354,16 +368,20 @@ func TestClientOrderEdit(t *testing.T) {
 	}
 	defer DeleteClientCategory(tenancyAuth, tenancyCategoryId, http.StatusOK, "删除成功")
 
-	productId, uniques, productType, _ = CreateProduct(tenancyAuth, cartId, brandId, shipTempId, tenancyCategoryId, http.StatusOK, "创建成功")
-	if productId == 0 || len(uniques) == 0 || productType == 0 {
-		t.Errorf("添加商品失败 商品id:%d 规格:%+v,商品类型:%d", productId, uniques, productType)
+	productId, productData := CreateProduct(tenancyAuth, cartId, brandId, shipTempId, tenancyCategoryId, http.StatusOK, "创建成功")
+	if productId == 0 {
+		t.Errorf("添加商品失败 商品id:%d ", productId)
 		return
 	}
 	defer DeleteProduct(tenancyAuth, productId, http.StatusOK, "删除成功")
 
+	unique, productType = GetProduct(tenancyAuth, productId, productData)
+	if len(unique) == 0 || productType == 0 {
+		t.Errorf("添加商品失败规格:%+v,商品类型:%d", unique, productType)
+	}
 	ChangeProductIsShow(tenancyAuth, productId, g.StatusTrue, http.StatusOK, "设置成功")
 
-	createCartData := map[string]interface{}{"cartNum": 2, "isNew": 2, "productAttrUnique": uniques[0], "productId": productId, "productType": productType}
+	createCartData := map[string]interface{}{"cartNum": 2, "isNew": 2, "productAttrUnique": unique, "productId": productId, "productType": productType}
 	cartId = CreateCart(deviceAuth, createCartData, http.StatusOK, "创建成功")
 	if cartId == 0 {
 		t.Error("添加购物车失败")

@@ -23,7 +23,7 @@ func TestDeviceRefundOrderList(t *testing.T) {
 
 func TestDeviceRefundOrderProcess(t *testing.T) {
 	var brandId, shipTempId, cateId, tenancyCategoryId, productId, cartId, orderId uint
-	var uniques []string
+	var unique string
 	var productType int32
 	var adminAuth, tenancyAuth, deviceAuth *httpexpect.Expect
 
@@ -66,16 +66,21 @@ func TestDeviceRefundOrderProcess(t *testing.T) {
 	}
 	defer DeleteClientCategory(tenancyAuth, tenancyCategoryId, http.StatusOK, "删除成功")
 
-	productId, uniques, productType, _ = CreateProduct(tenancyAuth, cartId, brandId, shipTempId, tenancyCategoryId, http.StatusOK, "创建成功")
-	if productId == 0 || len(uniques) == 0 || productType == 0 {
-		t.Errorf("添加商品失败 商品id:%d 规格:%+v,商品类型:%d", productId, uniques, productType)
+	productId, productData := CreateProduct(tenancyAuth, cartId, brandId, shipTempId, tenancyCategoryId, http.StatusOK, "创建成功")
+	if productId == 0 {
+		t.Errorf("添加商品失败 商品id:%d", productId)
 		return
 	}
 	defer DeleteProduct(tenancyAuth, productId, http.StatusOK, "删除成功")
 
+	unique, productType = GetProduct(tenancyAuth, productId, productData)
+	if len(unique) == 0 || productType == 0 {
+		t.Errorf("添加商品失败规格:%+v,商品类型:%d", unique, productType)
+	}
+
 	ChangeProductIsShow(tenancyAuth, productId, g.StatusTrue, http.StatusOK, "设置成功")
 
-	createCartData := map[string]interface{}{"cartNum": 2, "isNew": 2, "productAttrUnique": uniques[0], "productId": productId, "productType": productType}
+	createCartData := map[string]interface{}{"cartNum": 2, "isNew": 2, "productAttrUnique": unique, "productId": productId, "productType": productType}
 	cartId = CreateCart(deviceAuth, createCartData, http.StatusOK, "创建成功")
 	if cartId == 0 {
 		t.Error("添加购物车失败")
@@ -101,7 +106,7 @@ func TestDeviceRefundOrderProcess(t *testing.T) {
 			},
 		},
 	}
-	base.ScanById(deviceAuth, fmt.Sprintf("v1/device/order/getOrderById/%d", orderId), orderId, nil, getOrderByIdKeys, http.StatusOK, "操作成功")
+	base.ScanById(deviceAuth, fmt.Sprintf("v1/device/order/getOrderById/%d", orderId), nil, http.StatusOK, "操作成功", getOrderByIdKeys)
 	orderSn := getOrderByIdKeys.GetStringValue("orderSn")
 	orderProducts := getOrderByIdKeys.GetResponseKeysValue("orderProduct")
 	if len(orderProducts) == 0 {
