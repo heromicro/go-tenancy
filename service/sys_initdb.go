@@ -30,7 +30,6 @@ var (
 	baseSystem = config.System{
 		CacheType:   "",
 		Level:       "release",
-		Env:         "pro",
 		Addr:        8089,
 		DbType:      "mysql",
 		AdminPreix:  "/admin",
@@ -98,16 +97,12 @@ func InitDB(conf request.InitDB) error {
 	if conf.Level == "" {
 		conf.Level = "release"
 	}
-	if conf.Env == "" {
-		conf.Env = "pro"
-	}
 	if conf.Addr == 0 {
 		conf.Addr = 8089
 	}
 	g.TENANCY_CONFIG.System.CacheType = conf.SqlType
 	if conf.CacheType == "redis" {
 		g.TENANCY_CONFIG.System.CacheType = conf.CacheType
-		g.TENANCY_CONFIG.System.Env = conf.Env
 		g.TENANCY_CONFIG.System.Addr = conf.Addr
 		g.TENANCY_CONFIG.Redis.Addr = fmt.Sprintf("%s:%s", conf.Cache.Host, conf.Cache.Port)
 		g.TENANCY_CONFIG.Redis.Password = conf.Cache.Password

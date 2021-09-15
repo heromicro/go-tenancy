@@ -33,7 +33,6 @@ redis:
   pool-size: 0
 system:
   level: error
-  env: dev
   addr: 8089
   db-type: 
   cache-type:  # redis , local

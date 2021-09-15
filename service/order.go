@@ -837,6 +837,7 @@ func GetQrCode(orderId, tenancyId, userId uint, orderType int) ([]byte, error) {
 	}
 	// 生成支付地址二维码
 	payUrl := fmt.Sprintf("%s/v1/pay/payOrder?orderId=%d&tenancyId=%d&userId=%d&orderType=%d", seitURL, orderId, tenancyId, userId, orderType)
+	if g.TENANCY_CONFIG.System.debug ==  "debug"
 	q, err := qrcode.New(payUrl, qrcode.Medium)
 	if err != nil {
 		return nil, err

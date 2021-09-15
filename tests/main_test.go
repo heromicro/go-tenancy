@@ -46,7 +46,6 @@ func TestMain(m *testing.M) {
 		},
 		Addr:  8089,
 		Level: "test",
-		Env:   "dev",
 	}
 	err := service.InitDB(mysqlConfig)
 	if err != nil {

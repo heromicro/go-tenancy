@@ -18,7 +18,7 @@ func EmailTest() error {
 }
 
 // PayTest 支付测试
-func PayTest(req request.CreateCart, tenancyName string) ([]byte, error) {
+func PayTest(req request.CreateCart) ([]byte, error) {
 	cart, err := CreateCart(req)
 	if err != nil {
 		return nil, err
@@ -28,9 +28,14 @@ func PayTest(req request.CreateCart, tenancyName string) ([]byte, error) {
 		OrderType: 1,
 		Remark:    "remark",
 	}
+
 	qrcode, err := cache.GetCacheBytes(payTestKey)
 	if err != nil || qrcode == nil {
-		qrcode, _, err = CreateOrder(res, req.SysTenancyID, req.SysUserID, req.PatientID, tenancyName)
+		tenancy, err := GetTenancyByID(req.SysTenancyID)
+		if err != nil {
+			return nil, err
+		}
+		qrcode, _, err = CreateOrder(res, req.SysTenancyID, req.SysUserID, req.PatientID, tenancy.Name)
 		if err != nil {
 			return nil, err
 		}

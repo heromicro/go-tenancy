@@ -22,7 +22,7 @@ func EmailTest(ctx *gin.Context) {
 	}
 }
 
-// PayTest 发送测试邮件
+// PayTest 支付测试
 func PayTest(ctx *gin.Context) {
 	var req request.CreateCart
 	if errs := ctx.ShouldBindJSON(&req); errs != nil {
@@ -30,7 +30,7 @@ func PayTest(ctx *gin.Context) {
 		return
 	}
 
-	if qrcode, err := service.PayTest(req, "宝安中心人民医院"); err != nil {
+	if qrcode, err := service.PayTest(req); err != nil {
 		g.TENANCY_LOG.Error("测试失败!", zap.Any("err", err))
 		response.FailWithMessage("测试失败", ctx)
 	} else {

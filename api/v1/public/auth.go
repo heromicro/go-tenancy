@@ -19,7 +19,7 @@ func ClientLogin(ctx *gin.Context) {
 		return
 	}
 
-	if store.Verify(L.CaptchaId, L.Captcha, true) || g.TENANCY_CONFIG.System.Env == "dev" {
+	if store.Verify(L.CaptchaId, L.Captcha, true) || g.TENANCY_CONFIG.System.Level == "debug" {
 		U := &model.SysUser{Username: L.Username, Password: L.Password}
 		if loginResponse, err := service.Login(U, multi.TenancyAuthority); err != nil {
 			g.TENANCY_LOG.Error("登陆失败!", zap.Any("err", err))
@@ -40,7 +40,7 @@ func AdminLogin(ctx *gin.Context) {
 		return
 	}
 
-	if store.Verify(L.CaptchaId, L.Captcha, true) || g.TENANCY_CONFIG.System.Env == "dev" {
+	if store.Verify(L.CaptchaId, L.Captcha, true) || g.TENANCY_CONFIG.System.Level == "debug" {
 		U := &model.SysUser{Username: L.Username, Password: L.Password}
 		if loginResponse, err := service.Login(U, multi.AdminAuthority); err != nil {
 			g.TENANCY_LOG.Error("登陆失败!", zap.Any("err", err))
