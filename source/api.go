@@ -36,7 +36,7 @@ var baseApis = []model.SysApi{
 	{Path: "/v1/admin/user/deleteUser", Description: "删除用户", ApiGroup: "user", Method: "DELETE"},
 
 	// 患者管理
-	{Path: "/v1/admin/cuser/getPatientSelect/:tenancy_id", Description: "患者下拉选项", ApiGroup: "cuser", Method: "GET"},
+	{Path: "/v1/admin/patient/getPatientSelect/:tenancy_id", Description: "患者下拉选项", ApiGroup: "patient", Method: "GET"},
 	// 用户管理
 	{Path: "/v1/admin/cuser/getGeneralSelect/:tenancy_id", Description: "c用户下拉选项", ApiGroup: "cuser", Method: "GET"},
 	{Path: "/v1/admin/cuser/getGeneralList", Description: "c用户列表", ApiGroup: "cuser", Method: "POST"},

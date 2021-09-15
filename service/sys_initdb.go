@@ -32,7 +32,7 @@ var (
 		Level:       "release",
 		Env:         "pro",
 		Addr:        8089,
-		DbType:      "",
+		DbType:      "mysql",
 		AdminPreix:  "/admin",
 		ClientPreix: "/merchant",
 	}
@@ -104,7 +104,7 @@ func InitDB(conf request.InitDB) error {
 	if conf.Addr == 0 {
 		conf.Addr = 8089
 	}
-
+	g.TENANCY_CONFIG.System.CacheType = conf.SqlType
 	if conf.CacheType == "redis" {
 		g.TENANCY_CONFIG.System.CacheType = conf.CacheType
 		g.TENANCY_CONFIG.System.Env = conf.Env

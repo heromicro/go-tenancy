@@ -33,3 +33,13 @@ func getNodeId() *snowflake.Node {
 	node, _ = snowflake.NewNode(1)
 	return node
 }
+
+// IsInit 项目是否需要初始化
+func IsInit() bool {
+	if TENANCY_DB == nil {
+		return false
+	} else if TENANCY_CONFIG.System.CacheType == "redis" && TENANCY_CACHE == nil {
+		return false
+	}
+	return true
+}
