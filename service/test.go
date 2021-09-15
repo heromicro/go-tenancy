@@ -1,6 +1,7 @@
 package service
 
 import (
+	"fmt"
 	"time"
 
 	"github.com/snowlyg/go-tenancy/initialize/cache"
@@ -29,7 +30,7 @@ func PayTest(req request.CreateCart) ([]byte, error) {
 		Remark:    "remark",
 	}
 
-	qrcode, err := cache.GetCacheBytes(payTestKey)
+	qrcode, err := cache.GetCacheBytes(fmt.Sprintf("%s%d", payTestKey, cart.ID))
 	if err != nil || qrcode == nil {
 		tenancy, err := GetTenancyByID(req.SysTenancyID)
 		if err != nil {

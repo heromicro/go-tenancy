@@ -12,7 +12,7 @@ var SysConfigValue = new(configValue)
 type configValue struct{}
 
 var configValues = []model.SysConfigValue{
-	{ConfigKey: "site_url", Value: "http://127.0.0.1:8089", SysTenancyID: 0},
+	{ConfigKey: "site_url", Value: "http://tenancy.t.chindeo.com", SysTenancyID: 0},
 	{ConfigKey: "site_name", Value: "GOTENANCY\u591a\u5546\u6237\u5546\u57ce", SysTenancyID: 0},
 	{ConfigKey: "site_open", Value: "1", SysTenancyID: 0},
 	{ConfigKey: "wechat_name", Value: "GOTENANCY \u591a\u5546\u6237", SysTenancyID: 0},

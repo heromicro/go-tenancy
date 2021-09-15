@@ -149,7 +149,7 @@ func getOrderPrice(price float64) float64 {
 	return price
 }
 
-// Alipay
+// Alipay 支付宝支付
 func Alipay(order model.Order, tenancyName string) (response.PayOrder, error) {
 	var res response.PayOrder
 	siteName, err := param.GetSeitName()
@@ -177,6 +177,7 @@ func Alipay(order model.Order, tenancyName string) (response.PayOrder, error) {
 	return res, nil
 }
 
+// AliPayClient 支付客户端
 func AliPayClient() (*alipay.Client, error) {
 	alipayConf, err := param.GetAliPayConfig()
 	if err != nil {
@@ -187,11 +188,17 @@ func AliPayClient() (*alipay.Client, error) {
 		return nil, err
 	}
 
+	// 测试采用 PKCS1，正式使用 PKCS8
+	pkcs := alipay.PKCS8
+	if !alipayConf.AlipayEnv {
+		pkcs = alipay.PKCS1
+	}
+
 	client := alipay.NewClient(alipayConf.AlipayAppId, alipayConf.AlipayPrivateKey, alipayConf.AlipayEnv)
 	//配置公共参数
 	client.SetCharset("utf-8").
 		SetSignType(alipay.RSA2).
-		SetPrivateKeyType(alipay.PKCS1).
+		SetPrivateKeyType(pkcs).
 		SetNotifyUrl(notifyUrl)
 		//SetReturnUrl("https://www.fmm.ink").
 		// if !g.TENANCY_CONFIG.Alipay.IsProd {

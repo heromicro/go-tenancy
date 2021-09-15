@@ -16,6 +16,7 @@ import (
 	"github.com/snowlyg/go-tenancy/model/response"
 	"github.com/snowlyg/go-tenancy/utils/param"
 	"github.com/snowlyg/multi"
+	"go.uber.org/zap"
 	"gorm.io/gorm"
 )
 
@@ -801,7 +802,7 @@ func CreateOrder(req request.CreateOrder, tenancyId, userId, patientId uint, ten
 			return fmt.Errorf("生成订单-修改购物车属性错误 %w", err)
 		}
 		// 生成二维码
-		png, err = GetQrCode(order.ID, tenancyId, userId, order.OrderType)
+		png, err = GetQrCode(order.ID, tenancyId, patientId, order.OrderType)
 		if err != nil {
 			return err
 		}
@@ -830,14 +831,16 @@ func CheckOrderStatusBeforePay(req request.GetById) (model.Order, error) {
 }
 
 // GetQrCode 生成支付二维码
-func GetQrCode(orderId, tenancyId, userId uint, orderType int) ([]byte, error) {
+func GetQrCode(orderId, tenancyId, patientId uint, orderType int) ([]byte, error) {
 	seitURL, err := param.GetSeitURL()
 	if err != nil {
 		return nil, err
 	}
 	// 生成支付地址二维码
-	payUrl := fmt.Sprintf("%s/v1/pay/payOrder?orderId=%d&tenancyId=%d&userId=%d&orderType=%d", seitURL, orderId, tenancyId, userId, orderType)
-	if g.TENANCY_CONFIG.System.debug ==  "debug"
+	payUrl := fmt.Sprintf("%s/v1/pay/payOrder?orderId=%d&tenancyId=%d&patientId=%d&orderType=%d", seitURL, orderId, tenancyId, patientId, orderType)
+	if g.TENANCY_CONFIG.System.Level == "debug" {
+		g.TENANCY_LOG.Info("支付二维码", zap.String("url", payUrl))
+	}
 	q, err := qrcode.New(payUrl, qrcode.Medium)
 	if err != nil {
 		return nil, err

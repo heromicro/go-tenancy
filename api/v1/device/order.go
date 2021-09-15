@@ -96,7 +96,7 @@ func PayOrder(ctx *gin.Context) {
 		return
 	}
 
-	if qrcode, err := service.GetQrCode(req.Id, multi.GetTenancyId(ctx), multi.GetUserId(ctx), payOrder.OrderType); err != nil {
+	if qrcode, err := service.GetQrCode(req.Id, multi.GetTenancyId(ctx), req.PatientId, payOrder.OrderType); err != nil {
 		g.TENANCY_LOG.Error("获取失败!", zap.Any("err", err))
 		response.FailWithMessage("获取失败:"+err.Error(), ctx)
 		return

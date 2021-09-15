@@ -9,6 +9,7 @@ import (
 	"github.com/snowlyg/go-tenancy/model/request"
 	"github.com/snowlyg/go-tenancy/model/response"
 	"github.com/snowlyg/go-tenancy/service"
+	"github.com/snowlyg/go-tenancy/utils/param"
 	"go.uber.org/zap"
 )
 
@@ -24,6 +25,27 @@ func EmailTest(ctx *gin.Context) {
 
 // PayTest 支付测试
 func PayTest(ctx *gin.Context) {
+
+	wechatConf, err := param.GetWechatPayConfig()
+	if err != nil {
+		response.FailWithMessage(err.Error(), ctx)
+		return
+	}
+	if !wechatConf.PayWeixinOpen {
+		response.FailWithMessage("微信支付未开启", ctx)
+		return
+	}
+
+	alipayConfi, err := param.GetAliPayConfig()
+	if err != nil {
+		response.FailWithMessage(err.Error(), ctx)
+		return
+	}
+	if !alipayConfi.AlipayOpen {
+		response.FailWithMessage("支付宝支付未开启", ctx)
+		return
+	}
+
 	var req request.CreateCart
 	if errs := ctx.ShouldBindJSON(&req); errs != nil {
 		response.FailWithMessage(errs.Error(), ctx)
@@ -31,12 +53,12 @@ func PayTest(ctx *gin.Context) {
 	}
 
 	if qrcode, err := service.PayTest(req); err != nil {
-		g.TENANCY_LOG.Error("测试失败!", zap.Any("err", err))
-		response.FailWithMessage("测试失败", ctx)
+		g.TENANCY_LOG.Error("生成支付二维码失败!", zap.Any("err", err))
+		response.FailWithMessage("生成支付二维码失败", ctx)
 	} else {
 		response.OkWithDetailed(gin.H{
 			"qrcode": qrcode,
-		}, "测试成功", ctx)
+		}, "生成支付二维码成功", ctx)
 	}
 }
 
