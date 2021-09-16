@@ -85,4 +85,5 @@ GO TEST
 - 授权 [casbin](https://github.com/casbin/casbin/v2)
 - 辅助 [pkg](https://github.com/chindeo/pkg) 
 - 迁移 [migrate](https://github.com/golang-migrate/migrate) 
+- 异步队列 [asynq](https://github.com/hibiken/asynq) 
 

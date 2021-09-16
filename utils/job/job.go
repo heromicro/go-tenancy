@@ -41,10 +41,10 @@ func Timer() {
 				return
 			}
 			for _, groupOrderId := range groupOrderIds {
-				service.CancelNoPayGroupOrders(groupOrderId)
-			}
-			if err != nil {
-				g.TENANCY_LOG.Info("订单过期自动取消", zap.String("订单状态更新错误", err.Error()))
+				err := service.CancelNoPayGroupOrders(groupOrderId)
+				if err != nil {
+					g.TENANCY_LOG.Info("订单过期自动取消", zap.String("订单状态更新错误", err.Error()))
+				}
 			}
 		})
 

@@ -486,7 +486,7 @@ func getStat(info request.OrderPageInfo, ctx *gin.Context, stat []map[string]int
 		Joins("left join group_orders on orders.group_order_id = group_orders.id")); err != nil {
 		return nil, err
 	} else {
-		err = db.Where("orders.paid =?", 1).Count(&all).Error
+		err = db.Where("orders.paid =?", g.StatusTrue).Count(&all).Error
 		if err != nil && !errors.Is(err, gorm.ErrRecordNotFound) {
 			return nil, err
 		}
@@ -500,7 +500,7 @@ func getStat(info request.OrderPageInfo, ctx *gin.Context, stat []map[string]int
 		return nil, err
 	} else {
 
-		err = db.Select("sum(orders.pay_price) as count").Where("orders.paid =?", 1).First(&payPrice).Error
+		err = db.Select("sum(orders.pay_price) as count").Where("orders.paid =?", g.StatusTrue).First(&payPrice).Error
 		if err != nil && !errors.Is(err, gorm.ErrRecordNotFound) {
 			return nil, err
 		}
@@ -529,7 +529,7 @@ func getStat(info request.OrderPageInfo, ctx *gin.Context, stat []map[string]int
 		Joins("left join group_orders on orders.group_order_id = group_orders.id")); err != nil {
 		return nil, err
 	} else {
-		err = db.Select("sum(orders.pay_price) as count").Where("orders.paid =?", 1).Where("orders.pay_type in ?", []int{model.PayTypeWx, model.PayTypeRoutine, model.PayTypeH5}).First(&wxPayPrice).Error
+		err = db.Select("sum(orders.pay_price) as count").Where("orders.paid =?", g.StatusTrue).Where("orders.pay_type in ?", []int{model.PayTypeWx, model.PayTypeRoutine, model.PayTypeH5}).First(&wxPayPrice).Error
 		if err != nil && !errors.Is(err, gorm.ErrRecordNotFound) {
 			return nil, err
 		}
@@ -542,7 +542,7 @@ func getStat(info request.OrderPageInfo, ctx *gin.Context, stat []map[string]int
 		Joins("left join group_orders on orders.group_order_id = group_orders.id")); err != nil {
 		return nil, err
 	} else {
-		err = db.Select("sum(orders.pay_price) as count").Where("orders.paid =?", 1).Where("orders.pay_type = ?", model.PayTypeBalance).First(&blanPayPrice).Error
+		err = db.Select("sum(orders.pay_price) as count").Where("orders.paid =?", g.StatusTrue).Where("orders.pay_type = ?", model.PayTypeBalance).First(&blanPayPrice).Error
 		if err != nil && !errors.Is(err, gorm.ErrRecordNotFound) {
 			return nil, err
 		}
@@ -555,7 +555,7 @@ func getStat(info request.OrderPageInfo, ctx *gin.Context, stat []map[string]int
 		Joins("left join group_orders on orders.group_order_id = group_orders.id")); err != nil {
 		return nil, err
 	} else {
-		err = db.Select("sum(orders.pay_price) as count").Where("orders.paid =?", 1).Where("orders.pay_type = ?", model.PayTypeAlipay).First(&aliPayPrice).Error
+		err = db.Select("sum(orders.pay_price) as count").Where("orders.paid =?", g.StatusTrue).Where("orders.pay_type = ?", model.PayTypeAlipay).First(&aliPayPrice).Error
 		if err != nil && !errors.Is(err, gorm.ErrRecordNotFound) {
 			return nil, err
 		}
@@ -570,7 +570,7 @@ func GetOrdersByGroupOrderId(groupOrderId uint) ([]model.Order, error) {
 	orders := []model.Order{}
 	err := g.TENANCY_DB.Model(&model.Order{}).Where("group_order_id = ?", groupOrderId).Find(&orders).Error
 	if err != nil {
-		return orders, fmt.Errorf("获取订单错误 %w	", err)
+		return orders, fmt.Errorf("获取订单错误 %w", err)
 	}
 	return orders, nil
 }
@@ -713,7 +713,7 @@ func CreateOrder(req request.CreateOrder, tenancyId, userId, patientId uint, ten
 	}
 	err = g.TENANCY_DB.Transaction(func(tx *gorm.DB) error {
 		// 订单组
-		err := CreateGroupOrder(tx, groupOrder)
+		err := CreateGroupOrder(tx, &groupOrder)
 		if err != nil {
 			return err
 		}
@@ -747,7 +747,7 @@ func CreateOrder(req request.CreateOrder, tenancyId, userId, patientId uint, ten
 
 		// 订单状态
 		orderStatus := model.OrderStatus{ChangeType: "create", ChangeMessage: "生成订单", ChangeTime: time.Now(), OrderID: order.ID}
-		err = CreateOrderStatus(tx, orderStatus)
+		err = CreateOrderStatus(tx, &orderStatus)
 		if err != nil {
 			return err
 		}
@@ -906,8 +906,8 @@ func GetNoPayOrders() ([]model.Order, error) {
 }
 
 // CreateOrderStatus  新建订单状态
-func CreateOrderStatus(db *gorm.DB, orderStatus model.OrderStatus) error {
-	err := db.Create(&orderStatus).Error
+func CreateOrderStatus(db *gorm.DB, orderStatus *model.OrderStatus) error {
+	err := db.Create(orderStatus).Error
 	if err != nil {
 		return err
 	}
@@ -926,7 +926,7 @@ func ChangeOrderStatusByOrderId(orderId uint, changeData map[string]interface{},
 			return err
 		}
 		orderStatus := model.OrderStatus{ChangeType: changeType, ChangeMessage: changeMessage, ChangeTime: time.Now(), OrderID: orderId}
-		err = CreateOrderStatus(tx, orderStatus)
+		err = CreateOrderStatus(tx, &orderStatus)
 		if err != nil {
 			return err
 		}

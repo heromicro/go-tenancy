@@ -27,7 +27,7 @@ func PayOrder(ctx *gin.Context) {
 		if req.Code == "" || req.State == "" {
 			url, err := service.GetAutoCode(ctx.Request.RequestURI)
 			if err != nil {
-				g.TENANCY_LOG.Error("操作失败!", zap.Any("err", err))
+				g.TENANCY_LOG.Error("获取微信autoCode错误!", zap.Any("获取微信autoCode错误", err))
 				response.FailWithMessage("操作失败:"+err.Error(), ctx)
 				return
 			} else {
@@ -41,7 +41,7 @@ func PayOrder(ctx *gin.Context) {
 			}
 			openid, err := service.GetOpenId(req.Code)
 			if err != nil {
-				g.TENANCY_LOG.Error("操作失败!", zap.Any("err", err))
+				g.TENANCY_LOG.Error("获取微信openid错误!", zap.Any("获取微信openid错误", err))
 				response.FailWithMessage("操作失败:"+err.Error(), ctx)
 				return
 			}
@@ -50,7 +50,7 @@ func PayOrder(ctx *gin.Context) {
 	}
 
 	if res, err := service.PayOrder(req); err != nil {
-		g.TENANCY_LOG.Error("操作失败!", zap.Any("err", err))
+		g.TENANCY_LOG.Error("支付订单错误!", zap.Any("支付订单错误", err))
 		response.FailWithMessage("操作失败:"+err.Error(), ctx)
 	} else {
 		if res.AliPayUrl != "" {
@@ -71,7 +71,7 @@ func PayOrder(ctx *gin.Context) {
 
 func NotifyAliPay(ctx *gin.Context) {
 	if err := service.NotifyAliPay(ctx); err != nil {
-		g.TENANCY_LOG.Error("支付宝支付异步通知失败!", zap.Any("err", err))
+		g.TENANCY_LOG.Error("支付宝支付异步通知失败!", zap.Any("支付宝支付异步通知失败", err))
 		response.FailWithMessage("支付宝支付异步通知失败:"+err.Error(), ctx)
 	} else {
 		ctx.String(http.StatusOK, "%s", "success")
@@ -80,7 +80,7 @@ func NotifyAliPay(ctx *gin.Context) {
 
 func NotifyWechatPay(ctx *gin.Context) {
 	if err := service.NotifyWechatPay(ctx); err != nil {
-		g.TENANCY_LOG.Error("微信支付异步通知失败!", zap.Any("err", err))
+		g.TENANCY_LOG.Error("微信支付异步通知失败!", zap.Any("微信支付异步通知失败", err))
 		response.FailWithMessage("微信支付异步通知失败:"+err.Error(), ctx)
 	} else {
 		ctx.JSON(http.StatusOK, &wechat.V3NotifyRsp{Code: gopay.SUCCESS, Message: "成功"})

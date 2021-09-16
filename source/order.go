@@ -16,11 +16,11 @@ var Order = new(order)
 type order struct{}
 
 var groupOrders = []model.GroupOrder{
-	{SysUserID: 7, GroupOrderSn: g.CreateOrderSn("G"), TotalPostage: 20.00, TotalPrice: 50.00, TotalNum: 1, RealName: "real_name", UserPhone: "user_phone", UserAddress: "user_address", PayPrice: 50.00, PayPostage: 30.00, Cost: 5.00, Paid: 0, PayTime: time.Now(), PayType: model.PayTypeWx, IsRemind: 1},
-	{SysUserID: 7, GroupOrderSn: g.CreateOrderSn("G"), TotalPostage: 1.00, TotalPrice: 88.00, TotalNum: 1, RealName: "发斯蒂芬斯蒂芬", UserPhone: "13672286043", UserAddress: "北京市北京市东城区 的是非得失", PayPrice: 89.00, PayPostage: 1.00, Cost: 100.00, Paid: 0, PayType: model.PayTypeWx, IsRemind: 1, TENANCY_MODEL: g.TENANCY_MODEL{DeletedAt: gorm.DeletedAt{Time: time.Now()}}},
-	{SysUserID: 7, GroupOrderSn: g.CreateOrderSn("G"), TotalPostage: 1.00, TotalPrice: 88.00, TotalNum: 1, RealName: "发斯蒂芬斯蒂芬", UserPhone: "13672286043", UserAddress: "北京市北京市东城区 的是非得失", PayPrice: 89.00, PayPostage: 1.00, Cost: 100.00, Paid: 1, PayType: model.PayTypeWx, IsRemind: 1},
-	{SysUserID: 7, GroupOrderSn: g.CreateOrderSn("G"), TotalPostage: 1.00, TotalPrice: 88.00, TotalNum: 1, RealName: "发斯蒂芬斯蒂芬", UserPhone: "13672286043", UserAddress: "北京市北京市东城区 的是非得失", PayPrice: 89.00, PayPostage: 1.00, Cost: 100.00, Paid: 1, PayType: model.PayTypeWx, IsRemind: 1},
-	{SysUserID: 7, GroupOrderSn: g.CreateOrderSn("G"), TotalPostage: 4.00, TotalPrice: 352.00, TotalNum: 4, RealName: "发斯蒂芬斯蒂芬", UserPhone: "13672286043", UserAddress: "北京市北京市东城区 的是非得失", PayPrice: 356.00, PayPostage: 4.00, Cost: 400.00, Paid: 1, PayType: model.PayTypeWx, IsRemind: 1},
+	{SysUserID: 7, GroupOrderSn: g.CreateOrderSn("G"), TotalPostage: 20.00, TotalPrice: 50.00, TotalNum: 1, RealName: "real_name", UserPhone: "user_phone", UserAddress: "user_address", PayPrice: 50.00, PayPostage: 30.00, Cost: 5.00, Paid: g.StatusFalse, PayTime: time.Now(), PayType: model.PayTypeWx, IsRemind: g.StatusTrue},
+	{SysUserID: 7, GroupOrderSn: g.CreateOrderSn("G"), TotalPostage: 1.00, TotalPrice: 88.00, TotalNum: 1, RealName: "发斯蒂芬斯蒂芬", UserPhone: "13672286043", UserAddress: "北京市北京市东城区 的是非得失", PayPrice: 89.00, PayPostage: 1.00, Cost: 100.00, Paid: g.StatusFalse, PayType: model.PayTypeWx, IsRemind: g.StatusTrue, TENANCY_MODEL: g.TENANCY_MODEL{DeletedAt: gorm.DeletedAt{Time: time.Now()}}},
+	{SysUserID: 7, GroupOrderSn: g.CreateOrderSn("G"), TotalPostage: 1.00, TotalPrice: 88.00, TotalNum: 1, RealName: "发斯蒂芬斯蒂芬", UserPhone: "13672286043", UserAddress: "北京市北京市东城区 的是非得失", PayPrice: 89.00, PayPostage: 1.00, Cost: 100.00, Paid: g.StatusTrue, PayType: model.PayTypeWx, IsRemind: g.StatusTrue},
+	{SysUserID: 7, GroupOrderSn: g.CreateOrderSn("G"), TotalPostage: 1.00, TotalPrice: 88.00, TotalNum: 1, RealName: "发斯蒂芬斯蒂芬", UserPhone: "13672286043", UserAddress: "北京市北京市东城区 的是非得失", PayPrice: 89.00, PayPostage: 1.00, Cost: 100.00, Paid: g.StatusTrue, PayType: model.PayTypeWx, IsRemind: g.StatusTrue},
+	{SysUserID: 7, GroupOrderSn: g.CreateOrderSn("G"), TotalPostage: 4.00, TotalPrice: 352.00, TotalNum: 4, RealName: "发斯蒂芬斯蒂芬", UserPhone: "13672286043", UserAddress: "北京市北京市东城区 的是非得失", PayPrice: 356.00, PayPostage: 4.00, Cost: 400.00, Paid: g.StatusTrue, PayType: model.PayTypeWx, IsRemind: g.StatusTrue},
 }
 
 var orders = []model.Order{

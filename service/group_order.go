@@ -29,8 +29,8 @@ func GetNoPayGroupOrderAutoClose(isRemind bool) ([]uint, error) {
 	return orderIds, nil
 }
 
-func CreateGroupOrder(db *gorm.DB, groupOrder model.GroupOrder) error {
-	return db.Model(&model.GroupOrder{}).Create(&groupOrder).Error
+func CreateGroupOrder(db *gorm.DB, groupOrder *model.GroupOrder) error {
+	return db.Model(&model.GroupOrder{}).Create(groupOrder).Error
 }
 
 func GetGroupOrderById(id uint) (model.GroupOrder, error) {
@@ -60,7 +60,7 @@ func CancelNoPayGroupOrders(groupOrderId uint) error {
 	if err != nil {
 		return err
 	}
-	if orderGroup.Paid != 0 {
+	if orderGroup.Paid != g.StatusFalse {
 		return errors.New("订单组状态错误")
 	}
 	orders, err := GetOrdersByGroupOrderId(groupOrderId)
