@@ -99,6 +99,7 @@ func GetRefundOrderInfoList(info request.RefundOrderPageInfo, ctx *gin.Context) 
 	if err != nil {
 		return refundOrderList, stat, total, err
 	}
+	db = OrderBy(db, info.OrderBy, info.SortBy)
 	err = db.Limit(limit).Offset(offset).Find(&refundOrderList).Error
 	if err != nil {
 		return refundOrderList, stat, total, err
@@ -215,6 +216,7 @@ func GetRefundOrderRecord(id uint, info request.PageInfo) ([]model.RefundStatus,
 	if err != nil {
 		return returnRecord, total, err
 	}
+	db = OrderBy(db, info.OrderBy, info.SortBy)
 	err = db.Limit(limit).Offset(offset).Find(&returnRecord).Error
 	if err != nil {
 		return returnRecord, total, err

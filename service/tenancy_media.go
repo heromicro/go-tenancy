@@ -93,6 +93,7 @@ func GetFileRecordInfoList(info request.MediaPageInfo, ctx *gin.Context) (interf
 	if err != nil {
 		return fileLists, total, err
 	}
+	db = OrderBy(db, info.OrderBy, info.SortBy)
 	err = db.Limit(limit).Offset(offset).Order("updated_at desc").Find(&fileLists).Error
 	if err != nil {
 		return fileLists, total, err

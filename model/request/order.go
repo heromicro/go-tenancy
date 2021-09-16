@@ -3,8 +3,7 @@ package request
 import "github.com/snowlyg/go-tenancy/model"
 
 type OrderPageInfo struct {
-	Page         int    `json:"page" form:"page" binding:"required"`
-	PageSize     int    `json:"pageSize" form:"pageSize" binding:"required"`
+	PageInfo
 	SysTenancyId uint   `json:"sysTenancyId" form:"sysTenancyId"`
 	SysUserId    uint   `json:"sysUserId" form:"sysUserId"`
 	PatientId    uint   `json:"patientId" form:"patientId"`

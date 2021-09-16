@@ -113,6 +113,7 @@ func GetExpressInfoList(info request.ExpressPageInfo) ([]model.Express, int64, e
 	if err != nil {
 		return expressList, total, err
 	}
+	db = OrderBy(db, info.OrderBy, info.SortBy)
 	err = db.Limit(limit).Offset(offset).Find(&expressList).Error
 	return expressList, total, err
 }

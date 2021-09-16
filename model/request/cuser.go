@@ -23,8 +23,7 @@ type BatchSetUserLabel struct {
 }
 
 type UserPageInfo struct {
-	Page         int    `json:"page" form:"page" binding:"required"`
-	PageSize     int    `json:"pageSize" form:"pageSize" binding:"required"`
+	PageInfo
 	GroupId      string `json:"groupId" form:"groupId"`
 	LabelId      string `json:"labelId" form:"labelId"`
 	Sex          string `json:"sex" form:"sex"`

@@ -62,6 +62,7 @@ func GetAttrTemplateInfoList(info request.PageInfo) ([]response.AttrTemplate, in
 	if err != nil {
 		return attrTemplateList, total, err
 	}
+	db = OrderBy(db, info.OrderBy, info.SortBy)
 	err = db.Limit(limit).Offset(offset).Find(&attrTemplateList).Error
 	if err != nil {
 		return attrTemplateList, total, err

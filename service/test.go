@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/chindeo/pkg/file"
 	"github.com/snowlyg/go-tenancy/initialize/cache"
 	"github.com/snowlyg/go-tenancy/model/request"
 	"github.com/snowlyg/go-tenancy/utils"
@@ -29,8 +30,8 @@ func PayTest(req request.CreateCart) ([]byte, error) {
 		OrderType: 1,
 		Remark:    "remark",
 	}
-
-	qrcode, err := cache.GetCacheBytes(fmt.Sprintf("%s%d", payTestKey, cart.ID))
+	md5, _ := file.MD5(fmt.Sprintf("%d_%d_%d", req.SysTenancyID, req.SysUserID, req.PatientID))
+	qrcode, err := cache.GetCacheBytes(fmt.Sprintf("%s%s", payTestKey, md5))
 	if err != nil || qrcode == nil {
 		tenancy, err := GetTenancyByID(req.SysTenancyID)
 		if err != nil {

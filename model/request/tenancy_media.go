@@ -5,7 +5,6 @@ type UpdateMediaName struct {
 }
 
 type MediaPageInfo struct {
-	Page     int    `json:"page" form:"page" binding:"required"`
-	PageSize int    `json:"pageSize" form:"pageSize" binding:"required"`
-	Name     string `json:"name" form:"name"`
+	PageInfo
+	Name string `json:"name" form:"name"`
 }

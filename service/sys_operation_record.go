@@ -46,6 +46,7 @@ func GetSysOperationRecordInfoList(info request.SysOperationRecordSearch, ctx *g
 	if err != nil {
 		return nil, total, err
 	}
+	db = OrderBy(db, info.OrderBy, info.SortBy)
 	err = db.Order("id desc").Limit(limit).Offset(offset).Find(&sysOperationRecords).Error
 	if err != nil && !errors.Is(err, gorm.ErrRecordNotFound) {
 		return nil, total, err

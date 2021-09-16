@@ -17,15 +17,14 @@ import (
 func OperationRecord() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		var body []byte
-		if ctx.Request.Method != http.MethodGet {
-			var err error
-			body, err = ioutil.ReadAll(ctx.Request.Body)
-			if err != nil {
-				g.TENANCY_LOG.Error("read body from request error:", zap.Any("err", err))
-			} else {
-				// ioutil.ReadAll 读取数据后重新回写数据
-				ctx.Request.Body = ioutil.NopCloser(bytes.NewBuffer(body))
-			}
+
+		var err error
+		body, err = ioutil.ReadAll(ctx.Request.Body)
+		if err != nil {
+			g.TENANCY_LOG.Error("read body from request error:", zap.Any("err", err))
+		} else {
+			// ioutil.ReadAll 读取数据后重新回写数据
+			ctx.Request.Body = ioutil.NopCloser(bytes.NewBuffer(body))
 		}
 
 		record := model.SysOperationRecord{
@@ -53,7 +52,11 @@ func OperationRecord() gin.HandlerFunc {
 		record.ErrorMessage = ctx.Errors.ByType(gin.ErrorTypePrivate).String()
 		record.Status = ctx.Writer.Status()
 		record.Latency = latency
-		record.Resp = writer.body.String()
+		// 查询接口日志内容太多影响性能
+		if ctx.Request.Method != http.MethodGet {
+			record.Resp = writer.body.String()
+		}
+
 		if err := service.CreateSysOperationRecord(record); err != nil {
 			g.TENANCY_LOG.Error("create operation record error:", zap.Any("err", err))
 		}

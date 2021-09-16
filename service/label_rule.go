@@ -122,6 +122,7 @@ func GetAutoUserLabelInfoList(info request.UserLabelPageInfo, tenancyId uint) ([
 	if err != nil {
 		return userLabelList, total, err
 	}
+	db = OrderBy(db, info.OrderBy, info.SortBy)
 	err = db.Limit(limit).Offset(offset).Find(&userLabelList).Error
 	return userLabelList, total, err
 }

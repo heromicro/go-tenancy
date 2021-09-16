@@ -715,6 +715,7 @@ func GetProductInfoList(info request.ProductPageInfo, tenancyId uint, isTenancy,
 	if err != nil {
 		return productList, total, err
 	}
+	db = OrderBy(db, info.OrderBy, info.SortBy)
 	err = db.Limit(limit).Offset(offset).Find(&productList).Error
 
 	for i := 0; i < len(productList); i++ {

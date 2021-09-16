@@ -69,6 +69,7 @@ func GetMiniInfoList(info request.PageInfo) ([]response.SysMini, int64, error) {
 	if err != nil {
 		return miniList, total, err
 	}
+	db = OrderBy(db, info.OrderBy, info.SortBy)
 	err = db.Limit(limit).Offset(offset).Find(&miniList).Error
 	return miniList, total, err
 }

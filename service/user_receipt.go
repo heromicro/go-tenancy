@@ -67,6 +67,7 @@ func GetReceiptInfoList(info request.PageInfo, user_id uint) ([]model.UserReceip
 	if err != nil {
 		return receiptList, total, err
 	}
+	db = OrderBy(db, info.OrderBy, info.SortBy)
 	err = db.Limit(limit).Offset(offset).Find(&receiptList).Error
 	return receiptList, total, err
 }

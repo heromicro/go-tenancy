@@ -98,6 +98,7 @@ func GetUserGroupInfoList(info request.PageInfo) ([]model.UserGroup, int64, erro
 	if err != nil {
 		return userGroupList, total, err
 	}
+	db = OrderBy(db, info.OrderBy, info.SortBy)
 	err = db.Limit(limit).Offset(offset).Find(&userGroupList).Error
 	return userGroupList, total, err
 }

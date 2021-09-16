@@ -239,6 +239,7 @@ func GetTenanciesInfoList(info request.TenancyPageInfo) ([]response.SysTenancy, 
 	if err != nil {
 		return tenancyList, total, err
 	}
+	db = OrderBy(db, info.OrderBy, info.SortBy)
 	err = db.Limit(limit).Offset(offset).Find(&tenancyList).Error
 	return tenancyList, total, err
 }

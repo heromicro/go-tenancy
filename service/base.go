@@ -121,3 +121,14 @@ func CheckTenancyIdAndUserId(db *gorm.DB, req request.GetById, perfix string) *g
 	}
 	return db
 }
+
+//OrderBy 排序
+func OrderBy(db *gorm.DB, orderBy, sortBy string) *gorm.DB {
+	if orderBy == "" {
+		orderBy = "created_at"
+	}
+	if sortBy == "" {
+		sortBy = "desc"
+	}
+	return db.Order(fmt.Sprintf("%s %s", orderBy, sortBy))
+}

@@ -98,6 +98,7 @@ func GetMqttInfoList(info request.PageInfo) ([]model.Mqtt, int64, error) {
 	if err != nil {
 		return mqttList, total, err
 	}
+	db = OrderBy(db, info.OrderBy, info.SortBy)
 	err = db.Limit(limit).Offset(offset).Find(&mqttList).Error
 	return mqttList, total, err
 }
@@ -113,6 +114,7 @@ func GetMqttRecordList(info request.PageInfo) ([]model.MqttRecord, int64, error)
 	if err != nil {
 		return mqttList, total, err
 	}
+	db = OrderBy(db, info.OrderBy, info.SortBy)
 	err = db.Limit(limit).Offset(offset).Find(&mqttList).Error
 	return mqttList, total, err
 }

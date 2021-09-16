@@ -6,8 +6,7 @@ import (
 )
 
 type ProductPageInfo struct {
-	Page              int    `json:"page" form:"page" binding:"required"`
-	PageSize          int    `json:"pageSize" form:"pageSize" binding:"required"`
+	PageInfo
 	ProductCategoryId uint   `json:"tenancyCategoryId" form:"tenancyCategoryId"`
 	Type              string `json:"type" form:"type"`
 	CateId            int    `json:"cateId" form:"cateId"`

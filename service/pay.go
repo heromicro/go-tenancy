@@ -209,6 +209,7 @@ func AliPayClient() (*alipay.Client, error) {
 	return client, nil
 }
 
+//GetAutoCode 获取微信网页授权
 func GetAutoCode(redirectUri string) (string, error) {
 	seitUrl, err := param.GetSeitURL()
 	if err != nil {
@@ -225,6 +226,7 @@ func GetAutoCode(redirectUri string) (string, error) {
 	return url, nil
 }
 
+// GetOpenId 获取用户openid
 func GetOpenId(code string) (string, error) {
 	wechatConf, err := param.GetWechatPayConfig()
 	if err != nil {
@@ -241,7 +243,8 @@ func GetOpenId(code string) (string, error) {
 }
 
 // NotifyAliPay
-// 支付宝异步通知回调 total_amount=2.00&buyer_id=20****7&body=大乐透2.1&trade_no=2016071921001003030200089909&refund_fee=0.00&notify_time=2016-07-19 14:10:49&subject=大乐透2.1&sign_type=RSA2&charset=utf-8&notify_type=trade_status_sync&out_trade_no=0719141034-6418&gmt_close=2016-07-19 14:10:46&gmt_payment=2016-07-19 14:10:47&trade_status=TRADE_SUCCESS&version=1.0&sign=kPbQIjX+xQc8F0/A6/AocELIjhhZnGbcBN6G4MM/HmfWL4ZiHM6fWl5NQhzXJusaklZ1LFuMo+lHQUELAYeugH8LYFvxnNajOvZhuxNFbN2LhF0l/KL8ANtj8oyPM4NN7Qft2kWJTDJUpQOzCzNnV9hDxh5AaT9FPqRS6ZKxnzM=&gmt_create=2016-07-19 14:10:44&app_id=20151*****3&seller_id=20881021****8&notify_id=4a91b7a78a503640467525113fb7d8bg8e
+// 支付宝异步通知回调
+// total_amount=2.00&buyer_id=20****7&body=大乐透2.1&trade_no=2016071921001003030200089909&refund_fee=0.00&notify_time=2016-07-19 14:10:49&subject=大乐透2.1&sign_type=RSA2&charset=utf-8&notify_type=trade_status_sync&out_trade_no=0719141034-6418&gmt_close=2016-07-19 14:10:46&gmt_payment=2016-07-19 14:10:47&trade_status=TRADE_SUCCESS&version=1.0&sign=kPbQIjX+xQc8F0/A6/AocELIjhhZnGbcBN6G4MM/HmfWL4ZiHM6fWl5NQhzXJusaklZ1LFuMo+lHQUELAYeugH8LYFvxnNajOvZhuxNFbN2LhF0l/KL8ANtj8oyPM4NN7Qft2kWJTDJUpQOzCzNnV9hDxh5AaT9FPqRS6ZKxnzM=&gmt_create=2016-07-19 14:10:44&app_id=20151*****3&seller_id=20881021****8&notify_id=4a91b7a78a503640467525113fb7d8bg8e
 func NotifyAliPay(ctx *gin.Context) error {
 	notifyReq, err := alipay.ParseNotifyToBodyMap(ctx.Request)
 	if err != nil {

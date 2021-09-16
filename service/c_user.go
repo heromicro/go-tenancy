@@ -390,9 +390,10 @@ func GetGeneralInfoList(info request.UserPageInfo, ctx *gin.Context) ([]response
 		if err != nil {
 			return userList, total, err
 		}
+		
 		db = db.Limit(limit).Offset(offset)
 	}
-
+	db = OrderBy(db, info.OrderBy, info.SortBy)
 	err = db.Find(&userList).Error
 	if err != nil {
 		return userList, total, err

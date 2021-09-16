@@ -94,6 +94,7 @@ func GetBrandInfoList(info request.BrandPageInfo) ([]model.SysBrand, int64, erro
 	if err != nil {
 		return brandList, total, err
 	}
+	db = OrderBy(db, info.OrderBy, info.SortBy)
 	err = db.Limit(limit).Offset(offset).Find(&brandList).Error
 	return brandList, total, err
 }

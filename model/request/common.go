@@ -2,8 +2,10 @@ package request
 
 // Paging common input parameter structure
 type PageInfo struct {
-	Page     int `json:"page" form:"page" binding:"required"`
-	PageSize int `json:"pageSize" form:"pageSize" binding:"required"`
+	Page     int    `json:"page" form:"page" binding:"required"`
+	PageSize int    `json:"pageSize" form:"pageSize" binding:"required"`
+	OrderBy  string `json:"orderBy" form:"orderBy"`
+	SortBy   string `json:"sortBy" form:"sortBy"`
 }
 
 type ChangeStatus struct {

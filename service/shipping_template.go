@@ -63,6 +63,7 @@ func GetShippingTemplateInfoList(info request.ShippingTemplatePageInfo) ([]respo
 	if err != nil {
 		return shippingTemList, total, err
 	}
+	db = OrderBy(db, info.OrderBy, info.SortBy)
 	err = db.Limit(limit).Offset(offset).Find(&shippingTemList).Error
 
 	return shippingTemList, total, err

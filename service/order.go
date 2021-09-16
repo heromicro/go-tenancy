@@ -248,6 +248,7 @@ func GetOrderRecord(id uint, info request.PageInfo) ([]model.OrderStatus, int64,
 	if err != nil {
 		return orderRecord, total, err
 	}
+	db = OrderBy(db, info.OrderBy, info.SortBy)
 	err = db.Limit(limit).Offset(offset).Find(&orderRecord).Error
 	if err != nil {
 		return orderRecord, total, err
@@ -343,6 +344,8 @@ func GetOrderInfoList(info request.OrderPageInfo, ctx *gin.Context) (gin.H, erro
 	if err != nil {
 		return nil, err
 	}
+
+	db = OrderBy(db, info.OrderBy, info.SortBy)
 	err = db.Limit(limit).Offset(offset).Find(&orderList).Error
 	if err != nil {
 		return nil, err

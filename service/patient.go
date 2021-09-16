@@ -35,6 +35,7 @@ func GetPatientInfoList(info request.PageInfo, tenancyId uint) ([]response.Patie
 	if err != nil {
 		return patientList, total, err
 	}
+	db = OrderBy(db, info.OrderBy, info.SortBy)
 	err = db.Limit(limit).Offset(offset).Find(&patientList).Error
 
 	return patientList, total, err

@@ -1,8 +1,7 @@
 package request
 
 type RefundOrderPageInfo struct {
-	Page          int    `json:"page" form:"page" binding:"required"`
-	PageSize      int    `json:"pageSize" form:"pageSize" binding:"required"`
+	PageInfo
 	Date          string `json:"date" form:"date"`
 	IsTrader      string `json:"isTrader" form:"isTrader"`
 	OrderSn       string `json:"orderSn" form:"orderSn"`

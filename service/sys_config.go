@@ -179,6 +179,7 @@ func GetConfigInfoList(info request.PageInfo) ([]model.SysConfig, int64, error) 
 	if err != nil {
 		return configList, total, err
 	}
+	db = OrderBy(db, info.OrderBy, info.SortBy)
 	err = db.Limit(limit).Offset(offset).Find(&configList).Error
 	if err != nil {
 		return configList, total, err

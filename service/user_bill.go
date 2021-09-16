@@ -17,6 +17,7 @@ func GetUserBillInfoList(info request.PageInfo, sys_user_id uint) ([]model.UserB
 	if err != nil {
 		return userBillList, total, err
 	}
+	db = OrderBy(db, info.OrderBy, info.SortBy)
 	err = db.Limit(limit).Offset(offset).Find(&userBillList).Error
 	return userBillList, total, err
 }

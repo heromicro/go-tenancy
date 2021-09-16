@@ -62,6 +62,7 @@ func GetAddressInfoList(info request.PageInfo, user_id uint) ([]model.UserAddres
 	if err != nil {
 		return addressList, total, err
 	}
+	db = OrderBy(db, info.OrderBy, info.SortBy)
 	err = db.Limit(limit).Offset(offset).Find(&addressList).Error
 	return addressList, total, err
 }

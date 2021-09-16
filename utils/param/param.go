@@ -30,7 +30,7 @@ func GetPayNotifyUrl(notifyType string) (string, error) {
 	if err != nil {
 		return "", fmt.Errorf("获取站点url错误 %w", err)
 	}
-	return fmt.Sprintf("%s/%s/%s", seitUrl, "v1/pay/notify", notifyType), nil
+	return fmt.Sprintf("%s/%s/%s", seitUrl, "/v1/pay/notify", notifyType), nil
 }
 
 // GetTenancyDefaultPassword 商户默认密码
