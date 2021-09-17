@@ -16,7 +16,7 @@ func GetNoPayGroupOrderAutoClose(isRemind bool) ([]uint, error) {
 	var orderIds []uint
 	db := g.TENANCY_DB.Model(&model.GroupOrder{}).
 		Select("id").
-		Where("paid = ?", g.StatusFalse)
+		Where("paid = ? and is_cancel=?", g.StatusFalse, g.StatusFalse)
 
 	if isRemind {
 		db = db.Where("is_remind = ?", g.StatusFalse)
@@ -56,13 +56,6 @@ func UpdateGroupOrderById(db *gorm.DB, id uint, data map[string]interface{}) err
 // - 更新订单状态
 // - 回退库存
 func CancelNoPayGroupOrders(groupOrderId uint) error {
-	orderGroup, err := GetGroupOrderById(groupOrderId)
-	if err != nil {
-		return err
-	}
-	if orderGroup.Paid != g.StatusFalse {
-		return errors.New("订单组状态错误")
-	}
 	orders, err := GetOrdersByGroupOrderId(groupOrderId)
 	if err != nil {
 		return err

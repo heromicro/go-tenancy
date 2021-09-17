@@ -582,10 +582,14 @@ func getStat(info request.OrderPageInfo, ctx *gin.Context, stat []map[string]int
 	return stat, nil
 }
 
-// GetOrdersByGroupOrderId 根据订单组获取订单
+// GetOrdersByGroupOrderId 根据订单组获取未取消订单订单
 func GetOrdersByGroupOrderId(groupOrderId uint) ([]model.Order, error) {
+	whereCreatedAt := fmt.Sprintf("now() > SUBDATE(created_at,interval -%d minute)", param.GetOrderAutoCloseTime())
 	orders := []model.Order{}
-	err := g.TENANCY_DB.Model(&model.Order{}).Where("group_order_id = ?", groupOrderId).Find(&orders).Error
+	err := g.TENANCY_DB.Model(&model.Order{}).
+		Where("group_order_id = ? and is_cancel = ? and paid =?", groupOrderId, g.StatusFalse, g.StatusFalse).
+		Where(whereCreatedAt).
+		Find(&orders).Error
 	if err != nil {
 		return orders, fmt.Errorf("获取订单错误 %w", err)
 	}
