@@ -99,7 +99,7 @@ func GetRefundOrderInfoList(info request.RefundOrderPageInfo, ctx *gin.Context) 
 	if err != nil {
 		return refundOrderList, stat, total, err
 	}
-	db = OrderBy(db, info.OrderBy, info.SortBy)
+	db = OrderBy(db, info.OrderBy, info.SortBy, "refund_orders.")
 	err = db.Limit(limit).Offset(offset).Find(&refundOrderList).Error
 	if err != nil {
 		return refundOrderList, stat, total, err

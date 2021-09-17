@@ -303,7 +303,7 @@ func GetAdminInfoList(info request.PageInfo, userId uint) ([]response.SysAdminUs
 		if err != nil {
 			return userList, total, err
 		}
-		db = OrderBy(db, info.OrderBy, info.SortBy)
+		db = OrderBy(db, info.OrderBy, info.SortBy, "sys_users.")
 		db = db.Limit(limit).Offset(offset)
 	}
 	err = db.
@@ -504,7 +504,7 @@ func GetTenancyInfoList(info request.PageInfo, userId, tenancyId uint) ([]respon
 		if err != nil {
 			return userList, total, err
 		}
-		db = OrderBy(db, info.OrderBy, info.SortBy)
+		db = OrderBy(db, info.OrderBy, info.SortBy, "sys_users.")
 		db = db.Limit(limit).Offset(offset)
 	}
 	err = db.

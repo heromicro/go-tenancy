@@ -362,7 +362,7 @@ func GetOrderInfoList(info request.OrderPageInfo, ctx *gin.Context) (gin.H, erro
 		return nil, err
 	}
 
-	db = OrderBy(db, info.OrderBy, info.SortBy)
+	db = OrderBy(db, info.OrderBy, info.SortBy, "orders.")
 	err = db.Limit(limit).Offset(offset).Find(&orderList).Error
 	if err != nil {
 		return nil, err
