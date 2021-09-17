@@ -39,6 +39,7 @@ type OrderDetail struct {
 	model.BaseOrder
 	SysUserID        uint           `json:"sysUserId" form:"sysUserId"`
 	SysTenancyID     uint           `json:"sysTenancyId"`
+	PatientId        uint           `json:"patientId"`
 	GroupOrderID     int            `json:"groupOrderId"`
 	ReconciliationID uint8          `json:"reconciliationId"`
 	UserNickName     string         `json:"userNickName" form:"userNickName"`

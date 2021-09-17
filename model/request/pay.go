@@ -6,6 +6,7 @@ type PayOrder struct {
 	UserId    uint   `json:"userId" form:"userId"`
 	PatientID uint   `json:"patientId" form:"patientId"`
 	OrderType int    `json:"orderType" form:"orderType"`
+	Expire    int64  `json:"expire" form:"expire"`
 	OpenId    string `json:"openId" form:"openId"`
 	UserAgent string `json:"userAgent" form:"userAgent"`
 	Code      string `json:"code" form:"code"`

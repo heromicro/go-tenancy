@@ -37,7 +37,7 @@ func Viper(path ...string) *viper.Viper {
 	v.SetConfigFile(config)
 	err := v.ReadInConfig()
 	if err != nil {
-		panic(fmt.Errorf("Fatal error config file: %s \n", err))
+		panic(fmt.Sprintf("Fatal error config file: %v \n", err))
 	}
 	v.WatchConfig()
 
@@ -50,6 +50,6 @@ func Viper(path ...string) *viper.Viper {
 	if err := v.Unmarshal(&g.TENANCY_CONFIG); err != nil {
 		fmt.Println(err)
 	}
-	fmt.Printf("配置内容为： %+v\n", g.TENANCY_CONFIG)
+
 	return v
 }

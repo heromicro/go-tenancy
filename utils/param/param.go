@@ -3,6 +3,7 @@ package param
 import (
 	"errors"
 	"fmt"
+	"strings"
 
 	"github.com/snowlyg/go-tenancy/g"
 	"github.com/snowlyg/go-tenancy/model"
@@ -30,7 +31,7 @@ func GetPayNotifyUrl(notifyType string) (string, error) {
 	if err != nil {
 		return "", fmt.Errorf("获取站点url错误 %w", err)
 	}
-	return fmt.Sprintf("%s/%s/%s", seitUrl, "/v1/pay/notify", notifyType), nil
+	return fmt.Sprintf("%s/%s/%s", seitUrl, "v1/pay/notify", notifyType), nil
 }
 
 // GetTenancyDefaultPassword 商户默认密码
@@ -70,7 +71,7 @@ func GetConfigByCateKey(configKey string, tenancyId uint) ([]response.SysConfig,
 	for i := 0; i < len(configs); i++ {
 		for _, value := range values {
 			if configs[i].ConfigKey == value.ConfigKey {
-				configs[i].Value = value.Value
+				configs[i].Value = strings.TrimSpace(value.Value)
 				break
 			}
 		}

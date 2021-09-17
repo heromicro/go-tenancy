@@ -1,12 +1,18 @@
 package param
 
+import "strconv"
+
 // GetOrderAutoCloseTime 订单自动关闭时间(分钟)
-func GetOrderAutoCloseTime() string {
-	autoCloseTime, _ := GetConfigValueByKey("auto_close_order_timer")
-	if autoCloseTime == "" {
-		return "15"
+func GetOrderAutoCloseTime() int64 {
+	autoCloseTime, err := GetConfigValueByKey("auto_close_order_timer")
+	if autoCloseTime == "" || err != nil {
+		return 15
 	}
-	return autoCloseTime
+	iact, err := strconv.ParseInt(autoCloseTime, 10, 64)
+	if err != nil {
+		return 15
+	}
+	return iact
 }
 
 // GetRefundOrderAutoAgreeTime 退款单自动确认时间(天)

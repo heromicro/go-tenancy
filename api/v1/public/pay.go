@@ -72,7 +72,7 @@ func PayOrder(ctx *gin.Context) {
 func NotifyAliPay(ctx *gin.Context) {
 	if err := service.NotifyAliPay(ctx); err != nil {
 		g.TENANCY_LOG.Error("支付宝支付异步通知失败!", zap.Any("支付宝支付异步通知失败", err))
-		response.FailWithMessage("支付宝支付异步通知失败:"+err.Error(), ctx)
+		ctx.String(http.StatusOK, "%s", err.Error())
 	} else {
 		ctx.String(http.StatusOK, "%s", "success")
 	}
@@ -81,7 +81,7 @@ func NotifyAliPay(ctx *gin.Context) {
 func NotifyWechatPay(ctx *gin.Context) {
 	if err := service.NotifyWechatPay(ctx); err != nil {
 		g.TENANCY_LOG.Error("微信支付异步通知失败!", zap.Any("微信支付异步通知失败", err))
-		response.FailWithMessage("微信支付异步通知失败:"+err.Error(), ctx)
+		ctx.String(http.StatusOK, "%s", err.Error())
 	} else {
 		ctx.JSON(http.StatusOK, &wechat.V3NotifyRsp{Code: gopay.SUCCESS, Message: "成功"})
 	}

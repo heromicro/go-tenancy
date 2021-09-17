@@ -12,7 +12,7 @@ import (
 )
 
 func GetNoPayGroupOrderAutoClose(isRemind bool) ([]uint, error) {
-	whereCreatedAt := fmt.Sprintf("now() > SUBDATE(created_at,interval -%s minute)", param.GetOrderAutoCloseTime())
+	whereCreatedAt := fmt.Sprintf("now() > SUBDATE(created_at,interval -%d minute)", param.GetOrderAutoCloseTime())
 	var orderIds []uint
 	db := g.TENANCY_DB.Model(&model.GroupOrder{}).
 		Select("id").

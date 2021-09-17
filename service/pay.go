@@ -24,7 +24,14 @@ import (
 )
 
 func PayOrder(req request.PayOrder) (response.PayOrder, error) {
+	// 清除测试缓存
+	defer DeleteTestCache(req.TenancyId, req.UserId, req.PatientID)
 	var res response.PayOrder
+	autoCloseTime := param.GetOrderAutoCloseTime()
+	if time.Until(time.Unix(req.Expire, 0)) > time.Duration(autoCloseTime) {
+		g.TENANCY_LOG.Error("支付二维码已经过期", zap.Int64("now:", time.Now().Unix()), zap.Int64("expire:", req.Expire), zap.Int64("过期时间（分钟）:", autoCloseTime))
+		return res, fmt.Errorf("支付二维码已经过期，请重新下单")
+	}
 	tenancy, err := GetTenancyByID(req.TenancyId)
 	if err != nil {
 		return res, fmt.Errorf("商户参数错误")
@@ -250,6 +257,7 @@ func NotifyAliPay(ctx *gin.Context) error {
 	if err != nil {
 		return err
 	}
+
 	alipayConf, err := param.GetAliPayConfig()
 	if err != nil {
 		return err
@@ -262,11 +270,25 @@ func NotifyAliPay(ctx *gin.Context) error {
 	if !ok {
 		return fmt.Errorf("支付宝异步通知回调验签失败 %w", err)
 	}
-	orderSn := notifyReq["out_trade_no"].(string)     //商户订单号。原支付请求的商户订单号。
-	outBizNo := notifyReq["out_biz_no"].(string)      //商户业务号。商户业务 ID，主要是退款通知中返回退款申请的流水号。
-	refundFee := notifyReq["refund_fee"].(float64)    //总退款金额
-	gmtRefund := notifyReq["gmt_refund"].(string)     //交易退款时间
-	tradeStatus := notifyReq["trade_status"].(string) //交易状态
+
+	var orderSn, outBizNo, gmtRefund, tradeStatus string
+	var refundFee float64
+	if notifyReq["out_trade_no"] != nil {
+		orderSn = notifyReq["out_trade_no"].(string) //商户订单号。原支付请求的商户订单号。
+	}
+	if notifyReq["out_biz_no"] != nil {
+		outBizNo = notifyReq["out_biz_no"].(string) //商户业务号。商户业务 ID，主要是退款通知中返回退款申请的流水号。
+	}
+	if notifyReq["refund_fee"] != nil {
+		refundFee = notifyReq["refund_fee"].(float64) //总退款金额
+	}
+	if notifyReq["gmt_refund"] != nil {
+		gmtRefund = notifyReq["gmt_refund"].(string) //交易退款时间
+	}
+	if notifyReq["trade_status"] != nil {
+		tradeStatus = notifyReq["trade_status"].(string) //交易状态
+	}
+
 	// 退款
 	if outBizNo != "" && refundFee != 0 && gmtRefund != "" {
 		if tradeStatus != "TRADE_SUCCESS" && tradeStatus != "TRADE_CLOSED" {

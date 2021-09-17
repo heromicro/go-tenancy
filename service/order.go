@@ -222,6 +222,23 @@ func GetOrderDetailById(req request.GetById) (response.OrderDetail, error) {
 		return order, err
 	}
 
+	if order.SysUserID > 0 {
+		cuser, err := GetGeneralDetail(order.SysUserID, req.TenancyId)
+		if err != nil {
+			return order, err
+		}
+		order.UserNickName = cuser.NickName
+	}
+
+	// 如果不是小程序用户，显示床旁名称
+	if order.PatientId > 0 && order.UserNickName == "" {
+		patient, err := GetPatientById(order.PatientId, req.TenancyId)
+		if err != nil {
+			return order, err
+		}
+		order.UserNickName = patient.Name
+	}
+
 	orderProducts, err := GetOrderProductsByOrderIds([]uint{order.ID})
 	if err != nil {
 		return order, err
@@ -839,8 +856,11 @@ func GetQrCode(orderId, tenancyId, patientId uint, orderType int) ([]byte, error
 	if err != nil {
 		return nil, err
 	}
+
 	// 生成支付地址二维码
-	payUrl := fmt.Sprintf("%s/v1/pay/payOrder?orderId=%d&tenancyId=%d&patientId=%d&orderType=%d", seitURL, orderId, tenancyId, patientId, orderType)
+	// 订单自动过期时间
+	autoCloseTime := param.GetOrderAutoCloseTime()
+	payUrl := fmt.Sprintf("%s/v1/pay/payOrder?orderId=%d&tenancyId=%d&patientId=%d&orderType=%d&expire=%d", seitURL, orderId, tenancyId, patientId, orderType, time.Now().Add(time.Duration(autoCloseTime)*time.Second).Unix())
 	if g.TENANCY_CONFIG.System.Level == "debug" {
 		g.TENANCY_LOG.Info("支付二维码", zap.String("url", payUrl))
 	}

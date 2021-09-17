@@ -4,13 +4,19 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/chindeo/pkg/file"
 	"github.com/snowlyg/go-tenancy/initialize/cache"
 	"github.com/snowlyg/go-tenancy/model/request"
 	"github.com/snowlyg/go-tenancy/utils"
+	"github.com/snowlyg/go-tenancy/utils/param"
 )
 
-const payTestKey = "PAY_TEST_KEY:"
+const PayTestKey = "PAY_TEST_KEY:"
+
+// DeleteTestCache 清除测试缓存
+func DeleteTestCache(tenancyId, userId, patientId uint) {
+	index := fmt.Sprintf("%s%d_%d_%d", PayTestKey, tenancyId, userId, patientId)
+	cache.DeleteCache(index)
+}
 
 // EmailTest 发送邮件测试
 func EmailTest() error {
@@ -30,8 +36,8 @@ func PayTest(req request.CreateCart) ([]byte, error) {
 		OrderType: 1,
 		Remark:    "remark",
 	}
-	md5, _ := file.MD5(fmt.Sprintf("%d_%d_%d", req.SysTenancyID, req.SysUserID, req.PatientID))
-	qrcode, err := cache.GetCacheBytes(fmt.Sprintf("%s%s", payTestKey, md5))
+	index := fmt.Sprintf("%s%d_%d_%d", PayTestKey, req.SysTenancyID, req.SysUserID, req.PatientID)
+	qrcode, err := cache.GetCacheBytes(index)
 	if err != nil || qrcode == nil {
 		tenancy, err := GetTenancyByID(req.SysTenancyID)
 		if err != nil {
@@ -41,7 +47,9 @@ func PayTest(req request.CreateCart) ([]byte, error) {
 		if err != nil {
 			return nil, err
 		}
-		err = cache.SetCache(payTestKey, qrcode, 15*time.Minute)
+
+		autoCloseTime := param.GetOrderAutoCloseTime()
+		err = cache.SetCache(index, qrcode, time.Duration(autoCloseTime)*time.Minute)
 		if err != nil {
 			return nil, err
 		}
