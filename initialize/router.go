@@ -42,7 +42,8 @@ func Routers(app *gin.Engine) {
 	app.Static("/system", "www/admin/system")
 	app.Static("/merchant", "www/merchant")
 	app.Static("/client", "www/merchant/client")
-	app.Static("/UEditor", "www/merchant/UEditor")
+	app.Static("/a/UEditor", "www/admin/a/UEditor")
+	app.Static("/m/UEditor", "www/merchant/m/UEditor")
 	app.Use(static.Serve("/uploads", static.LocalFile("uploads", true)))
 
 	app.LoadHTMLGlob(filepath.Join(g.TENANCY_CONFIG.Casbin.ModelPath, "resource/template/*"))

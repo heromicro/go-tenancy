@@ -11,12 +11,12 @@
     {
       "label": "build linux",
       "type": "shell",
-      "command": "go env -w CGO_ENABLED=0 | go env -w GOOS=linux | go build -ldflags '-w -s' -o ./main main.go | ./upx -9 ./main | go env -w GOOS=windows | go env -w CGO_ENABLED=1 | ./package.bat"
+      "command": "go env -w CGO_ENABLED=0 | go env -w GOOS=linux | go build -ldflags '-w -s' -o ./main main.go | upx -9 ./main | go env -w GOOS=windows | go env -w CGO_ENABLED=1 | ./package.bat"
     },
     {
       "label": "build win",
       "type": "shell",
-      "command": "go build -ldflags '-w -s' -o ./main.exe main.go | ./upx -9 ./main.exe "
+      "command": "go build -ldflags '-w -s' -o ./main.exe main.go | upx -9 ./main.exe "
     },
     {
       "label": "git push gitee",
