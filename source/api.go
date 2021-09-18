@@ -176,7 +176,7 @@ var baseApis = []model.SysApi{
 	{Path: "/v1/admin/product/getProductSelect/:tenancy_id", Description: "商品下拉选项", ApiGroup: "product", Method: "GET"},
 	{Path: "/v1/admin/product/getEditProductFictiMap/:id", Description: "设置虚拟销量表单", ApiGroup: "product", Method: "GET"},
 	{Path: "/v1/admin/product/setProductFicti/:id", Description: "设置虚拟销量", ApiGroup: "product", Method: "PUT"},
-	{Path: "/v1/admin/product/getProductFilter", Description: "商品过滤参数", ApiGroup: "product", Method: "GET"},
+	{Path: "/v1/admin/product/getProductFilter", Description: "商品过滤参数", ApiGroup: "product", Method: "POST"},
 	{Path: "/v1/admin/product/changeProductStatus", Description: "强制下架，重新审核", ApiGroup: "product", Method: "POST"},
 	{Path: "/v1/admin/product/changeMutilProductStatus", Description: "批量强制下架，重新审核", ApiGroup: "product", Method: "POST"},
 	{Path: "/v1/admin/product/getProductList", Description: "商品列表", ApiGroup: "product", Method: "POST"},
@@ -284,7 +284,7 @@ var baseApis = []model.SysApi{
 	//商品
 	{Path: "/v1/merchant/product/getEditProductFictiMap/:id", Description: "设置虚拟销量表单", ApiGroup: "productClient", Method: "GET"},
 	{Path: "/v1/merchant/product/setProductFicti/:id", Description: "设置虚拟销量", ApiGroup: "productClient", Method: "PUT"},
-	{Path: "/v1/merchant/product/getProductFilter", Description: "商品过滤参数", ApiGroup: "productClient", Method: "GET"},
+	{Path: "/v1/merchant/product/getProductFilter", Description: "商品过滤参数", ApiGroup: "productClient", Method: "POST"},
 	{Path: "/v1/merchant/product/changeProductIsShow", Description: "上下架商品", ApiGroup: "productClient", Method: "POST"},
 	{Path: "/v1/merchant/product/getProductList", Description: "商品列表", ApiGroup: "productClient", Method: "POST"},
 	{Path: "/v1/merchant/product/createProduct", Description: "添加商品", ApiGroup: "productClient", Method: "POST"},

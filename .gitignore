@@ -16,6 +16,7 @@ latest_log
 main
 tests/resource/favicon.ico
 .air.conf
+deploy.bat
 
 
 # ext
@@ -25,6 +26,7 @@ tests/resource/favicon.ico
 *.txt
 *.zip
 *.toml
+
 
 
 

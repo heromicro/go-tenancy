@@ -22,7 +22,7 @@ func PayOrder(req request.GetById) (string, error) {
 		return "", err
 	}
 
-	if order.IsCancel == g.StatusFalse {
+	if order.IsCancel == g.StatusTrue {
 		return "", fmt.Errorf("订单已取消")
 	}
 

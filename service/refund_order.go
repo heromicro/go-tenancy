@@ -32,10 +32,6 @@ func GetRefundOrder(orderIds []uint, ctx *gin.Context) (float64, error) {
 }
 
 func getRefundOrderSearch(info request.RefundOrderPageInfo, ctx *gin.Context, db *gorm.DB) (*gorm.DB, error) {
-	if info.Status != "" {
-		db = db.Where("refund_orders.status = ?", info.Status)
-	}
-
 	if multi.IsTenancy(ctx) {
 		db = db.Where("refund_orders.sys_tenancy_id = ?", multi.GetTenancyId(ctx))
 	}
@@ -87,11 +83,15 @@ func GetRefundOrderInfoList(info request.RefundOrderPageInfo, ctx *gin.Context) 
 		Joins("left join sys_users on refund_orders.sys_user_id = sys_users.id").
 		Joins("left join general_infos on general_infos.sys_user_id = sys_users.id")
 
+	if info.Status != "" {
+		db = db.Where("refund_orders.status = ?", info.Status)
+	}
+
 	db, err := getRefundOrderSearch(info, ctx, db)
 	if err != nil {
 		return refundOrderList, stat, total, err
 	}
-	stat, err = getRefundStat(stat, ctx)
+	stat, err = getRefundStat(stat, info, ctx)
 	if err != nil {
 		return refundOrderList, stat, total, err
 	}
@@ -141,13 +141,15 @@ func getRefundProducts(refundOrderIds []uint) ([]response.RefundProduct, error) 
 	return refundProducts, nil
 }
 
-func getRefundStat(stat map[string]int64, ctx *gin.Context) (map[string]int64, error) {
-
-	// 已支付订单数量
+func getRefundStat(stat map[string]int64, info request.RefundOrderPageInfo, ctx *gin.Context) (map[string]int64, error) {
 	{
 		var all int64
 		db := g.TENANCY_DB.Model(&model.RefundOrder{})
-		err := db.Count(&all).Error
+		db, err := getRefundOrderSearch(info, ctx, db)
+		if err != nil {
+			return nil, err
+		}
+		err = db.Count(&all).Error
 		if err != nil {
 			return nil, err
 		}
@@ -157,7 +159,11 @@ func getRefundStat(stat map[string]int64, ctx *gin.Context) (map[string]int64, e
 	{
 		var agree int64
 		db := g.TENANCY_DB.Model(&model.RefundOrder{})
-		err := db.Where("status = ?", model.RefundStatusAgree).Count(&agree).Error
+		db, err := getRefundOrderSearch(info, ctx, db)
+		if err != nil {
+			return nil, err
+		}
+		err = db.Where("status = ?", model.RefundStatusAgree).Count(&agree).Error
 		if err != nil {
 			return nil, err
 		}
@@ -167,7 +173,11 @@ func getRefundStat(stat map[string]int64, ctx *gin.Context) (map[string]int64, e
 	{
 		var audit int64
 		db := g.TENANCY_DB.Model(&model.RefundOrder{})
-		err := db.Where("status = ?", model.RefundStatusAudit).Count(&audit).Error
+		db, err := getRefundOrderSearch(info, ctx, db)
+		if err != nil {
+			return nil, err
+		}
+		err = db.Where("status = ?", model.RefundStatusAudit).Count(&audit).Error
 		if err != nil {
 			return nil, err
 		}
@@ -177,7 +187,11 @@ func getRefundStat(stat map[string]int64, ctx *gin.Context) (map[string]int64, e
 	{
 		var backgood int64
 		db := g.TENANCY_DB.Model(&model.RefundOrder{})
-		err := db.Where("status = ?", model.RefundStatusBackgood).Count(&backgood).Error
+		db, err := getRefundOrderSearch(info, ctx, db)
+		if err != nil {
+			return nil, err
+		}
+		err = db.Where("status = ?", model.RefundStatusBackgood).Count(&backgood).Error
 		if err != nil {
 			return nil, err
 		}
@@ -187,7 +201,11 @@ func getRefundStat(stat map[string]int64, ctx *gin.Context) (map[string]int64, e
 	{
 		var end int64
 		db := g.TENANCY_DB.Model(&model.RefundOrder{})
-		err := db.Where("status = ?", model.RefundStatusEnd).Count(&end).Error
+		db, err := getRefundOrderSearch(info, ctx, db)
+		if err != nil {
+			return nil, err
+		}
+		err = db.Where("status = ?", model.RefundStatusEnd).Count(&end).Error
 		if err != nil {
 			return nil, err
 		}
@@ -197,7 +215,11 @@ func getRefundStat(stat map[string]int64, ctx *gin.Context) (map[string]int64, e
 	{
 		var refuse int64
 		db := g.TENANCY_DB.Model(&model.RefundOrder{})
-		err := db.Where("status = ?", model.RefundStatusRefuse).Count(&refuse).Error
+		db, err := getRefundOrderSearch(info, ctx, db)
+		if err != nil {
+			return nil, err
+		}
+		err = db.Where("status = ?", model.RefundStatusRefuse).Count(&refuse).Error
 		if err != nil {
 			return nil, err
 		}

@@ -45,7 +45,7 @@ func GetEditProductFictiMap(id uint, ctx *gin.Context) (Form, error) {
 // 审核未通过 7:'status' => 3
 
 // GetProductFilter
-func GetProductFilter(tenancyId uint, isTenancy bool) ([]response.ProductFilter, error) {
+func GetProductFilter(info request.ProductPageInfo, tenancyId uint, isTenancy bool) ([]response.ProductFilter, error) {
 	wheres := getProductConditions(tenancyId, isTenancy)
 	filters := []response.ProductFilter{}
 	for _, where := range wheres {
@@ -70,7 +70,12 @@ func GetProductFilter(tenancyId uint, isTenancy bool) ([]response.ProductFilter,
 			db = CheckTenancyId(db, tenancyId, "")
 		}
 
-		err := db.Count(&filter.Count).Error
+		db, err := getProductSearch(db, info, tenancyId)
+		if err != nil {
+			return filters, err
+		}
+
+		err = db.Count(&filter.Count).Error
 		if err != nil {
 			return filters, err
 		}
@@ -693,27 +698,13 @@ func GetProductInfoList(info request.ProductPageInfo, tenancyId uint, isTenancy,
 		}
 	}
 
+	db, err := getProductSearch(db, info, tenancyId)
+	if err != nil {
+		return productList, total, err
+	}
 	db = CheckTenancyId(db, tenancyId, "products.")
 
-	if info.Keyword != "" {
-		db = db.Where(g.TENANCY_DB.Where("products.store_name like ?", info.Keyword+"%").Or("products.store_info like ?", info.Keyword+"%").Or("products.keyword like ?", info.Keyword+"%").Or("products.bar_code like ?", info.Keyword+"%"))
-	}
-
-	// 平台分类id
-	if info.ProductCategoryId > 0 {
-		productIds, err := getProductIdsByProductCategoryId(info.ProductCategoryId, tenancyId)
-		if err != nil {
-			return productList, total, err
-		}
-		db = db.Where("products.id in ?", productIds)
-	}
-
-	// 平台分类id
-	if info.CateId > 0 {
-		db = db.Where("products.product_category_id = ?", info.CateId)
-	}
-
-	err := db.Count(&total).Error
+	err = db.Count(&total).Error
 	if err != nil {
 		return productList, total, err
 	}
@@ -729,6 +720,27 @@ func GetProductInfoList(info request.ProductPageInfo, tenancyId uint, isTenancy,
 	}
 
 	return productList, total, err
+}
+
+func getProductSearch(db *gorm.DB, info request.ProductPageInfo, tenancyId uint) (*gorm.DB, error) {
+	if info.Keyword != "" {
+		db = db.Where(g.TENANCY_DB.Where("products.store_name like ?", info.Keyword+"%").Or("products.store_info like ?", info.Keyword+"%").Or("products.keyword like ?", info.Keyword+"%").Or("products.bar_code like ?", info.Keyword+"%"))
+	}
+	// 平台分类id
+	if info.ProductCategoryId > 0 {
+		productIds, err := getProductIdsByProductCategoryId(info.ProductCategoryId, tenancyId)
+		if err != nil {
+			return db, err
+		}
+		db = db.Where("products.id in ?", productIds)
+	}
+
+	// 平台分类id
+	if info.CateId > 0 {
+		db = db.Where("products.product_category_id = ?", info.CateId)
+	}
+
+	return db, nil
 }
 
 func GetProductSelect(tenancyId uint) ([]response.SelectOption, error) {

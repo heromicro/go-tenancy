@@ -74,7 +74,7 @@ func InitMediaRouter(Router *gin.RouterGroup) {
 func InitProductRouter(Router *gin.RouterGroup) {
 	ProductRouter := Router.Group("/product")
 	{
-		ProductRouter.GET("/getProductFilter", client.GetProductFilter)
+		ProductRouter.POST("/getProductFilter", client.GetProductFilter)
 		ProductRouter.POST("/createProduct", client.CreateProduct)
 		ProductRouter.POST("/changeProductIsShow", client.ChangeProductIsShow)
 		ProductRouter.POST("/getProductList", client.GetProductList)

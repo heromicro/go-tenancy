@@ -224,7 +224,7 @@ var carbines = []gormadapter.CasbinRule{
 	{Ptype: "p", V0: AdminAuthorityId, V1: "/v1/admin/product/getProductSelect/:tenancy_id", V2: "GET"},
 	{Ptype: "p", V0: AdminAuthorityId, V1: "/v1/admin/product/getEditProductFictiMap/:id", V2: "GET"},
 	{Ptype: "p", V0: AdminAuthorityId, V1: "/v1/admin/product/setProductFicti/:id", V2: "PUT"},
-	{Ptype: "p", V0: AdminAuthorityId, V1: "/v1/admin/product/getProductFilter", V2: "GET"},
+	{Ptype: "p", V0: AdminAuthorityId, V1: "/v1/admin/product/getProductFilter", V2: "POST"},
 	{Ptype: "p", V0: AdminAuthorityId, V1: "/v1/admin/product/getProductList", V2: "POST"},
 	{Ptype: "p", V0: AdminAuthorityId, V1: "/v1/admin/product/changeProductStatus", V2: "POST"},
 	{Ptype: "p", V0: AdminAuthorityId, V1: "/v1/admin/product/changeMutilProductStatus", V2: "POST"},
@@ -314,7 +314,7 @@ var carbines = []gormadapter.CasbinRule{
 	//商品
 	{Ptype: "p", V0: TenancyAuthorityId, V1: "/v1/merchant/product/getEditProductFictiMap/:id", V2: "GET"},
 	{Ptype: "p", V0: TenancyAuthorityId, V1: "/v1/merchant/product/setProductFicti/:id", V2: "PUT"},
-	{Ptype: "p", V0: TenancyAuthorityId, V1: "/v1/merchant/product/getProductFilter", V2: "GET"},
+	{Ptype: "p", V0: TenancyAuthorityId, V1: "/v1/merchant/product/getProductFilter", V2: "POST"},
 	{Ptype: "p", V0: TenancyAuthorityId, V1: "/v1/merchant/product/changeProductIsShow", V2: "POST"},
 	{Ptype: "p", V0: TenancyAuthorityId, V1: "/v1/merchant/product/getProductList", V2: "POST"},
 	{Ptype: "p", V0: TenancyAuthorityId, V1: "/v1/merchant/product/createProduct", V2: "POST"},

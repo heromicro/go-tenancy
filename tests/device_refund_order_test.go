@@ -130,16 +130,32 @@ func TestDeviceRefundOrderProcess(t *testing.T) {
 		return
 	}
 	base.Get(deviceAuth, fmt.Sprintf("v1/device/refundOrder/getRefundOrderById/%d", refundOrder), nil, http.StatusOK, "操作成功")
+	url := "v1/device/refundOrder/getRefundOrderList"
+	pageKeys := base.ResponseKeys{
+		{Key: "pageSize", Value: 10},
+		{Key: "page", Value: 1},
+		{Key: "total", Value: 1},
+		{Key: "list", Value: []base.ResponseKeys{}},
+		{Key: "stat", Value: base.ResponseKeys{
+			{Key: "agree", Value: 0},
+			{Key: "all", Value: 1},
+			{Key: "audit", Value: 1},
+			{Key: "backgood", Value: 1},
+			{Key: "end", Value: 1},
+			{Key: "refuse", Value: 1},
+		}},
+	}
+	base.PostList(deviceAuth, url, base.PageRes, http.StatusOK, "获取成功", pageKeys)
 }
 
 func CreateRefundOrder(auth *httpexpect.Expect, orderId uint, ids []uint, status int, message string) uint {
 	data := map[string]interface{}{
 		"ids":           ids,
 		"refundMessage": "地址错了",
-		"RefundPrice":   1.0,
-		"RefundType":    1,
-		"Num":           1,
-		"Mark":          "",
+		"refundPrice":   1.0,
+		"refundType":    1,
+		"num":           1,
+		"mark":          "",
 	}
 	keys := base.IdKeys()
 	// 提交退款

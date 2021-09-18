@@ -150,6 +150,8 @@ func RefundOrder(ctx *gin.Context) {
 		response.FailWithMessage("参数校验不通过", ctx)
 		return
 	}
+	req.PatientId = multi.GetUserId(ctx)
+	req.TenancyId = multi.GetTenancyId(ctx)
 	if id, err := logic.CreateRefundOrder(req, createRefundOrder); err != nil {
 		g.TENANCY_LOG.Error("操作失败!", zap.Any("err", err))
 		response.FailWithMessage("操作失败:"+err.Error(), ctx)

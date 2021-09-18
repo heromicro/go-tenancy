@@ -203,7 +203,7 @@ func InitProductRouter(Router *gin.RouterGroup) {
 	{
 		ProductRouter.GET("/getProductSelect/:tenancy_id", admin.GetProductSelect)
 		ProductRouter.GET("/getEditProductFictiMap/:id", admin.GetEditProductFictiMap)
-		ProductRouter.GET("/getProductFilter", admin.GetProductFilter)
+		ProductRouter.POST("/getProductFilter", admin.GetProductFilter)
 		ProductRouter.PUT("/setProductFicti/:id", admin.SetProductFicti)                //设置虚拟销量
 		ProductRouter.POST("/changeProductStatus", admin.ChangeProductStatus)           // 强制下架，重新审核
 		ProductRouter.POST("/changeMutilProductStatus", admin.ChangeMutilProductStatus) // 强制下架，重新审核

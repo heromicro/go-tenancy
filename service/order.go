@@ -347,6 +347,21 @@ func GetOrderInfoList(info request.OrderPageInfo, ctx *gin.Context) (gin.H, erro
 		Joins("left join sys_tenancies on orders.sys_tenancy_id = sys_tenancies.id").
 		Joins("left join group_orders on orders.group_order_id = group_orders.id")
 
+	if info.Status != "" {
+		cond := getOrderConditionByStatus(info.Status)
+		if cond.IsDeleted {
+			db = db.Unscoped()
+		}
+
+		for key, cn := range cond.Conditions {
+			if cn == nil {
+				db = db.Where(fmt.Sprintf("%s%s", "orders.", key))
+			} else {
+				db = db.Where(fmt.Sprintf("%s%s = ?", "orders.", key), cn)
+			}
+		}
+	}
+
 	db, err := getOrderSearch(info, ctx, db)
 	if err != nil {
 		return nil, err
@@ -441,21 +456,6 @@ func GetOrderProductsByOrderIds(orderIds []uint) ([]response.OrderProduct, error
 
 // getOrderSearch
 func getOrderSearch(info request.OrderPageInfo, ctx *gin.Context, db *gorm.DB) (*gorm.DB, error) {
-	if info.Status != "" {
-		cond := getOrderConditionByStatus(info.Status)
-		if cond.IsDeleted {
-			db = db.Unscoped()
-		}
-
-		for key, cn := range cond.Conditions {
-			if cn == nil {
-				db = db.Where(fmt.Sprintf("%s%s", "orders.", key))
-			} else {
-				db = db.Where(fmt.Sprintf("%s%s = ?", "orders.", key), cn)
-			}
-		}
-	}
-
 	if multi.IsTenancy(ctx) {
 		db = db.Where("orders.sys_tenancy_id = ?", multi.GetTenancyId(ctx))
 	} else {
@@ -504,8 +504,10 @@ func getOrderSearch(info request.OrderPageInfo, ctx *gin.Context, db *gorm.DB) (
 func getStat(info request.OrderPageInfo, ctx *gin.Context, stat []map[string]interface{}) ([]map[string]interface{}, error) {
 	// 已支付订单数量
 	var all int64
-	if db, err := getOrderSearch(info, ctx, g.TENANCY_DB.Model(&model.Order{}).Joins("left join sys_tenancies on orders.sys_tenancy_id = sys_tenancies.id").
-		Joins("left join group_orders on orders.group_order_id = group_orders.id")); err != nil {
+	db := g.TENANCY_DB.Model(&model.Order{}).
+		Joins("left join sys_tenancies on orders.sys_tenancy_id = sys_tenancies.id").
+		Joins("left join group_orders on orders.group_order_id = group_orders.id")
+	if db, err := getOrderSearch(info, ctx, db); err != nil {
 		return nil, err
 	} else {
 		err = db.Where("orders.paid =?", g.StatusTrue).Count(&all).Error
@@ -517,8 +519,7 @@ func getStat(info request.OrderPageInfo, ctx *gin.Context, stat []map[string]int
 
 	//实际支付金额
 	var payPrice request.Result
-	if db, err := getOrderSearch(info, ctx, g.TENANCY_DB.Model(&model.Order{}).Joins("left join sys_tenancies on orders.sys_tenancy_id = sys_tenancies.id").
-		Joins("left join group_orders on orders.group_order_id = group_orders.id")); err != nil {
+	if db, err := getOrderSearch(info, ctx, db); err != nil {
 		return nil, err
 	} else {
 
@@ -531,8 +532,7 @@ func getStat(info request.OrderPageInfo, ctx *gin.Context, stat []map[string]int
 
 	//已退款金额
 	var orderIds []uint
-	if db, err := getOrderSearch(info, ctx, g.TENANCY_DB.Model(&model.Order{}).Joins("left join sys_tenancies on orders.sys_tenancy_id = sys_tenancies.id").
-		Joins("left join group_orders on orders.group_order_id = group_orders.id")); err != nil {
+	if db, err := getOrderSearch(info, ctx, db); err != nil {
 		return nil, err
 	} else {
 
@@ -547,8 +547,7 @@ func getStat(info request.OrderPageInfo, ctx *gin.Context, stat []map[string]int
 
 	//微信支付金额
 	var wxPayPrice request.Result
-	if db, err := getOrderSearch(info, ctx, g.TENANCY_DB.Model(&model.Order{}).Joins("left join sys_tenancies on orders.sys_tenancy_id = sys_tenancies.id").
-		Joins("left join group_orders on orders.group_order_id = group_orders.id")); err != nil {
+	if db, err := getOrderSearch(info, ctx, db); err != nil {
 		return nil, err
 	} else {
 		err = db.Select("sum(orders.pay_price) as count").Where("orders.paid =?", g.StatusTrue).Where("orders.pay_type in ?", []int{model.PayTypeWx, model.PayTypeRoutine, model.PayTypeH5}).First(&wxPayPrice).Error
@@ -560,8 +559,7 @@ func getStat(info request.OrderPageInfo, ctx *gin.Context, stat []map[string]int
 
 	//余额支付金额
 	var blanPayPrice request.Result
-	if db, err := getOrderSearch(info, ctx, g.TENANCY_DB.Model(&model.Order{}).Joins("left join sys_tenancies on orders.sys_tenancy_id = sys_tenancies.id").
-		Joins("left join group_orders on orders.group_order_id = group_orders.id")); err != nil {
+	if db, err := getOrderSearch(info, ctx, db); err != nil {
 		return nil, err
 	} else {
 		err = db.Select("sum(orders.pay_price) as count").Where("orders.paid =?", g.StatusTrue).Where("orders.pay_type = ?", model.PayTypeBalance).First(&blanPayPrice).Error
@@ -573,8 +571,7 @@ func getStat(info request.OrderPageInfo, ctx *gin.Context, stat []map[string]int
 
 	//支付宝支付金额
 	var aliPayPrice request.Result
-	if db, err := getOrderSearch(info, ctx, g.TENANCY_DB.Model(&model.Order{}).Joins("left join sys_tenancies on orders.sys_tenancy_id = sys_tenancies.id").
-		Joins("left join group_orders on orders.group_order_id = group_orders.id")); err != nil {
+	if db, err := getOrderSearch(info, ctx, db); err != nil {
 		return nil, err
 	} else {
 		err = db.Select("sum(orders.pay_price) as count").Where("orders.paid =?", g.StatusTrue).Where("orders.pay_type = ?", model.PayTypeAlipay).First(&aliPayPrice).Error

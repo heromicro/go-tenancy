@@ -179,7 +179,7 @@ func TestDeviceOrderProcessForCancelOrder(t *testing.T) {
 		{Key: "qrcode", Type: "notempty"},
 	}
 	// 重新支付订单
-	base.Get(deviceAuth, fmt.Sprintf("v1/device/order/payOrder/%d", orderId), map[string]interface{}{"orderType": createOrderData["orderType"]}, http.StatusOK, "获取成功", payOrderKeys)
+	base.Get(deviceAuth, fmt.Sprintf("v1/device/order/payOrder/%d", orderId), map[string]interface{}{"orderType": createOrderData["orderType"]}, http.StatusOK, "操作成功", payOrderKeys)
 
 	// 取消订单
 	base.Get(deviceAuth, fmt.Sprintf("v1/device/order/cancelOrder/%d", orderId), nil, http.StatusOK, "操作成功")
@@ -263,7 +263,7 @@ func TestDeviceOrderProcessForCheckReturnOrder(t *testing.T) {
 	data := map[string]interface{}{
 		"ids": []uint{productId},
 	}
-	base.Post(deviceAuth, fmt.Sprintf("v1/device/order/checkRefundOrder/%d", orderId), data, http.StatusBadRequest, "操作失败:商品不存在")
+	base.Post(deviceAuth, fmt.Sprintf("v1/device/order/checkRefundOrder/%d", orderId), data, http.StatusBadRequest, "操作失败:订单不存在")
 
 	getOrderByIdKeys := base.ResponseKeys{
 		{Key: "orderSn", Value: ""},

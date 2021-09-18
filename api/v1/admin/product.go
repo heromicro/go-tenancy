@@ -40,7 +40,12 @@ func GetEditProductFictiMap(ctx *gin.Context) {
 
 // GetProductFilter
 func GetProductFilter(ctx *gin.Context) {
-	if filters, err := service.GetProductFilter(multi.GetTenancyId(ctx), multi.IsTenancy(ctx)); err != nil {
+	var pageInfo request.ProductPageInfo
+	if errs := ctx.ShouldBindJSON(&pageInfo); errs != nil {
+		response.FailWithMessage(errs.Error(), ctx)
+		return
+	}
+	if filters, err := service.GetProductFilter(pageInfo, multi.GetTenancyId(ctx), multi.IsTenancy(ctx)); err != nil {
 		g.TENANCY_LOG.Error("获取失败!", zap.Any("err", err))
 		response.FailWithMessage("获取失败:"+err.Error(), ctx)
 	} else {

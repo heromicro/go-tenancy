@@ -41,7 +41,7 @@ func checkOrder(req request.GetById, orderPorductIds []uint) (model.Order, []res
 		return order, nil, err
 	}
 
-	if order.IsCancel == g.StatusFalse {
+	if order.IsCancel == g.StatusTrue {
 		return order, nil, fmt.Errorf("订单已取消")
 	}
 
