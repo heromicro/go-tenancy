@@ -14,6 +14,7 @@ import (
 	"github.com/snowlyg/go-tenancy/model/response"
 	"github.com/snowlyg/go-tenancy/utils/param"
 	"github.com/snowlyg/multi"
+	"go.uber.org/zap"
 	"gorm.io/gorm"
 )
 
@@ -287,9 +288,11 @@ func GetRefundPriceByOrderIds(ids []uint) (float64, error) {
 
 func checkRefundPrice(refundOrder model.RefundOrder) (float64, error) {
 	getById := request.GetById{Id: refundOrder.OrderID, TenancyId: refundOrder.SysTenancyID, PatientId: refundOrder.PatientID, UserId: refundOrder.SysUserID}
-	order, err := CheckOrderStatusBeforePay(getById)
-	if err != nil {
-		return 0, fmt.Errorf("get order %w", err)
+	order, err := GetOrderByOrderId(getById)
+	if errors.Is(err, gorm.ErrRecordNotFound) {
+		return 0, fmt.Errorf("当前订单不存在")
+	} else if err != nil {
+		return 0, err
 	}
 	refundPrice, err := GetRefundPriceByOrderIds([]uint{refundOrder.OrderID})
 	if err != nil {
@@ -492,50 +495,9 @@ func UpdateRefundOrderById(db *gorm.DB, refundOrderId uint, data map[string]inte
 	return nil
 }
 
-func CheckRefundOrder(req request.GetById, orderPorductIds []uint) (response.CheckRefundOrder, error) {
-	var checkRefundOrder response.CheckRefundOrder
-	order, err := CheckOrderStatusBeforePay(req)
-	if err != nil {
-		return checkRefundOrder, err
-	}
-
-	orderProducts, err := GetOrdersProductByProductIds(orderPorductIds, req)
-	if err != nil {
-		return checkRefundOrder, err
-	}
-	if len(orderProducts) == 0 {
-		return checkRefundOrder, fmt.Errorf("商品不存在或已退款")
-	}
-	if len(orderProducts) != len(orderPorductIds) {
-		return checkRefundOrder, fmt.Errorf("请选择正确的退款商品")
-	}
-	checkRefundOrder.TotalRefundPrice = GetTotalRefundPrice(orderProducts)
-	if order.Status >= model.OrderStatusNoReceive { // 发货
-		checkRefundOrder.PostagePrice = order.PayPostage
-	}
-	checkRefundOrder.Status = order.Status
-	checkRefundOrder.Product = orderProducts
-
-	return checkRefundOrder, nil
-}
-
-func CreateRefundOrder(reqId request.GetById, req request.CreateRefundOrder) (uint, error) {
+func CreateRefundOrder(reqId request.GetById, req request.CreateRefundOrder, orderProducts []response.OrderProduct) (uint, error) {
 	var returnOrderId uint
-	_, err := CheckOrderStatusBeforePay(reqId)
-	if err != nil {
-		return returnOrderId, err
-	}
-	orderProducts, err := GetOrdersProductByProductIds(req.Ids, reqId)
-	if err != nil {
-		return returnOrderId, err
-	}
-	if len(orderProducts) == 0 {
-		return returnOrderId, fmt.Errorf("商品不存在或已退款")
-	}
-	if len(orderProducts) != len(req.Ids) {
-		return returnOrderId, fmt.Errorf("请选择正确的退款商品")
-	}
-	err = g.TENANCY_DB.Transaction(func(tx *gorm.DB) error {
+	err := g.TENANCY_DB.Transaction(func(tx *gorm.DB) error {
 		refundOrder := model.RefundOrder{
 			OrderID:      reqId.Id,
 			PatientID:    reqId.PatientId,
@@ -557,7 +519,8 @@ func CreateRefundOrder(reqId request.GetById, req request.CreateRefundOrder) (ui
 		}
 		err := tx.Model(&model.RefundOrder{}).Create(&refundOrder).Error
 		if err != nil {
-			return err
+			g.TENANCY_LOG.Error("添加退款单错误", zap.String("CreateRefundOrder()", err.Error()))
+			return fmt.Errorf("添加退款单错误 %w", err)
 		}
 
 		err = addRefundOrderStatus(tx, refundOrder.ID, "create", "创建退款单")
@@ -591,6 +554,7 @@ func CreateRefundOrder(reqId request.GetById, req request.CreateRefundOrder) (ui
 func CreateRefundProduct(db *gorm.DB, refundProducts []model.RefundProduct) error {
 	err := db.Model(&model.RefundProduct{}).Create(&refundProducts).Error
 	if err != nil {
+		g.TENANCY_LOG.Error("添加退款商品错误", zap.String("CreateRefundProduct()", err.Error()))
 		return fmt.Errorf("添加退款商品错误: %v", err)
 	}
 	return nil
@@ -610,6 +574,7 @@ func GetRefundOrderAutoAgree() ([]model.RefundOrder, error) {
 		Where(whereCreatedAt).
 		Find(&refundOrder).Error
 	if err != nil {
+		g.TENANCY_LOG.Error("获取超时退款单错误", zap.String("GetRefundOrderAutoAgree()", err.Error()))
 		return refundOrder, fmt.Errorf("获取超时退款单错误: %v", err)
 	}
 	return refundOrder, nil
@@ -621,6 +586,7 @@ func AutoAgreeRefundOrders(refundOrders []model.RefundOrder) {
 	}
 }
 
+// addRefundOrderStatus 添加退款单记录
 func addRefundOrderStatus(db *gorm.DB, id uint, cahngeType, changeMessage string) error {
 	status := model.RefundStatus{
 		RefundOrderID: id,
@@ -628,7 +594,12 @@ func addRefundOrderStatus(db *gorm.DB, id uint, cahngeType, changeMessage string
 		ChangeMessage: changeMessage,
 		ChangeTime:    time.Now(),
 	}
-	return db.Model(&model.RefundStatus{}).Create(&status).Error
+	err := db.Model(&model.RefundStatus{}).Create(&status).Error
+	if err != nil {
+		g.TENANCY_LOG.Error("添加退款单记录错误", zap.String("addRefundOrderStatus()", err.Error()))
+		return fmt.Errorf("添加退款单记录错误 %w", err)
+	}
+	return nil
 }
 
 func ChangeReturnOrderStatusByOrderSn(status int, orderSn, changeType, changeMessage string) error {

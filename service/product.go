@@ -14,6 +14,7 @@ import (
 	"github.com/snowlyg/go-tenancy/model/request"
 	"github.com/snowlyg/go-tenancy/model/response"
 	"github.com/snowlyg/multi"
+	"go.uber.org/zap"
 	"gorm.io/gorm"
 )
 
@@ -233,6 +234,7 @@ func ChangeProduct(req request.UpdateProduct, id uint, ctx *gin.Context) error {
 // UpdateProduct 更新产品信息
 func UpdateProduct(db *gorm.DB, id uint, data map[string]interface{}) error {
 	if err := db.Model(&model.Product{}).Where("id = ?", id).Updates(&data).Error; err != nil {
+		g.TENANCY_LOG.Error("更新产品信息错误", zap.String("UpdateProduct()", err.Error()))
 		return fmt.Errorf("更新产品信息错误 %w", err)
 	}
 	return nil
@@ -750,6 +752,7 @@ func UpdateProductAttrValue(db *gorm.DB, productId uint, unique string, data map
 		Where("`unique` = ?", unique).
 		Updates(&data).Error
 	if err != nil {
+		g.TENANCY_LOG.Error("更新商品规格错误", zap.String("UpdateProductAttrValue()", err.Error()))
 		return fmt.Errorf("更新商品规格错误 %w", err)
 	}
 	return nil

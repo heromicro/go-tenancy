@@ -263,7 +263,7 @@ func TestDeviceOrderProcessForCheckReturnOrder(t *testing.T) {
 	data := map[string]interface{}{
 		"ids": []uint{productId},
 	}
-	base.Post(deviceAuth, fmt.Sprintf("v1/device/order/checkRefundOrder/%d", orderId), data, http.StatusBadRequest, "操作失败:订单未付款,请取消订单")
+	base.Post(deviceAuth, fmt.Sprintf("v1/device/order/checkRefundOrder/%d", orderId), data, http.StatusBadRequest, "操作失败:商品不存在")
 
 	getOrderByIdKeys := base.ResponseKeys{
 		{Key: "orderSn", Value: ""},

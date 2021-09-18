@@ -194,11 +194,11 @@ func getOrderConditionByStatus(status string) response.OrderCondition {
 }
 
 // GetOrderByOrderId 获取订单
-func GetOrderByOrderId(req request.GetById) (model.Order, error) {
+func GetOrderByOrderId(req request.GetById, funcs ...func(*gorm.DB) *gorm.DB) (model.Order, error) {
 	var order model.Order
-	db := g.TENANCY_DB.Model(&model.Order{}).
-		Where("id = ?", req.Id)
+	db := g.TENANCY_DB.Model(&model.Order{}).Where("id = ?", req.Id)
 	db = CheckTenancyIdAndUserId(db, req, "")
+	db = db.Scopes(funcs...)
 	err := db.First(&order).Error
 	if err != nil {
 		return order, err
@@ -407,7 +407,8 @@ func GetOrdersProductByProductIds(orderProductIds []uint, req request.GetById) (
 		Where("id in ?", orderProductIds)
 	err := db.Find(&orderProducts).Error
 	if err != nil {
-		return orderProducts, err
+		g.TENANCY_LOG.Error("获取订单产品错误", zap.String("GetOrdersProductByProductIds()", err.Error()))
+		return orderProducts, fmt.Errorf("获取订单产品错误 %w", err)
 	}
 	return orderProducts, nil
 }
@@ -420,7 +421,10 @@ func GetTotalRefundPrice(products []response.OrderProduct) float64 {
 		totalRefundPrice = totalRefundPrice.Add(productPrice)
 	}
 
-	price, _ := totalRefundPrice.Round(2).Float64()
+	price, b := totalRefundPrice.Round(2).Float64()
+	if !b {
+		g.TENANCY_LOG.Error("退款总价计算错误", zap.String("GetTotalRefundPrice()", "totalRefundPrice.Round(2).Float64()"))
+	}
 	return price
 }
 
@@ -429,7 +433,8 @@ func GetOrderProductsByOrderIds(orderIds []uint) ([]response.OrderProduct, error
 	orderProducts := []response.OrderProduct{}
 	err := g.TENANCY_DB.Model(&model.OrderProduct{}).Where("order_id in ?", orderIds).Find(&orderProducts).Error
 	if err != nil {
-		return orderProducts, err
+		g.TENANCY_LOG.Error("获取订单商品错误", zap.String("GetOrderProductsByOrderIds()", err.Error()))
+		return orderProducts, fmt.Errorf("获取订单商品错误 %w", err)
 	}
 	return orderProducts, nil
 }
@@ -610,6 +615,7 @@ func ChangeOrder(id uint, order request.OrderRemarkAndUpdate, ctx *gin.Context) 
 func UpdateOrderById(db *gorm.DB, id uint, data map[string]interface{}) error {
 	err := db.Model(&model.Order{}).Where("id = ?", id).Updates(data).Error
 	if err != nil {
+		g.TENANCY_LOG.Error("更新订单错误", zap.String("UpdateOrderById()", err.Error()))
 		return fmt.Errorf("更新订单错误 %w", err)
 	}
 	return nil
@@ -619,6 +625,7 @@ func UpdateOrderById(db *gorm.DB, id uint, data map[string]interface{}) error {
 func UpdateOrderByIds(db *gorm.DB, ids []uint, data map[string]interface{}) error {
 	err := db.Model(&model.Order{}).Where("id in ?", ids).Updates(data).Error
 	if err != nil {
+		g.TENANCY_LOG.Error("批量更新订单错误", zap.String("UpdateOrderByIds()", err.Error()))
 		return fmt.Errorf("批量更新订单 %w", err)
 	}
 	return nil
@@ -839,21 +846,6 @@ func CreateOrder(req request.CreateOrder, tenancyId, userId, patientId uint, ten
 	return png, order.ID, nil
 }
 
-// CheckOrderStatusBeforePay 订单状态检测
-func CheckOrderStatusBeforePay(req request.GetById) (model.Order, error) {
-	order, err := GetOrderByOrderId(req)
-	if errors.Is(err, gorm.ErrRecordNotFound) {
-		return order, fmt.Errorf("订单不存在或者已被删除")
-	}
-	if err != nil {
-		return order, err
-	}
-	if order.Status != model.OrderStatusNoPay {
-		return order, fmt.Errorf("订单已付款,请勿重复操作")
-	}
-	return order, nil
-}
-
 // GetQrCode 生成支付二维码
 func GetQrCode(orderId, tenancyId, patientId uint, orderType int) ([]byte, error) {
 	seitURL, err := param.GetSeitURL()
@@ -870,10 +862,12 @@ func GetQrCode(orderId, tenancyId, patientId uint, orderType int) ([]byte, error
 	}
 	q, err := qrcode.New(payUrl, qrcode.Medium)
 	if err != nil {
+		g.TENANCY_LOG.Error("生成二维码错误", zap.String("qrcode.New()", err.Error()))
 		return nil, err
 	}
 	png, err := q.PNG(256)
 	if err != nil {
+		g.TENANCY_LOG.Error("生成二维码错误", zap.String("q.PNG(256)", err.Error()))
 		return nil, err
 	}
 	return png, nil
@@ -929,11 +923,12 @@ func GetNoPayOrders() ([]model.Order, error) {
 	return orders, nil
 }
 
-// CreateOrderStatus  新建订单状态
+// CreateOrderStatus  添加订单处理记录
 func CreateOrderStatus(db *gorm.DB, orderStatus *model.OrderStatus) error {
 	err := db.Create(orderStatus).Error
 	if err != nil {
-		return err
+		g.TENANCY_LOG.Error("添加订单处理记录错误", zap.String("CreateOrderStatus", err.Error()))
+		return fmt.Errorf("添加订单处理记录错误 %w", err)
 	}
 	return nil
 }
@@ -977,13 +972,8 @@ func ChangeOrderStatusByOrderId(orderId uint, changeData map[string]interface{},
 
 // CancelOrder 用户取消订单
 func CancelOrder(req request.GetById) error {
-	_, err := CheckOrderStatusBeforePay(req)
-	if err != nil {
-		return err
-	}
-
 	changeData := map[string]interface{}{"is_cancel": g.StatusTrue}
-	err = ChangeOrderStatusByOrderId(req.Id, changeData, "cancel", "取消订单")
+	err := ChangeOrderStatusByOrderId(req.Id, changeData, "cancel", "取消订单")
 	if err != nil {
 		return err
 	}
@@ -992,7 +982,7 @@ func CancelOrder(req request.GetById) error {
 
 // DeleteOrder 商户取消订单
 func DeleteOrder(req request.GetById) error {
-	_, err := CheckOrderStatusBeforePay(req)
+	_, err := GetOrderByOrderId(req)
 	if err != nil {
 		return err
 	}

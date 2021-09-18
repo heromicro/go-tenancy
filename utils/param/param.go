@@ -8,6 +8,7 @@ import (
 	"github.com/snowlyg/go-tenancy/g"
 	"github.com/snowlyg/go-tenancy/model"
 	"github.com/snowlyg/go-tenancy/model/response"
+	"go.uber.org/zap"
 	"gorm.io/gorm"
 )
 
@@ -15,6 +16,7 @@ func GetConfigValueByKey(configKey string) (string, error) {
 	configValue := model.SysConfigValue{}
 	err := g.TENANCY_DB.Where("config_key = ?", configKey).First(&configValue).Error
 	if err != nil && !errors.Is(err, gorm.ErrRecordNotFound) {
+		g.TENANCY_LOG.Error("获取配置错误", zap.String(configKey, err.Error()))
 		return "", err
 	}
 	return configValue.Value, nil
