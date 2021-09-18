@@ -238,7 +238,7 @@ var carbines = []gormadapter.CasbinRule{
 
 	//订单
 	{Ptype: "p", V0: AdminAuthorityId, V1: "/v1/admin/order/getOrderList", V2: "POST"},
-	{Ptype: "p", V0: AdminAuthorityId, V1: "/v1/admin/order/getOrderChart", V2: "GET"},
+	{Ptype: "p", V0: AdminAuthorityId, V1: "/v1/admin/order/getOrderChart", V2: "POST"},
 	{Ptype: "p", V0: AdminAuthorityId, V1: "/v1/admin/order/getOrderById/:id", V2: "GET"},
 	//退款订单
 	{Ptype: "p", V0: AdminAuthorityId, V1: "/v1/admin/refundOrder/getRefundOrderList", V2: "POST"},
@@ -334,8 +334,8 @@ var carbines = []gormadapter.CasbinRule{
 	{Ptype: "p", V0: TenancyAuthorityId, V1: "/v1/merchant/order/getOrderRemarkMap/:id", V2: "GET"},
 	{Ptype: "p", V0: TenancyAuthorityId, V1: "/v1/merchant/order/getEditOrderMap/:id", V2: "GET"},
 	{Ptype: "p", V0: TenancyAuthorityId, V1: "/v1/merchant/order/getOrderList", V2: "POST"},
-	{Ptype: "p", V0: TenancyAuthorityId, V1: "/v1/merchant/order/getOrderChart", V2: "GET"},
-	{Ptype: "p", V0: TenancyAuthorityId, V1: "/v1/merchant/order/getOrderFilter", V2: "GET"},
+	{Ptype: "p", V0: TenancyAuthorityId, V1: "/v1/merchant/order/getOrderChart", V2: "POST"},
+	{Ptype: "p", V0: TenancyAuthorityId, V1: "/v1/merchant/order/getOrderFilter", V2: "POST"},
 	{Ptype: "p", V0: TenancyAuthorityId, V1: "/v1/merchant/order/getOrderById/:id", V2: "GET"},
 	{Ptype: "p", V0: TenancyAuthorityId, V1: "/v1/merchant/order/getOrderRecord/:id", V2: "POST"},
 	{Ptype: "p", V0: TenancyAuthorityId, V1: "/v1/merchant/order/deliveryOrder/:id", V2: "POST"},

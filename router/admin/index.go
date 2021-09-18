@@ -303,7 +303,7 @@ func InitOrderRouter(Router *gin.RouterGroup) {
 	OrderRouter := Router.Group("/order")
 	{
 		OrderRouter.POST("/getOrderList", admin.GetOrderList)
-		OrderRouter.GET("/getOrderChart", admin.GetOrderChart)
+		OrderRouter.POST("/getOrderChart", admin.GetOrderChart)
 		OrderRouter.GET("/getOrderById/:id", admin.GetOrderById)
 	}
 }

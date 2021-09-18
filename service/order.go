@@ -83,7 +83,7 @@ func GetOrderRemarkAndUpdateByID(id uint, ctx *gin.Context) (request.OrderRemark
 }
 
 // getOrderCount 订单数量
-func getOrderCount(name string, ctx *gin.Context) (int64, error) {
+func getOrderCount(info request.OrderPageInfo, name string, ctx *gin.Context) (int64, error) {
 	var count int64
 	wheres := getOrderConditions()
 	for _, where := range wheres {
@@ -101,8 +101,12 @@ func getOrderCount(name string, ctx *gin.Context) (int64, error) {
 			if multi.IsTenancy(ctx) {
 				db = CheckTenancyId(db, multi.GetTenancyId(ctx), "")
 			}
+			db, err := getOrderSearch(info, ctx, db)
+			if err != nil {
+				return count, err
+			}
 
-			err := db.Count(&count).Error
+			err = db.Count(&count).Error
 			if err != nil {
 				return count, err
 			}
@@ -113,7 +117,7 @@ func getOrderCount(name string, ctx *gin.Context) (int64, error) {
 }
 
 // GetFilter 订单过滤数量
-func GetFilter(ctx *gin.Context) ([]map[string]interface{}, error) {
+func GetFilter(info request.OrderPageInfo, ctx *gin.Context) ([]map[string]interface{}, error) {
 	charts := []map[string]interface{}{
 		{"count": 0, "orderType": "", "title": "全部"},
 		{"count": 0, "orderType": "1", "title": "普通订单"},
@@ -129,8 +133,12 @@ func GetFilter(ctx *gin.Context) ([]map[string]interface{}, error) {
 		if multi.IsTenancy(ctx) {
 			db = CheckTenancyId(db, multi.GetTenancyId(ctx), "")
 		}
+		db, err := getOrderSearch(info, ctx, db)
+		if err != nil {
+			return nil, err
+		}
 
-		err := db.Where("order_type = ?", chart["orderType"]).Count(&count).Error
+		err = db.Where("order_type = ?", chart["orderType"]).Count(&count).Error
 		if err != nil {
 			return nil, err
 		} else {
@@ -142,7 +150,7 @@ func GetFilter(ctx *gin.Context) ([]map[string]interface{}, error) {
 }
 
 // GetChart 订单分类抬头
-func GetChart(ctx *gin.Context) (map[string]interface{}, error) {
+func GetChart(info request.OrderPageInfo, ctx *gin.Context) (map[string]interface{}, error) {
 	charts := map[string]interface{}{
 		"all":        0,
 		"complete":   0,
@@ -155,7 +163,7 @@ func GetChart(ctx *gin.Context) (map[string]interface{}, error) {
 		"untake":     0,
 	}
 	for name, _ := range charts {
-		if cc, err := getOrderCount(name, ctx); err != nil {
+		if cc, err := getOrderCount(info, name, ctx); err != nil {
 			return nil, err
 		} else {
 			charts[name] = cc

@@ -70,7 +70,12 @@ func GetOrderList(ctx *gin.Context) {
 
 // GetOrderChart
 func GetOrderChart(ctx *gin.Context) {
-	if order, err := service.GetChart(ctx); err != nil {
+	var pageInfo request.OrderPageInfo
+	if errs := ctx.ShouldBindJSON(&pageInfo); errs != nil {
+		response.FailWithMessage(errs.Error(), ctx)
+		return
+	}
+	if order, err := service.GetChart(pageInfo, ctx); err != nil {
 		g.TENANCY_LOG.Error("获取失败!", zap.Any("err", err))
 		response.FailWithMessage("获取失败:"+err.Error(), ctx)
 	} else {
@@ -80,7 +85,12 @@ func GetOrderChart(ctx *gin.Context) {
 
 // GetOrderFilter
 func GetOrderFilter(ctx *gin.Context) {
-	if order, err := service.GetFilter(ctx); err != nil {
+	var pageInfo request.OrderPageInfo
+	if errs := ctx.ShouldBindJSON(&pageInfo); errs != nil {
+		response.FailWithMessage(errs.Error(), ctx)
+		return
+	}
+	if order, err := service.GetFilter(pageInfo, ctx); err != nil {
 		g.TENANCY_LOG.Error("获取失败!", zap.Any("err", err))
 		response.FailWithMessage("获取失败:"+err.Error(), ctx)
 	} else {

@@ -225,7 +225,7 @@ var baseApis = []model.SysApi{
 
 	//订单
 	{Path: "/v1/admin/order/getOrderList", Description: "订单列表", ApiGroup: "order", Method: "POST"},
-	{Path: "/v1/admin/order/getOrderChart", Description: "订单表头数量", ApiGroup: "order", Method: "GET"},
+	{Path: "/v1/admin/order/getOrderChart", Description: "订单表头数量", ApiGroup: "order", Method: "POST"},
 	{Path: "/v1/admin/order/getOrderById/:id", Description: "订单详情", ApiGroup: "order", Method: "GET"},
 	//退款订单
 	{Path: "/v1/admin/refundOrder/getRefundOrderList", Description: "退款订单列表", ApiGroup: "refundOrder", Method: "POST"},
@@ -304,8 +304,8 @@ var baseApis = []model.SysApi{
 	{Path: "/v1/merchant/order/getOrderRemarkMap/:id", Description: "订单备注表单", ApiGroup: "orderClient", Method: "GET"},
 	{Path: "/v1/merchant/order/getEditOrderMap/:id", Description: "订单编辑表单", ApiGroup: "orderClient", Method: "GET"},
 	{Path: "/v1/merchant/order/getOrderList", Description: "订单列表", ApiGroup: "orderClient", Method: "POST"},
-	{Path: "/v1/merchant/order/getOrderChart", Description: "订单表头数量", ApiGroup: "orderClient", Method: "GET"},
-	{Path: "/v1/merchant/order/getOrderFilter", Description: "订单分类统计", ApiGroup: "orderClient", Method: "GET"},
+	{Path: "/v1/merchant/order/getOrderChart", Description: "订单表头数量", ApiGroup: "orderClient", Method: "POST"},
+	{Path: "/v1/merchant/order/getOrderFilter", Description: "订单分类统计", ApiGroup: "orderClient", Method: "POST"},
 	{Path: "/v1/merchant/order/getOrderById/:id", Description: "订单详情", ApiGroup: "orderClient", Method: "GET"},
 	{Path: "/v1/merchant/order/getOrderRecord/:id", Description: "订单记录", ApiGroup: "orderClient", Method: "POST"},
 	{Path: "/v1/merchant/order/deliveryOrder/:id", Description: "订单发货", ApiGroup: "orderClient", Method: "POST"},
