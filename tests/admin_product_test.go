@@ -52,7 +52,7 @@ func TestGetProductFilter(t *testing.T) {
 			{Key: "count", Value: 0},
 		},
 	}
-	base.Get(auth, url, nil, http.StatusOK, "获取成功", pageKeys...)
+	base.PostList(auth, url, base.PageRes, http.StatusOK, "获取成功", pageKeys...)
 }
 
 func TestProductProcess(t *testing.T) {

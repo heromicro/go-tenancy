@@ -28,7 +28,8 @@ func TestClientOrderList(t *testing.T) {
 func TestGetClientOrderChart(t *testing.T) {
 	auth, _ := base.TenancyWithLoginTester(t)
 	defer base.BaseLogOut(auth)
-	obj := auth.GET("v1/merchant/order/getOrderChart").
+	obj := auth.POST("v1/merchant/order/getOrderChart").
+		WithJSON(base.PageRes).
 		Expect().Status(http.StatusOK).JSON().Object()
 	obj.Keys().ContainsOnly("status", "data", "message")
 	obj.Value("status").Number().Equal(200)
@@ -38,7 +39,8 @@ func TestGetClientOrderChart(t *testing.T) {
 func TestGetClientOrderFilter(t *testing.T) {
 	auth, _ := base.TenancyWithLoginTester(t)
 	defer base.BaseLogOut(auth)
-	obj := auth.GET("v1/merchant/order/getOrderFilter").
+	obj := auth.POST("v1/merchant/order/getOrderFilter").
+		WithJSON(base.PageRes).
 		Expect().Status(http.StatusOK).JSON().Object()
 	obj.Keys().ContainsOnly("status", "data", "message")
 	obj.Value("status").Number().Equal(200)

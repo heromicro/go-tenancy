@@ -28,7 +28,8 @@ func TestOrderList(t *testing.T) {
 func TestGetOrderFilter(t *testing.T) {
 	auth := base.BaseWithLoginTester(t)
 	defer base.BaseLogOut(auth)
-	obj := auth.GET("v1/admin/order/getOrderChart").
+	obj := auth.POST("v1/admin/order/getOrderChart").
+		WithJSON(base.PageRes).
 		Expect().Status(http.StatusOK).JSON().Object()
 	obj.Keys().ContainsOnly("status", "data", "message")
 	obj.Value("status").Number().Equal(200)

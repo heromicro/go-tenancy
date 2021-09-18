@@ -78,11 +78,11 @@ func TestMain(m *testing.M) {
 
 	code := m.Run()
 
-	err = dorpDB(uuid)
-	if err != nil {
-		fmt.Printf("初始化商户错误： %v\n", err)
-		return
-	}
+	// err = dorpDB(uuid)
+	// if err != nil {
+	// 	fmt.Printf("初始化商户错误： %v\n", err)
+	// 	return
+	// }
 
 	cache.DeleteCache(g.TENANCY_CONFIG.Mysql.Dbname + ":username")
 	cache.DeleteCache(g.TENANCY_CONFIG.Mysql.Dbname + ":id")

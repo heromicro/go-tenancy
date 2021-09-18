@@ -20,7 +20,8 @@ func TestClientProductList(t *testing.T) {
 func TestGetClientProductFilter(t *testing.T) {
 	auth, _ := base.TenancyWithLoginTester(t)
 	defer base.BaseLogOut(auth)
-	obj := auth.GET("v1/merchant/product/getProductFilter").
+	obj := auth.POST("v1/merchant/product/getProductFilter").
+		WithJSON(base.PageRes).
 		Expect().Status(http.StatusOK).JSON().Object()
 	obj.Keys().ContainsOnly("status", "data", "message")
 	obj.Value("status").Number().Equal(200)

@@ -135,14 +135,16 @@ func TestDeviceRefundOrderProcess(t *testing.T) {
 		{Key: "pageSize", Value: 10},
 		{Key: "page", Value: 1},
 		{Key: "total", Value: 1},
-		{Key: "list", Value: []base.ResponseKeys{}},
+		{Key: "list", Value: []base.ResponseKeys{
+			{{Key: "id", Value: 0, Type: "ge"}},
+		}},
 		{Key: "stat", Value: base.ResponseKeys{
 			{Key: "agree", Value: 0},
 			{Key: "all", Value: 1},
-			{Key: "audit", Value: 1},
-			{Key: "backgood", Value: 1},
-			{Key: "end", Value: 1},
-			{Key: "refuse", Value: 1},
+			{Key: "audit", Value: 0},
+			{Key: "backgood", Value: 0},
+			{Key: "end", Value: 0},
+			{Key: "refuse", Value: 0},
 		}},
 	}
 	base.PostList(deviceAuth, url, base.PageRes, http.StatusOK, "获取成功", pageKeys)
