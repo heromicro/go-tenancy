@@ -88,18 +88,18 @@ func getOrderCount(info request.OrderPageInfo, name string, ctx *gin.Context) (i
 	wheres := getOrderConditions()
 	for _, where := range wheres {
 		if where.Name == name {
-			db := g.TENANCY_DB.Model(&model.Order{})
+			db := g.TENANCY_DB.Model(&model.Order{}).Joins("left join sys_tenancies on orders.sys_tenancy_id = sys_tenancies.id")
 			if where.Conditions != nil && len(where.Conditions) > 0 {
 				for key, cn := range where.Conditions {
 					if cn == nil {
-						db = db.Where(key)
+						db = db.Where("orders." + key)
 					} else {
-						db = db.Where(fmt.Sprintf("%s = ?", key), cn)
+						db = db.Where(fmt.Sprintf("%s = ?", "orders."+key), cn)
 					}
 				}
 			}
 			if multi.IsTenancy(ctx) {
-				db = CheckTenancyId(db, multi.GetTenancyId(ctx), "")
+				db = CheckTenancyId(db, multi.GetTenancyId(ctx), "orders.")
 			}
 			db, err := getOrderSearch(info, ctx, db)
 			if err != nil {
@@ -138,7 +138,7 @@ func GetFilter(info request.OrderPageInfo, ctx *gin.Context) ([]map[string]inter
 			return nil, err
 		}
 
-		err = db.Where("order_type = ?", chart["orderType"]).Count(&count).Error
+		err = db.Where("orders.order_type = ?", chart["orderType"]).Count(&count).Error
 		if err != nil {
 			return nil, err
 		} else {
@@ -337,7 +337,6 @@ func DeliveryOrder(id uint, delivery request.DeliveryOrder, ctx *gin.Context) er
 
 // GetOrderInfoList 订单列表
 func GetOrderInfoList(info request.OrderPageInfo, ctx *gin.Context) (gin.H, error) {
-
 	stat := []map[string]interface{}{
 		{"className": "el-icon-s-goods", "count": 0, "field": "件", "name": "已支付订单数量"},
 		{"className": "el-icon-s-order", "count": 0, "field": "元", "name": "实际支付金额"},
