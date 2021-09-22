@@ -11,6 +11,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/go-pay/gopay"
 	"github.com/go-pay/gopay/alipay"
+	"github.com/go-pay/gopay/pkg/util"
 	v2 "github.com/go-pay/gopay/wechat"
 	"github.com/go-pay/gopay/wechat/v3"
 	"github.com/snowlyg/go-tenancy/g"
@@ -42,8 +43,7 @@ func PayOrder(req request.PayOrder) (response.PayOrder, error) {
 	if tenancy.State == g.StatusFalse {
 		return res, fmt.Errorf("当前商户已经停业")
 	}
-	getById := request.GetById{Id: req.OrderId, TenancyId: req.TenancyId, PatientId: req.PatientID, UserId: req.UserId}
-	order, err := GetOrderByOrderId(getById)
+	order, err := GetOrderById(req.OrderId)
 	if errors.Is(err, gorm.ErrRecordNotFound) {
 		return res, fmt.Errorf("当前订单不存在")
 	} else if err != nil {
@@ -65,26 +65,35 @@ func PayOrder(req request.PayOrder) (response.PayOrder, error) {
 	}
 }
 
-func WechatPay(order model.Order, tenancyName, openid string) (response.PayOrder, error) {
-	var res response.PayOrder
-	siteName, err := param.GetSeitName()
-	if err != nil {
-		return res, fmt.Errorf("获取商城名称 %w", err)
-	}
-	wechatConf, err := param.GetWechatPayConfig()
-	if err != nil {
-		return res, err
+// RefundOrder 退款订单
+func RefundOrder(order model.Order, refundOrder model.RefundOrder, refundPrice float64) error {
+	if order.Paid != g.StatusTrue || order.Status == model.OrderStatusNoPay {
+		return errors.New("订单未支付")
 	}
 
+	if order.PayType == model.PayTypeWx {
+		return WechatRefund(order.OrderSn, refundOrder.RefundOrderSn, refundOrder.RefundMessage, order.PayPrice, refundPrice)
+	} else if order.PayType == model.PayTypeAlipay {
+		return AliRefund(order.OrderSn, refundOrder.RefundMessage, refundPrice)
+	}
+
+	return nil
+}
+
+func getWechatPayClient() (client *wechat.ClientV3, err error) {
+	wechatConf, err := param.GetWechatPayConfig()
+	if err != nil {
+		return nil, err
+	}
 	pKContent, err := file.ReadString(filepath.Join(g.TENANCY_CONFIG.Casbin.ModelPath, wechatConf.PayWeixinClientKey))
 	if err != nil {
-		return res, fmt.Errorf("获取支付 %w", err)
+		return nil, fmt.Errorf("获取支付 %w", err)
 	}
 
 	if g.TENANCY_CONFIG.WechatPay.WxPkContent == "" || g.TENANCY_CONFIG.WechatPay.WxPkSerialNo == "" {
 		certs, err := wechat.GetPlatformCerts(wechatConf.PayWeixinMchid, wechatConf.PayWeixinKey, wechatConf.PaySerialNo, pKContent)
 		if err != nil {
-			return res, fmt.Errorf("获取微信支付平台证书错误 %w", err)
+			return nil, fmt.Errorf("获取微信支付平台证书错误 %w", err)
 		}
 		if len(certs.Certs) == 1 {
 			g.TENANCY_CONFIG.WechatPay.WxPkContent = certs.Certs[0].PublicKey
@@ -95,9 +104,9 @@ func WechatPay(order model.Order, tenancyName, openid string) (response.PayOrder
 	// 	serialNo：商户证书的证书序列号
 	//	apiV3Key：apiV3Key，商户平台获取
 	//	pkContent：私钥 apiclient_key.pem 读取后的内容
-	client, err := wechat.NewClientV3(wechatConf.PayWeixinAppid, wechatConf.PayWeixinMchid, wechatConf.PaySerialNo, wechatConf.PayWeixinKey, pKContent)
+	client, err = wechat.NewClientV3(wechatConf.PayWeixinAppid, wechatConf.PayWeixinMchid, wechatConf.PaySerialNo, wechatConf.PayWeixinKey, pKContent)
 	if err != nil {
-		return res, fmt.Errorf("初始化微信支付错误 %w", err)
+		return nil, fmt.Errorf("初始化微信支付错误 %w", err)
 	}
 
 	// 设置微信平台证书和序列号，并启用自动同步返回验签
@@ -106,6 +115,16 @@ func WechatPay(order model.Order, tenancyName, openid string) (response.PayOrder
 
 	// 打开Debug开关，输出日志，默认是关闭的
 	client.DebugSwitch = gopay.DebugOff
+	return client, nil
+}
+
+func WechatPay(order model.Order, tenancyName, openid string) (response.PayOrder, error) {
+	var res response.PayOrder
+	siteName, err := param.GetSeitName()
+	if err != nil {
+		return res, fmt.Errorf("获取商城名称 %w", err)
+	}
+
 	expire := time.Now().Add(10 * time.Minute).Format(time.RFC3339)
 
 	notifyUrl, err := param.GetPayNotifyUrl("wechat")
@@ -127,6 +146,11 @@ func WechatPay(order model.Order, tenancyName, openid string) (response.PayOrder
 			bm.Set("openid", openid)
 		})
 
+	client, err := getWechatPayClient()
+	if err != nil {
+		return res, err
+	}
+
 	wxRsp, err := client.V3TransactionJsapi(bm)
 	if err != nil {
 		return res, fmt.Errorf("transaction jsapi 错误 %w", err)
@@ -143,6 +167,37 @@ func WechatPay(order model.Order, tenancyName, openid string) (response.PayOrder
 	return res, nil
 }
 
+// WechatRefund 微信
+func WechatRefund(orderSn, refundOrderSn, refundMessage string, totalPrice, refundPrice float64) error {
+	client, err := getWechatPayClient()
+	if err != nil {
+		return err
+	}
+	notifyUrl, err := param.GetPayNotifyUrl("wechat")
+	if err != nil {
+		return err
+	}
+	// 初始化参数结构体
+	bm := make(gopay.BodyMap)
+	bm.Set("out_trade_no", orderSn).
+		Set("nonce_str", util.GetRandomString(32)).
+		Set("sign_type", wechat.SignTypeRSA).
+		Set("out_refund_no", refundOrderSn).
+		Set("total_fee", getOrderPrice(totalPrice)).
+		Set("refund_fee", getOrderPrice(refundPrice)).
+		Set("notify_url", notifyUrl)
+
+	//请求申请退款（沙箱环境下，证书路径参数可传空）
+	//    body：参数Body
+	wxRsp, err := client.V3Refund(bm)
+	if err != nil {
+		return err
+	}
+	g.TENANCY_LOG.Debug("微信支付退款", zap.String("aliRsp", fmt.Sprintf("%+v", wxRsp.Response)))
+	return nil
+}
+
+// getOrderPrice 计算订单价格
 func getOrderPrice(price float64) float64 {
 	seitMode, err := param.GetSeitMode()
 	if err != nil {
@@ -171,17 +226,39 @@ func Alipay(order model.Order, tenancyName string) (response.PayOrder, error) {
 
 	body.Set("total_amount", getOrderPrice(order.PayPrice))
 	body.Set("product_code", "QUICK_WAP_WAY") //商家和支付宝签约的产品码
-	//手机网站支付请求
 	client, err := AliPayClient()
 	if err != nil {
 		return res, err
 	}
+	//手机网站支付请求
 	payUrl, err := client.TradeWapPay(body)
 	if err != nil {
 		return res, err
 	}
 	res.AliPayUrl = payUrl
 	return res, nil
+}
+
+//  AliRefund 支付宝退款
+func AliRefund(orderSn, refundMessage string, refundPrice float64) error {
+	client, err := AliPayClient()
+	if err != nil {
+		g.TENANCY_LOG.Error("支付宝退款错误", zap.String("AliPayClient()", err.Error()))
+		return err
+	}
+	//请求参数
+	body := make(gopay.BodyMap)
+	body.Set("out_trade_no", orderSn)
+	body.Set("refund_amount", getOrderPrice(refundPrice))
+	body.Set("refund_reason", refundMessage)
+
+	aliRsp, err := client.TradeRefund(body)
+	if err != nil {
+		g.TENANCY_LOG.Error("支付宝退款错误", zap.String("client.TradeRefund()", err.Error()))
+		return err
+	}
+	g.TENANCY_LOG.Debug("支付宝退款", zap.String("aliRsp", fmt.Sprintf("%+v", aliRsp.Response)))
+	return nil
 }
 
 // AliPayClient 支付客户端

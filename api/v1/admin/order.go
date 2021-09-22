@@ -48,7 +48,7 @@ func GetOrderById(ctx *gin.Context) {
 		response.FailWithMessage(errs.Error(), ctx)
 		return
 	}
-	if chart, err := service.GetOrderDetailById(req); err != nil {
+	if chart, err := service.GetOrderDetailById(req.Id); err != nil {
 		g.TENANCY_LOG.Error("获取失败!", zap.Any("err", err))
 		response.FailWithMessage("获取失败:"+err.Error(), ctx)
 	} else {

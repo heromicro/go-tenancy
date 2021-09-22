@@ -52,7 +52,7 @@ func GetOrderById(ctx *gin.Context) {
 	}
 	req.TenancyId = multi.GetTenancyId(ctx)
 	req.PatientId = multi.GetUserId(ctx)
-	if order, err := service.GetOrderDetailById(req); err != nil {
+	if order, err := service.GetOrderDetailById(req.Id); err != nil {
 		g.TENANCY_LOG.Error("获取失败!", zap.Any("err", err))
 		response.FailWithMessage("获取失败:"+err.Error(), ctx)
 	} else {

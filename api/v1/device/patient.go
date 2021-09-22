@@ -28,7 +28,7 @@ func GetPatientList(ctx *gin.Context) {
 
 // GetPatientDetail
 func GetPatientDetail(ctx *gin.Context) {
-	if patient, err := service.GetPatientById(multi.GetUserId(ctx), multi.GetTenancyId(ctx)); err != nil {
+	if patient, err := service.GetPatientById(multi.GetUserId(ctx)); err != nil {
 		g.TENANCY_LOG.Error("获取失败!", zap.Any("err", err))
 		response.FailWithMessage("获取失败:"+err.Error(), ctx)
 	} else {

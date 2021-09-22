@@ -17,7 +17,7 @@ import (
 func UpdateUserMap(id uint, ctx *gin.Context) (Form, error) {
 	var form Form
 	var formStr string
-	user, err := GetGeneralDetail(id, multi.GetTenancyId(ctx))
+	user, err := GetGeneralDetail(id)
 	if err != nil {
 		return Form{}, err
 	}
@@ -58,7 +58,7 @@ func UpdateUser(id, tenancyId uint, req response.GeneralUserDetail) error {
 func SetNowMoneyMap(id uint, ctx *gin.Context) (Form, error) {
 	var form Form
 	var formStr string
-	user, err := GetGeneralDetail(id, multi.GetTenancyId(ctx))
+	user, err := GetGeneralDetail(id)
 	if err != nil {
 		return Form{}, err
 	}
@@ -74,7 +74,7 @@ func SetNowMoneyMap(id uint, ctx *gin.Context) (Form, error) {
 
 // SetNowMoney
 func SetNowMoney(id, tenancyId uint, req request.SetNowMoney) error {
-	user, err := GetGeneralDetail(id, tenancyId)
+	user, err := GetGeneralDetail(id)
 	if err != nil {
 		return err
 	}
@@ -95,10 +95,10 @@ func SetNowMoney(id, tenancyId uint, req request.SetNowMoney) error {
 	return nil
 }
 
-func GetUserLabelIdsByUserId(id, tenancyId uint) ([]uint, error) {
+func GetUserLabelIdsByUserId(id uint) ([]uint, error) {
 	var labelIds []uint
 	db := g.TENANCY_DB.Model(&model.UserUserLabel{}).Select("user_label_id").Where("sys_user_id = ?", id)
-	db = CheckTenancyId(db, tenancyId, "")
+	// db = CheckTenancyId(db, tenancyId, "")
 	err := db.Find(&labelIds).Error
 	if err != nil {
 		return labelIds, fmt.Errorf("get label ids %w", err)
@@ -159,7 +159,7 @@ func BatchSetUserLabel(req request.SetUserLabel, tenancyId uint) error {
 func SetUserGroupMap(id uint, ctx *gin.Context) (Form, error) {
 	var form Form
 	var formStr string
-	user, err := GetGeneralDetail(id, multi.GetTenancyId(ctx))
+	user, err := GetGeneralDetail(id)
 	if err != nil {
 		return Form{}, err
 	}
@@ -189,7 +189,7 @@ func SetUserGroup(id uint, req request.SetUserGroup) error {
 func SetUserLabelMap(id uint, ctx *gin.Context) (Form, error) {
 	var form Form
 	var formStr string
-	user, err := GetGeneralDetail(id, multi.GetTenancyId(ctx))
+	user, err := GetGeneralDetail(id)
 	if err != nil {
 		return Form{}, err
 	}
@@ -211,7 +211,7 @@ func SetUserLabelMap(id uint, ctx *gin.Context) (Form, error) {
 
 // SetUserLabel
 func SetUserLabel(id, tenancyId uint, reqlabelIds []uint) error {
-	labelIds, err := GetUserLabelIdsByUserId(id, tenancyId)
+	labelIds, err := GetUserLabelIdsByUserId(id)
 	if err != nil {
 		return err
 	}
@@ -268,7 +268,7 @@ func SetUserLabel(id, tenancyId uint, reqlabelIds []uint) error {
 	return nil
 }
 
-func GetGeneralDetail(id, tenancyId uint) (response.GeneralUserDetail, error) {
+func GetGeneralDetail(id uint) (response.GeneralUserDetail, error) {
 	var user response.GeneralUserDetail
 	generalAuthorityIds, err := GetUserAuthorityIds(multi.GeneralAuthority)
 	if err != nil {
@@ -292,7 +292,7 @@ func GetGeneralDetail(id, tenancyId uint) (response.GeneralUserDetail, error) {
 	user.TotalPayCount = u.TotalPayCount
 	user.TotalPayPrice = u.TotalPayPrice
 
-	labelIds, err := GetUserLabelIdsByUserId(user.Uid, tenancyId)
+	labelIds, err := GetUserLabelIdsByUserId(user.Uid)
 	if err != nil {
 		return user, err
 	}

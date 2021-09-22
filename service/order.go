@@ -201,11 +201,11 @@ func getOrderConditionByStatus(status string) response.OrderCondition {
 	return conditions[0]
 }
 
-// GetOrderByOrderId 获取订单
-func GetOrderByOrderId(req request.GetById, funcs ...func(*gorm.DB) *gorm.DB) (model.Order, error) {
+// GetOrderById 获取订单
+func GetOrderById(id uint, funcs ...func(*gorm.DB) *gorm.DB) (model.Order, error) {
 	var order model.Order
-	db := g.TENANCY_DB.Model(&model.Order{}).Where("id = ?", req.Id)
-	db = CheckTenancyIdAndUserId(db, req, "")
+	db := g.TENANCY_DB.Model(&model.Order{}).Where("id = ?", id)
+	// db = CheckTenancyIdAndUserId(db, req, "")
 	db = db.Scopes(funcs...)
 	err := db.First(&order).Error
 	if err != nil {
@@ -215,7 +215,7 @@ func GetOrderByOrderId(req request.GetById, funcs ...func(*gorm.DB) *gorm.DB) (m
 }
 
 // GetOrderDetailById 订单详情，包括关联数据
-func GetOrderDetailById(req request.GetById) (response.OrderDetail, error) {
+func GetOrderDetailById(id uint, funcs ...func(*gorm.DB) *gorm.DB) (response.OrderDetail, error) {
 	var order response.OrderDetail
 	db := g.TENANCY_DB.Model(&model.Order{}).
 		Select("orders.*,general_infos.nick_name as user_nick_name").
@@ -223,15 +223,16 @@ func GetOrderDetailById(req request.GetById) (response.OrderDetail, error) {
 		Joins("left join general_infos on general_infos.sys_user_id = sys_users.id").
 		Joins(fmt.Sprintf("left join sys_authorities on sys_authorities.authority_id = sys_users.authority_id and sys_authorities.authority_type = %d", multi.GeneralAuthority))
 
-	db = CheckTenancyIdAndUserId(db, req, "orders.")
+	// db = CheckTenancyIdAndUserId(db, req, "orders.")
+	db = db.Scopes(funcs...)
 
-	err := db.Where("orders.id = ?", req.Id).First(&order).Error
+	err := db.Where("orders.id = ?", id).First(&order).Error
 	if err != nil {
 		return order, err
 	}
 
 	if order.SysUserID > 0 {
-		cuser, err := GetGeneralDetail(order.SysUserID, req.TenancyId)
+		cuser, err := GetGeneralDetail(order.SysUserID)
 		if err != nil {
 			return order, err
 		}
@@ -240,7 +241,7 @@ func GetOrderDetailById(req request.GetById) (response.OrderDetail, error) {
 
 	// 如果不是小程序用户，显示床旁名称
 	if order.PatientId > 0 && order.UserNickName == "" {
-		patient, err := GetPatientById(order.PatientId, req.TenancyId)
+		patient, err := GetPatientById(order.PatientId)
 		if err != nil {
 			return order, err
 		}
@@ -421,10 +422,10 @@ func GetOrderInfoList(info request.OrderPageInfo, ctx *gin.Context) (gin.H, erro
 }
 
 // GetOrdersProductByProductIds 订单产品
-func GetOrdersProductByProductIds(orderProductIds []uint, req request.GetById) ([]response.OrderProduct, error) {
+func GetOrdersProductByProductIds(orderProductIds []uint, orderId uint) ([]response.OrderProduct, error) {
 	orderProducts := []response.OrderProduct{}
 	db := g.TENANCY_DB.Model(&model.OrderProduct{}).
-		Where("order_id = ?", req.Id).
+		Where("order_id = ?", orderId).
 		Where("refund_num > 0").
 		Where("id in ?", orderProductIds)
 	err := db.Find(&orderProducts).Error
@@ -702,7 +703,7 @@ func CreateOrder(req request.CreateOrder, tenancyId, userId, patientId uint, ten
 
 	var order model.Order
 	// 床旁用户登录，userId 为患者id
-	patient, err := GetPatientById(patientId, tenancyId)
+	patient, err := GetPatientById(patientId)
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return nil, 0, fmt.Errorf("患者不存在")
@@ -986,7 +987,7 @@ func CancelOrder(req request.GetById) error {
 
 // DeleteOrder 商户取消订单
 func DeleteOrder(req request.GetById) error {
-	_, err := GetOrderByOrderId(req)
+	_, err := GetOrderById(req.Id)
 	if err != nil {
 		return err
 	}
@@ -1024,6 +1025,7 @@ func ChangeOrderPayNotifyByOrderSn(changeData map[string]interface{}, orderSn, c
 	return palyload, nil
 }
 
+// UpdateOrderProduct 更新订单商品
 func UpdateOrderProduct(db *gorm.DB, orderProductId uint, data map[string]interface{}) error {
 	err := db.Model(&model.OrderProduct{}).Where("id = ?", orderProductId).Updates(data).Error
 	if err != nil {
@@ -1032,6 +1034,7 @@ func UpdateOrderProduct(db *gorm.DB, orderProductId uint, data map[string]interf
 	return nil
 }
 
+// GetOrderAutoAgree 获取需要自动收货订单
 func GetOrderAutoAgree() ([]uint, error) {
 	whereCreatedAt := fmt.Sprintf("now() > SUBDATE(pay_time,interval -%s DAY)", param.GetOrderAutoTakeOrderTime())
 	orderIds := []uint{}

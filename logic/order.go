@@ -15,7 +15,7 @@ import (
 // PayOrder 结算订单，生成支付二维码
 // 逻辑： 支付未付款，未取消的，本人当前商户的订单，
 func PayOrder(req request.GetById) (string, error) {
-	order, err := service.GetOrderByOrderId(req)
+	order, err := service.GetOrderById(req.Id)
 	if errors.Is(err, gorm.ErrRecordNotFound) {
 		return "", fmt.Errorf("订单不存在")
 	} else if err != nil {
@@ -40,7 +40,7 @@ func PayOrder(req request.GetById) (string, error) {
 // 逻辑： 取消未支付，未取消订单，本人当前商户的订单，
 func CancelOrder(req request.GetById) error {
 	noPayScope := scope.SimpleScope("is_cancel", g.StatusFalse)
-	order, err := service.GetOrderByOrderId(req, noPayScope)
+	order, err := service.GetOrderById(req.Id, noPayScope)
 	if errors.Is(err, gorm.ErrRecordNotFound) {
 		return fmt.Errorf("订单不存在")
 	} else if err != nil {

@@ -1,6 +1,8 @@
 package request
 
-import "github.com/snowlyg/go-tenancy/model"
+import (
+	"github.com/snowlyg/go-tenancy/model"
+)
 
 type OrderPageInfo struct {
 	PageInfo

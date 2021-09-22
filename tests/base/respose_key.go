@@ -65,7 +65,6 @@ func (rks ResponseKeys) Test(object *httpexpect.Object) {
 				object.Value(rk.Key).Number().Equal(rk.Value.(int))
 			}
 		case "[]base.ResponseKeys":
-			object.Value(rk.Key).Array().Length().Equal(len(rk.Value.([]ResponseKeys)))
 			length := int(object.Value(rk.Key).Array().Length().Raw())
 			if length > 0 && len(rk.Value.([]ResponseKeys)) == length {
 				for i := 0; i < length; i++ {

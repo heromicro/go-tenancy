@@ -124,23 +124,23 @@ func TestDeviceRefundOrderProcess(t *testing.T) {
 	if err != nil {
 		t.Errorf("%s 订单支付失败%v", orderSn, err.Error())
 	}
-	refundOrder := CreateRefundOrder(deviceAuth, orderId, []uint{orderProductId}, http.StatusOK, "操作成功")
-	if refundOrder == 0 {
+	refundOrderId := CreateRefundOrder(deviceAuth, orderId, []uint{orderProductId}, http.StatusOK, "操作成功")
+	if refundOrderId == 0 {
 		t.Error("添加提交退款申请失败")
 		return
 	}
-	base.Get(deviceAuth, fmt.Sprintf("v1/device/refundOrder/getRefundOrderById/%d", refundOrder), nil, http.StatusOK, "操作成功")
+	base.Get(deviceAuth, fmt.Sprintf("v1/device/refundOrder/getRefundOrderById/%d", refundOrderId), nil, http.StatusOK, "操作成功")
 	url := "v1/device/refundOrder/getRefundOrderList"
 	pageKeys := base.ResponseKeys{
 		{Key: "pageSize", Value: 10},
 		{Key: "page", Value: 1},
-		{Key: "total", Value: 1},
+		{Key: "total", Value: 1, Type: "ge"},
 		{Key: "list", Value: []base.ResponseKeys{
-			{{Key: "id", Value: 0, Type: "ge"}},
+			{{Key: "id", Value: refundOrderId}},
 		}},
 		{Key: "stat", Value: base.ResponseKeys{
 			{Key: "agree", Value: 0},
-			{Key: "all", Value: 1},
+			{Key: "all", Value: 1, Type: "ge"},
 			{Key: "audit", Value: 0},
 			{Key: "backgood", Value: 0},
 			{Key: "end", Value: 0},
@@ -148,6 +148,15 @@ func TestDeviceRefundOrderProcess(t *testing.T) {
 		}},
 	}
 	base.PostList(deviceAuth, url, base.PageRes, http.StatusOK, "获取成功", pageKeys)
+
+	// 申请退款结算
+	data := map[string]interface{}{
+		"ids": []uint{productId},
+	}
+	base.Post(deviceAuth, fmt.Sprintf("v1/device/order/checkRefundOrder/%d", orderId), data, http.StatusBadRequest, "操作失败:有退款单未处理完成")
+
+	CreateRefundOrder(deviceAuth, orderId, []uint{orderProductId}, http.StatusBadRequest, "操作失败:有退款单未处理完成")
+
 }
 
 func CreateRefundOrder(auth *httpexpect.Expect, orderId uint, ids []uint, status int, message string) uint {
@@ -161,6 +170,6 @@ func CreateRefundOrder(auth *httpexpect.Expect, orderId uint, ids []uint, status
 	}
 	keys := base.IdKeys()
 	// 提交退款
-	base.Create(auth, fmt.Sprintf("v1/device/order/refundOrder/%d", orderId), data, keys, http.StatusOK, "操作成功")
+	base.Create(auth, fmt.Sprintf("v1/device/order/refundOrder/%d", orderId), data, keys, status, message)
 	return keys.GetId()
 }

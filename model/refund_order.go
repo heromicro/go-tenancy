@@ -15,11 +15,11 @@ const (
 // 1:待审核 2:待退货 3:待收货 4:已退款 5:审核未通过
 const (
 	RefundStatusUnknown  int = iota //
+	RefundStatusRefuse              //审核未通过
 	RefundStatusAudit               //待审核
 	RefundStatusAgree               //待退货
 	RefundStatusBackgood            //待收货
 	RefundStatusEnd                 //已退款
-	RefundStatusRefuse              //审核未通过
 )
 
 // RefundOrder 订单退款表

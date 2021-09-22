@@ -259,7 +259,7 @@ func TestDeviceOrderProcessForCheckReturnOrder(t *testing.T) {
 	}
 	defer DeleteClientOrder(tenancyAuth, orderId, http.StatusOK, "删除成功")
 
-	// 申请退款
+	// 申请退款结算
 	data := map[string]interface{}{
 		"ids": []uint{productId},
 	}
@@ -297,7 +297,7 @@ func TestDeviceOrderProcessForCheckReturnOrder(t *testing.T) {
 		t.Errorf("%s 订单支付失败%v", orderSn, err.Error())
 	}
 
-	// 申请退款
+	// 申请退款结算
 	base.Post(deviceAuth, fmt.Sprintf("v1/device/order/checkRefundOrder/%d", orderId), data, http.StatusOK, "操作成功")
 }
 

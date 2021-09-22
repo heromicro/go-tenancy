@@ -129,7 +129,7 @@ type OrderProduct struct {
 type BaseOrderProduct struct {
 	ProductSku   string  `gorm:"column:product_sku;type:char(12);not null" json:"productSku"`                   // 商品 sku
 	Unique       string  `gorm:"index;column:unique;type:char(12);not null;default:''" json:"unique"`           // 唯一值
-	IsRefund     int     `gorm:"column:is_refund;type:tinyint unsigned;not null;default:0" json:"isRefund"`     // 是否退款   0:未退款 1:退款中 2:部分退款 3=全退
+	IsRefund     int     `gorm:"column:is_refund;type:tinyint unsigned;not null;default:0" json:"isRefund"`     // 退款状态   0:未退款 1:退款中 2:部分退款 3=全退
 	ProductNum   int64   `gorm:"column:product_num;type:int unsigned;not null;default:0" json:"productNum"`     // 购买数量
 	ProductType  int32   `gorm:"column:product_type;type:int;not null;default:0" json:"productType"`            // 1.普通商品 2.秒杀商品,3.预售商品
 	RefundNum    int64   `gorm:"column:refund_num;type:int unsigned;not null;default:0" json:"refundNum"`       // 可申请退货数量

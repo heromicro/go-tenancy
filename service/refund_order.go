@@ -18,6 +18,7 @@ import (
 	"gorm.io/gorm"
 )
 
+// GetRefundOrder 退款单金额
 func GetRefundOrder(orderIds []uint, ctx *gin.Context) (float64, error) {
 	var refundPayPrice request.Result
 	db := g.TENANCY_DB.Model(&model.RefundOrder{}).
@@ -31,6 +32,7 @@ func GetRefundOrder(orderIds []uint, ctx *gin.Context) (float64, error) {
 	return refundPayPrice.Count, nil
 }
 
+// getRefundOrderSearch 退款单筛选
 func getRefundOrderSearch(info request.RefundOrderPageInfo, ctx *gin.Context, db *gorm.DB) (*gorm.DB, error) {
 	if multi.IsTenancy(ctx) {
 		db = db.Where("refund_orders.sys_tenancy_id = ?", multi.GetTenancyId(ctx))
@@ -64,7 +66,7 @@ func getRefundOrderSearch(info request.RefundOrderPageInfo, ctx *gin.Context, db
 	return db, nil
 }
 
-// GetRefundOrderInfoList
+// GetRefundOrderInfoList 退款单列表
 func GetRefundOrderInfoList(info request.RefundOrderPageInfo, ctx *gin.Context) ([]response.RefundOrderList, map[string]int64, int64, error) {
 	stat := map[string]int64{
 		"agree":    0,
@@ -132,6 +134,7 @@ func GetRefundOrderInfoList(info request.RefundOrderPageInfo, ctx *gin.Context) 
 	return refundOrderList, stat, total, nil
 }
 
+// getRefundProducts 退款商品
 func getRefundProducts(refundOrderIds []uint) ([]response.RefundProduct, error) {
 	refundProducts := []response.RefundProduct{}
 	err := g.TENANCY_DB.Model(&model.RefundProduct{}).
@@ -144,6 +147,7 @@ func getRefundProducts(refundOrderIds []uint) ([]response.RefundProduct, error) 
 	return refundProducts, nil
 }
 
+// getRefundStat 退款单按状态统计数量
 func getRefundStat(stat map[string]int64, info request.RefundOrderPageInfo, ctx *gin.Context) (map[string]int64, error) {
 	db := g.TENANCY_DB.Model(&model.RefundOrder{}).
 		Joins("left join orders on refund_orders.order_id = orders.id")
@@ -229,6 +233,7 @@ func getRefundStat(stat map[string]int64, info request.RefundOrderPageInfo, ctx 
 	return stat, nil
 }
 
+// GetRefundOrderRecord 退款单操作记录
 func GetRefundOrderRecord(id uint, info request.PageInfo) ([]model.RefundStatus, int64, error) {
 	returnRecord := []model.RefundStatus{}
 	var total int64
@@ -247,6 +252,7 @@ func GetRefundOrderRecord(id uint, info request.PageInfo) ([]model.RefundStatus,
 	return returnRecord, total, nil
 }
 
+// GetRefundOrderRemarkMap 退款单备注表单
 func GetRefundOrderRemarkMap(id uint, ctx *gin.Context) (Form, error) {
 	var form Form
 	var formStr string
@@ -264,6 +270,7 @@ func GetRefundOrderRemarkMap(id uint, ctx *gin.Context) (Form, error) {
 	return form, err
 }
 
+// GetRefundOrderMap 退款审核表单
 func GetRefundOrderMap(id uint, ctx *gin.Context) (Form, error) {
 	var form Form
 	formStr := `{"rule":[{"type":"radio","field":"status","value":5,"title":"审核","props":{},"control":[{"value":5,"rule":[{"type":"input","field":"failMessage","value":"","title":"拒绝原因","props":{"type":"text","placeholder":"请输入拒绝原因"},"validate":[{"message":"请输入拒绝原因","required":true,"type":"string","trigger":"change"}]}]}],"options":[{"value":2,"label":"同意"},{"value":5,"label":"拒绝"}]}],"action":"","method":"POST","title":"退款审核","config":{}}`
@@ -276,7 +283,7 @@ func GetRefundOrderMap(id uint, ctx *gin.Context) (Form, error) {
 	return form, err
 }
 
-// GetRefundOrderById
+// GetRefundOrderById 退款单详情
 func GetRefundOrderById(id uint) (model.RefundOrder, error) {
 	var refundOrder model.RefundOrder
 	db := g.TENANCY_DB.Model(&model.RefundOrder{}).Where("id = ?", id)
@@ -284,6 +291,7 @@ func GetRefundOrderById(id uint) (model.RefundOrder, error) {
 	return refundOrder, err
 }
 
+// GetRefundOrderByIds 根据ids查询订单
 func GetRefundOrderByIds(ids []uint) (model.RefundOrder, error) {
 	var refundOrder model.RefundOrder
 	db := g.TENANCY_DB.Model(&model.RefundOrder{}).Where("id in ?", ids)
@@ -291,6 +299,7 @@ func GetRefundOrderByIds(ids []uint) (model.RefundOrder, error) {
 	return refundOrder, err
 }
 
+// RemarkRefundOrder 备注退款单
 func RemarkRefundOrder(id uint, merMark map[string]interface{}) error {
 	db := g.TENANCY_DB.Model(&model.RefundOrder{})
 
@@ -308,9 +317,9 @@ func GetRefundPriceByOrderIds(ids []uint) (float64, error) {
 	return wxPayPrice.Count, nil
 }
 
+// checkRefundPrice 检查退款金额
 func checkRefundPrice(refundOrder model.RefundOrder) (float64, error) {
-	getById := request.GetById{Id: refundOrder.OrderID, TenancyId: refundOrder.SysTenancyID, PatientId: refundOrder.PatientID, UserId: refundOrder.SysUserID}
-	order, err := GetOrderByOrderId(getById)
+	order, err := GetOrderById(refundOrder.OrderID)
 	if errors.Is(err, gorm.ErrRecordNotFound) {
 		return 0, fmt.Errorf("当前订单不存在")
 	} else if err != nil {
@@ -329,17 +338,22 @@ func checkRefundPrice(refundOrder model.RefundOrder) (float64, error) {
 	return refundPrice, nil
 }
 
+// GetOtherRefundOrderIds 获取其他退款单ID集合
 func GetOtherRefundOrderIds(orderId, refundOrderId uint) ([]uint, error) {
 	ids := []uint{}
-	err := g.TENANCY_DB.Model(&model.RefundOrder{}).Select("id").Where("order_id = ?", orderId).
-		Where("status in ?", []int{model.RefundStatusAudit, model.RefundStatusAgree, model.RefundStatusBackgood}).
-		Where("id != ?", refundOrderId).Find(&ids).Error
+	db := g.TENANCY_DB.Model(&model.RefundOrder{}).Select("id").Where("order_id = ?", orderId).
+		Where("status in ?", []int{model.RefundStatusAudit, model.RefundStatusAgree, model.RefundStatusBackgood})
+	if refundOrderId > 0 {
+		db = db.Where("id != ?", refundOrderId)
+	}
+	err := db.Find(&ids).Error
 	if err != nil {
 		return ids, fmt.Errorf("get other refund order ids %w", err)
 	}
 	return ids, nil
 }
 
+// AuditRefundOrder 审核退款单
 func AuditRefundOrder(id uint, audit request.OrderAudit, refundAgreeMsg string) error {
 	refundOrder, err := GetRefundOrderById(id)
 	if err != nil {
@@ -361,12 +375,14 @@ func AuditRefundOrder(id uint, audit request.OrderAudit, refundAgreeMsg string) 
 	return nil
 }
 
-//  2. 拒绝退款
+// refuseRefundOrder 拒绝退款
 //    2.1 如果退款数量 等于 购买数量 返还可退款数 is_refund = 0
 //    2.2 商品总数小于可退数量 返还可退数 以商品数为准
 //    2.3 是否存在其他图款单,是 ,退款中 ,否, 部分退款
 func refuseRefundOrder(refundOrder model.RefundOrder, failMessage string) error {
 	status := refundOrder.Status
+
+	// 其他退款订单
 	refundOrderIds, err := GetOtherRefundOrderIds(refundOrder.OrderID, refundOrder.ID)
 	if err != nil {
 		return err
@@ -379,14 +395,19 @@ func refuseRefundOrder(refundOrder model.RefundOrder, failMessage string) error 
 		// 更新订单商品状态
 		for _, refundProduct := range refundProducts {
 			var isRefund int
-			refundNum := refundProduct.RefundNum + refundProduct.OrderProduct.RefundNum //返还可退款数
+
+			refundNum := refundProduct.RefundNum + refundProduct.OrderProduct.RefundNum //返还可退款数 当前退款数+可退款数量
+			// 如果商品数量等于退款数量，商品变成初始未退款状态
 			if refundProduct.OrderProduct.ProductNum == refundNum {
 				isRefund = 0
 			}
+
+			// 否则，可退款数量退货数量等于订单商品数量
 			if refundProduct.OrderProduct.ProductNum < refundNum {
 				refundNum = refundProduct.OrderProduct.ProductNum
 			}
 
+			// 判断如果还有其他退款单，商品状态变为退款中
 			if len(refundOrderIds) > 0 {
 				var count int64
 				err := g.TENANCY_DB.Model(&model.RefundProduct{}).Where("refund_order_id in ?", refundOrderIds).Where("order_product_id = ?", refundProduct.ProductID).Count(&count).Error
@@ -427,8 +448,7 @@ func GetRefundProductCountByRefundOrderIds(refundOrderIds []uint, refundProductI
 	return count, nil
 }
 
-// agreeRefundOrder
-//  1.同意退款
+// agreeRefundOrder 同意退款
 //    1.1 仅退款
 //       1.1.1 是 , 如果退款数量 等于 购买数量 is_refund = 3 全退退款 不等于 is_refund = 2 部分退款
 //       1.1.2 否, is_refund = 1 退款中
@@ -437,11 +457,7 @@ func GetRefundProductCountByRefundOrderIds(refundOrderIds []uint, refundProductI
 //    修改商品规格库存和销量
 func agreeRefundOrder(refundOrder model.RefundOrder, refundAgreeMsg string) error {
 	status := refundOrder.Status
-	refundOrderIds, err := GetOtherRefundOrderIds(refundOrder.OrderID, refundOrder.ID)
-	if err != nil {
-		return err
-	}
-	refundPrice, err := checkRefundPrice(refundOrder)
+	refundPrice, err := checkRefundPrice(refundOrder) // 可退款金额
 	if err != nil {
 		return err
 	}
@@ -451,45 +467,49 @@ func agreeRefundOrder(refundOrder model.RefundOrder, refundAgreeMsg string) erro
 	}
 	err = g.TENANCY_DB.Transaction(func(tx *gorm.DB) error {
 		// 更新订单商品状态
+		// isRefund  0:未退款 1:退款中 2:部分退款 3=全退
 		for _, refundProduct := range refundProducts {
 			var isRefund int
-			if refundOrder.RefundType == model.RefundTypeTK {
-				if refundProduct.RefundNum == refundProduct.BaseOrderProduct.ProductNum {
+
+			if refundOrder.RefundType == model.RefundTypeTK { // 退款
+				if refundProduct.RefundNum == refundProduct.BaseOrderProduct.ProductNum { //全退
 					isRefund = 3
-				} else {
+				} else { //部分退款
 					isRefund = 2
 				}
 			}
-			if len(refundOrderIds) > 0 {
-				count, err := GetRefundProductCountByRefundOrderIds(refundOrderIds, refundProduct.ProductID)
-				if err != nil {
-					return fmt.Errorf("get check refund product %w", err)
-				}
-				if count > 0 {
-					isRefund = 1
-				}
-			}
+
 			refundProduct.OrderProduct.IsRefund = isRefund
 			err := UpdateOrderProduct(tx, refundProduct.OrderProduct.ID, map[string]interface{}{"is_refund": isRefund})
 			if err != nil {
 				return err
 			}
-			//    修改商品库存和销量
+			// 修改商品库存和销量
 			if err = IncStock(tx, refundProduct.ProductID, refundProduct.ProductNum); err != nil {
 				return err
 			}
-			//    修改商品规格库存和销量
+			// 修改商品规格库存和销量
 			if err = IncSkuStock(tx, refundProduct.ProductID, refundProduct.Unique, refundProduct.ProductNum); err != nil {
 				return err
 			}
 		}
 
 		// 更新退款单状态
-		if refundOrder.RefundType == model.RefundTypeTK {
+		if refundOrder.RefundType == model.RefundTypeTK { // 只退款，直接原路退款给用户
 			status = model.RefundStatusEnd
-			// TODO:: 退款操作 func actionRefundPrice(id uint, refundPrice float64){}
-			fmt.Printf("refundPrice %f", refundPrice)
-		} else if refundOrder.RefundType == model.RefundTypeAll {
+			// 获取订单支付类型，获取订单号
+			// 生成支付平台退款单
+			order, err := GetOrderById(refundOrder.OrderID)
+			if err != nil {
+				return err
+			}
+
+			// 申请退款
+			err = RefundOrder(order, refundOrder, refundPrice)
+			if err != nil {
+				return err
+			}
+		} else if refundOrder.RefundType == model.RefundTypeAll { // 退款退货，由用户退款后商家发起退款
 			status = model.RefundStatusAgree
 			err := addRefundOrderStatus(tx, refundOrder.ID, "refund_agree", refundAgreeMsg)
 			if err != nil {
@@ -501,6 +521,7 @@ func agreeRefundOrder(refundOrder model.RefundOrder, refundAgreeMsg string) erro
 		if err != nil {
 			return err
 		}
+
 		return nil
 	})
 	if err != nil {
@@ -509,6 +530,7 @@ func agreeRefundOrder(refundOrder model.RefundOrder, refundAgreeMsg string) erro
 	return nil
 }
 
+// UpdateRefundOrderById 更新退款单
 func UpdateRefundOrderById(db *gorm.DB, refundOrderId uint, data map[string]interface{}) error {
 	err := db.Model(&model.RefundOrder{}).Where("id = ?", refundOrderId).Updates(data).Error
 	if err != nil {
@@ -517,6 +539,7 @@ func UpdateRefundOrderById(db *gorm.DB, refundOrderId uint, data map[string]inte
 	return nil
 }
 
+// CreateRefundOrder 添加退款单
 func CreateRefundOrder(reqId request.GetById, req request.CreateRefundOrder, orderProducts []response.OrderProduct) (uint, error) {
 	var returnOrderId uint
 	err := g.TENANCY_DB.Transaction(func(tx *gorm.DB) error {
@@ -573,6 +596,7 @@ func CreateRefundOrder(reqId request.GetById, req request.CreateRefundOrder, ord
 	return returnOrderId, nil
 }
 
+// CreateRefundProduct 新建退款单商品
 func CreateRefundProduct(db *gorm.DB, refundProducts []model.RefundProduct) error {
 	err := db.Model(&model.RefundProduct{}).Create(&refundProducts).Error
 	if err != nil {
@@ -582,7 +606,7 @@ func CreateRefundProduct(db *gorm.DB, refundProducts []model.RefundProduct) erro
 	return nil
 }
 
-// DeleteRefundOrder
+// DeleteRefundOrder 删除退款单
 func DeleteRefundOrder(id uint) error {
 	return g.TENANCY_DB.Model(&model.RefundOrder{}).Where("id = ?", id).Update("is_system_del", g.StatusTrue).Error
 }
@@ -602,6 +626,7 @@ func GetRefundOrderAutoAgree() ([]model.RefundOrder, error) {
 	return refundOrder, nil
 }
 
+// AutoAgreeRefundOrders 退款单自动审核
 func AutoAgreeRefundOrders(refundOrders []model.RefundOrder) {
 	for _, refundOrder := range refundOrders {
 		agreeRefundOrder(refundOrder, "退款成功[自动]")

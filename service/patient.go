@@ -41,10 +41,10 @@ func GetPatientInfoList(info request.PageInfo, tenancyId uint) ([]response.Patie
 	return patientList, total, err
 }
 
-func GetPatientById(patientId, tenancyId uint) (model.Patient, error) {
+func GetPatientById(patientId uint) (model.Patient, error) {
 	var patient model.Patient
 	db := g.TENANCY_DB.Model(&model.Patient{}).Where("id =?", patientId)
-	db = CheckTenancyId(db, tenancyId, "")
+	// db = CheckTenancyId(db, tenancyId, "")
 	err := db.First(&patient).Error
 	if err != nil {
 		return patient, err
