@@ -498,8 +498,8 @@ func agreeRefundOrder(refundOrder model.RefundOrder, refundAgreeMsg string) erro
 		}
 
 		// 更新退款单状态
+		status = model.RefundStatusAgree
 		if refundOrder.RefundType == model.RefundTypeTK { // 只退款，直接原路退款给用户
-			status = model.RefundStatusEnd
 			// 获取订单支付类型，获取订单号
 			// 生成支付平台退款单
 			order, err := GetOrderById(refundOrder.OrderID)
@@ -513,7 +513,6 @@ func agreeRefundOrder(refundOrder model.RefundOrder, refundAgreeMsg string) erro
 				return err
 			}
 		} else if refundOrder.RefundType == model.RefundTypeAll { // 退款退货，由用户退款后商家发起退款
-			status = model.RefundStatusAgree
 			err := addRefundOrderStatus(tx, refundOrder.ID, "refund_agree", refundAgreeMsg)
 			if err != nil {
 				return fmt.Errorf("add refund order status %w", err)
@@ -652,32 +651,83 @@ func addRefundOrderStatus(db *gorm.DB, id uint, cahngeType, changeMessage string
 	return nil
 }
 
+// GetStatusAgreeRefundOrdersByOrderSn 获取审核通过订单失败
+func GetStatusAgreeRefundOrdersByOrderSn(orderSn string) ([]model.RefundOrder, error) {
+	var refundOrders []model.RefundOrder
+	err := g.TENANCY_DB.Model(&model.RefundOrder{}).
+		Joins("left join orders on orders.id = refund_orders.order_id").
+		Where("refund_orders.status = ?", model.RefundStatusAgree).
+		Where("orders.order_sn = ?", orderSn).
+		Find(&refundOrders).Error
+	if err == nil {
+		g.TENANCY_LOG.Error("获取审核通过订单失败", zap.String("GetStatusAgreeRefundOrdersByOrderSn()", err.Error()))
+		return refundOrders, fmt.Errorf("获取审核通过订单失败 %w", err)
+	}
+	return refundOrders, nil
+
+}
+
+// GetStatusAgreeRefundOrdersByReturnOrderSn 获取审核通过订单失败
+func GetStatusAgreeRefundOrdersByReturnOrderSn(refundOrderSn string) ([]model.RefundOrder, error) {
+	var refundOrders []model.RefundOrder
+	err := g.TENANCY_DB.Model(&model.RefundOrder{}).
+		Where("status = ?", model.RefundStatusAgree).
+		Where("refund_order_sn = ?", refundOrderSn).
+		Find(&refundOrders).Error
+	if err == nil {
+		g.TENANCY_LOG.Error("获取审核通过订单失败", zap.String("GetStatusAgreeRefundOrdersByReturnOrderSn()", err.Error()))
+		return refundOrders, fmt.Errorf("获取审核通过订单失败 %w", err)
+	}
+	return refundOrders, nil
+}
+
 func ChangeReturnOrderStatusByOrderSn(status int, orderSn, changeType, changeMessage string) error {
-	// orders, err := GetNoPayOrdersByOrderSn(orderSn)
-	// if err != nil {
-	// 	return err
-	// }
-	// if len(orders) != 1 {
-	// 	return fmt.Errorf("%s 订单号重复生产 %d 个订单", orderSn, len(orders))
-	// }
-	// err = ChangeOrderStatusByOrderId(orders[0].ID, status, changeType, changeMessage)
-	// if err != nil {
-	// 	return err
-	// }
+	refundOrders, err := GetStatusAgreeRefundOrdersByOrderSn(orderSn)
+	if err != nil {
+		return err
+	}
+	if len(refundOrders) != 1 {
+		return fmt.Errorf("%s 订单号重复生产 %d 个订单", orderSn, len(refundOrders))
+	}
+	err = ChangeRefundStatusByOrderId(refundOrders[0].ID, map[string]interface{}{"status": status, "status_time": time.Now()}, changeType, changeMessage)
+	if err != nil {
+		return err
+	}
+
 	return nil
 }
 
-func ChangeReturnOrderStatusByReturnOrderSn(status int, orderSn, changeType, changeMessage string) error {
-	// orders, err := GetNoPayOrdersByOrderSn(orderSn)
-	// if err != nil {
-	// 	return err
-	// }
-	// if len(orders) != 1 {
-	// 	return fmt.Errorf("%s 订单号重复生产 %d 个订单", orderSn, len(orders))
-	// }
-	// err = ChangeOrderStatusByOrderId(orders[0].ID, status, changeType, changeMessage)
-	// if err != nil {
-	// 	return err
-	// }
+func ChangeReturnOrderStatusByReturnOrderSn(status int, refundOrderSn, changeType, changeMessage string) error {
+	refundOrders, err := GetStatusAgreeRefundOrdersByReturnOrderSn(refundOrderSn)
+	if err != nil {
+		return err
+	}
+	if len(refundOrders) != 1 {
+		return fmt.Errorf("%s 退款订单号重复生产 %d 个订单", refundOrderSn, len(refundOrders))
+	}
+	err = ChangeRefundStatusByOrderId(refundOrders[0].ID, map[string]interface{}{"status": status, "status_time": time.Now()}, changeType, changeMessage)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+// ChangeRefundStatusByOrderId 修改退款订单状态
+func ChangeRefundStatusByOrderId(refundOrderId uint, changeData map[string]interface{}, changeType, changeMessage string) error {
+	err := g.TENANCY_DB.Transaction(func(tx *gorm.DB) error {
+		err := UpdateRefundOrderById(tx, refundOrderId, changeData)
+		if err != nil {
+			return err
+		}
+		err = addRefundOrderStatus(tx, refundOrderId, changeType, changeMessage)
+		if err != nil {
+			return err
+		}
+
+		return nil
+	})
+	if err != nil {
+		return err
+	}
 	return nil
 }

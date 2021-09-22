@@ -348,8 +348,7 @@ func NotifyAliPay(ctx *gin.Context) error {
 		return fmt.Errorf("支付宝异步通知回调验签失败 %w", err)
 	}
 
-	var orderSn, outBizNo, gmtRefund, tradeStatus string
-	var refundFee float64
+	var orderSn, outBizNo, gmtRefund, tradeStatus, refundFee string
 	if notifyReq["out_trade_no"] != nil {
 		orderSn = notifyReq["out_trade_no"].(string) //商户订单号。原支付请求的商户订单号。
 	}
@@ -357,7 +356,7 @@ func NotifyAliPay(ctx *gin.Context) error {
 		outBizNo = notifyReq["out_biz_no"].(string) //商户业务号。商户业务 ID，主要是退款通知中返回退款申请的流水号。
 	}
 	if notifyReq["refund_fee"] != nil {
-		refundFee = notifyReq["refund_fee"].(float64) //总退款金额
+		refundFee = notifyReq["refund_fee"].(string) //总退款金额
 	}
 	if notifyReq["gmt_refund"] != nil {
 		gmtRefund = notifyReq["gmt_refund"].(string) //交易退款时间
@@ -365,9 +364,9 @@ func NotifyAliPay(ctx *gin.Context) error {
 	if notifyReq["trade_status"] != nil {
 		tradeStatus = notifyReq["trade_status"].(string) //交易状态
 	}
-
+	g.TENANCY_LOG.Error("支付: 支付宝支付异步通知回调", zap.String("订单号", orderSn), zap.String("流水号", outBizNo), zap.String("总退款金额", refundFee), zap.String("交易退款时间", gmtRefund), zap.String("交易状态", tradeStatus))
 	// 退款
-	if outBizNo != "" && refundFee != 0 && gmtRefund != "" {
+	if outBizNo != "" && gmtRefund != "" {
 		if tradeStatus != "TRADE_SUCCESS" && tradeStatus != "TRADE_CLOSED" {
 			return fmt.Errorf("退款: %s 支付宝异步通知回调返回状态: %s", orderSn, tradeStatus)
 		}

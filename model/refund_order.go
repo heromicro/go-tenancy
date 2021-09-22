@@ -16,7 +16,7 @@ const (
 const (
 	RefundStatusUnknown  int = iota //
 	RefundStatusAudit               //待审核
-	RefundStatusAgree               //待退货
+	RefundStatusAgree               //待退货，审核通过
 	RefundStatusBackgood            //待收货
 	RefundStatusEnd                 //已退款
 	RefundStatusRefuse              //审核未通过
