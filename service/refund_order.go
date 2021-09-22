@@ -328,14 +328,14 @@ func checkRefundPrice(refundOrder model.RefundOrder) (float64, error) {
 	// 已退款金额
 	refundPrice, err := GetRefundPriceByOrderIds([]uint{refundOrder.OrderID})
 	if err != nil {
-		g.TENANCY_LOG.Debug("检查退款金额", zap.String("GetRefundPriceByOrderIds()", err.Error()))
+		g.TENANCY_LOG.Error("检查退款金额", zap.String("GetRefundPriceByOrderIds()", err.Error()))
 		return 0, fmt.Errorf("get refund order price %w", err)
 	}
 	payPrice := decimal.NewFromFloat(order.PayPrice)
 	refundPriceD := decimal.NewFromFloat(refundPrice)
 	pefundPrice := decimal.NewFromFloat(refundOrder.RefundPrice)
-	if payPrice.Sub(refundPriceD).LessThanOrEqual(pefundPrice) {
-		g.TENANCY_LOG.Debug("退款金额超出订单可退金额", zap.String("订单支付金额", payPrice.String()), zap.String("已退款金额", refundPriceD.String()), zap.String("当前退款金额", pefundPrice.String()))
+	if payPrice.Sub(refundPriceD).LessThan(pefundPrice) {
+		g.TENANCY_LOG.Error("退款金额超出订单可退金额", zap.String("订单支付金额", payPrice.String()), zap.String("已退款金额", refundPriceD.String()), zap.String("当前退款金额", pefundPrice.String()))
 		return 0, fmt.Errorf("退款金额超出订单可退金额")
 	}
 	return refundPrice, nil
