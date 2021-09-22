@@ -861,7 +861,7 @@ func GetQrCode(orderId, tenancyId, patientId uint, orderType int) ([]byte, error
 	// 生成支付地址二维码
 	// 订单自动过期时间
 	autoCloseTime := param.GetOrderAutoCloseTime()
-	payUrl := fmt.Sprintf("%s/v1/pay/payOrder?orderId=%d&tenancyId=%d&patientId=%d&orderType=%d&expire=%d", seitURL, orderId, tenancyId, patientId, orderType, time.Now().Add(time.Duration(autoCloseTime)*time.Second).Unix())
+	payUrl := fmt.Sprintf("%s/v1/pay/payOrder?orderId=%d&tenancyId=%d&patientId=%d&orderType=%d&expire=%d", seitURL, orderId, tenancyId, patientId, orderType, time.Now().Add(time.Duration(autoCloseTime)*time.Minute).Unix())
 	if g.TENANCY_CONFIG.System.Level == "debug" {
 		g.TENANCY_LOG.Info("支付二维码", zap.String("url", payUrl))
 	}

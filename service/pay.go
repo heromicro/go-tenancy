@@ -29,8 +29,8 @@ func PayOrder(req request.PayOrder) (response.PayOrder, error) {
 	defer DeleteTestCache(req.TenancyId, req.UserId, req.PatientID)
 	var res response.PayOrder
 	autoCloseTime := param.GetOrderAutoCloseTime()
-	if time.Until(time.Unix(req.Expire, 0)) > time.Duration(autoCloseTime) {
-		g.TENANCY_LOG.Error("支付二维码已经过期", zap.Int64("now:", time.Now().Unix()), zap.Int64("expire:", req.Expire), zap.Int64("过期时间（分钟）:", autoCloseTime))
+	if time.Until(time.Unix(req.Expire, 0)).Minutes() > float64(autoCloseTime) {
+		g.TENANCY_LOG.Error("支付二维码已经过期", zap.Float64("sub:", time.Until(time.Unix(req.Expire, 0)).Minutes()), zap.Int64("过期时间（分钟）:", autoCloseTime))
 		return res, fmt.Errorf("支付二维码已经过期，请重新下单")
 	}
 	tenancy, err := GetTenancyByID(req.TenancyId)
@@ -364,7 +364,7 @@ func NotifyAliPay(ctx *gin.Context) error {
 	if notifyReq["trade_status"] != nil {
 		tradeStatus = notifyReq["trade_status"].(string) //交易状态
 	}
-	g.TENANCY_LOG.Error("支付: 支付宝支付异步通知回调", zap.String("订单号", orderSn), zap.String("流水号", outBizNo), zap.String("总退款金额", refundFee), zap.String("交易退款时间", gmtRefund), zap.String("交易状态", tradeStatus))
+	g.TENANCY_LOG.Info("支付: 支付宝支付异步通知回调", zap.String("订单号", orderSn), zap.String("流水号", outBizNo), zap.String("总退款金额", refundFee), zap.String("交易退款时间", gmtRefund), zap.String("交易状态", tradeStatus))
 	// 退款
 	if outBizNo != "" && gmtRefund != "" {
 		if tradeStatus != "TRADE_SUCCESS" && tradeStatus != "TRADE_CLOSED" {

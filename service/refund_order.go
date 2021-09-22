@@ -512,14 +512,13 @@ func agreeRefundOrder(refundOrder model.RefundOrder, refundAgreeMsg string) erro
 			if err != nil {
 				return err
 			}
-		} else if refundOrder.RefundType == model.RefundTypeAll { // 退款退货，由用户退款后商家发起退款
-			err := addRefundOrderStatus(tx, refundOrder.ID, "refund_agree", refundAgreeMsg)
-			if err != nil {
-				return fmt.Errorf("add refund order status %w", err)
-			}
+		}
+		err := addRefundOrderStatus(tx, refundOrder.ID, "refund_agree", refundAgreeMsg)
+		if err != nil {
+			return fmt.Errorf("add refund order status %w", err)
 		}
 
-		err := UpdateRefundOrderById(tx, refundOrder.ID, map[string]interface{}{"status": status, "status_time": time.Now()})
+		err = UpdateRefundOrderById(tx, refundOrder.ID, map[string]interface{}{"status": status, "status_time": time.Now()})
 		if err != nil {
 			return err
 		}
@@ -659,7 +658,7 @@ func GetStatusAgreeRefundOrdersByOrderSn(orderSn string) ([]model.RefundOrder, e
 		Where("refund_orders.status = ?", model.RefundStatusAgree).
 		Where("orders.order_sn = ?", orderSn).
 		Find(&refundOrders).Error
-	if err == nil {
+	if err != nil {
 		g.TENANCY_LOG.Error("获取审核通过订单失败", zap.String("GetStatusAgreeRefundOrdersByOrderSn()", err.Error()))
 		return refundOrders, fmt.Errorf("获取审核通过订单失败 %w", err)
 	}
@@ -674,7 +673,7 @@ func GetStatusAgreeRefundOrdersByReturnOrderSn(refundOrderSn string) ([]model.Re
 		Where("status = ?", model.RefundStatusAgree).
 		Where("refund_order_sn = ?", refundOrderSn).
 		Find(&refundOrders).Error
-	if err == nil {
+	if err != nil {
 		g.TENANCY_LOG.Error("获取审核通过订单失败", zap.String("GetStatusAgreeRefundOrdersByReturnOrderSn()", err.Error()))
 		return refundOrders, fmt.Errorf("获取审核通过订单失败 %w", err)
 	}
