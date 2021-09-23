@@ -11,7 +11,6 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/go-pay/gopay"
 	"github.com/go-pay/gopay/alipay"
-	"github.com/go-pay/gopay/pkg/util"
 	v2 "github.com/go-pay/gopay/wechat"
 	"github.com/go-pay/gopay/wechat/v3"
 	"github.com/snowlyg/go-tenancy/g"
@@ -183,11 +182,13 @@ func WechatRefund(orderSn, refundOrderSn, refundMessage string, totalPrice, refu
 	// 初始化参数结构体
 	bm := make(gopay.BodyMap)
 	bm.Set("out_trade_no", orderSn).
-		Set("nonce_str", util.GetRandomString(32)).
-		Set("sign_type", wechat.SignTypeRSA).
+		Set("reason", refundMessage).
 		Set("out_refund_no", refundOrderSn).
-		Set("total_fee", getOrderPrice(totalPrice)).
-		Set("refund_fee", getOrderPrice(refundPrice)).
+		SetBodyMap("amount", func(bm gopay.BodyMap) {
+			bm.Set("refund", getOrderPrice(refundPrice)*100).
+				Set("total", getOrderPrice(totalPrice)*100).
+				Set("currency", "CNY")
+		}).
 		Set("notify_url", notifyUrl)
 
 	//请求申请退款（沙箱环境下，证书路径参数可传空）
