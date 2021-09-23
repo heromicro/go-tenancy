@@ -639,7 +639,8 @@ func UpdateOrderByIds(db *gorm.DB, ids []uint, data map[string]interface{}) erro
 // GetNoPayOrdersByOrderSn 根据订单号获取未支付订单
 func GetNoPayOrdersByOrderSn(orderSn string) ([]model.Order, error) {
 	orders := []model.Order{}
-	err := g.TENANCY_DB.Model(&model.Order{}).Where("order_sn = ?", orderSn).
+	err := g.TENANCY_DB.Model(&model.Order{}).
+		Where("order_sn = ?", orderSn).
 		Where("is_system_del = ?", g.StatusFalse).
 		Where("is_cancel = ?", g.StatusFalse).
 		Where("status = ?", model.OrderStatusNoPay).

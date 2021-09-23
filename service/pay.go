@@ -196,7 +196,12 @@ func WechatRefund(orderSn, refundOrderSn, refundMessage string, totalPrice, refu
 	if err != nil {
 		return err
 	}
-	g.TENANCY_LOG.Debug("微信支付退款", zap.String("aliRsp", fmt.Sprintf("%+v", wxRsp.Response)))
+
+	if wxRsp.Code != 0 {
+		return fmt.Errorf("微信支付退款失败 %s", wxRsp.Error)
+
+	}
+	g.TENANCY_LOG.Error("微信支付退款", zap.String("aliRsp", fmt.Sprintf("%+v", wxRsp.Response)))
 	return nil
 }
 
@@ -401,7 +406,8 @@ func NotifyAliPay(ctx *gin.Context) error {
 		if err != nil {
 			g.TENANCY_LOG.Error("支付异步通知: 支付宝支付异步通知回调错误", zap.String(orderSn, err.Error()))
 		}
-
+		payload.PayType = model.PayTypeAlipay
+		payload.PayNotifyType = "pay"
 		// 异步发送 mqtt
 		go func() {
 			SendMqttMsgs(model.TOPIC, payload, model.QOS)
@@ -475,7 +481,8 @@ func wechatPayNotifyForPay(result *wechat.V3DecryptResult) error {
 	if err != nil {
 		g.TENANCY_LOG.Error("支付异步回调: 微信支付异支付异步通知回调错误", zap.String(result.OutTradeNo, err.Error()))
 	}
-
+	payload.PayType = model.PayTypeWx
+	payload.PayNotifyType = "pay"
 	// 异步发送 mqtt
 	go func() {
 		SendMqttMsgs(model.TOPIC, payload, model.QOS)
