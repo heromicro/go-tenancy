@@ -521,11 +521,11 @@ func wechatPayNotifyForRefund(result *wechat.V3DecryptRefundResult) error {
 	g.TENANCY_LOG.Info("退款异步回调: 微信支付异支付异步通知回调", zap.String("订单号", result.OutTradeNo), zap.String("通知状态", result.RefundStatus), zap.String("退款单号", result.OutRefundNo), zap.String("时间", result.SuccessTime), zap.String("流水号", result.TransactionId), zap.Int("用户支付金额，单位为分", result.Amount.PayerTotal), zap.Int("订单总金额，单位为分", result.Amount.Total))
 
 	g.TENANCY_LOG.Error("支付异步回调 ", zap.String("wechatPayNotifyForRefund()", fmt.Sprintf("%+v", result)))
-	// if result.RefundStatus != "SUCCESS" {
-	// 	return fmt.Errorf("退款异步回调返回状态错误")
-	// }
+	if result.RefundStatus != "SUCCESS" {
+		return fmt.Errorf("退款异步回调返回状态错误")
+	}
 
-	err := ChangeReturnOrderStatusByReturnOrderSn(model.PayTypeWx, model.RefundStatusEnd, result.OutTradeNo, "refund_success", "退款成功")
+	err := ChangeReturnOrderStatusByReturnOrderSn(model.PayTypeWx, model.RefundStatusEnd, result.OutRefundNo, "refund_success", "退款成功")
 	if err != nil {
 		g.TENANCY_LOG.Error("退款异步回调: 微信支付异支付异步通知回调错误", zap.String(result.OutTradeNo, err.Error()))
 	}
