@@ -175,7 +175,7 @@ func WechatRefund(orderSn, refundOrderSn, refundMessage string, totalPrice, refu
 	if err != nil {
 		return err
 	}
-	notifyUrl, err := param.GetPayNotifyUrl("wechat")
+	notifyUrl, err := param.GetPayNotifyUrl("wechat_return")
 	if err != nil {
 		return err
 	}
@@ -451,6 +451,30 @@ func NotifyWechatPay(ctx *gin.Context) error {
 		return wechatPayNotifyForPay(result)
 	}
 
+	return nil
+}
+
+// NotifyWechatPayReturn 微信支付异步回调通知
+func NotifyWechatPayReturn(ctx *gin.Context) error {
+	// ========异步通知验签========
+	notifyReq, err := wechat.V3ParseNotify(ctx.Request)
+	if err != nil {
+		g.TENANCY_LOG.Error("支付异步回调: 微信支付异异步通知解析错误", zap.String("V3ParseNotify()", err.Error()))
+		return fmt.Errorf("异步回调: 微信支付异异步通知解析错误: %w", err)
+	}
+	// WxPkContent 是通过 wechat.GetPlatformCerts() 接口向微信获取的微信平台公钥证书内容
+	err = notifyReq.VerifySign(g.TENANCY_CONFIG.WechatPay.WxPkContent)
+	if err != nil {
+		g.TENANCY_LOG.Error("支付异步回调: 微信支付异异步通知验签错误", zap.String("VerifySign()", err.Error()))
+		return fmt.Errorf("支付异步回调: 微信支付异异步通知验签错误: %w", err)
+	}
+
+	wechatConf, err := param.GetWechatPayConfig()
+	if err != nil {
+		g.TENANCY_LOG.Error("支付异步回调: 获取微信支付配置错误", zap.String("GetWechatPayConfig()", err.Error()))
+		return fmt.Errorf("支付异步回调: 获取微信支付配置错误: %w", err)
+	}
+
 	// 退款通知解密
 	resultRefund, err := notifyReq.DecryptRefundCipherText(wechatConf.PayWeixinKey)
 	if err != nil {
@@ -496,9 +520,10 @@ func wechatPayNotifyForPay(result *wechat.V3DecryptResult) error {
 func wechatPayNotifyForRefund(result *wechat.V3DecryptRefundResult) error {
 	g.TENANCY_LOG.Info("退款异步回调: 微信支付异支付异步通知回调", zap.String("订单号", result.OutTradeNo), zap.String("通知状态", result.RefundStatus), zap.String("退款单号", result.OutRefundNo), zap.String("时间", result.SuccessTime), zap.String("流水号", result.TransactionId), zap.Int("用户支付金额，单位为分", result.Amount.PayerTotal), zap.Int("订单总金额，单位为分", result.Amount.Total))
 
-	if result.RefundStatus != "SUCCESS" {
-		return fmt.Errorf("退款异步回调: 订单 ：%s ，退款单：%s 微信支付异异步通知回调返回状态: %s", result.OutTradeNo, result.OutRefundNo, result.RefundStatus)
-	}
+	g.TENANCY_LOG.Error("支付异步回调 ", zap.String("wechatPayNotifyForRefund()", fmt.Sprintf("%+v", result)))
+	// if result.RefundStatus != "SUCCESS" {
+	// 	return fmt.Errorf("退款异步回调返回状态错误")
+	// }
 
 	err := ChangeReturnOrderStatusByReturnOrderSn(model.PayTypeWx, model.RefundStatusEnd, result.OutTradeNo, "refund_success", "退款成功")
 	if err != nil {

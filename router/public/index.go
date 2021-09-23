@@ -13,9 +13,10 @@ func InitAuthRouter(Router *gin.RouterGroup) {
 func InitPayRouter(Router *gin.RouterGroup) {
 	payRouter := Router.Group("/pay")
 	{
-		payRouter.GET("/payOrder", public.PayOrder)             // 扫码支付
-		payRouter.Any("/notify/wechat", public.NotifyWechatPay) // 微信支付回调
-		payRouter.Any("/notify/ali", public.NotifyAliPay)       // 支付宝支付回调
+		payRouter.GET("/payOrder", public.PayOrder)                          // 扫码支付
+		payRouter.Any("/notify/wechat", public.NotifyWechatPay)              // 微信支付回调
+		payRouter.Any("/notify/wechat_return", public.NotifyWechatPayReturn) // 微信退款回调
+		payRouter.Any("/notify/ali", public.NotifyAliPay)                    // 支付宝支付回调
 	}
 }
 

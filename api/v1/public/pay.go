@@ -86,3 +86,11 @@ func NotifyWechatPay(ctx *gin.Context) {
 		ctx.JSON(http.StatusOK, &wechat.V3NotifyRsp{Code: gopay.SUCCESS, Message: "成功"})
 	}
 }
+func NotifyWechatPayReturn(ctx *gin.Context) {
+	if err := service.NotifyWechatPayReturn(ctx); err != nil {
+		g.TENANCY_LOG.Error("微信支付异步通知失败!", zap.Any("微信支付异步通知失败", err))
+		ctx.String(http.StatusOK, "%s", err.Error())
+	} else {
+		ctx.JSON(http.StatusOK, &wechat.V3NotifyRsp{Code: gopay.SUCCESS, Message: "成功"})
+	}
+}
