@@ -80,6 +80,7 @@ func RefundOrder(order model.Order, refundOrder model.RefundOrder, refundPrice f
 	return nil
 }
 
+// getWechatPayClient 微信支付客户端
 func getWechatPayClient() (client *wechat.ClientV3, err error) {
 	wechatConf, err := param.GetWechatPayConfig()
 	if err != nil {
@@ -118,6 +119,7 @@ func getWechatPayClient() (client *wechat.ClientV3, err error) {
 	return client, nil
 }
 
+// WechatPay 微信支付
 func WechatPay(order model.Order, tenancyName, openid string) (response.PayOrder, error) {
 	var res response.PayOrder
 	siteName, err := param.GetSeitName()
@@ -387,7 +389,6 @@ func NotifyAliPay(ctx *gin.Context) error {
 		if tradeStatus != "TRADE_SUCCESS" && tradeStatus != "TRADE_FINISHED" {
 			return fmt.Errorf("支付: %s 支付宝异步通知回调返回状态: %s", orderSn, tradeStatus)
 		}
-
 		// 发送 mqtt
 		changeData := map[string]interface{}{
 			"status":   model.OrderStatusNoDeliver,
@@ -399,7 +400,11 @@ func NotifyAliPay(ctx *gin.Context) error {
 		if err != nil {
 			g.TENANCY_LOG.Error("支付: 支付宝支付异步通知回调错误", zap.String(orderSn, err.Error()))
 		}
-		SendMqttMsgs("tenancy_notify_pay", payload, 2)
+
+		// 异步发送 mqtt
+		go func() {
+			SendMqttMsgs(model.TOPIC, payload, model.QOS)
+		}()
 	}
 
 	return nil

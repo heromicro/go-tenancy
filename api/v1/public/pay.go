@@ -24,7 +24,7 @@ func PayOrder(ctx *gin.Context) {
 
 	req.UserAgent = ctx.Request.UserAgent()
 	if strings.Contains(req.UserAgent, "MicroMessenger") {
-		if req.Code == "" || req.State == "" {
+		if req.Code == "" {
 			url, err := service.GetAutoCode(ctx.Request.RequestURI)
 			if err != nil {
 				g.TENANCY_LOG.Error("获取微信autoCode错误!", zap.Any("获取微信autoCode错误", err))
@@ -64,7 +64,7 @@ func PayOrder(ctx *gin.Context) {
 				"signType":  res.JSAPIPayParams.SignType, //微信签名方式：
 				"paySign":   res.JSAPIPayParams.PaySign,  //微信签名
 			}
-			ctx.HTML(http.StatusOK, "wechat_pay.tmpl", jsapi)
+			ctx.HTML(http.StatusOK, "wechat_pay.html", jsapi)
 		}
 	}
 }

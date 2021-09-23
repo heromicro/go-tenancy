@@ -630,7 +630,7 @@ func GetRefundOrderAutoAgree() ([]model.RefundOrder, error) {
 // AutoAgreeRefundOrders 退款单自动审核
 func AutoAgreeRefundOrders(refundOrders []model.RefundOrder) {
 	for _, refundOrder := range refundOrders {
-		agreeRefundOrder(refundOrder, "退款成功[自动]")
+		agreeRefundOrder(refundOrder, "审核通过[自动]")
 	}
 }
 

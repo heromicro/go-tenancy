@@ -8,6 +8,11 @@ import (
 	"github.com/snowlyg/go-tenancy/g"
 )
 
+var (
+	TOPIC      = "tenancy_notify_pay"
+	QOS   byte = 2
+)
+
 type Mqtt struct {
 	g.TENANCY_MODEL
 	Host     string `gorm:"unique;column:host;type:varchar(30);not null" json:"host" binding:"ip"`         // mqtt host
