@@ -41,6 +41,9 @@ func PayOrder(ctx *gin.Context) {
 			}
 			openid, err := service.GetOpenId(req.Code)
 			if err != nil {
+				if strings.Contains(err.Error(), "code been used") {
+					ctx.Redirect(http.StatusFound, "http://www.chindeo.com")
+				}
 				g.TENANCY_LOG.Error("获取微信openid错误!", zap.Any("获取微信openid错误", err))
 				response.FailWithMessage("操作失败:"+err.Error(), ctx)
 				return
