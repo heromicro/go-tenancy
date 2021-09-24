@@ -48,7 +48,7 @@ func Timer() {
 			}
 		})
 
-		// 商户自动处理退款订单
+		// 商户自动处理退款订单，自动通过退款审核
 		g.TENANCY_Timer.AddTaskByFunc("RefundOrderAutoAgree", EveryMinute, "商户自动处理退款订单", func() {
 			refundOrders, err := service.GetRefundOrderAutoAgree()
 			if err != nil {
@@ -61,7 +61,9 @@ func Timer() {
 			service.AutoAgreeRefundOrders(refundOrders)
 		})
 
-		// 用户订单自动收货
+		// 用户订单自动收货，自动确认收货
+		// - 发货前：如果没有发生退款售后，按设定日期自动确认收货（正常流程），发货后：申请售后，不影响订单流程订单，正常收货完成。
+		// - 发货前：如果有退款售后，并且已经全额退款完成，才会按设定日期自动确认收货。
 		g.TENANCY_Timer.AddTaskByFunc("OrderAutoAgree", EveryMinute, "用户订单自动收货", func() {
 			orderIds, err := service.GetOrderAutoAgree()
 			if err != nil {

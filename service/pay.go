@@ -202,7 +202,7 @@ func WechatRefund(orderSn, refundOrderSn, refundMessage string, totalPrice, refu
 		return fmt.Errorf("微信支付退款失败 %s", wxRsp.Error)
 
 	}
-	g.TENANCY_LOG.Error("微信支付退款", zap.String("aliRsp", fmt.Sprintf("%+v", wxRsp.Response)))
+	g.TENANCY_LOG.Info("微信支付退款", zap.String("aliRsp", fmt.Sprintf("%+v", wxRsp.Response)))
 	return nil
 }
 
@@ -489,7 +489,17 @@ func NotifyWechatPayReturn(ctx *gin.Context) error {
 
 // wechatPayNotifyForPay 微信支付异步回调
 func wechatPayNotifyForPay(result *wechat.V3DecryptResult) error {
-	g.TENANCY_LOG.Info("支付异步回调: 微信支付异支付异步通知回调", zap.String("订单号", result.OutTradeNo), zap.String("通知状态", result.TradeState), zap.String("通知状态", result.TradeStateDesc), zap.String("通知类型", result.TradeType), zap.String("时间", result.SuccessTime), zap.String("流水号", result.TransactionId), zap.Int("用户支付金额，单位为分", result.Amount.PayerTotal), zap.Int("订单总金额，单位为分", result.Amount.Total))
+	g.TENANCY_LOG.Info("支付异步回调: 微信支付异支付异步通知回调",
+		zap.String("订单号", result.OutTradeNo),
+		zap.String("通知状态", result.TradeState),
+		zap.String("通知状态", result.TradeStateDesc),
+		zap.String("通知类型", result.TradeType),
+		zap.String("时间", result.SuccessTime),
+		zap.String("流水号", result.TransactionId),
+		zap.Int("用户支付金额，单位为分", result.Amount.PayerTotal),
+		zap.String("人民币", result.Amount.Currency),
+		zap.String("用户支付币种", result.Amount.PayerCurrency),
+		zap.Int("订单总金额，单位为分", result.Amount.Total))
 
 	// 支付
 	if result.TradeState != "SUCCESS" {
@@ -518,9 +528,18 @@ func wechatPayNotifyForPay(result *wechat.V3DecryptResult) error {
 
 // wechatPayNotifyForRefund 微信退款异步回调
 func wechatPayNotifyForRefund(result *wechat.V3DecryptRefundResult) error {
-	g.TENANCY_LOG.Info("退款异步回调: 微信支付异支付异步通知回调", zap.String("订单号", result.OutTradeNo), zap.String("通知状态", result.RefundStatus), zap.String("退款单号", result.OutRefundNo), zap.String("时间", result.SuccessTime), zap.String("流水号", result.TransactionId), zap.Int("用户支付金额，单位为分", result.Amount.PayerTotal), zap.Int("订单总金额，单位为分", result.Amount.Total))
+	g.TENANCY_LOG.Info("退款异步回调: 微信支付异支付异步通知回调",
+		zap.String("订单号", result.OutTradeNo),
+		zap.String("通知状态", result.RefundStatus),
+		zap.String("退款单号", result.OutRefundNo),
+		zap.String("时间", result.SuccessTime),
+		zap.String("流水号", result.TransactionId),
+		zap.Int("用户支付金额，单位为分", result.Amount.PayerTotal),
+		zap.Int("退款金额", result.Amount.Refund),
+		zap.Int("退款给用户的金额", result.Amount.PayerRefund),
+		zap.Int("订单总金额，单位为分", result.Amount.Total))
 
-	g.TENANCY_LOG.Error("支付异步回调 ", zap.String("wechatPayNotifyForRefund()", fmt.Sprintf("%+v", result)))
+	g.TENANCY_LOG.Info("支付异步回调 ", zap.String("wechatPayNotifyForRefund()", fmt.Sprintf("%+v", result)))
 	if result.RefundStatus != "SUCCESS" {
 		return fmt.Errorf("退款异步回调返回状态错误")
 	}

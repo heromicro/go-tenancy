@@ -10,7 +10,7 @@ import (
 )
 
 func Auth() {
-	g.TENANCY_LOG.Info("缓存类型是", zap.String("缓存类型", g.TENANCY_CONFIG.System.CacheType))
+	g.TENANCY_LOG.Info("初始化认证驱动", zap.String("使用缓存类型", g.TENANCY_CONFIG.System.CacheType))
 	if g.TENANCY_CONFIG.System.CacheType == "" {
 		return
 	}

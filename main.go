@@ -25,7 +25,6 @@ func main() {
 		db, _ := g.TENANCY_DB.DB()
 		defer db.Close()
 	}
-
 	// 初始化认证服务
 	initialize.Auth()
 	if multi.AuthDriver != nil {

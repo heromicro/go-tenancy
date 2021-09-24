@@ -41,9 +41,6 @@ func PayOrder(ctx *gin.Context) {
 			}
 			openid, err := service.GetOpenId(req.Code)
 			if err != nil {
-				if strings.Contains(err.Error(), "code been used") {
-					ctx.Redirect(http.StatusFound, "http://www.chindeo.com")
-				}
 				g.TENANCY_LOG.Error("获取微信openid错误!", zap.Any("获取微信openid错误", err))
 				response.FailWithMessage("操作失败:"+err.Error(), ctx)
 				return
@@ -84,7 +81,7 @@ func NotifyAliPay(ctx *gin.Context) {
 func NotifyWechatPay(ctx *gin.Context) {
 	if err := service.NotifyWechatPay(ctx); err != nil {
 		g.TENANCY_LOG.Error("微信支付异步通知失败!", zap.Any("微信支付异步通知失败", err))
-		ctx.String(http.StatusOK, "%s", err.Error())
+		ctx.JSON(http.StatusOK, &wechat.V3NotifyRsp{Code: gopay.FAIL, Message: err.Error()})
 	} else {
 		ctx.JSON(http.StatusOK, &wechat.V3NotifyRsp{Code: gopay.SUCCESS, Message: "成功"})
 	}
@@ -92,7 +89,7 @@ func NotifyWechatPay(ctx *gin.Context) {
 func NotifyWechatPayReturn(ctx *gin.Context) {
 	if err := service.NotifyWechatPayReturn(ctx); err != nil {
 		g.TENANCY_LOG.Error("微信支付异步通知失败!", zap.Any("微信支付异步通知失败", err))
-		ctx.String(http.StatusOK, "%s", err.Error())
+		ctx.JSON(http.StatusOK, &wechat.V3NotifyRsp{Code: gopay.FAIL, Message: err.Error()})
 	} else {
 		ctx.JSON(http.StatusOK, &wechat.V3NotifyRsp{Code: gopay.SUCCESS, Message: "成功"})
 	}
