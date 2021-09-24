@@ -112,6 +112,7 @@ func Routers(app *gin.Engine) {
 			admin.InitUserGroupRouter(AdminGroup)      // 用户分组路由
 			admin.InitUserLabelRouter(AdminGroup)      // 用户标签路由
 			admin.InitPatientRouter(AdminGroup)        // 床旁患者路由
+			admin.InitStatisticsRouter(AdminGroup)     // 控制大盘路由
 		}
 
 		AdminLogGroup := V1Group.Group(g.TENANCY_CONFIG.System.AdminPreix, middleware.IsAdmin(), middleware.CasbinHandler())

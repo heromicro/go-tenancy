@@ -1,13 +1,13 @@
 package service
 
 import (
-	"errors"
 	"fmt"
 	"time"
 
 	"github.com/snowlyg/go-tenancy/g"
 	"github.com/snowlyg/go-tenancy/model"
 	"github.com/snowlyg/go-tenancy/utils/param"
+	"go.uber.org/zap"
 	"gorm.io/gorm"
 )
 
@@ -61,7 +61,8 @@ func CancelNoPayGroupOrders(groupOrderId uint) error {
 		return err
 	}
 	if len(orders) == 0 {
-		return errors.New("订单数据错误")
+		g.TENANCY_LOG.Info("自动取消订单", zap.Uint("订单组id", groupOrderId), zap.String("GetOrdersByGroupOrderId()", "没有查询到订单"))
+		return nil
 	}
 	var orderIds []uint
 	var orderStatues []model.OrderStatus

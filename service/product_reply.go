@@ -11,6 +11,7 @@ import (
 	"github.com/snowlyg/go-tenancy/model"
 	"github.com/snowlyg/go-tenancy/model/request"
 	"github.com/snowlyg/go-tenancy/model/response"
+	"github.com/snowlyg/go-tenancy/service/scope"
 )
 
 func GetAdminReplyMap(ctx *gin.Context) (Form, error) {
@@ -108,7 +109,7 @@ func GetProductReplyInfoList(info request.ProductReplyPageInfo, tenancyId uint, 
 	}
 
 	if info.Date != "" {
-		db = filterDate(db, info.Date, "")
+		db = db.Scopes(scope.FilterDate(info.Date, ""))
 	}
 	if info.IsReply > 0 {
 		db = db.Where("is_reply = ?", info.IsReply)

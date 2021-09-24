@@ -12,6 +12,7 @@ import (
 	"github.com/snowlyg/go-tenancy/model"
 	"github.com/snowlyg/go-tenancy/model/request"
 	"github.com/snowlyg/go-tenancy/model/response"
+	"github.com/snowlyg/go-tenancy/service/scope"
 	"github.com/snowlyg/go-tenancy/utils/param"
 	"github.com/snowlyg/multi"
 	"go.uber.org/zap"
@@ -39,7 +40,7 @@ func getRefundOrderSearch(info request.RefundOrderPageInfo, ctx *gin.Context, db
 	}
 
 	if info.Date != "" {
-		db = filterDate(db, info.Date, "refund_orders")
+		db = db.Scopes(scope.FilterDate(info.Date, "refund_orders"))
 	}
 
 	if info.IsTrader != "" {

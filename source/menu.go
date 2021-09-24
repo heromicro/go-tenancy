@@ -13,6 +13,7 @@ var BaseMenu = new(menu)
 type menu struct{}
 
 var menus = []model.SysBaseMenu{
+	{TENANCY_MODEL: g.TENANCY_MODEL{ID: 32}, Pid: 38, Path: "/110/38/", Icon: "", MenuName: "api管理", Route: "/admin/setting/api", Params: "", Sort: 0, Hidden: 2, IsTenancy: 2, IsMenu: 1},
 	{TENANCY_MODEL: g.TENANCY_MODEL{ID: 33}, Pid: 0, Path: "/", Icon: "s-home", MenuName: "仪表盘", Route: "/admin/dashboard", Params: "", Sort: 100, Hidden: 2, IsTenancy: 2, IsMenu: 1},
 	{TENANCY_MODEL: g.TENANCY_MODEL{ID: 34}, Pid: 110, Path: "/110/", Icon: "", MenuName: "系统配置", Route: "/admin/config", Params: "", Sort: 0, Hidden: 2, IsTenancy: 2, IsMenu: 1},
 	{TENANCY_MODEL: g.TENANCY_MODEL{ID: 35}, Pid: 34, Path: "/110/34/", Icon: "", MenuName: "配置分类", Route: "/admin/config/classify", Params: "", Sort: 0, Hidden: 2, IsTenancy: 2, IsMenu: 1},

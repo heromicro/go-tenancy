@@ -2,8 +2,6 @@ package service
 
 import (
 	"fmt"
-	"strings"
-	"time"
 
 	"github.com/gin-gonic/gin"
 	"github.com/snowlyg/go-tenancy/model/request"
@@ -46,44 +44,6 @@ type Opt struct {
 type StringOpt struct {
 	Label string `json:"label"`
 	Value string `json:"value"`
-}
-
-// filterDate
-func filterDate(db *gorm.DB, date, perfix string) *gorm.DB {
-	field := "created_at"
-	if perfix != "" {
-		field = fmt.Sprintf("%s.created_at", perfix)
-	}
-	dates := strings.Split(date, "-")
-	if len(dates) == 2 {
-		start, _ := time.Parse("2006/01/02", dates[0])
-		end, _ := time.Parse("2006/01/02", dates[1])
-		return db.Where(fmt.Sprintf("%s BETWEEN ? AND ?", field), start, end)
-	}
-	if len(dates) == 1 {
-		// { text: '今天', val: 'today' },
-		// { text: '昨天', val: 'yesterday' },
-		// { text: '最近7天', val: 'lately7' },
-		// { text: '最近30天', val: 'lately30' },
-		// { text: '本月', val: 'month' },
-		// { text: '本年', val: 'year' }
-		// TODO: 使用内置函数，可能造成索引失效
-		switch dates[0] {
-		case "today":
-			return db.Where(fmt.Sprintf("TO_DAYS(NOW()) - TO_DAYS(%s) < 1", field))
-		case "yesterday":
-			return db.Where(fmt.Sprintf("TO_DAYS(NOW()) - TO_DAYS(%s) = 1", field))
-		case "lately7":
-			return db.Where(fmt.Sprintf("DATE_SUB(CURDATE(),INTERVAL 7 DAY) <= DATE(%s)", field))
-		case "lately30":
-			return db.Where(fmt.Sprintf("DATE_SUB(CURDATE(), INTERVAL 30 DAY) <= date(%s)", field))
-		case "month":
-			return db.Where(fmt.Sprintf("DATE_FORMAT( %s, '%%Y%%m' ) = DATE_FORMAT( CURDATE() , '%%Y%%m' )", field))
-		case "year":
-			return db.Where(fmt.Sprintf("YEAR(%s)=YEAR(NOW())", field))
-		}
-	}
-	return db
 }
 
 // 是否是 c用户

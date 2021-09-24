@@ -14,6 +14,7 @@ import (
 	"github.com/snowlyg/go-tenancy/model"
 	"github.com/snowlyg/go-tenancy/model/request"
 	"github.com/snowlyg/go-tenancy/model/response"
+	"github.com/snowlyg/go-tenancy/service/scope"
 	"github.com/snowlyg/go-tenancy/utils/param"
 	"github.com/snowlyg/multi"
 	"go.uber.org/zap"
@@ -481,7 +482,7 @@ func getOrderSearch(info request.OrderPageInfo, ctx *gin.Context, db *gorm.DB) (
 	}
 
 	if info.Date != "" {
-		db = filterDate(db, info.Date, "orders")
+		db = db.Scopes(scope.FilterDate(info.Date, "orders"))
 	}
 
 	if info.OrderType != "" && info.OrderType != "0" {
@@ -530,7 +531,6 @@ func getStat(info request.OrderPageInfo, ctx *gin.Context, stat []map[string]int
 	if db, err := getOrderSearch(info, ctx, db); err != nil {
 		return nil, err
 	} else {
-
 		err = db.Select("sum(orders.pay_price) as count").Where("orders.paid =?", g.StatusTrue).First(&payPrice).Error
 		if err != nil && !errors.Is(err, gorm.ErrRecordNotFound) {
 			return nil, err
@@ -1069,4 +1069,18 @@ func AutoTakeOrders(orderIds []uint) error {
 		}
 		return nil
 	})
+}
+
+// GetOrderPayPrice 获取订单支付价格
+func GetOrderPayPrice(scopes ...func(*gorm.DB) *gorm.DB) (float64, error) {
+	var payPrice request.Result
+	db := g.TENANCY_DB.Model(&model.Order{}).Select("sum(pay_price) as count").Where("paid =?", g.StatusTrue)
+	if len(scopes) > 0 {
+		db = db.Scopes(scopes...)
+	}
+	err := db.First(&payPrice).Error
+	if err != nil && !errors.Is(err, gorm.ErrRecordNotFound) {
+		return 0, err
+	}
+	return payPrice.Count, nil
 }

@@ -12,6 +12,7 @@ import (
 	"github.com/snowlyg/go-tenancy/model"
 	"github.com/snowlyg/go-tenancy/model/request"
 	"github.com/snowlyg/go-tenancy/model/response"
+	"github.com/snowlyg/go-tenancy/service/scope"
 	"github.com/snowlyg/go-tenancy/source"
 	"github.com/snowlyg/go-tenancy/utils"
 	"github.com/snowlyg/go-tenancy/utils/param"
@@ -231,7 +232,7 @@ func GetTenanciesInfoList(info request.TenancyPageInfo) ([]response.SysTenancy, 
 	}
 
 	if info.Date != "" {
-		db = filterDate(db, info.Date, "sys_tenancies")
+		db = db.Scopes(scope.FilterDate(info.Date, "sys_tenancies"))
 	}
 
 	var total int64

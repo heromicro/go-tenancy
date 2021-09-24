@@ -229,6 +229,9 @@ var baseApis = []model.SysApi{
 	{Path: "/v1/admin/order/getOrderById/:id", Description: "订单详情", ApiGroup: "order", Method: "GET"},
 	//退款订单
 	{Path: "/v1/admin/refundOrder/getRefundOrderList", Description: "退款订单列表", ApiGroup: "refundOrder", Method: "POST"},
+	
+	//控制台
+	{Path: "/v1/admin/statistics/main", Description: "控制台列表", ApiGroup: "statistics", Method: "GET"},
 
 	// other
 	{Path: "/v1/admin/test/emailTest", Description: "发送测试邮件", ApiGroup: "email", Method: "POST"},
