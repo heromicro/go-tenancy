@@ -49,7 +49,7 @@ func ChangePasswordMap(ctx *gin.Context) {
 
 // RegisterAdminMap 注册用户表单
 func RegisterAdminMap(ctx *gin.Context) {
-	if detail, err := service.RegisterAdminMap(0, ctx); err != nil {
+	if detail, err := service.RegisterClientMap(0, ctx); err != nil {
 		g.TENANCY_LOG.Error("获取失败", zap.Any("err", err))
 		response.FailWithMessage("获取失败:"+err.Error(), ctx)
 	} else {
@@ -64,7 +64,7 @@ func UpdateAdminMap(ctx *gin.Context) {
 		response.FailWithMessage(errs.Error(), ctx)
 		return
 	}
-	if detail, err := service.RegisterAdminMap(req.Id, ctx); err != nil {
+	if detail, err := service.RegisterClientMap(req.Id, ctx); err != nil {
 		g.TENANCY_LOG.Error("获取失败", zap.Any("err", err))
 		response.FailWithMessage("获取失败:"+err.Error(), ctx)
 	} else {
@@ -87,7 +87,7 @@ func RegisterTenancy(ctx *gin.Context) {
 		response.FailWithMessage("用户角色为必选参数", ctx)
 		return
 	}
-	id, err := service.Register(req, multi.TenancyAuthority, multi.GetTenancyId(ctx))
+	id, err := service.RegisterClient(req, multi.TenancyAuthority, multi.GetTenancyId(ctx))
 	if err != nil {
 		g.TENANCY_LOG.Error("注册失败", zap.Any("err", err))
 		response.FailWithMessage(err.Error(), ctx)
@@ -107,7 +107,7 @@ func ChangePassword(ctx *gin.Context) {
 		response.FailWithMessage("两次输入密码不一致", ctx)
 		return
 	}
-	err := service.ChangePassword(multi.GetUserId(ctx), req, multi.GetAuthorityType(ctx))
+	err := service.ChangeClientPassword(multi.GetUserId(ctx), req, multi.GetAuthorityType(ctx))
 	if err != nil {
 		g.TENANCY_LOG.Error("修改失败", zap.Any("err", err))
 		response.FailWithMessage(err.Error(), ctx)
@@ -124,7 +124,7 @@ func ChangeProfile(ctx *gin.Context) {
 		return
 	}
 
-	err := service.ChangeProfile(user, multi.GetUserId(ctx))
+	err := service.ChangeClientProfile(user, multi.GetUserId(ctx))
 	if err != nil {
 		g.TENANCY_LOG.Error("修改失败", zap.Any("err", err))
 		response.FailWithMessage(err.Error(), ctx)
@@ -166,7 +166,7 @@ func DeleteUser(ctx *gin.Context) {
 		response.FailWithMessage("删除失败, 自杀失败", ctx)
 		return
 	}
-	if err := service.DeleteUser(reqId.Id); err != nil {
+	if err := service.DeleteClientUser(reqId.Id); err != nil {
 		g.TENANCY_LOG.Error("删除失败!", zap.Any("err", err))
 		response.FailWithMessage("删除失败:"+err.Error(), ctx)
 	} else {
@@ -177,7 +177,7 @@ func DeleteUser(ctx *gin.Context) {
 // SetUserInfo 设置用户信息
 func SetUserInfo(ctx *gin.Context) {
 	userId := ctx.Param("user_id")
-	user, err := service.FindUserByStringId(userId)
+	user, err := service.FindClientByStringId(userId)
 	if err != nil {
 		response.FailWithMessage(err.Error(), ctx)
 		return
@@ -185,7 +185,7 @@ func SetUserInfo(ctx *gin.Context) {
 
 	var info request.UpdateUser
 	_ = ctx.ShouldBindJSON(&info)
-	if err := service.UpdateAdminInfo(info, user, multi.GetTenancyId(ctx)); err != nil {
+	if err := service.UpdateClientInfo(info, user); err != nil {
 		g.TENANCY_LOG.Error("设置失败", zap.Any("err", err))
 		response.FailWithMessage("设置失败", ctx)
 	} else {

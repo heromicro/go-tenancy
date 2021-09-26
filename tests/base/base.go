@@ -72,7 +72,7 @@ func TenancyWithLoginTester(t *testing.T) (*httpexpect.Expect, uint) {
 	obj.Value("message").String().Equal("登录成功")
 	data := obj.Value("data").Object()
 	user := data.Value("user").Object()
-	user.Value("id").Number().Equal(2)
+	user.Value("id").Number().Equal(1)
 	user.Value("userName").String().Equal(username)
 	user.Value("authorityName").String().Equal("商户管理员")
 	user.Value("authorityType").Number().Equal(multi.TenancyAuthority)
@@ -89,14 +89,12 @@ func TenancyWithLoginTester(t *testing.T) (*httpexpect.Expect, uint) {
 }
 
 func DeviceWithLoginTester(t *testing.T) *httpexpect.Expect {
-
 	uuid, _ := cache.GetCacheString(g.TENANCY_CONFIG.Mysql.Dbname + ":uuid")
-	username, _ := cache.GetCacheString(g.TENANCY_CONFIG.Mysql.Dbname + ":username")
 	if uuid == "" {
 		auth := BaseWithLoginTester(t)
 		defer BaseLogOut(auth)
 
-		_, username, uuid = CreateTenancy(auth, "tenancy_hospital", http.StatusOK, "创建成功")
+		_, username, uuid := CreateTenancy(auth, "tenancy_hospital", http.StatusOK, "创建成功")
 		cache.SetCache(g.TENANCY_CONFIG.Mysql.Dbname+":uuid", uuid, 0)
 		cache.SetCache(g.TENANCY_CONFIG.Mysql.Dbname+":username", username, 0)
 	}

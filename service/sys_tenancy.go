@@ -40,11 +40,10 @@ func ChangeTenancyPasswordMap(id uint, ctx *gin.Context) (Form, error) {
 func LoginTenancy(id uint) (response.LoginTenancy, error) {
 	var loginTenancy response.LoginTenancy
 	var token string
-	err := g.TENANCY_DB.Model(&model.SysUser{}).
-		Select("sys_users.id,sys_users.username,sys_users.authority_id,sys_users.created_at,sys_users.updated_at,sys_tenancies.id as tenancy_id,sys_tenancies.name as tenancy_name,sys_tenancies.status,admin_infos.email, admin_infos.phone, admin_infos.nick_name, admin_infos.header_img,sys_authorities.authority_name,sys_authorities.authority_type,sys_authorities.default_router,sys_users.authority_id").
-		Joins("left join admin_infos on admin_infos.sys_user_id = sys_users.id").
-		Joins("left join sys_tenancies on sys_users.sys_tenancy_id = sys_tenancies.id").
-		Joins("left join sys_authorities on sys_authorities.authority_id = sys_users.authority_id").
+	err := g.TENANCY_DB.Model(&model.TUser{}).
+		Select("t_users.id,t_users.username,t_users.authority_id,t_users.created_at,t_users.updated_at,sys_tenancies.id as tenancy_id,sys_tenancies.name as tenancy_name,sys_tenancies.status,t_users.email, t_users.phone, t_users.nick_name, t_users.header_img,sys_authorities.authority_name,sys_authorities.authority_type,sys_authorities.default_router,t_users.authority_id").
+		Joins("left join sys_tenancies on t_users.sys_tenancy_id = sys_tenancies.id").
+		Joins("left join sys_authorities on sys_authorities.authority_id = t_users.authority_id").
 		Where("sys_authorities.authority_type = ?", multi.TenancyAuthority).
 		Where("sys_tenancies.id = ?", id).
 		First(&loginTenancy.Admin).Error
@@ -100,10 +99,10 @@ func CreateTenancy(req request.CreateTenancy) (uint, string, string, error) {
 	}
 
 	err = g.TENANCY_DB.
-		Joins("left join sys_authorities on sys_authorities.authority_id = sys_users.authority_id").
-		Where("sys_users.username = ?", req.Username).
+		Joins("left join sys_authorities on sys_authorities.authority_id = t_users.authority_id").
+		Where("t_users.username = ?", req.Username).
 		Where("sys_authorities.authority_type = ?", multi.TenancyAuthority).
-		First(&model.SysUser{}).Error
+		First(&model.TUser{}).Error
 	if !errors.Is(err, gorm.ErrRecordNotFound) {
 		return 0, "", "", errors.New("管理员用户名已注册")
 	}
@@ -120,13 +119,8 @@ func CreateTenancy(req request.CreateTenancy) (uint, string, string, error) {
 		if defaultPwd == "" {
 			defaultPwd = "123456"
 		}
-		user := model.SysUser{Username: req.Username, Password: utils.MD5V([]byte(defaultPwd)), AuthorityId: source.TenancyAuthorityId, Status: g.StatusTrue, IsShow: g.StatusFalse, SysTenancyID: req.SysTenancy.ID}
+		user := model.TUser{Username: req.Username, Password: utils.MD5V([]byte(defaultPwd)), AuthorityId: source.TenancyAuthorityId, Status: g.StatusTrue, IsShow: g.StatusFalse, SysTenancyID: req.SysTenancy.ID, NickName: req.Name}
 		err = tx.Create(&user).Error
-		if err != nil {
-			return err
-		}
-		tenancyInfo := model.AdminInfo{NickName: req.Name, SysUserID: user.ID}
-		err = tx.Create(&tenancyInfo).Error
 		if err != nil {
 			return err
 		}
@@ -191,20 +185,7 @@ func DeleteTenancy(id uint) error {
 			return err
 		}
 		if user.ID > 0 {
-			err = tx.Where("id = ?", user.ID).Delete(&model.SysUser{}).Error
-			if err != nil {
-				return err
-			}
-		}
-		if user.AdminInfo.ID > 0 {
-			err = tx.Where("id = ?", user.AdminInfo.ID).Delete(&model.AdminInfo{}).Error
-			if err != nil {
-				return err
-			}
-		}
-
-		if user.GeneralInfo.ID > 0 {
-			err = tx.Where("id = ?", user.GeneralInfo.ID).Delete(&model.GeneralInfo{}).Error
+			err = tx.Where("id = ?", user.ID).Delete(&model.TUser{}).Error
 			if err != nil {
 				return err
 			}
@@ -224,8 +205,8 @@ func GetTenanciesInfoList(info request.TenancyPageInfo) ([]response.SysTenancy, 
 	limit := info.PageSize
 	offset := info.PageSize * (info.Page - 1)
 	db := g.TENANCY_DB.Model(&model.SysTenancy{}).
-		Joins("left join sys_users on sys_users.sys_tenancy_id = sys_tenancies.id").
-		Select("sys_tenancies.*,sys_users.username as username").
+		Joins("left join t_users on t_users.sys_tenancy_id = sys_tenancies.id").
+		Select("sys_tenancies.*,t_users.username as username").
 		Where("sys_tenancies.status = ?", info.Status)
 	if info.Keyword != "" {
 		db = db.Where(g.TENANCY_DB.Where("sys_tenancies.name like ?", info.Keyword+"%").Or("sys_tenancies.tele like ?", info.Keyword+"%"))
@@ -249,8 +230,8 @@ func GetTenanciesInfoList(info request.TenancyPageInfo) ([]response.SysTenancy, 
 func GetTenanciesByRegion(p_code string) ([]response.SysTenancy, error) {
 	tenancyList := []response.SysTenancy{}
 	err := g.TENANCY_DB.Model(&model.SysTenancy{}).
-		Joins("left join sys_users on sys_users.sys_tenancy_id = sys_tenancies.id").
-		Select("sys_tenancies.*,sys_users.username as username").
+		Joins("left join t_users on t_users.sys_tenancy_id = sys_tenancies.id").
+		Select("sys_tenancies.*,t_users.username as username").
 		Where("sys_tenancies.sys_region_code = ?", p_code).Find(&tenancyList).Error
 	return tenancyList, err
 }

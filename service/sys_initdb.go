@@ -196,8 +196,8 @@ func InitDB(conf request.InitDB) error {
 func MysqlTables(db *gorm.DB) error {
 	err := db.AutoMigrate(
 		model.SysUser{},
-		model.AdminInfo{},
-		model.GeneralInfo{},
+		model.TUser{},
+		model.CUser{},
 		model.SysAuthority{},
 		model.SysApi{},
 		model.SysBaseMenu{},

@@ -219,10 +219,9 @@ func GetOrderById(id uint, funcs ...func(*gorm.DB) *gorm.DB) (model.Order, error
 func GetOrderDetailById(id uint, funcs ...func(*gorm.DB) *gorm.DB) (response.OrderDetail, error) {
 	var order response.OrderDetail
 	db := g.TENANCY_DB.Model(&model.Order{}).
-		Select("orders.*,general_infos.nick_name as user_nick_name").
-		Joins("left join sys_users on orders.sys_user_id = sys_users.id").
-		Joins("left join general_infos on general_infos.sys_user_id = sys_users.id").
-		Joins(fmt.Sprintf("left join sys_authorities on sys_authorities.authority_id = sys_users.authority_id and sys_authorities.authority_type = %d", multi.GeneralAuthority))
+		Select("orders.*,c_users.nick_name as user_nick_name").
+		Joins("left join c_users on orders.sys_user_id = c_users.id").
+		Joins(fmt.Sprintf("left join sys_authorities on sys_authorities.authority_id = c_users.authority_id and sys_authorities.authority_type = %d", multi.GeneralAuthority))
 
 	// db = CheckTenancyIdAndUserId(db, req, "orders.")
 	db = db.Scopes(funcs...)

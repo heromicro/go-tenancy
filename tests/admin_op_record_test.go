@@ -10,6 +10,9 @@ import (
 func TestOperationRecode(t *testing.T) {
 	auth := base.BaseWithLoginTester(t)
 	defer base.BaseLogOut(auth)
+
+	
+
 	obj := auth.POST("v1/admin/sysOperationRecord/getSysOperationRecordList").
 		WithJSON(map[string]interface{}{"page": 1, "pageSize": 10}).
 		Expect().Status(http.StatusOK).JSON().Object()

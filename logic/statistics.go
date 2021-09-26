@@ -4,7 +4,6 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/snowlyg/go-tenancy/service"
 	"github.com/snowlyg/go-tenancy/service/scope"
-	"gorm.io/gorm"
 )
 
 // GetStatisticsMain 大盘运营数据
@@ -20,34 +19,43 @@ func GetStatisticsMaim() (gin.H, error) {
 		"yesterday":    gin.H{"payPrice": 0, "userNum": 0, "storeNum": 0, "visitUserNum": 0, "visitNum": 0}, //昨日
 		"lastWeekRate": gin.H{"payPrice": 0, "userNum": 0, "storeNum": 0, "visitUserNum": 0, "visitNum": 0}, //同比上周
 	}
-	today, err := getStaticMain(scope.FilterToday("pay_time", ""))
+	today, err := getStaticMainToday()
 	if err != nil {
 		return ginH, err
 	}
 	ginH["today"] = today
 
-	yeaterday, err := getStaticMain(scope.FilterYesterday("pay_time", ""))
-	if err != nil {
-		return ginH, err
-	}
-	ginH["yeaterday"] = yeaterday
+	// yeaterday, err := getStaticMain(scope.FilterYesterday("pay_time", ""))
+	// if err != nil {
+	// 	return ginH, err
+	// }
+	// ginH["yesterday"] = yeaterday
 
-	lastWeekRate, err := getStaticMain(scope.FilterYesterday("pay_time", ""))
-	if err != nil {
-		return ginH, err
-	}
-	ginH["lastWeekRate"] = lastWeekRate
+	// lastWeekRate, err := getStaticMain(scope.FilterLatelyWeek("pay_time", ""))
+	// if err != nil {
+	// 	return ginH, err
+	// }
+	// ginH["lastWeekRate"] = lastWeekRate
 	return ginH, nil
+
 }
 
 // getStaticMain 大盘运营数据
 // - date 时间类型参数 today ，yesterday ，lastWeekRate
-func getStaticMain(scope func(*gorm.DB) *gorm.DB) (gin.H, error) {
+func getStaticMainToday() (gin.H, error) {
 	ginH := gin.H{"payPrice": 0, "userNum": 0, "storeNum": 0, "visitUserNum": 0, "visitNum": 0}
-	payPrice, err := service.GetOrderPayPrice(scope)
+
+	// 订单
+	payPrice, err := service.GetOrderPayPrice(scope.FilterToday("pay_time", ""))
 	if err != nil {
 		return ginH, err
 	}
 	ginH["payPrice"] = payPrice
+
+	userNum, err := service.GetOrderPayPrice(scope.FilterToday("pay_time", ""))
+	if err != nil {
+		return ginH, err
+	}
+	ginH["userNum"] = userNum
 	return ginH, nil
 }

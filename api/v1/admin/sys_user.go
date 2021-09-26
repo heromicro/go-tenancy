@@ -68,7 +68,7 @@ func RegisterAdmin(ctx *gin.Context) {
 		return
 	}
 
-	id, err := service.Register(req, multi.AdminAuthority, multi.GetTenancyId(ctx))
+	id, err := service.Register(req, multi.AdminAuthority)
 	if err != nil {
 		g.TENANCY_LOG.Error("注册失败", zap.Any("err", err))
 		response.FailWithMessage(err.Error(), ctx)
@@ -197,7 +197,7 @@ func SetUserInfo(ctx *gin.Context) {
 
 	var info request.UpdateUser
 	_ = ctx.ShouldBindJSON(&info)
-	if err := service.UpdateAdminInfo(info, user, multi.GetTenancyId(ctx)); err != nil {
+	if err := service.UpdateAdminInfo(info, user); err != nil {
 		g.TENANCY_LOG.Error("设置失败", zap.Any("err", err))
 		response.FailWithMessage("设置失败", ctx)
 	} else {

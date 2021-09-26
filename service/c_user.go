@@ -45,7 +45,7 @@ func UpdateUserMap(id uint, ctx *gin.Context) (Form, error) {
 // UpdateUser
 func UpdateUser(id, tenancyId uint, req response.GeneralUserDetail) error {
 	update := map[string]interface{}{"address": req.Address, "birthday": req.Birthday, "id_card": req.IdCard, "group_id": req.GroupId, "mark": req.Mark, "phone": req.Phone, "real_name": req.RealName}
-	err := g.TENANCY_DB.Model(&model.GeneralInfo{}).Where("sys_user_id = ?", id).Updates(update).Error
+	err := g.TENANCY_DB.Model(&model.CUser{}).Where("sys_user_id = ?", id).Updates(update).Error
 	if err != nil {
 		return err
 	}
@@ -89,7 +89,7 @@ func SetNowMoney(id, tenancyId uint, req request.SetNowMoney) error {
 			nowMoney = user.NowMoney - req.NowMoney
 		}
 	}
-	if err := g.TENANCY_DB.Model(&model.GeneralInfo{}).Where("sys_user_id = ?", id).Updates(map[string]interface{}{"now_money": nowMoney}).Error; err != nil {
+	if err := g.TENANCY_DB.Model(&model.CUser{}).Where("sys_user_id = ?", id).Updates(map[string]interface{}{"now_money": nowMoney}).Error; err != nil {
 		return err
 	}
 	return nil
@@ -125,7 +125,7 @@ func BatchSetUserGroupMap(ids string, ctx *gin.Context) (Form, error) {
 
 // BatchSetUserGroup
 func BatchSetUserGroup(req request.SetUserGroup) error {
-	if err := g.TENANCY_DB.Model(&model.GeneralInfo{}).Where("sys_user_id in ?", req.Ids).Updates(map[string]interface{}{"group_id": req.GroupId}).Error; err != nil {
+	if err := g.TENANCY_DB.Model(&model.CUser{}).Where("sys_user_id in ?", req.Ids).Updates(map[string]interface{}{"group_id": req.GroupId}).Error; err != nil {
 		return err
 	}
 	return nil
@@ -180,7 +180,7 @@ func SetUserGroupMap(id uint, ctx *gin.Context) (Form, error) {
 
 // SetUserGroup
 func SetUserGroup(id uint, req request.SetUserGroup) error {
-	if err := g.TENANCY_DB.Model(&model.GeneralInfo{}).Where("sys_user_id = ?", id).Updates(map[string]interface{}{"group_id": req.GroupId}).Error; err != nil {
+	if err := g.TENANCY_DB.Model(&model.CUser{}).Where("sys_user_id = ?", id).Updates(map[string]interface{}{"group_id": req.GroupId}).Error; err != nil {
 		return err
 	}
 	return nil
@@ -275,9 +275,8 @@ func GetGeneralDetail(id uint) (response.GeneralUserDetail, error) {
 		return user, err
 	}
 
-	err = g.TENANCY_DB.Model(&model.SysUser{}).
-		Select("sys_users.id as uid,general_infos.mark,general_infos.real_name,general_infos.phone,general_infos.address,general_infos.id_card,general_infos.birthday,general_infos.avatar_url,general_infos.nick_name,general_infos.now_money,general_infos.pay_count,general_infos.pay_price,general_infos.group_id").
-		Joins("left join general_infos on general_infos.sys_user_id = sys_users.id").
+	err = g.TENANCY_DB.Model(&model.CUser{}).
+		Select("c_users.id as uid,c_users.mark,c_users.real_name,c_users.phone,c_users.address,c_users.id_card,c_users.birthday,c_users.avatar_url,c_users.nick_name,c_users.now_money,c_users.pay_count,c_users.pay_price,c_users.group_id").
 		Where("sys_users.authority_id IN (?)", generalAuthorityIds).
 		Where("sys_users.id = ?", id).
 		First(&user).Error
@@ -305,9 +304,8 @@ func GetGeneralSelect(tenancyId uint) ([]response.SelectOption, error) {
 		{ID: 0, Name: "请选择"},
 	}
 	var userSelects []response.SelectOption
-	err := g.TENANCY_DB.Model(&model.SysUser{}).
-		Joins("left join general_infos on general_infos.sys_user_id = sys_users.id").
-		Select("sys_users.id as id,general_infos.nick_name as name").
+	err := g.TENANCY_DB.Model(&model.CUser{}).
+		Select("c_users.id as id,c_users.nick_name as name").
 		Where("status = ?", g.StatusTrue).
 		Where("is_show = ?", g.StatusTrue).
 		Find(&userSelects).Error
@@ -328,18 +326,17 @@ func GetGeneralInfoList(info request.UserPageInfo, ctx *gin.Context) ([]response
 		return userList, 0, err
 	}
 
-	db := g.TENANCY_DB.Model(&model.SysUser{})
+	db := g.TENANCY_DB.Model(&model.CUser{})
 	if multi.IsTenancy(ctx) {
-		db = db.Select("general_infos.sex,general_infos.nick_name,general_infos.avatar_url,general_infos.user_type,sys_users.id as uid,sys_users.username,sys_users.authority_id,sys_users.created_at,sys_users.updated_at,sys_authorities.authority_name,sys_authorities.authority_type,sys_users.authority_id,user_groups.group_name,user_merchants.first_pay_time,user_merchants.last_pay_time").
-			Joins("left join user_merchants on user_merchants.sys_user_id = sys_users.id").
+		db = db.Select("c_user.sex,c_user.nick_name,c_user.avatar_url,c_user.user_type,c_user.id as uid,c_user.username,c_user.authority_id,c_user.created_at,c_user.updated_at,sys_authorities.authority_name,sys_authorities.authority_type,c_user.authority_id,user_groups.group_name,user_merchants.first_pay_time,user_merchants.last_pay_time").
+			Joins("left join user_merchants on user_merchants.sys_user_id = c_user.id").
 			Where("user_merchants.sys_tenancy_id = ?", tenancyId)
 	} else {
-		db = db.Select("sys_users.id as uid,sys_users.username,sys_users.authority_id,sys_users.created_at,sys_users.updated_at, general_infos.*,sys_authorities.authority_name,sys_authorities.authority_type,sys_users.authority_id,user_groups.group_name")
+		db = db.Select("c_user.id as uid,c_user.username,c_user.authority_id,c_user.created_at,c_user.updated_at, c_user.*,sys_authorities.authority_name,sys_authorities.authority_type,c_user.authority_id,user_groups.group_name")
 	}
-	db = db.Joins("left join general_infos on general_infos.sys_user_id = sys_users.id").
-		Joins("left join sys_authorities on sys_authorities.authority_id = sys_users.authority_id").
-		Joins("left join user_groups on general_infos.group_id = user_groups.id").
-		Where("sys_users.authority_id IN (?)", generalAuthorityIds)
+	db = db.Joins("left join sys_authorities on sys_authorities.authority_id = c_user.authority_id").
+		Joins("left join user_groups on c_user.group_id = user_groups.id").
+		Where("c_user.authority_id IN (?)", generalAuthorityIds)
 
 	if info.UserTimeType != "" && info.UserTime != "" {
 		userTimes := strings.Split(info.UserTime, "-")
@@ -352,37 +349,37 @@ func GetGeneralInfoList(info request.UserPageInfo, ctx *gin.Context) ([]response
 			return userList, total, fmt.Errorf("parse time %w", err)
 		}
 		if info.UserTimeType == "add_time" {
-			db = db.Where("general_infos.created_at BETWEEN ? AND ?", start, end)
+			db = db.Where("c_users.created_at BETWEEN ? AND ?", start, end)
 		} else if info.UserTimeType == "visit" {
-			db = db.Where("general_infos.last_time BETWEEN ? AND ?", start, end)
+			db = db.Where("c_users.last_time BETWEEN ? AND ?", start, end)
 		}
 	}
 
 	if info.PayCount != "" {
 		if info.PayCount == "0" {
-			db = db.Where("general_infos.pay_count = ?", info.PayCount)
+			db = db.Where("c_users.pay_count = ?", info.PayCount)
 		} else {
-			db = db.Where("general_infos.pay_count >= ?", info.PayCount)
+			db = db.Where("c_users.pay_count >= ?", info.PayCount)
 		}
 	}
 	if info.GroupId != "" {
-		db = db.Where("general_infos.group_id = ?", info.GroupId)
+		db = db.Where("c_users.group_id = ?", info.GroupId)
 	}
 	if info.LabelId != "" {
 		userIds, err := GetUserIdsByLabelId(info.LabelId, tenancyId)
 		if err != nil {
 			return userList, total, err
 		}
-		db = db.Where("general_infos.sys_user_id in ?", userIds)
+		db = db.Where("c_users.sys_user_id in ?", userIds)
 	}
 	if info.Sex != "" {
-		db = db.Where("general_infos.sex = ?", info.Sex)
+		db = db.Where("c_users.sex = ?", info.Sex)
 	}
 	if info.NickName != "" {
-		db = db.Where("general_infos.nick_name like ?", info.NickName+"%")
+		db = db.Where("c_users.nick_name like ?", info.NickName+"%")
 	}
 	if info.UserType != "" {
-		db = db.Where("general_infos.user_type = ?", info.UserType)
+		db = db.Where("c_users.user_type = ?", info.UserType)
 	}
 
 	if limit > 0 {
@@ -393,7 +390,7 @@ func GetGeneralInfoList(info request.UserPageInfo, ctx *gin.Context) ([]response
 
 		db = db.Limit(limit).Offset(offset)
 	}
-	db = OrderBy(db, info.OrderBy, info.SortBy, "general_infos.")
+	db = OrderBy(db, info.OrderBy, info.SortBy, "c_users.")
 	err = db.Find(&userList).Error
 	if err != nil {
 		return userList, total, err
@@ -446,15 +443,15 @@ func GetUserIdsByNickname(nickname string, tenancyId uint) ([]uint, error) {
 	if err != nil {
 		return userIds, err
 	}
-	db := g.TENANCY_DB.Model(&model.SysUser{}).
-		Select("sys_users.id").
-		Joins("left join general_infos on general_infos.sys_user_id = sys_users.id").
-		Joins("left join sys_authorities on sys_authorities.authority_id = sys_users.authority_id").
-		Joins("left join sys_tenancies on sys_users.sys_tenancy_id = sys_tenancies.id").
-		Where("sys_users.authority_id IN (?)", cuserAuthorityIds).
-		Where("general_infos.nick_name like ?", nickname+"%")
+	db := g.TENANCY_DB.Model(&model.CUser{}).
+		Select("c_users.id").
+		Joins("left join sys_authorities on sys_authorities.authority_id = c_users.authority_id").
+		Joins("left join sys_tenancies on c_users.sys_tenancy_id = sys_tenancies.id").
+		Where("c_users.authority_id IN (?)", cuserAuthorityIds).
+		Where("c_users.nick_name like ?", nickname+"%")
 	if tenancyId > 0 {
-		db = db.Joins("left join user_merchants on user_merchants.sys_user_id = sys_users.id").Where("user_merchants.sys_tenancy_id = ?", tenancyId)
+		db = db.Joins("left join user_merchants on user_merchants.sys_user_id = c_users.id").
+			Where("user_merchants.sys_tenancy_id = ?", tenancyId)
 	}
 	err = db.Find(&userIds).Error
 	return userIds, err
@@ -467,15 +464,14 @@ func GetCuserByUserIds(userIds []uint, tenancyId uint) ([]response.SysGeneralUse
 	if err != nil {
 		return userList, err
 	}
-	db := g.TENANCY_DB.Model(&model.SysUser{}).
-		Select("sys_users.id,sys_users.status,sys_users.username,sys_users.authority_id,sys_users.created_at,sys_users.updated_at, general_infos.email, general_infos.phone, general_infos.nick_name, general_infos.avatar_url,sys_authorities.authority_name,sys_authorities.authority_type,sys_users.authority_id,sys_tenancies.name as tenancy_name").
-		Joins("left join general_infos on general_infos.sys_user_id = sys_users.id").
-		Joins("left join sys_authorities on sys_authorities.authority_id = sys_users.authority_id").
-		Joins("left join sys_tenancies on sys_users.sys_tenancy_id = sys_tenancies.id").
-		Where("sys_users.authority_id IN (?)", cuserAuthorityIds).
-		Where("sys_users.id IN (?)", userIds)
+	db := g.TENANCY_DB.Model(&model.CUser{}).
+		Select("c_users.id,c_users.status,c_users.username,c_users.authority_id,c_users.created_at,c_users.updated_at, c_users.email, c_users.phone, c_users.nick_name, c_users.avatar_url,sys_authorities.authority_name,sys_authorities.authority_type,c_users.authority_id,sys_tenancies.name as tenancy_name").
+		Joins("left join sys_authorities on sys_authorities.authority_id = c_users.authority_id").
+		Joins("left join sys_tenancies on c_users.sys_tenancy_id = sys_tenancies.id").
+		Where("c_users.authority_id IN (?)", cuserAuthorityIds).
+		Where("c_users.id IN (?)", userIds)
 	if tenancyId > 0 {
-		db = db.Joins("left join user_merchants on user_merchants.sys_user_id = sys_users.id").Where("user_merchants.sys_tenancy_id = ?", tenancyId)
+		db = db.Joins("left join user_merchants on user_merchants.sys_user_id = c_users.id").Where("user_merchants.sys_tenancy_id = ?", tenancyId)
 	}
 	err = db.Find(&userList).Error
 	return userList, err

@@ -96,6 +96,16 @@ func FilterLately7(field, perfix string) func(db *gorm.DB) *gorm.DB {
 	}
 }
 
+// FilterThisWeek 本周
+func FilterThisWeek(field, perfix string) func(db *gorm.DB) *gorm.DB {
+	if perfix != "" {
+		field = fmt.Sprintf("%s.%s", perfix, field)
+	}
+	return func(db *gorm.DB) *gorm.DB {
+		return db.Where(fmt.Sprintf("YEARWEEK(date_format((%s,'%%Y-%%m-%%d')) = YEARWEEK(now())", field))
+	}
+}
+
 // FilterLatelyWeek 上周
 func FilterLatelyWeek(field, perfix string) func(db *gorm.DB) *gorm.DB {
 	if perfix != "" {
