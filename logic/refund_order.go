@@ -16,9 +16,9 @@ import (
 // CheckRefundOrder 申请退款结算页面
 // 逻辑：付款，未取消，未完成订单支持退款申请
 // 需要判断订单是否已经申请退款，如果已经申请，则不能重复申请
-func CheckRefundOrder(req request.GetById, orderPorductIds []uint) (response.CheckRefundOrder, error) {
+func CheckRefundOrder(req request.GetById, orderProductIds []uint) (response.CheckRefundOrder, error) {
 	var checkRefundOrder response.CheckRefundOrder
-	order, orderProducts, err := checkOrder(req.Id, orderPorductIds)
+	order, orderProducts, err := checkOrder(req.Id, orderProductIds)
 	if err != nil {
 		return checkRefundOrder, err
 	}
@@ -34,7 +34,7 @@ func CheckRefundOrder(req request.GetById, orderPorductIds []uint) (response.Che
 }
 
 // checkOrder 检查订单是否可以申请退款
-func checkOrder(orderId uint, orderPorductIds []uint) (model.Order, []response.OrderProduct, error) {
+func checkOrder(orderId uint, orderProductIds []uint) (model.Order, []response.OrderProduct, error) {
 	payScope := scope.SimpleScope("status", []int{model.OrderStatusNoDeliver, model.OrderStatusNoReceive, model.OrderStatusNoComment}, "in")
 	order, err := service.GetOrderById(orderId, payScope)
 	if errors.Is(err, gorm.ErrRecordNotFound) {
@@ -47,14 +47,15 @@ func checkOrder(orderId uint, orderPorductIds []uint) (model.Order, []response.O
 		return order, nil, fmt.Errorf("订单已取消")
 	}
 
-	orderProducts, err := service.GetOrdersProductByProductIds(orderPorductIds, orderId)
+	orderProducts, err := service.GetOrdersProductByProductIds(orderProductIds, orderId)
 	if err != nil {
 		return order, nil, err
 	}
 	if len(orderProducts) == 0 {
-		return order, nil, fmt.Errorf("商品不存在")
+		return order, nil, fmt.Errorf("没有可退款商品")
 	}
-	if len(orderProducts) != len(orderPorductIds) {
+
+	if len(orderProducts) != len(orderProductIds) {
 		return order, nil, fmt.Errorf("请选择正确的退款商品")
 	}
 

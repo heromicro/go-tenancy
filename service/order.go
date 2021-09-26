@@ -427,6 +427,7 @@ func GetOrdersProductByProductIds(orderProductIds []uint, orderId uint) ([]respo
 	db := g.TENANCY_DB.Model(&model.OrderProduct{}).
 		Where("order_id = ?", orderId).
 		Where("refund_num > 0").
+		Where("is_refund < 3"). // 未退款
 		Where("id in ?", orderProductIds)
 	err := db.Find(&orderProducts).Error
 	if err != nil {

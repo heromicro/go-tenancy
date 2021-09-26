@@ -22,9 +22,9 @@ func TestDeviceRefundOrderList(t *testing.T) {
 }
 
 func TestDeviceRefundOrderProcess(t *testing.T) {
-	var brandId, shipTempId, cateId, tenancyCategoryId, productId, cartId, orderId uint
-	var unique string
-	var productType int32
+	var brandId, shipTempId, cateId, tenancyCategoryId, productId, cartId, productId2, cartId2, orderId uint
+	var unique, unique2 string
+	var productType, productType2 int32
 	var adminAuth, tenancyAuth, deviceAuth *httpexpect.Expect
 
 	adminAuth = base.BaseWithLoginTester(t)
@@ -72,14 +72,12 @@ func TestDeviceRefundOrderProcess(t *testing.T) {
 		return
 	}
 	defer DeleteProduct(tenancyAuth, productId, http.StatusOK, "删除成功")
-
 	unique, productType = GetProduct(tenancyAuth, productId, productData)
 	if len(unique) == 0 || productType == 0 {
 		t.Errorf("添加商品失败规格:%+v,商品类型:%d", unique, productType)
 	}
 
 	ChangeProductIsShow(tenancyAuth, productId, g.StatusTrue, http.StatusOK, "设置成功")
-
 	createCartData := map[string]interface{}{"cartNum": 2, "isNew": 2, "productAttrUnique": unique, "productId": productId, "productType": productType}
 	cartId = CreateCart(deviceAuth, createCartData, http.StatusOK, "创建成功")
 	if cartId == 0 {
@@ -88,7 +86,28 @@ func TestDeviceRefundOrderProcess(t *testing.T) {
 	}
 	defer DeleteCart(deviceAuth, map[string]interface{}{"ids": []uint{cartId}}, http.StatusOK, "操作成功")
 
-	createOrderData := map[string]interface{}{"cartIds": []uint{uint(cartId)}, "orderType": 1, "remark": "fsdfsdf "}
+	productId2, productData2 := CreateProduct(tenancyAuth, cartId, brandId, shipTempId, tenancyCategoryId, http.StatusOK, "创建成功")
+	if productId == 0 {
+		t.Errorf("添加商品失败 商品id:%d", productId2)
+		return
+	}
+	defer DeleteProduct(tenancyAuth, productId2, http.StatusOK, "删除成功")
+	unique2, productType2 = GetProduct(tenancyAuth, productId2, productData2)
+	if len(unique) == 0 || productType == 0 {
+		t.Errorf("添加商品失败规格:%+v,商品类型:%d", unique2, productType2)
+	}
+
+	ChangeProductIsShow(tenancyAuth, productId2, g.StatusTrue, http.StatusOK, "设置成功")
+
+	createCartData2 := map[string]interface{}{"cartNum": 2, "isNew": 2, "productAttrUnique": unique2, "productId": productId2, "productType": productType2}
+	cartId2 = CreateCart(deviceAuth, createCartData2, http.StatusOK, "创建成功")
+	if cartId2 == 0 {
+		t.Error("添加购物车失败")
+		return
+	}
+	defer DeleteCart(deviceAuth, map[string]interface{}{"ids": []uint{cartId2}}, http.StatusOK, "操作成功")
+
+	createOrderData := map[string]interface{}{"cartIds": []uint{cartId, cartId2}, "orderType": 1, "remark": "fsdfsdf "}
 	orderId = CreateOrder(deviceAuth, createOrderData, http.StatusOK, "获取成功")
 	if orderId == 0 {
 		t.Error("添加订单失败")
@@ -102,6 +121,7 @@ func TestDeviceRefundOrderProcess(t *testing.T) {
 			Value: []base.ResponseKeys{
 				{
 					{Key: "id", Value: 0},
+					{Key: "id", Value: 0},
 				},
 			},
 		},
@@ -114,6 +134,10 @@ func TestDeviceRefundOrderProcess(t *testing.T) {
 		return
 	}
 	orderProductId := orderProducts[0].GetId()
+	if orderProductId == 0 {
+		t.Error("添加订单失败:订单产品ID为空")
+		return
+	}
 	changeData := map[string]interface{}{
 		"status":   model.OrderStatusNoDeliver,
 		"pay_type": model.PayTypeAlipay,
@@ -151,7 +175,7 @@ func TestDeviceRefundOrderProcess(t *testing.T) {
 
 	// 申请退款结算
 	data := map[string]interface{}{
-		"ids": []uint{productId},
+		"ids": []uint{orderProductId},
 	}
 	base.Post(deviceAuth, fmt.Sprintf("v1/device/order/checkRefundOrder/%d", orderId), data, http.StatusBadRequest, "操作失败:有退款单未处理完成")
 
