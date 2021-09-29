@@ -2,6 +2,7 @@ package service
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"strings"
 	"time"
@@ -12,6 +13,7 @@ import (
 	"github.com/snowlyg/go-tenancy/model/request"
 	"github.com/snowlyg/go-tenancy/model/response"
 	"github.com/snowlyg/multi"
+	"gorm.io/gorm"
 )
 
 func UpdateUserMap(id uint, ctx *gin.Context) (Form, error) {
@@ -45,7 +47,7 @@ func UpdateUserMap(id uint, ctx *gin.Context) (Form, error) {
 // UpdateUser
 func UpdateUser(id, tenancyId uint, req response.GeneralUserDetail) error {
 	update := map[string]interface{}{"address": req.Address, "birthday": req.Birthday, "id_card": req.IdCard, "group_id": req.GroupId, "mark": req.Mark, "phone": req.Phone, "real_name": req.RealName}
-	err := g.TENANCY_DB.Model(&model.CUser{}).Where("sys_user_id = ?", id).Updates(update).Error
+	err := g.TENANCY_DB.Model(&model.CUser{}).Where("id = ?", id).Updates(update).Error
 	if err != nil {
 		return err
 	}
@@ -89,7 +91,7 @@ func SetNowMoney(id, tenancyId uint, req request.SetNowMoney) error {
 			nowMoney = user.NowMoney - req.NowMoney
 		}
 	}
-	if err := g.TENANCY_DB.Model(&model.CUser{}).Where("sys_user_id = ?", id).Updates(map[string]interface{}{"now_money": nowMoney}).Error; err != nil {
+	if err := g.TENANCY_DB.Model(&model.CUser{}).Where("id = ?", id).Updates(map[string]interface{}{"now_money": nowMoney}).Error; err != nil {
 		return err
 	}
 	return nil
@@ -97,7 +99,7 @@ func SetNowMoney(id, tenancyId uint, req request.SetNowMoney) error {
 
 func GetUserLabelIdsByUserId(id uint) ([]uint, error) {
 	var labelIds []uint
-	db := g.TENANCY_DB.Model(&model.UserUserLabel{}).Select("user_label_id").Where("sys_user_id = ?", id)
+	db := g.TENANCY_DB.Model(&model.UserUserLabel{}).Select("user_label_id").Where("c_user_id = ?", id)
 	// db = CheckTenancyId(db, tenancyId, "")
 	err := db.Find(&labelIds).Error
 	if err != nil {
@@ -125,7 +127,7 @@ func BatchSetUserGroupMap(ids string, ctx *gin.Context) (Form, error) {
 
 // BatchSetUserGroup
 func BatchSetUserGroup(req request.SetUserGroup) error {
-	if err := g.TENANCY_DB.Model(&model.CUser{}).Where("sys_user_id in ?", req.Ids).Updates(map[string]interface{}{"group_id": req.GroupId}).Error; err != nil {
+	if err := g.TENANCY_DB.Model(&model.CUser{}).Where("id in ?", req.Ids).Updates(map[string]interface{}{"group_id": req.GroupId}).Error; err != nil {
 		return err
 	}
 	return nil
@@ -180,7 +182,7 @@ func SetUserGroupMap(id uint, ctx *gin.Context) (Form, error) {
 
 // SetUserGroup
 func SetUserGroup(id uint, req request.SetUserGroup) error {
-	if err := g.TENANCY_DB.Model(&model.CUser{}).Where("sys_user_id = ?", id).Updates(map[string]interface{}{"group_id": req.GroupId}).Error; err != nil {
+	if err := g.TENANCY_DB.Model(&model.CUser{}).Where("id = ?", id).Updates(map[string]interface{}{"group_id": req.GroupId}).Error; err != nil {
 		return err
 	}
 	return nil
@@ -232,7 +234,7 @@ func SetUserLabel(id, tenancyId uint, reqlabelIds []uint) error {
 	}
 
 	if len(delIds) > 0 {
-		db := g.TENANCY_DB.Where("sys_user_id = ?", id)
+		db := g.TENANCY_DB.Where("c_user_id = ?", id)
 		db = CheckTenancyId(db, tenancyId, "")
 		err := db.Where("user_label_id in ?", delIds).Delete(&model.UserUserLabel{}).Error
 		if err != nil {
@@ -258,7 +260,7 @@ func SetUserLabel(id, tenancyId uint, reqlabelIds []uint) error {
 	if len(addIds) > 0 {
 		labels := []model.UserUserLabel{}
 		for _, addId := range addIds {
-			labels = append(labels, model.UserUserLabel{UserLabelID: addId, SysUserID: id, SysTenancyID: tenancyId})
+			labels = append(labels, model.UserUserLabel{UserLabelID: addId, CUserID: id, SysTenancyID: tenancyId})
 		}
 		if err = g.TENANCY_DB.Model(&model.UserUserLabel{}).Create(&labels).Error; err != nil {
 			return fmt.Errorf("create user_user_labels %w", err)
@@ -277,8 +279,8 @@ func GetGeneralDetail(id uint) (response.GeneralUserDetail, error) {
 
 	err = g.TENANCY_DB.Model(&model.CUser{}).
 		Select("c_users.id as uid,c_users.mark,c_users.real_name,c_users.phone,c_users.address,c_users.id_card,c_users.birthday,c_users.avatar_url,c_users.nick_name,c_users.now_money,c_users.pay_count,c_users.pay_price,c_users.group_id").
-		Where("sys_users.authority_id IN (?)", generalAuthorityIds).
-		Where("sys_users.id = ?", id).
+		Where("c_users.authority_id IN (?)", generalAuthorityIds).
+		Where("c_users.id = ?", id).
 		First(&user).Error
 	if err != nil {
 		return user, fmt.Errorf("get general detail %w", err)
@@ -329,7 +331,7 @@ func GetGeneralInfoList(info request.UserPageInfo, ctx *gin.Context) ([]response
 	db := g.TENANCY_DB.Model(&model.CUser{})
 	if multi.IsTenancy(ctx) {
 		db = db.Select("c_user.sex,c_user.nick_name,c_user.avatar_url,c_user.user_type,c_user.id as uid,c_user.username,c_user.authority_id,c_user.created_at,c_user.updated_at,sys_authorities.authority_name,sys_authorities.authority_type,c_user.authority_id,user_groups.group_name,user_merchants.first_pay_time,user_merchants.last_pay_time").
-			Joins("left join user_merchants on user_merchants.sys_user_id = c_user.id").
+			Joins("left join user_merchants on user_merchants.c_user_id = c_user.id").
 			Where("user_merchants.sys_tenancy_id = ?", tenancyId)
 	} else {
 		db = db.Select("c_user.id as uid,c_user.username,c_user.authority_id,c_user.created_at,c_user.updated_at, c_user.*,sys_authorities.authority_name,sys_authorities.authority_type,c_user.authority_id,user_groups.group_name")
@@ -370,7 +372,7 @@ func GetGeneralInfoList(info request.UserPageInfo, ctx *gin.Context) ([]response
 		if err != nil {
 			return userList, total, err
 		}
-		db = db.Where("c_users.sys_user_id in ?", userIds)
+		db = db.Where("c_users.id in ?", userIds)
 	}
 	if info.Sex != "" {
 		db = db.Where("c_users.sex = ?", info.Sex)
@@ -428,7 +430,7 @@ func getCuserLabels(userList []response.GeneralUser, tenancyId uint) ([]response
 
 func GetUserIdsByLabelId(labelId string, tenancyId uint) ([]uint, error) {
 	var userIds []uint
-	db := g.TENANCY_DB.Model(&model.UserUserLabel{}).Select("sys_user_id").Where("user_label_id = ?", labelId)
+	db := g.TENANCY_DB.Model(&model.UserUserLabel{}).Select("c_user_id").Where("user_label_id = ?", labelId)
 	db = CheckTenancyId(db, tenancyId, "")
 	err := db.Find(&userIds).Error
 	if err != nil {
@@ -450,7 +452,7 @@ func GetUserIdsByNickname(nickname string, tenancyId uint) ([]uint, error) {
 		Where("c_users.authority_id IN (?)", cuserAuthorityIds).
 		Where("c_users.nick_name like ?", nickname+"%")
 	if tenancyId > 0 {
-		db = db.Joins("left join user_merchants on user_merchants.sys_user_id = c_users.id").
+		db = db.Joins("left join user_merchants on user_merchants.c_user_id = c_users.id").
 			Where("user_merchants.sys_tenancy_id = ?", tenancyId)
 	}
 	err = db.Find(&userIds).Error
@@ -471,8 +473,72 @@ func GetCuserByUserIds(userIds []uint, tenancyId uint) ([]response.SysGeneralUse
 		Where("c_users.authority_id IN (?)", cuserAuthorityIds).
 		Where("c_users.id IN (?)", userIds)
 	if tenancyId > 0 {
-		db = db.Joins("left join user_merchants on user_merchants.sys_user_id = c_users.id").Where("user_merchants.sys_tenancy_id = ?", tenancyId)
+		db = db.Joins("left join user_merchants on user_merchants.c_user_id = c_users.id").Where("user_merchants.sys_tenancy_id = ?", tenancyId)
 	}
 	err = db.Find(&userList).Error
 	return userList, err
+}
+
+// GetCUserNum 获取c用户数量
+func GetCUserNum(scopes ...func(*gorm.DB) *gorm.DB) (int64, error) {
+	var userNum int64
+	db := g.TENANCY_DB.Model(&model.CUser{})
+	if len(scopes) > 0 {
+		db = db.Scopes(scopes...)
+	}
+	err := db.Count(&userNum).Error
+	if err != nil && !errors.Is(err, gorm.ErrRecordNotFound) {
+		return 0, err
+	}
+	return userNum, nil
+}
+
+// GetVisitUserNum 用户浏览记录，查询用户浏览商品记录
+func GetVisitUserNum(scopes ...func(*gorm.DB) *gorm.DB) (int64, error) {
+	var userNum int64
+	db := g.TENANCY_DB.Model(&model.UserVisit{}).
+		Joins("left join products on products.id = user_visits.type_id").
+		Where("user_visits.type = ?", "product")
+	if len(scopes) > 0 {
+		db = db.Scopes(scopes...)
+	}
+	err := db.Count(&userNum).Error
+	if err != nil && !errors.Is(err, gorm.ErrRecordNotFound) {
+		return 0, err
+	}
+	return userNum, nil
+}
+
+// GetVisitUserNumGroup 用户浏览记录，查询用户浏览商品记录
+func GetVisitUserNumGroup(scopes ...func(*gorm.DB) *gorm.DB) ([]*response.MerchantVisitData, error) {
+	var visitData []*response.MerchantVisitData
+	db := g.TENANCY_DB.Model(&model.UserVisit{}).
+		Select("count(user_visits.type) as total,products.sys_tenancy_id as tenancy_id,sys_tenancies.name as tenancy_name").
+		Joins("left join products on products.id = user_visits.type_id").
+		Joins("left join sys_tenancies on products.sys_tenancy_id = sys_tenancies.id").
+		Where("user_visits.type = ?", "product")
+	if len(scopes) > 0 {
+		db = db.Scopes(scopes...)
+	}
+	err := db.Limit(7).Group("tenancy_id").Order("total DESC").Find(&visitData).Error
+	if err != nil && !errors.Is(err, gorm.ErrRecordNotFound) {
+		return nil, err
+	}
+	return visitData, nil
+}
+
+// GetVisitNum 浏览记录，查询用户浏览产品和小程序记录
+func GetVisitNum(scopes ...func(*gorm.DB) *gorm.DB) (int64, error) {
+	var userNum int64
+	db := g.TENANCY_DB.Model(&model.UserVisit{}).
+		Joins("left join products on products.id = user_visits.type_id").
+		Where("user_visits.type in ?", []string{"page", "smallProgram"})
+	if len(scopes) > 0 {
+		db = db.Scopes(scopes...)
+	}
+	err := db.Count(&userNum).Error
+	if err != nil && !errors.Is(err, gorm.ErrRecordNotFound) {
+		return 0, err
+	}
+	return userNum, nil
 }

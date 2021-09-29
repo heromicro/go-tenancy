@@ -28,8 +28,8 @@ type RefundOrder struct {
 	BaseRefundOrder
 	ReconciliationID uint `gorm:"column:reconciliation_id;type:int unsigned;default:0" json:"reconciliationId"` // 对账id
 	PatientID        uint `json:"patientId" form:"patientId" gorm:"column:patient_id;comment:患者"`
-	OrderID          uint `gorm:"index:oid;column:order_id;type:int unsigned;not null" json:"orderId"` // 订单id
-	SysUserID        uint `json:"sysUserId" form:"sysUserId" gorm:"column:sys_user_id;comment:关联标记"`
+	OrderID          uint `gorm:"index:oid;column:order_id;type:int unsigned;not null" json:"orderId"`              // 订单id
+	SysUserID        uint `json:"sysUserId" form:"sysUserId" gorm:"column:sys_user_id;comment:关联标记"`                // 关联 c_users
 	SysTenancyID     uint `gorm:"index:sys_tenancy_id;column:sys_tenancy_id;type:int;not null" json:"sysTenancyId"` // 商户 id
 }
 

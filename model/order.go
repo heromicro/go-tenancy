@@ -63,7 +63,7 @@ type BaseOrder struct {
 	PayPrice       float64   `gorm:"column:pay_price;type:decimal(8,2) unsigned;not null;default:0.00" json:"payPrice"`               // 实际支付金额
 	PayPostage     float64   `gorm:"column:pay_postage;type:decimal(8,2) unsigned;not null;default:0.00" json:"payPostage"`           // 支付邮费
 	CommissionRate float64   `gorm:"column:commission_rate;type:decimal(6,4) unsigned;not null;default:0.0000" json:"commissionRate"` // 平台手续费
-	OrderType      int       `gorm:"column:order_type;type:tinyint unsigned;default:1" json:"orderType"`                              // 1普通 2自提 
+	OrderType      int       `gorm:"column:order_type;type:tinyint unsigned;default:1" json:"orderType"`                              // 1普通 2自提
 	Paid           int       `gorm:"column:paid;type:tinyint unsigned;not null;default:2" json:"paid"`                                // 支付状态
 	PayTime        time.Time `gorm:"column:pay_time;type:timestamp" json:"payTime"`                                                   // 支付时间
 	PayType        int       `gorm:"column:pay_type;type:tinyint(1);not null" json:"payType"`                                         // 支付方式  1=微信 2=小程序 3=h5 4=余额 5=支付宝
@@ -108,8 +108,8 @@ type OrderReceipt struct {
 	StatusTime   time.Time `gorm:"column:status_time;type:datetime;not null" json:"statusTime"`         // 状态变更时间
 	MerMark      string    `gorm:"column:mer_mark;type:varchar(255)" json:"merMark"`                    // 备注
 
-	OrderID      string `gorm:"column:order_id;type:varchar(255);not null;default:0" json:"orderId"` // 订单ID
-	SysUserID    uint   `json:"sysUserId" form:"sysUserId" gorm:"column:sys_user_id;comment:关联标记"`
+	OrderID      string `gorm:"column:order_id;type:varchar(255);not null;default:0" json:"orderId"`              // 订单ID
+	SysUserID    uint   `json:"sysUserId" form:"sysUserId" gorm:"column:sys_user_id;comment:关联标记"`                // 关联 c_users
 	SysTenancyID uint   `gorm:"index:sys_tenancy_id;column:sys_tenancy_id;type:int;not null" json:"sysTenancyId"` // 商户 id
 }
 
@@ -119,9 +119,9 @@ type OrderProduct struct {
 
 	BaseOrderProduct
 
-	CartInfo  string `gorm:"column:cart_info;type:text;not null" json:"cartInfo"`                 // 购买东西的详细信息
-	OrderID   uint   `gorm:"index:oid;column:order_id;type:int unsigned;not null" json:"orderId"` // 订单id
-	SysUserID uint   `json:"sysUserId" form:"sysUserId" gorm:"column:sys_user_id;comment:关联标记"`
+	CartInfo  string `gorm:"column:cart_info;type:text;not null" json:"cartInfo"`                                      // 购买东西的详细信息
+	OrderID   uint   `gorm:"index:oid;column:order_id;type:int unsigned;not null" json:"orderId"`                      // 订单id
+	SysUserID uint   `json:"sysUserId" form:"sysUserId" gorm:"column:sys_user_id;comment:关联标记"`                        // 关联 c_users
 	CartID    uint   `gorm:"column:cart_id;type:int unsigned;not null;default:0" json:"cartId"`                        // 购物车id
 	ProductID uint   `gorm:"index:product_id;column:product_id;type:int unsigned;not null;default:0" json:"productId"` // 商品ID
 }

@@ -482,7 +482,7 @@ func getOrderSearch(info request.OrderPageInfo, ctx *gin.Context, db *gorm.DB) (
 	}
 
 	if info.Date != "" {
-		db = db.Scopes(scope.FilterDate(info.Date, "orders"))
+		db = db.Scopes(scope.FilterDate(info.Date, "created_at", "orders"))
 	}
 
 	if info.OrderType != "" && info.OrderType != "0" {
@@ -1083,4 +1083,140 @@ func GetOrderPayPrice(scopes ...func(*gorm.DB) *gorm.DB) (float64, error) {
 		return 0, err
 	}
 	return payPrice.Count, nil
+}
+
+// GetOrderPayPriceGroup 获取订单支付价格按时间分组集合
+func GetOrderPayPriceGroup(scopes ...func(*gorm.DB) *gorm.DB) ([]request.Result, error) {
+	var res []request.Result
+	db := g.TENANCY_DB.Model(&model.Order{}).Select("sum(pay_price) as count , from_unixtime(unix_timestamp(pay_time),'%H:%i') as time").
+		Where("paid =?", g.StatusTrue)
+	if len(scopes) > 0 {
+		db = db.Scopes(scopes...)
+	}
+	err := db.Group("time").Find(&res).Error
+	if err != nil && !errors.Is(err, gorm.ErrRecordNotFound) {
+		return nil, err
+	}
+	return res, nil
+}
+
+// GetOrderNum 获取订单数量
+func GetOrderNum(scopes ...func(*gorm.DB) *gorm.DB) (int64, error) {
+	var count int64
+	db := g.TENANCY_DB.Model(&model.Order{}).Where("paid =?", g.StatusTrue)
+	if len(scopes) > 0 {
+		db = db.Scopes(scopes...)
+	}
+	err := db.Count(&count).Error
+	if err != nil && !errors.Is(err, gorm.ErrRecordNotFound) {
+		return 0, err
+	}
+	return count, nil
+}
+
+// GetOrderUserNum 获取订单用户数量
+func GetOrderUserNum(scopes ...func(*gorm.DB) *gorm.DB) (int64, error) {
+	var count int64
+	db := g.TENANCY_DB.Model(&model.Order{}).Where("paid =?", g.StatusTrue)
+	if len(scopes) > 0 {
+		db = db.Scopes(scopes...)
+	}
+	err := db.Where("sys_user_id > ?", 0).Group("sys_user_id").Count(&count).Error
+	if err != nil && !errors.Is(err, gorm.ErrRecordNotFound) {
+		return 0, err
+	}
+	return count, nil
+}
+
+// GetOrderPatientNum 获取订单床旁用户数量
+func GetOrderPatientNum(scopes ...func(*gorm.DB) *gorm.DB) (int64, error) {
+	var count int64
+	db := g.TENANCY_DB.Model(&model.Order{}).Where("paid =?", g.StatusTrue)
+	if len(scopes) > 0 {
+		db = db.Scopes(scopes...)
+	}
+	err := db.Where("patient_id > ? and sys_user_id= ? ", 0, 0).Group("patient_id").Count(&count).Error
+	if err != nil && !errors.Is(err, gorm.ErrRecordNotFound) {
+		return 0, err
+	}
+	return count, nil
+}
+
+// GetOrderNumGroup 获取订单数量按时间分组集合
+func GetOrderNumGroup(scopes ...func(*gorm.DB) *gorm.DB) ([]request.Result, error) {
+	var res []request.Result
+	db := g.TENANCY_DB.Model(&model.Order{}).Select("count(*) as total , from_unixtime(unix_timestamp(pay_time),'%H:%i') as time").
+		Where("paid =?", g.StatusTrue)
+	if len(scopes) > 0 {
+		db = db.Scopes(scopes...)
+	}
+	err := db.Group("time").Find(&res).Error
+	if err != nil && !errors.Is(err, gorm.ErrRecordNotFound) {
+		return nil, err
+	}
+	return res, nil
+}
+
+// GetOrderUserNumGroup 获取订单数量按时间分组集合
+func GetOrderUserNumGroup(scopes ...func(*gorm.DB) *gorm.DB) ([]request.Result, error) {
+	var res []request.Result
+	db := g.TENANCY_DB.Model(&model.Order{}).Select("count(DISTINCT sys_user_id) as total , from_unixtime(unix_timestamp(pay_time),'%H:%i') as time").Where("paid =?", g.StatusTrue)
+	if len(scopes) > 0 {
+		db = db.Scopes(scopes...)
+	}
+	err := db.Where("sys_user_id > ?", 0).Group("time").Find(&res).Error
+	if err != nil && !errors.Is(err, gorm.ErrRecordNotFound) {
+		return nil, err
+	}
+	return res, nil
+}
+
+// GetOrderPatientNumGroup 获取订单数量按时间分组集合
+func GetOrderPatientNumGroup(scopes ...func(*gorm.DB) *gorm.DB) ([]request.Result, error) {
+	var res []request.Result
+	db := g.TENANCY_DB.Model(&model.Order{}).Select("count(DISTINCT patient_id) as total , from_unixtime(unix_timestamp(pay_time),'%H:%i') as time").Where("paid =?", g.StatusTrue)
+	if len(scopes) > 0 {
+		db = db.Scopes(scopes...)
+	}
+	err := db.Where("patient_id > ? and sys_user_id= ? ", 0, 0).Group("time").Find(&res).Error
+	if err != nil && !errors.Is(err, gorm.ErrRecordNotFound) {
+		return nil, err
+	}
+	return res, nil
+}
+
+// GetPayOrderProductNum 获取支付订单商品数量
+func GetPayOrderProductNum(scopes ...func(*gorm.DB) *gorm.DB) (int64, error) {
+	var res request.Result
+	db := g.TENANCY_DB.Model(&model.OrderProduct{}).
+		Select("sum(order_products.product_num) as count").
+		Joins("left join orders on order_products.order_id = orders.id")
+	if len(scopes) > 0 {
+		db = db.Scopes(scopes...)
+	}
+	err := db.Where("orders.paid =?", g.StatusTrue).First(&res).Error
+	if err != nil && !errors.Is(err, gorm.ErrRecordNotFound) {
+		return 0, err
+	}
+	return int64(res.Count), nil
+}
+
+// GetPayOrderProductNumGroup 获取支付订单商品数量
+// - product_id 分组
+// - 根据 total desc 排序
+// - limit 7 个
+func GetPayOrderProductNumGroup(scopes ...func(*gorm.DB) *gorm.DB) ([]*response.MerchantStockData, error) {
+	var stockData []*response.MerchantStockData
+	db := g.TENANCY_DB.Model(&model.OrderProduct{}).
+		Select("sum(order_products.product_num) as total,order_products.product_id,products.store_name").
+		Joins("left join orders on order_products.order_id = orders.id").
+		Joins("left join products on order_products.product_id = products.id")
+	if len(scopes) > 0 {
+		db = db.Scopes(scopes...)
+	}
+	err := db.Where("orders.paid =?", g.StatusTrue).Group("order_products.product_id").Order("total desc").Limit(7).Find(&stockData).Error
+	if err != nil && !errors.Is(err, gorm.ErrRecordNotFound) {
+		return nil, err
+	}
+	return stockData, nil
 }

@@ -396,5 +396,11 @@ func InitStatisticsRouter(Router *gin.RouterGroup) {
 	StatisticsRouter := Router.Group("/statistics")
 	{
 		StatisticsRouter.GET("/main", admin.GetStatisticsMain)
+		StatisticsRouter.GET("/order", admin.GetStatisticsOrder)
+		StatisticsRouter.GET("/orderNum", admin.GetStatisticsOrderNum)
+		StatisticsRouter.GET("/orderUser", admin.GetStatisticsOrderUser)
+		StatisticsRouter.GET("/merchantStock", admin.GetStatisticsMerchantStock)
+		StatisticsRouter.GET("/merchantVisit", admin.GetStatisticsMerchantVisit)
+		StatisticsRouter.GET("/merchantRate", admin.GetStatisticsMerchantRate)
 	}
 }

@@ -147,7 +147,4 @@ type BaseProductAttrValue struct {
 	Volume  float64 `gorm:"column:volume;type:decimal(8,2);not null;default:0.00" json:"volume"`    // 体积
 	Weight  float64 `gorm:"column:weight;type:decimal(8,2);not null;default:0.00" json:"weight"`    // 重量
 	Unique  string  `gorm:"index;column:unique;type:char(12);not null;default:''" json:"unique"`    // 唯一值
-
-	// ExtensionOne float64 `gorm:"column:extension_one;type:decimal(8,2);default:0.00" json:"extensionOne"` // 一级佣金
-	// ExtensionTwo float64 `gorm:"column:extension_two;type:decimal(8,2);default:0.00" json:"extensionTwo"` // 二级佣金
 }

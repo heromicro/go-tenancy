@@ -25,7 +25,7 @@ func CreateAddress(m request.CreateAddress, user_id uint) (model.UserAddress, er
 	address.BedNum = m.BedNum
 	address.HospitalNO = m.HospitalNO
 	address.Disease = m.Disease
-	address.SysUserID = user_id
+	address.CUserID = user_id
 	err := g.TENANCY_DB.Create(&address).Error
 	return address, err
 }
@@ -33,7 +33,7 @@ func CreateAddress(m request.CreateAddress, user_id uint) (model.UserAddress, er
 // GetAddressByID
 func GetAddressByID(id uint, user_id uint) (model.UserAddress, error) {
 	var address model.UserAddress
-	err := g.TENANCY_DB.Where("id = ?", id).Where("sys_user_id = ?", user_id).First(&address).Error
+	err := g.TENANCY_DB.Where("id = ?", id).Where("c_user_id = ?", user_id).First(&address).Error
 	return address, err
 }
 
@@ -48,15 +48,15 @@ func UpdateAddress(m request.UpdateAddress) (model.UserAddress, error) {
 // DeleteAddress
 func DeleteAddress(id uint, user_id uint) error {
 	var address model.UserAddress
-	return g.TENANCY_DB.Where("id = ?", id).Where("sys_user_id = ?", user_id).Delete(&address).Error
+	return g.TENANCY_DB.Where("id = ?", id).Where("c_user_id = ?", user_id).Delete(&address).Error
 }
 
 // GetAddressInfoList
 func GetAddressInfoList(info request.PageInfo, user_id uint) ([]model.UserAddress, int64, error) {
-	 addressList := []model.UserAddress{}
+	addressList := []model.UserAddress{}
 	limit := info.PageSize
 	offset := info.PageSize * (info.Page - 1)
-	db := g.TENANCY_DB.Model(&model.UserAddress{}).Where("sys_user_id = ?", user_id)
+	db := g.TENANCY_DB.Model(&model.UserAddress{}).Where("c_user_id = ?", user_id)
 	var total int64
 	err := db.Count(&total).Error
 	if err != nil {

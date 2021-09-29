@@ -20,23 +20,31 @@ func SimpleScope(field string, value interface{}, params ...string) func(db *gor
 }
 
 // FilterDate 日期筛选过滤
-func FilterDate(date, perfix string) func(db *gorm.DB) *gorm.DB {
-	field := "created_at"
+//  - 不传默认最近7天
+func FilterDate(date, field, perfix string) func(db *gorm.DB) *gorm.DB {
+	if date == "" {
+		date = "lately7"
+	}
+
 	dates := strings.Split(date, "-")
 	if len(dates) == 2 {
 		start, _ := time.Parse("2006/01/02", dates[0])
 		end, _ := time.Parse("2006/01/02", dates[1])
 		return FilterBetween(start, end, field, perfix)
 	}
+
 	if len(dates) == 1 {
 		// { text: '今天', val: 'today' },
 		// { text: '昨天', val: 'yesterday' },
 		// { text: '最近7天', val: 'lately7' },
 		// { text: '最近30天', val: 'lately30' },
+		// { text: '本周', val: 'thisweek' },
+		// { text: '上周', val: 'lateweek' },
+		// { text: '本季度', val: 'quarter' },
 		// { text: '本月', val: 'month' },
 		// { text: '本年', val: 'year' }
 		// TODO: 使用内置函数，可能造成索引失效
-		switch dates[0] {
+		switch date {
 		case "today":
 			return FilterToday(field, perfix)
 		case "yesterday":
@@ -45,6 +53,10 @@ func FilterDate(date, perfix string) func(db *gorm.DB) *gorm.DB {
 			return FilterLately7(field, perfix)
 		case "lately30":
 			return FilterLately30(field, perfix)
+		case "thisweek":
+			return FilterThisWeek(field, perfix)
+		case "lastweek":
+			return FilterLatelyWeek(field, perfix)
 		case "month":
 			return FilterMonth(field, perfix)
 		case "quarter":
@@ -102,7 +114,7 @@ func FilterThisWeek(field, perfix string) func(db *gorm.DB) *gorm.DB {
 		field = fmt.Sprintf("%s.%s", perfix, field)
 	}
 	return func(db *gorm.DB) *gorm.DB {
-		return db.Where(fmt.Sprintf("YEARWEEK(date_format((%s,'%%Y-%%m-%%d')) = YEARWEEK(now())", field))
+		return db.Where(fmt.Sprintf("YEARWEEK(DATE_FORMAT(%s,'%%Y-%%m-%%d')) = YEARWEEK(NOW())", field))
 	}
 }
 
@@ -112,7 +124,7 @@ func FilterLatelyWeek(field, perfix string) func(db *gorm.DB) *gorm.DB {
 		field = fmt.Sprintf("%s.%s", perfix, field)
 	}
 	return func(db *gorm.DB) *gorm.DB {
-		return db.Where(fmt.Sprintf("YEARWEEK(DATE_FORMAT(%s,'%%Y-%%m-%%d')) = YEARWEEK(NOW())-1", field))
+		return db.Where(fmt.Sprintf("YEARWEEK(DATE_FORMAT(%s,'%%Y-%%m-%%d')) = YEARWEEK(NOW()) - 1", field))
 	}
 }
 

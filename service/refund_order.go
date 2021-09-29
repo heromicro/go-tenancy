@@ -40,7 +40,7 @@ func getRefundOrderSearch(info request.RefundOrderPageInfo, ctx *gin.Context, db
 	}
 
 	if info.Date != "" {
-		db = db.Scopes(scope.FilterDate(info.Date, "refund_orders"))
+		db = db.Scopes(scope.FilterDate(info.Date,"created_at", "refund_orders"))
 	}
 
 	if info.IsTrader != "" {

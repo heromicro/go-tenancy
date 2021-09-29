@@ -793,3 +793,4 @@ func DecSkuStock(db *gorm.DB, id uint, unique string, dec int64) error {
 	data := map[string]interface{}{"stock": gorm.Expr("stock-(IF(stock >?,?,0))", dec, dec), "sales": gorm.Expr("sales+?", dec)}
 	return UpdateProductAttrValue(db, id, unique, data)
 }
+

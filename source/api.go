@@ -138,7 +138,7 @@ var baseApis = []model.SysApi{
 	{Path: "/v1/admin/tenancy/getTenancies/:code", Description: "根据地区商户", ApiGroup: "tenancy", Method: "GET"},
 	{Path: "/v1/admin/tenancy/getTenancyCount", Description: "Tenancy对应状态数量", ApiGroup: "tenancy", Method: "GET"},
 	{Path: "/v1/admin/tenancy/getTenancyList", Description: "商户列表", ApiGroup: "tenancy", Method: "POST"},
-	{Path: "/v1/admin/tenancy/loginTenancy", Description: "登录商户", ApiGroup: "tenancy", Method: "POST"},
+	{Path: "/v1/admin/tenancy/loginTenancy/:id", Description: "登录商户", ApiGroup: "tenancy", Method: "POST"},
 	{Path: "/v1/admin/tenancy/createTenancy", Description: "添加商户", ApiGroup: "tenancy", Method: "POST"},
 	{Path: "/v1/admin/tenancy/setTenancyRegion", Description: "设置商户地区", ApiGroup: "tenancy", Method: "POST"},
 	{Path: "/v1/admin/tenancy/setCopyProductNum/:id", Description: "设置商品复制次数", ApiGroup: "tenancy", Method: "POST"},

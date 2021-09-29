@@ -213,7 +213,7 @@ func GetTenanciesInfoList(info request.TenancyPageInfo) ([]response.SysTenancy, 
 	}
 
 	if info.Date != "" {
-		db = db.Scopes(scope.FilterDate(info.Date, "sys_tenancies"))
+		db = db.Scopes(scope.FilterDate(info.Date, "created_at", "sys_tenancies"))
 	}
 
 	var total int64
@@ -377,4 +377,34 @@ func LoginDevice(loginDevice request.LoginDevice) (*response.LoginResponse, erro
 		Token: token,
 	}
 	return loginResponse, nil
+}
+
+// GetTenancyNum 获取商户数量
+func GetTenancyNum(scopes ...func(*gorm.DB) *gorm.DB) (int64, error) {
+	var userNum int64
+	db := g.TENANCY_DB.Model(&model.SysTenancy{})
+	if len(scopes) > 0 {
+		db = db.Scopes(scopes...)
+	}
+	err := db.Count(&userNum).Error
+	if err != nil && !errors.Is(err, gorm.ErrRecordNotFound) {
+		return 0, err
+	}
+	return userNum, nil
+}
+
+// GetTenancyNum 商户收入排行
+func GetTenancyOrderPayPriceGroup(scopes ...func(*gorm.DB) *gorm.DB) ([]*response.MerchantRateData, error) {
+	var rateData []*response.MerchantRateData
+	db := g.TENANCY_DB.Model(&model.SysTenancy{}).
+		Select("sum(C.pay_price) as pay_price,A.tenancy_name").
+		Joins("left join orders on sys_tenancies.id = orders.sys_tenancy_id")
+	if len(scopes) > 0 {
+		db = db.Scopes(scopes...)
+	}
+	err := db.Where("pay_price > ?", 0).Group("sys_tenancy_id").Order("pay_price desc").Limit(4).Find(&rateData).Error
+	if err != nil && !errors.Is(err, gorm.ErrRecordNotFound) {
+		return nil, err
+	}
+	return rateData, nil
 }

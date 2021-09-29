@@ -19,7 +19,7 @@ func CreateReceipt(m request.CreateReceipt, user_id uint) (model.UserReceipt, er
 	receipt.Address = m.Address
 	receipt.Tel = m.Tel
 	receipt.IsDefault = m.IsDefault
-	receipt.SysUserID = user_id
+	receipt.CUserID = user_id
 	err := g.TENANCY_DB.Create(&receipt).Error
 	return receipt, err
 }
@@ -27,7 +27,7 @@ func CreateReceipt(m request.CreateReceipt, user_id uint) (model.UserReceipt, er
 // GetReceiptByID
 func GetReceiptByID(id uint, user_id uint) (model.UserReceipt, error) {
 	var receipt model.UserReceipt
-	err := g.TENANCY_DB.Where("id = ?", id).Where("sys_user_id = ?", user_id).First(&receipt).Error
+	err := g.TENANCY_DB.Where("id = ?", id).Where("C_user_id = ?", user_id).First(&receipt).Error
 	return receipt, err
 }
 
@@ -53,7 +53,7 @@ func UpdateReceipt(m request.UpdateReceipt) (model.UserReceipt, error) {
 // DeleteReceipt
 func DeleteReceipt(id uint, user_id uint) error {
 	var receipt model.UserReceipt
-	return g.TENANCY_DB.Where("id = ?", id).Where("sys_user_id = ?", user_id).Delete(&receipt).Error
+	return g.TENANCY_DB.Where("id = ?", id).Where("c_user_id = ?", user_id).Delete(&receipt).Error
 }
 
 // GetReceiptInfoList
@@ -61,7 +61,7 @@ func GetReceiptInfoList(info request.PageInfo, user_id uint) ([]model.UserReceip
 	receiptList := []model.UserReceipt{}
 	limit := info.PageSize
 	offset := info.PageSize * (info.Page - 1)
-	db := g.TENANCY_DB.Model(&model.UserReceipt{}).Where("sys_user_id = ?", user_id)
+	db := g.TENANCY_DB.Model(&model.UserReceipt{}).Where("c_user_id = ?", user_id)
 	var total int64
 	err := db.Count(&total).Error
 	if err != nil {

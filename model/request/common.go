@@ -30,12 +30,17 @@ type IdsReq struct {
 	Ids []uint `json:"ids" form:"ids" binding:"required"`
 }
 
+type DateReq struct {
+	Date string `json:"date" form:"date"`
+}
+
 // Get role by id structure
 type GetAuthorityId struct {
 	AuthorityId string `json:"authorityId" form:"authorityId" binding:"required"`
 }
 
 type Result struct {
+	Time  string
 	Count float64
 }
 

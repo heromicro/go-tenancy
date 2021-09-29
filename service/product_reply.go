@@ -109,7 +109,7 @@ func GetProductReplyInfoList(info request.ProductReplyPageInfo, tenancyId uint, 
 	}
 
 	if info.Date != "" {
-		db = db.Scopes(scope.FilterDate(info.Date, ""))
+		db = db.Scopes(scope.FilterDate(info.Date,"created_at", ""))
 	}
 	if info.IsReply > 0 {
 		db = db.Where("is_reply = ?", info.IsReply)
