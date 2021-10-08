@@ -402,5 +402,8 @@ func InitStatisticsRouter(Router *gin.RouterGroup) {
 		StatisticsRouter.GET("/merchantStock", admin.GetStatisticsMerchantStock)
 		StatisticsRouter.GET("/merchantVisit", admin.GetStatisticsMerchantVisit)
 		StatisticsRouter.GET("/merchantRate", admin.GetStatisticsMerchantRate)
+		StatisticsRouter.GET("/userData", admin.GetStatisticsUserData)
+		StatisticsRouter.GET("/user", admin.GetStatisticsUser)
+		StatisticsRouter.GET("/userRate", admin.GetStatisticsUserRate)
 	}
 }

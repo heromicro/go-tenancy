@@ -397,7 +397,7 @@ func GetTenancyNum(scopes ...func(*gorm.DB) *gorm.DB) (int64, error) {
 func GetTenancyOrderPayPriceGroup(scopes ...func(*gorm.DB) *gorm.DB) ([]*response.MerchantRateData, error) {
 	var rateData []*response.MerchantRateData
 	db := g.TENANCY_DB.Model(&model.SysTenancy{}).
-		Select("sum(C.pay_price) as pay_price,A.tenancy_name").
+		Select("sum(orders.pay_price) as pay_price,sys_tenancies.name as tenancy_name").
 		Joins("left join orders on sys_tenancies.id = orders.sys_tenancy_id")
 	if len(scopes) > 0 {
 		db = db.Scopes(scopes...)

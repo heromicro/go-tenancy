@@ -96,3 +96,51 @@ func GetStatisticsMerchantRate(ctx *gin.Context) {
 		response.OkWithDetailed(data, "获取成功", ctx)
 	}
 }
+
+// GetStatisticsUserData 用户数据
+func GetStatisticsUserData(ctx *gin.Context) {
+	var dateReq request.DateReq
+	if errs := ctx.ShouldBind(&dateReq); errs != nil {
+		response.FailWithMessage(errs.Error(), ctx)
+		return
+	}
+
+	if data, err := logic.GetStatisticsUserData(dateReq); err != nil {
+		g.TENANCY_LOG.Error("获取失败!", zap.Any("err", err))
+		response.FailWithMessage("获取失败:"+err.Error(), ctx)
+	} else {
+		response.OkWithDetailed(data, "获取成功", ctx)
+	}
+}
+
+// GetStatisticsUser 用户成交数据
+func GetStatisticsUser(ctx *gin.Context) {
+	var dateReq request.DateReq
+	if errs := ctx.ShouldBind(&dateReq); errs != nil {
+		response.FailWithMessage(errs.Error(), ctx)
+		return
+	}
+
+	if data, err := logic.GetStatisticsUser(dateReq); err != nil {
+		g.TENANCY_LOG.Error("获取失败!", zap.Any("err", err))
+		response.FailWithMessage("获取失败:"+err.Error(), ctx)
+	} else {
+		response.OkWithDetailed(data, "获取成功", ctx)
+	}
+}
+
+// GetStatisticsUserRate 用户成交占比数据
+func GetStatisticsUserRate(ctx *gin.Context) {
+	var dateReq request.DateReq
+	if errs := ctx.ShouldBind(&dateReq); errs != nil {
+		response.FailWithMessage(errs.Error(), ctx)
+		return
+	}
+
+	if data, err := logic.GetStatisticsUserRate(dateReq); err != nil {
+		g.TENANCY_LOG.Error("获取失败!", zap.Any("err", err))
+		response.FailWithMessage("获取失败:"+err.Error(), ctx)
+	} else {
+		response.OkWithDetailed(data, "获取成功", ctx)
+	}
+}

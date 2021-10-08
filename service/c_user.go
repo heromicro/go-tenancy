@@ -542,3 +542,33 @@ func GetVisitNum(scopes ...func(*gorm.DB) *gorm.DB) (int64, error) {
 	}
 	return userNum, nil
 }
+
+// GetUserNumGroup 用户数量
+func GetUserNumGroup(scopes ...func(*gorm.DB) *gorm.DB) ([]*response.UserData, error) {
+	var userData []*response.UserData
+	db := g.TENANCY_DB.Model(&model.CUser{}).
+		Select("from_unixtime(unix_timestamp(created_at),'%m-%d') as time, count(id) as new")
+	if len(scopes) > 0 {
+		db = db.Scopes(scopes...)
+	}
+	err := db.Group("time").Order("time asc").Find(&userData).Error
+	if err != nil && !errors.Is(err, gorm.ErrRecordNotFound) {
+		return nil, err
+	}
+	return userData, nil
+}
+
+// GetVisitNumGroup 访客用户数量
+func GetVisitNumGroup(scopes ...func(*gorm.DB) *gorm.DB) ([]*response.UserData, error) {
+	var userData []*response.UserData
+	db := g.TENANCY_DB.Model(&model.UserVisit{}).
+		Select("from_unixtime(unix_timestamp(created_at),'%m-%d') as time, count(id) as visit")
+	if len(scopes) > 0 {
+		db = db.Scopes(scopes...)
+	}
+	err := db.Group("time").Order("time asc").Find(&userData).Error
+	if err != nil && !errors.Is(err, gorm.ErrRecordNotFound) {
+		return nil, err
+	}
+	return userData, nil
+}

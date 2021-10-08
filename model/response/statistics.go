@@ -1,7 +1,7 @@
 package response
 
 type MerchantStock struct {
-	Total int64               `json:"total"`
+	Total int64                `json:"total"`
 	List  []*MerchantStockData `json:"list"`
 }
 
@@ -13,7 +13,7 @@ type MerchantStockData struct {
 }
 
 type MerchantVisit struct {
-	Total int64               `json:"total"`
+	Total int64                `json:"total"`
 	List  []*MerchantVisitData `json:"list"`
 }
 
@@ -25,7 +25,7 @@ type MerchantVisitData struct {
 }
 
 type MerchantRate struct {
-	Total float64            `json:"total"`
+	Total float64             `json:"total"`
 	List  []*MerchantRateData `json:"list"`
 }
 
@@ -79,4 +79,31 @@ type StaticMainData struct {
 	StoreNum     int64   `json:"storeNum"`
 	VisitUserNum int64   `json:"visitUserNum"`
 	VisitNum     int64   `json:"visitNum"`
+}
+
+type UserData struct {
+	Day   string `json:"day"`
+	New   int64  `json:"new"`
+	Total int64  `json:"total"`
+	Visit int64  `json:"visit"`
+}
+
+type User struct {
+	OrderPrice    float64 `json:"orderPrice"`
+	OrderRate     float64 `json:"orderRate"`
+	OrderUser     int64   `json:"orderUser"`
+	PayOrderPrice float64 `json:"payOrderPrice"`
+	PayOrderRate  float64 `json:"payOrderRate"`
+	PayOrderUser  int64   `json:"payOrderUser"`
+	UserRate      float64 `json:"userRate"`
+	VisitUser     int64   `json:"visitUser"`
+}
+
+type UserRate struct {
+	NewTotalPrice float64 `json:"newTotalPrice"`
+	NewUser       int64   `json:"newUser"`
+	OldTotalPrice float64 `json:"oldTotalPrice"`
+	OldUser       int64   `json:"oldUser"`
+	TotalPrice    float64 `json:"totalPrice"`
+	User          int64   `json:"user"`
 }

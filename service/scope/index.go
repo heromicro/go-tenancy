@@ -167,3 +167,17 @@ func FilterYear(field, perfix string) func(db *gorm.DB) *gorm.DB {
 		return db.Where(fmt.Sprintf("YEAR(%s)=YEAR(NOW())", field))
 	}
 }
+
+// FilterBase 基础查询
+// - field 字段
+// - cond 条件 = ,> , >= e.g.
+// - perfix 表前缀
+// - value 数值
+func FilterBase(field, cond, perfix string, value interface{}) func(db *gorm.DB) *gorm.DB {
+	if perfix != "" {
+		field = fmt.Sprintf("%s.%s", perfix, field)
+	}
+	return func(db *gorm.DB) *gorm.DB {
+		return db.Where(fmt.Sprintf("%s %s ? ", field, cond), value)
+	}
+}

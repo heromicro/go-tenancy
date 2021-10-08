@@ -1074,7 +1074,7 @@ func AutoTakeOrders(orderIds []uint) error {
 // GetOrderPayPrice 获取订单支付价格
 func GetOrderPayPrice(scopes ...func(*gorm.DB) *gorm.DB) (float64, error) {
 	var payPrice request.Result
-	db := g.TENANCY_DB.Model(&model.Order{}).Select("sum(pay_price) as count").Where("paid =?", g.StatusTrue)
+	db := g.TENANCY_DB.Model(&model.Order{}).Select("sum(pay_price) as count")
 	if len(scopes) > 0 {
 		db = db.Scopes(scopes...)
 	}
@@ -1117,7 +1117,7 @@ func GetOrderNum(scopes ...func(*gorm.DB) *gorm.DB) (int64, error) {
 // GetOrderUserNum 获取订单用户数量
 func GetOrderUserNum(scopes ...func(*gorm.DB) *gorm.DB) (int64, error) {
 	var count int64
-	db := g.TENANCY_DB.Model(&model.Order{}).Where("paid =?", g.StatusTrue)
+	db := g.TENANCY_DB.Model(&model.Order{})
 	if len(scopes) > 0 {
 		db = db.Scopes(scopes...)
 	}
