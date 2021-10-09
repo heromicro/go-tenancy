@@ -527,6 +527,23 @@ func GetVisitUserNumGroup(scopes ...func(*gorm.DB) *gorm.DB) ([]*response.Mercha
 	return visitData, nil
 }
 
+// GetVisitProductNumGroup 用户浏览记录，查询用户浏览商品记录
+func GetVisitProductNumGroup(scopes ...func(*gorm.DB) *gorm.DB) ([]*response.ProductVisitData, error) {
+	var visitData []*response.ProductVisitData
+	db := g.TENANCY_DB.Model(&model.UserVisit{}).
+		Select("count(user_visits.type) as total,products.image as image,products.store_name as store_name").
+		Joins("left join products on products.id = user_visits.type_id").
+		Where("user_visits.type = ?", "product")
+	if len(scopes) > 0 {
+		db = db.Scopes(scopes...)
+	}
+	err := db.Limit(7).Group("type_id").Order("total DESC").Find(&visitData).Error
+	if err != nil && !errors.Is(err, gorm.ErrRecordNotFound) {
+		return nil, err
+	}
+	return visitData, nil
+}
+
 // GetVisitNum 浏览记录，查询用户浏览产品和小程序记录
 func GetVisitNum(scopes ...func(*gorm.DB) *gorm.DB) (int64, error) {
 	var userNum int64
@@ -571,4 +588,18 @@ func GetVisitNumGroup(scopes ...func(*gorm.DB) *gorm.DB) ([]*response.UserData, 
 		return nil, err
 	}
 	return userData, nil
+}
+
+// GetLikeStore 商户关注用户数
+func GetLikeStore(scopes ...func(*gorm.DB) *gorm.DB) (int64, error) {
+	var count int64
+	db := g.TENANCY_DB.Model(&model.UserRelation{}).Where("type = ?", 10)
+	if len(scopes) > 0 {
+		db = db.Scopes(scopes...)
+	}
+	err := db.Count(&count).Error
+	if err != nil && !errors.Is(err, gorm.ErrRecordNotFound) {
+		return count, err
+	}
+	return count, nil
 }

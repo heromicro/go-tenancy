@@ -141,6 +141,7 @@ func Routers(app *gin.Engine) {
 			client.InitUserLabelRouter(ClientGroup)        // 用户标签路由
 			client.InitCUserRouter(ClientGroup)            // 用户管理路由
 			client.InitPatientRouter(ClientGroup)          // 患者管理路由
+			client.InitStatisticsRouter(ClientGroup)       // 大盘路由
 		}
 		ClientLogGroup := V1Group.Group(g.TENANCY_CONFIG.System.ClientPreix, middleware.IsTenancy(), middleware.CasbinHandler())
 		{

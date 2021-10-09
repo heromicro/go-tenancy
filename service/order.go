@@ -122,7 +122,6 @@ func GetFilter(info request.OrderPageInfo, ctx *gin.Context) ([]map[string]inter
 	charts := []map[string]interface{}{
 		{"count": 0, "orderType": "", "title": "全部"},
 		{"count": 0, "orderType": "1", "title": "普通订单"},
-		{"count": 0, "orderType": "2", "title": "核销订单"},
 	}
 
 	for _, chart := range charts {
@@ -1100,8 +1099,8 @@ func GetOrderPayPriceGroup(scopes ...func(*gorm.DB) *gorm.DB) ([]request.Result,
 	return res, nil
 }
 
-// GetOrderNum 获取订单数量
-func GetOrderNum(scopes ...func(*gorm.DB) *gorm.DB) (int64, error) {
+// GetPayOrderNum 获取支付订单数量
+func GetPayOrderNum(scopes ...func(*gorm.DB) *gorm.DB) (int64, error) {
 	var count int64
 	db := g.TENANCY_DB.Model(&model.Order{}).Where("paid =?", g.StatusTrue)
 	if len(scopes) > 0 {
@@ -1142,6 +1141,21 @@ func GetOrderPatientNum(scopes ...func(*gorm.DB) *gorm.DB) (int64, error) {
 	return count, nil
 }
 
+// GetOrderGroup 获取订单数量按时间分组集合
+func GetOrderGroup(scopes ...func(*gorm.DB) *gorm.DB) ([]response.ClientStaticOrder, error) {
+	var res []response.ClientStaticOrder
+	db := g.TENANCY_DB.Model(&model.Order{}).Select("sum(pay_price) as pay_price,count(*) as total,count(distinct sys_user_id) as user,from_unixtime(unix_timestamp(pay_time),'%m-%d') as `day`").
+		Where("paid =?", g.StatusTrue)
+	if len(scopes) > 0 {
+		db = db.Scopes(scopes...)
+	}
+	err := db.Order("day ASC").Group("day").Find(&res).Error
+	if err != nil && !errors.Is(err, gorm.ErrRecordNotFound) {
+		return nil, err
+	}
+	return res, nil
+}
+
 // GetOrderNumGroup 获取订单数量按时间分组集合
 func GetOrderNumGroup(scopes ...func(*gorm.DB) *gorm.DB) ([]request.Result, error) {
 	var res []request.Result
@@ -1171,7 +1185,7 @@ func GetOrderUserNumGroup(scopes ...func(*gorm.DB) *gorm.DB) ([]request.Result, 
 	return res, nil
 }
 
-// GetOrderPatientNumGroup 获取订单数量按时间分组集合
+// GetOrderPatientNumGroup 获取床旁订单数量按时间分组集合
 func GetOrderPatientNumGroup(scopes ...func(*gorm.DB) *gorm.DB) ([]request.Result, error) {
 	var res []request.Result
 	db := g.TENANCY_DB.Model(&model.Order{}).Select("count(DISTINCT patient_id) as total , from_unixtime(unix_timestamp(pay_time),'%H:%i') as time").Where("paid =?", g.StatusTrue)

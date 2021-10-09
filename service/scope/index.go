@@ -63,6 +63,8 @@ func FilterDate(date, field, perfix string) func(db *gorm.DB) *gorm.DB {
 			return FilterQuarter(field, perfix)
 		case "year":
 			return FilterYear(field, perfix)
+		default:
+			return nil
 		}
 	}
 	return nil

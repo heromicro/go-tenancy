@@ -235,3 +235,17 @@ func InitPatientRouter(Router *gin.RouterGroup) {
 		PatientRouter.POST("/getPatientList", client.GetPatientList)
 	}
 }
+
+// 控制面板接口
+func InitStatisticsRouter(Router *gin.RouterGroup) {
+	StatisticsRouter := Router.Group("/statistics")
+	{
+		StatisticsRouter.GET("/main", client.GetStatisticsMain)
+		StatisticsRouter.GET("/order", client.GetStatisticsOrder)
+		StatisticsRouter.GET("/user", client.GetStatisticsUser)
+		StatisticsRouter.GET("/userRate", client.GetStatisticsUserRate)
+		StatisticsRouter.GET("/product", client.GetStatisticsProduct)
+		StatisticsRouter.GET("/productVisit", client.GetStatisticsProductVisit)
+		StatisticsRouter.GET("/productCart", client.GetStatisticsProductCart)
+	}
+}

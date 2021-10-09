@@ -1,4 +1,4 @@
-package admin
+package client
 
 import (
 	"github.com/gin-gonic/gin"
@@ -6,12 +6,13 @@ import (
 	"github.com/snowlyg/go-tenancy/logic"
 	"github.com/snowlyg/go-tenancy/model/request"
 	"github.com/snowlyg/go-tenancy/model/response"
+	"github.com/snowlyg/multi"
 	"go.uber.org/zap"
 )
 
 // GetStatisticsMain 运营数据
 func GetStatisticsMain(ctx *gin.Context) {
-	if data, err := logic.GetStatisticsMaim(); err != nil {
+	if data, err := logic.GetClientStatisticsMaim(multi.GetTenancyId(ctx)); err != nil {
 		g.TENANCY_LOG.Error("获取失败!", zap.Any("err", err))
 		response.FailWithMessage("获取失败:"+err.Error(), ctx)
 	} else {
@@ -21,43 +22,13 @@ func GetStatisticsMain(ctx *gin.Context) {
 
 // GetStatisticsOrder 订单金额数据
 func GetStatisticsOrder(ctx *gin.Context) {
-	if data, err := logic.GetStatisticsOrder(); err != nil {
-		g.TENANCY_LOG.Error("获取失败!", zap.Any("err", err))
-		response.FailWithMessage("获取失败:"+err.Error(), ctx)
-	} else {
-		response.OkWithDetailed(data, "获取成功", ctx)
-	}
-}
-
-// GetStatisticsOrderNum 订单数据
-func GetStatisticsOrderNum(ctx *gin.Context) {
-	if data, err := logic.GetStatisticsOrderNum(); err != nil {
-		g.TENANCY_LOG.Error("获取失败!", zap.Any("err", err))
-		response.FailWithMessage("获取失败:"+err.Error(), ctx)
-	} else {
-		response.OkWithDetailed(data, "获取成功", ctx)
-	}
-}
-
-// GetStatisticsOrderUser 订单用户数据
-func GetStatisticsOrderUser(ctx *gin.Context) {
-	if data, err := logic.GetStatisticsOrderUser(); err != nil {
-		g.TENANCY_LOG.Error("获取失败!", zap.Any("err", err))
-		response.FailWithMessage("获取失败:"+err.Error(), ctx)
-	} else {
-		response.OkWithDetailed(data, "获取成功", ctx)
-	}
-}
-
-// GetStatisticsMerchantStock 商品销量排行
-func GetStatisticsMerchantStock(ctx *gin.Context) {
 	var dateReq request.DateReq
 	if errs := ctx.ShouldBind(&dateReq); errs != nil {
 		response.FailWithMessage(errs.Error(), ctx)
 		return
 	}
 
-	if data, err := logic.GetStatisticsMerchantStock(dateReq); err != nil {
+	if data, err := logic.GetClientStatisticsOrder(dateReq, multi.GetTenancyId(ctx)); err != nil {
 		g.TENANCY_LOG.Error("获取失败!", zap.Any("err", err))
 		response.FailWithMessage("获取失败:"+err.Error(), ctx)
 	} else {
@@ -65,15 +36,15 @@ func GetStatisticsMerchantStock(ctx *gin.Context) {
 	}
 }
 
-// GetStatisticsMerchantVisit 商户访客量排行
-func GetStatisticsMerchantVisit(ctx *gin.Context) {
+// GetStatisticsProduct 商品销量排行
+func GetStatisticsProduct(ctx *gin.Context) {
 	var dateReq request.DateReq
 	if errs := ctx.ShouldBind(&dateReq); errs != nil {
 		response.FailWithMessage(errs.Error(), ctx)
 		return
 	}
 
-	if data, err := logic.GetStatisticsMerchantVisit(dateReq); err != nil {
+	if data, err := logic.GetStatisticsProduct(dateReq, multi.GetTenancyId(ctx)); err != nil {
 		g.TENANCY_LOG.Error("获取失败!", zap.Any("err", err))
 		response.FailWithMessage("获取失败:"+err.Error(), ctx)
 	} else {
@@ -81,15 +52,15 @@ func GetStatisticsMerchantVisit(ctx *gin.Context) {
 	}
 }
 
-// GetStatisticsMerchantRate 商户销售额占比
-func GetStatisticsMerchantRate(ctx *gin.Context) {
+// GetStatisticsProductVisit 商户访客量排行
+func GetStatisticsProductVisit(ctx *gin.Context) {
 	var dateReq request.DateReq
 	if errs := ctx.ShouldBind(&dateReq); errs != nil {
 		response.FailWithMessage(errs.Error(), ctx)
 		return
 	}
 
-	if data, err := logic.GetStatisticsMerchantRate(dateReq); err != nil {
+	if data, err := logic.GetStatisticsProductVisit(dateReq, multi.GetTenancyId(ctx)); err != nil {
 		g.TENANCY_LOG.Error("获取失败!", zap.Any("err", err))
 		response.FailWithMessage("获取失败:"+err.Error(), ctx)
 	} else {
@@ -97,15 +68,15 @@ func GetStatisticsMerchantRate(ctx *gin.Context) {
 	}
 }
 
-// GetStatisticsUserData 用户数据
-func GetStatisticsUserData(ctx *gin.Context) {
+// GetStatisticsProductCart 商户销售额占比
+func GetStatisticsProductCart(ctx *gin.Context) {
 	var dateReq request.DateReq
 	if errs := ctx.ShouldBind(&dateReq); errs != nil {
 		response.FailWithMessage(errs.Error(), ctx)
 		return
 	}
 
-	if data, err := logic.GetStatisticsUserData(dateReq); err != nil {
+	if data, err := logic.GetStatisticsProductCart(dateReq, multi.GetTenancyId(ctx)); err != nil {
 		g.TENANCY_LOG.Error("获取失败!", zap.Any("err", err))
 		response.FailWithMessage("获取失败:"+err.Error(), ctx)
 	} else {
@@ -121,7 +92,7 @@ func GetStatisticsUser(ctx *gin.Context) {
 		return
 	}
 
-	if data, err := logic.GetStatisticsUser(dateReq, 0); err != nil {
+	if data, err := logic.GetStatisticsUser(dateReq, multi.GetTenancyId(ctx)); err != nil {
 		g.TENANCY_LOG.Error("获取失败!", zap.Any("err", err))
 		response.FailWithMessage("获取失败:"+err.Error(), ctx)
 	} else {

@@ -47,6 +47,7 @@ require (
 	github.com/shopspring/decimal v1.2.0
 	github.com/skip2/go-qrcode v0.0.0-20200617195104-da1b6568686e
 	github.com/snowlyg/multi v0.0.0-20210826091246-c9334c5258fa
+	github.com/spf13/cobra v1.2.1 // indirect
 	github.com/spf13/viper v1.8.1
 	github.com/tencentyun/cos-go-sdk-v5 v0.7.25
 	github.com/thinkerou/favicon v0.1.0

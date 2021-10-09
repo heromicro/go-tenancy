@@ -74,9 +74,7 @@ type BaseOrder struct {
 	Mark           string    `gorm:"column:mark;type:varchar(512);not null" json:"mark"`                                              // 备注
 	Remark         string    `gorm:"column:remark;type:varchar(512)" json:"remark"`                                                   // 管理员备注
 	AdminMark      string    `gorm:"column:admin_mark;type:varchar(512)" json:"adminMark"`                                            // 总后台备注
-	VerifyCode     string    `gorm:"index:verify_code;column:verify_code;type:char(16)" json:"verifyCode"`                            // 核销码
-	VerifyTime     time.Time `gorm:"column:verify_time;type:timestamp" json:"verifyTime"`                                             // 核销时间
-	ActivityType   int32     `gorm:"column:activity_type;type:tinyint unsigned;not null;default:1" json:"activityType"`               // 1：普通 2:秒杀 3:预售 4:助力
+	ActivityType   int32     `gorm:"column:activity_type;type:tinyint unsigned;not null;default:1" json:"activityType"`               // 1：普通
 	Cost           float64   `gorm:"column:cost;type:decimal(8,2) unsigned;not null" json:"cost"`                                     // 成本价
 	IsCancel       int       `gorm:"column:is_cancel;type:tinyint unsigned;not null;default:2" json:"isCancel"`                       // 用户是否取消
 	IsSystemDel    int       `gorm:"column:is_system_del;type:tinyint(1);default:2" json:"isSystemDel"`                               // 商户删除

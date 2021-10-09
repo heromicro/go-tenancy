@@ -89,7 +89,7 @@ type UserRecharge struct {
 	OrderID   string `gorm:"unique;column:order_id;type:varchar(32);not null" json:"orderId"` // 订单号
 }
 
-// UserRelation 用户记录表
+// UserRelation 用户记录表,关注店铺和商品
 type UserRelation struct {
 	g.TENANCY_MODEL
 

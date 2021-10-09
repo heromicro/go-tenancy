@@ -1,5 +1,34 @@
 package response
 
+type ClientStaticMain struct {
+	Day          string                   `json:"day"`
+	Today        ClientStaticMainData     `json:"today"`
+	Yesterday    ClientStaticMainData     `json:"yesterday"`
+	LastWeekRate ClientStaticMainDataRate `json:"lastWeekRate"`
+}
+
+// ClientSStaticMainData
+// - LikeStore 关注店铺
+// - OrderNum 支付订单
+// - PayPrice 支付金额
+// - PayUser 支付人数
+// - VisitNum 访客人数
+type ClientStaticMainData struct {
+	LikeStore int64   `json:"likeStore"`
+	OrderNum  int64   `json:"orderNum"`
+	PayPrice  float64 `json:"payPrice"`
+	PayUser   int64   `json:"payUser"`
+	VisitNum  int64   `json:"visitNum"`
+}
+
+type ClientStaticMainDataRate struct {
+	LikeStore float64 `json:"likeStore"`
+	OrderNum  float64 `json:"orderNum"`
+	PayPrice  float64 `json:"payPrice"`
+	PayUser   float64 `json:"payUser"`
+	VisitNum  float64 `json:"visitNum"`
+}
+
 type MerchantStock struct {
 	Total int64                `json:"total"`
 	List  []*MerchantStockData `json:"list"`
@@ -48,6 +77,18 @@ type StaticOrderNumData struct {
 	Total float64 `json:"total"`
 }
 
+// ClientStaticOrder
+// -Day 日期
+// -PayPrice 支付价格
+// -Total 支付订单
+// -User 支付人数
+type ClientStaticOrder struct {
+	Day      string  `json:"day"`
+	PayPrice float64 `json:"payPrice"`
+	Total    float64 `json:"total"`
+	User     int64   `json:"user"`
+}
+
 type StaticOrder struct {
 	TodayPrice     float64           `json:"todayPrice"`
 	YesterdayPrice float64           `json:"yesterdayPrice"`
@@ -73,6 +114,7 @@ type StaticMainDataRate struct {
 	VisitUserNum float64 `json:"visitUserNum"`
 	VisitNum     float64 `json:"visitNum"`
 }
+
 type StaticMainData struct {
 	PayPrice     float64 `json:"payPrice"`
 	UserNum      int64   `json:"userNum"`
@@ -106,4 +148,10 @@ type UserRate struct {
 	OldUser       int64   `json:"oldUser"`
 	TotalPrice    float64 `json:"totalPrice"`
 	User          int64   `json:"user"`
+}
+
+type ProductVisitData struct {
+	Total     int64  `json:"total"`
+	Image     string `json:"image"`
+	StoreName string `json:"store_name"`
 }

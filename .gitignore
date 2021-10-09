@@ -16,7 +16,8 @@ latest_log
 main
 tests/resource/favicon.ico
 .air.conf
-deploy.bat
+migration/main.go
+
 
 
 # ext

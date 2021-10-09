@@ -794,3 +794,22 @@ func DecSkuStock(db *gorm.DB, id uint, unique string, dec int64) error {
 	return UpdateProductAttrValue(db, id, unique, data)
 }
 
+// GetCartProductNumGroup 商品购物车
+func GetCartProductNumGroup(scopes ...func(*gorm.DB) *gorm.DB) ([]*response.ProductVisitData, error) {
+	var visitData []*response.ProductVisitData
+	db := g.TENANCY_DB.Model(&model.Product{}).
+		Select("count(carts.cart_num) as total,products.image as image,products.store_name as store_name").
+		Joins("left join carts on products.id = carts.product_id").
+		Where("carts.product_type", model.GeneralSale).
+		Where("carts.is_pay", g.StatusFalse).
+		Where("carts.is_new", g.StatusFalse).
+		Where("carts.is_fail", g.StatusFalse)
+	if len(scopes) > 0 {
+		db = db.Scopes(scopes...)
+	}
+	err := db.Limit(7).Group("products.id").Order("total DESC").Find(&visitData).Error
+	if err != nil && !errors.Is(err, gorm.ErrRecordNotFound) {
+		return nil, err
+	}
+	return visitData, nil
+}
