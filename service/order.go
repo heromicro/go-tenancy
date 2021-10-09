@@ -1222,7 +1222,7 @@ func GetPayOrderProductNum(scopes ...func(*gorm.DB) *gorm.DB) (int64, error) {
 func GetPayOrderProductNumGroup(scopes ...func(*gorm.DB) *gorm.DB) ([]*response.MerchantStockData, error) {
 	var stockData []*response.MerchantStockData
 	db := g.TENANCY_DB.Model(&model.OrderProduct{}).
-		Select("sum(order_products.product_num) as total,order_products.product_id,products.store_name").
+		Select("sum(order_products.product_num) as total,order_products.product_id,products.store_name,products.image").
 		Joins("left join orders on order_products.order_id = orders.id").
 		Joins("left join products on order_products.product_id = products.id")
 	if len(scopes) > 0 {

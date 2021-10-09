@@ -37,8 +37,9 @@ type MerchantStock struct {
 type MerchantStockData struct {
 	Total     int64   `json:"total"`
 	Rate      float64 `json:"rate"`
-	ProductId int64   `json:"product_id"`
-	StoreName string  `json:"store_name"`
+	ProductId int64   `json:"productId"`
+	StoreName string  `json:"storeName"`
+	Image     string  `json:"image"`
 }
 
 type MerchantVisit struct {
@@ -49,8 +50,8 @@ type MerchantVisit struct {
 type MerchantVisitData struct {
 	Total       int64   `json:"total"`
 	Rate        float64 `json:"rate"`
-	TenancyId   int64   `json:"tenancy_id"`
-	TenancyName string  `json:"tenancy_name"`
+	TenancyId   int64   `json:"tenancyId"`
+	TenancyName string  `json:"tenancyName"`
 }
 
 type MerchantRate struct {
@@ -61,7 +62,7 @@ type MerchantRate struct {
 type MerchantRateData struct {
 	Price       float64 `json:"price"`
 	Rate        float64 `json:"rate"`
-	TenancyName string  `json:"tenancy_name"`
+	TenancyName string  `json:"tenancyName"`
 }
 
 type StaticOrderNum struct {
@@ -153,5 +154,5 @@ type UserRate struct {
 type ProductVisitData struct {
 	Total     int64  `json:"total"`
 	Image     string `json:"image"`
-	StoreName string `json:"store_name"`
+	StoreName string `json:"storeName"`
 }
