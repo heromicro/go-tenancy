@@ -20,10 +20,10 @@ type CUser struct {
 
 	Authority    SysAuthority `json:"authority" gorm:"foreignKey:AuthorityId;references:AuthorityId;comment:用户角色"`
 	AuthorityId  string       `json:"authorityId" gorm:"not null;comment:用户角色ID"`
-	SysTenancyID uint         `json:"sysTenancyId" form:"sysTenancyId" gorm:"column:sys_tenancy_id;comment:关联标记"`
+	SysTenancyId uint         `json:"sysTenancyId" form:"sysTenancyId" gorm:"column:sys_tenancy_id;comment:关联标记"`
 
 	GroupID   uint `gorm:"column:group_id;type:int unsigned;not null;default:0" json:"groupId"` // 用户分组id
-	SysUserID uint `json:"sysUserId" form:"sysUserId" gorm:"column:sys_user_id;comment:关联标记"`
+	SysUserId uint `json:"sysUserId" form:"sysUserId" gorm:"column:sys_user_id;comment:关联标记"`
 }
 
 const (

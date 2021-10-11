@@ -12,7 +12,7 @@ var Receipt = new(receipt)
 type receipt struct{}
 
 var receipts = []model.UserReceipt{
-	{ReceiptType: 1, ReceiptTitle: "title", ReceiptTitleType: 1, DutyGaragraph: "garagraph", Email: "email", BankName: "bank_name", BankCode: "bank_code", Address: "松山湖阿里产业园", Tel: "413514", IsDefault: g.StatusTrue, CUserID: 3},
+	{ReceiptType: 1, ReceiptTitle: "title", ReceiptTitleType: 1, DutyGaragraph: "garagraph", Email: "email", BankName: "bank_name", BankCode: "bank_code", Address: "松山湖阿里产业园", Tel: "413514", IsDefault: g.StatusTrue, CUserId: 3},
 }
 
 func (m *receipt) Init() error {

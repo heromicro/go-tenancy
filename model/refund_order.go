@@ -26,11 +26,11 @@ const (
 type RefundOrder struct {
 	g.TENANCY_MODEL
 	BaseRefundOrder
-	ReconciliationID uint `gorm:"column:reconciliation_id;type:int unsigned;default:0" json:"reconciliationId"` // 对账id
-	PatientID        uint `json:"patientId" form:"patientId" gorm:"column:patient_id;comment:患者"`
-	OrderID          uint `gorm:"index:oid;column:order_id;type:int unsigned;not null" json:"orderId"`              // 订单id
-	SysUserID        uint `json:"sysUserId" form:"sysUserId" gorm:"column:sys_user_id;comment:关联标记"`                // 关联 c_users
-	SysTenancyID     uint `gorm:"index:sys_tenancy_id;column:sys_tenancy_id;type:int;not null" json:"sysTenancyId"` // 商户 id
+	ReconciliationId uint `gorm:"column:reconciliation_id;type:int unsigned;default:0" json:"reconciliationId"` // 对账id
+	PatientId        uint `json:"patientId" form:"patientId" gorm:"column:patient_id;comment:患者"`
+	OrderId          uint `gorm:"index:oid;column:order_id;type:int unsigned;not null" json:"orderId"` // 订单id
+	CUserId          uint `json:"cUserId" form:"cUserId" gorm:"column:c_user_id;comment:关联标记"`
+	SysTenancyId     uint `gorm:"index:sys_tenancy_id;column:sys_tenancy_id;type:int;not null" json:"sysTenancyId"` // 商户 id
 }
 
 type BaseRefundOrder struct {
@@ -63,8 +63,8 @@ type BaseRefundOrder struct {
 type RefundProduct struct {
 	g.TENANCY_MODEL
 
-	RefundOrderID  uint  `gorm:"index:refund_order_id;column:refund_order_id;type:int unsigned;not null" json:"refundOrderId"` // 退款单
-	OrderProductID uint  `gorm:"column:order_product_id;type:int unsigned;not null" json:"orderProductId"`                     // 订单产品id
+	RefundOrderId  uint  `gorm:"index:refund_order_id;column:refund_order_id;type:int unsigned;not null" json:"refundOrderId"` // 退款单
+	OrderProductId uint  `gorm:"column:order_product_id;type:int unsigned;not null" json:"orderProductId"`                     // 订单产品id
 	RefundNum      int64 `gorm:"column:refund_num;type:int unsigned;not null;default:0" json:"refundNum"`                      // 退货数
 }
 
@@ -72,7 +72,7 @@ type RefundProduct struct {
 type RefundStatus struct {
 	g.TENANCY_MODEL
 
-	RefundOrderID uint      `gorm:"index:refund_order_id;column:refund_order_id;type:int unsigned;not null" json:"refundOrderId"` // 退款单订单id
+	RefundOrderId uint      `gorm:"index:refund_order_id;column:refund_order_id;type:int unsigned;not null" json:"refundOrderId"` // 退款单订单id
 	ChangeType    string    `gorm:"index:change_type;column:change_type;type:varchar(32);not null" json:"changeType"`             // 操作类型
 	ChangeMessage string    `gorm:"column:change_message;type:varchar(256);not null" json:"changeMessage"`                        // 操作备注
 	ChangeTime    time.Time `gorm:"column:change_time;type:timestamp;not null;default:CURRENT_TIMESTAMP" json:"changeTime"`       // 操作时间

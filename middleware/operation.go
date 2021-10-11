@@ -34,7 +34,7 @@ func OperationRecord() gin.HandlerFunc {
 				Agent:        ctx.Request.UserAgent(),
 				Body:         string(body),
 				UserID:       multi.GetUserId(ctx),
-				SysTenancyID: multi.GetTenancyId(ctx),
+				SysTenancyId: multi.GetTenancyId(ctx),
 			},
 		}
 

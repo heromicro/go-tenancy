@@ -12,7 +12,7 @@ var LabelRule = new(labelRule)
 type labelRule struct{}
 
 var labelRules = []model.LabelRule{
-	{Type: model.LabelRuleTypeDDJE, Min: 999999.99, Max: 999999.99, UserNum: 0, SysTenancyID: 1, UserLabelID: 4},
+	{Type: model.LabelRuleTypeDDJE, Min: 999999.99, Max: 999999.99, UserNum: 0, SysTenancyId: 1, UserLabelID: 4},
 }
 
 func (m *labelRule) Init() error {

@@ -68,7 +68,7 @@ func CancelNoPayGroupOrders(groupOrderId uint) error {
 	var orderStatues []model.OrderStatus
 	for _, order := range orders {
 		orderIds = append(orderIds, order.ID)
-		orderStatus := model.OrderStatus{ChangeType: "cancel", ChangeMessage: "取消订单[自动]", ChangeTime: time.Now(), OrderID: order.ID}
+		orderStatus := model.OrderStatus{ChangeType: "cancel", ChangeMessage: "取消订单[自动]", ChangeTime: time.Now(), OrderId: order.ID}
 		orderStatues = append(orderStatues, orderStatus)
 	}
 	return g.TENANCY_DB.Transaction(func(tx *gorm.DB) error {

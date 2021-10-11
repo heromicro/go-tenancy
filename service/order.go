@@ -219,7 +219,7 @@ func GetOrderDetailById(id uint, funcs ...func(*gorm.DB) *gorm.DB) (response.Ord
 	var order response.OrderDetail
 	db := g.TENANCY_DB.Model(&model.Order{}).
 		Select("orders.*,c_users.nick_name as user_nick_name").
-		Joins("left join c_users on orders.sys_user_id = c_users.id").
+		Joins("left join c_users on orders.c_user_id = c_users.id").
 		Joins(fmt.Sprintf("left join sys_authorities on sys_authorities.authority_id = c_users.authority_id and sys_authorities.authority_type = %d", multi.GeneralAuthority))
 
 	// db = CheckTenancyIdAndUserId(db, req, "orders.")
@@ -230,8 +230,8 @@ func GetOrderDetailById(id uint, funcs ...func(*gorm.DB) *gorm.DB) (response.Ord
 		return order, err
 	}
 
-	if order.SysUserID > 0 {
-		cuser, err := GetGeneralDetail(order.SysUserID)
+	if order.SysUserId > 0 {
+		cuser, err := GetGeneralDetail(order.SysUserId)
 		if err != nil {
 			return order, err
 		}
@@ -254,7 +254,7 @@ func GetOrderDetailById(id uint, funcs ...func(*gorm.DB) *gorm.DB) (response.Ord
 
 	order.OrderProduct = []response.OrderProduct{}
 	for _, orderProduct := range orderProducts {
-		if order.ID == orderProduct.OrderID {
+		if order.ID == orderProduct.OrderId {
 			order.OrderProduct = append(order.OrderProduct, orderProduct)
 		}
 	}
@@ -326,7 +326,7 @@ func DeliveryOrder(id uint, delivery request.DeliveryOrder, ctx *gin.Context) er
 		ChangeType:    fmt.Sprintf("delivery_%d", delivery.DeliveryType),
 		ChangeMessage: changeMessage,
 		ChangeTime:    time.Now(),
-		OrderID:       id,
+		OrderId:       id,
 	}
 	err = g.TENANCY_DB.Model(&model.OrderStatus{}).Create(&orderStatus).Error
 	if err != nil {
@@ -404,7 +404,7 @@ func GetOrderInfoList(info request.OrderPageInfo, ctx *gin.Context) (gin.H, erro
 		for i := 0; i < len(orderList); i++ {
 			orderList[i].OrderProduct = []response.OrderProduct{}
 			for _, orderProduct := range orderProducts {
-				if orderList[i].ID == orderProduct.OrderID {
+				if orderList[i].ID == orderProduct.OrderId {
 					orderList[i].OrderProduct = append(orderList[i].OrderProduct, orderProduct)
 				}
 			}
@@ -473,7 +473,7 @@ func getOrderSearch(info request.OrderPageInfo, ctx *gin.Context, db *gorm.DB) (
 	}
 
 	if info.SysUserId > 0 {
-		db.Where("orders.sys_user_id = ?", info.SysUserId)
+		db.Where("orders.c_user_id = ?", info.SysUserId)
 	}
 
 	if info.PatientId > 0 {
@@ -680,7 +680,7 @@ func GetOrderInfoByCartId(tenancyId, userId, patientId uint, cartIds []uint) (re
 		for _, product := range res.CartList.Products {
 			productPrice := decimal.NewFromFloat(product.AttrValue.Price).Mul(decimal.NewFromInt(product.CartNum))
 			productOtPrice := decimal.NewFromFloat(product.AttrValue.OtPrice).Mul(decimal.NewFromInt(product.CartNum))
-			res.ProductPrices[product.ProductID] = map[string]decimal.Decimal{
+			res.ProductPrices[product.ProductId] = map[string]decimal.Decimal{
 				"price":   productPrice,
 				"otPrice": productOtPrice,
 			}
@@ -740,8 +740,8 @@ func CreateOrder(req request.CreateOrder, tenancyId, userId, patientId uint, ten
 		TotalPostage: postagePrice,
 		PayPostage:   postagePrice,
 		Paid:         g.StatusFalse,
-		PatientID:    patientId,
-		SysUserID:    userId,
+		PatientId:    patientId,
+		CUserId:      userId,
 		Cost:         orderCost,
 	}
 	err = g.TENANCY_DB.Transaction(func(tx *gorm.DB) error {
@@ -767,10 +767,10 @@ func CreateOrder(req request.CreateOrder, tenancyId, userId, patientId uint, ten
 				Paid:         g.StatusFalse,
 				Cost:         orderCost,
 			},
-			PatientID:    patientId,
-			SysUserID:    userId,
-			SysTenancyID: tenancyId,
-			GroupOrderID: groupOrder.ID,
+			PatientId:    patientId,
+			CUserId:      userId,
+			SysTenancyId: tenancyId,
+			GroupOrderId: groupOrder.ID,
 		}
 
 		err = tx.Model(&model.Order{}).Create(&order).Error
@@ -779,7 +779,7 @@ func CreateOrder(req request.CreateOrder, tenancyId, userId, patientId uint, ten
 		}
 
 		// 订单状态
-		orderStatus := model.OrderStatus{ChangeType: "create", ChangeMessage: "生成订单", ChangeTime: time.Now(), OrderID: order.ID}
+		orderStatus := model.OrderStatus{ChangeType: "create", ChangeMessage: "生成订单", ChangeTime: time.Now(), OrderId: order.ID}
 		err = CreateOrderStatus(tx, &orderStatus)
 		if err != nil {
 			return err
@@ -800,10 +800,10 @@ func CreateOrder(req request.CreateOrder, tenancyId, userId, patientId uint, ten
 			}
 			ci, _ := json.Marshal(&cartInfo)
 			orderProduct := model.OrderProduct{
-				OrderID:   order.ID,
-				SysUserID: userId,
-				CartID:    cartProduct.Id,
-				ProductID: cartProduct.ProductID,
+				OrderId:   order.ID,
+				CUserId:   userId,
+				CartId:    cartProduct.Id,
+				ProductId: cartProduct.ProductId,
 				CartInfo:  string(ci),
 				BaseOrderProduct: model.BaseOrderProduct{
 					ProductSku:   cartProduct.AttrValue.Sku,
@@ -825,10 +825,10 @@ func CreateOrder(req request.CreateOrder, tenancyId, userId, patientId uint, ten
 
 		// 减库存
 		for _, cartProduct := range orderInfo.Products {
-			if err = DecStock(tx, cartProduct.ProductID, cartProduct.CartNum); err != nil {
+			if err = DecStock(tx, cartProduct.ProductId, cartProduct.CartNum); err != nil {
 				return err
 			}
-			if err = DecSkuStock(tx, cartProduct.ProductID, cartProduct.AttrValue.Unique, cartProduct.CartNum); err != nil {
+			if err = DecSkuStock(tx, cartProduct.ProductId, cartProduct.AttrValue.Unique, cartProduct.CartNum); err != nil {
 				return err
 			}
 		}
@@ -882,7 +882,7 @@ func GetQrCode(orderId, tenancyId, patientId uint, orderType int) ([]byte, error
 func GetThisMonthOrdersByUserId(userId uint) ([]model.Order, error) {
 	orders := []model.Order{}
 	err := g.TENANCY_DB.Model(&model.Order{}).
-		Where("sys_user_id = ?", userId).
+		Where("c_user_id = ?", userId).
 		Where("DATE_FORMAT(`created_at`,'%Y%m')=DATE_FORMAT(CURDATE(),'%Y%m')").
 		Where("paid = ?", g.StatusTrue).
 		Not("status = ?", model.OrderStatusRefund).
@@ -900,7 +900,7 @@ func GetThisMonthOrderPriceByUserId(userId uint) (response.GeneralUserDetail, er
 	var user response.GeneralUserDetail
 	err := g.TENANCY_DB.Model(&model.Order{}).
 		Select("sum(orders.pay_price) as total_pay_price, count(orders.id) as total_pay_count").
-		Where("sys_user_id = ?", userId).
+		Where("c_user_id = ?", userId).
 		Where("DATE_FORMAT(`created_at`,'%Y%m')=DATE_FORMAT(CURDATE(),'%Y%m')").
 		Where("paid = ?", g.StatusTrue).
 		Not("status = ?", model.OrderStatusRefund).
@@ -949,7 +949,7 @@ func ChangeOrderStatusByOrderId(orderId uint, changeData map[string]interface{},
 		if err != nil {
 			return err
 		}
-		orderStatus := model.OrderStatus{ChangeType: changeType, ChangeMessage: changeMessage, ChangeTime: time.Now(), OrderID: orderId}
+		orderStatus := model.OrderStatus{ChangeType: changeType, ChangeMessage: changeMessage, ChangeTime: time.Now(), OrderId: orderId}
 		err = CreateOrderStatus(tx, &orderStatus)
 		if err != nil {
 			return err
@@ -958,10 +958,10 @@ func ChangeOrderStatusByOrderId(orderId uint, changeData map[string]interface{},
 		if changeType == "cancel" {
 			// 退回库存
 			for _, cartProduct := range orderProducts {
-				if err = IncStock(tx, cartProduct.ProductID, cartProduct.ProductNum); err != nil {
+				if err = IncStock(tx, cartProduct.ProductId, cartProduct.ProductNum); err != nil {
 					return err
 				}
-				if err = IncSkuStock(tx, cartProduct.ProductID, cartProduct.Unique, cartProduct.ProductNum); err != nil {
+				if err = IncSkuStock(tx, cartProduct.ProductId, cartProduct.Unique, cartProduct.ProductNum); err != nil {
 					return err
 				}
 			}
@@ -1016,8 +1016,8 @@ func ChangeOrderPayNotifyByOrderSn(changeData map[string]interface{}, orderSn, c
 
 	palyload = model.Payload{
 		OrderId:   orders[0].ID,
-		TenancyId: orders[0].SysTenancyID,
-		UserId:    orders[0].SysUserID,
+		TenancyId: orders[0].SysTenancyId,
+		UserId:    orders[0].CUserId,
 		OrderType: orders[0].OrderType,
 		PayType:   orders[0].PayType,
 		CreatedAt: time.Now(),
@@ -1053,7 +1053,7 @@ func GetOrderAutoAgree() ([]uint, error) {
 func AutoTakeOrders(orderIds []uint) error {
 	var orderStatues []model.OrderStatus
 	for _, orderId := range orderIds {
-		orderStatus := model.OrderStatus{ChangeType: "take", ChangeMessage: "已收货", ChangeTime: time.Now(), OrderID: orderId}
+		orderStatus := model.OrderStatus{ChangeType: "take", ChangeMessage: "已收货", ChangeTime: time.Now(), OrderId: orderId}
 		orderStatues = append(orderStatues, orderStatus)
 	}
 	return g.TENANCY_DB.Transaction(func(tx *gorm.DB) error {
@@ -1120,7 +1120,7 @@ func GetOrderUserNum(scopes ...func(*gorm.DB) *gorm.DB) (int64, error) {
 	if len(scopes) > 0 {
 		db = db.Scopes(scopes...)
 	}
-	err := db.Where("sys_user_id > ?", 0).Group("sys_user_id").Count(&count).Error
+	err := db.Where("c_user_id > ?", 0).Group("c_user_id").Count(&count).Error
 	if err != nil && !errors.Is(err, gorm.ErrRecordNotFound) {
 		return 0, err
 	}
@@ -1134,7 +1134,7 @@ func GetOrderPatientNum(scopes ...func(*gorm.DB) *gorm.DB) (int64, error) {
 	if len(scopes) > 0 {
 		db = db.Scopes(scopes...)
 	}
-	err := db.Where("patient_id > ? and sys_user_id= ? ", 0, 0).Group("patient_id").Count(&count).Error
+	err := db.Where("patient_id > ? and c_user_id= ? ", 0, 0).Group("patient_id").Count(&count).Error
 	if err != nil && !errors.Is(err, gorm.ErrRecordNotFound) {
 		return 0, err
 	}
@@ -1144,7 +1144,7 @@ func GetOrderPatientNum(scopes ...func(*gorm.DB) *gorm.DB) (int64, error) {
 // GetOrderGroup 获取订单数量按时间分组集合
 func GetOrderGroup(scopes ...func(*gorm.DB) *gorm.DB) ([]response.ClientStaticOrder, error) {
 	var res []response.ClientStaticOrder
-	db := g.TENANCY_DB.Model(&model.Order{}).Select("sum(pay_price) as pay_price,count(*) as total,count(distinct sys_user_id) as user,from_unixtime(unix_timestamp(pay_time),'%m-%d') as `day`").
+	db := g.TENANCY_DB.Model(&model.Order{}).Select("sum(pay_price) as pay_price,count(*) as total,count(distinct c_user_id) as user,from_unixtime(unix_timestamp(pay_time),'%m-%d') as `day`").
 		Where("paid =?", g.StatusTrue)
 	if len(scopes) > 0 {
 		db = db.Scopes(scopes...)
@@ -1174,11 +1174,11 @@ func GetOrderNumGroup(scopes ...func(*gorm.DB) *gorm.DB) ([]request.Result, erro
 // GetOrderUserNumGroup 获取订单数量按时间分组集合
 func GetOrderUserNumGroup(scopes ...func(*gorm.DB) *gorm.DB) ([]request.Result, error) {
 	var res []request.Result
-	db := g.TENANCY_DB.Model(&model.Order{}).Select("count(DISTINCT sys_user_id) as total , from_unixtime(unix_timestamp(pay_time),'%H:%i') as time").Where("paid =?", g.StatusTrue)
+	db := g.TENANCY_DB.Model(&model.Order{}).Select("count(DISTINCT c_user_id) as total , from_unixtime(unix_timestamp(pay_time),'%H:%i') as time").Where("paid =?", g.StatusTrue)
 	if len(scopes) > 0 {
 		db = db.Scopes(scopes...)
 	}
-	err := db.Where("sys_user_id > ?", 0).Group("time").Find(&res).Error
+	err := db.Where("c_user_id > ?", 0).Group("time").Find(&res).Error
 	if err != nil && !errors.Is(err, gorm.ErrRecordNotFound) {
 		return nil, err
 	}
@@ -1192,7 +1192,7 @@ func GetOrderPatientNumGroup(scopes ...func(*gorm.DB) *gorm.DB) ([]request.Resul
 	if len(scopes) > 0 {
 		db = db.Scopes(scopes...)
 	}
-	err := db.Where("patient_id > ? and sys_user_id= ? ", 0, 0).Group("time").Find(&res).Error
+	err := db.Where("patient_id > ? and c_user_id= ? ", 0, 0).Group("time").Find(&res).Error
 	if err != nil && !errors.Is(err, gorm.ErrRecordNotFound) {
 		return nil, err
 	}

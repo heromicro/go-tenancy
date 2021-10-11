@@ -3,7 +3,7 @@ package response
 import "github.com/snowlyg/go-tenancy/model/request"
 
 type CartList struct {
-	SysTenancyID uint          `json:"sysTenancyId"`
+	SysTenancyId uint          `json:"sysTenancyId"`
 	Name         string        `json:"name" form:"name"`
 	Avatar       string        `json:"Avatar"`
 	Products     []CartProduct `json:"products" gorm:"-"`
@@ -11,9 +11,9 @@ type CartList struct {
 
 type CartProduct struct {
 	Id                uint                     `json:"id"`
-	SysTenancyID      uint                     `json:"sysTenancyId"`
+	SysTenancyId      uint                     `json:"sysTenancyId"`
 	SpecType          int                      `json:"specType,omitempty" `
-	ProductID         uint                     `json:"productId"`
+	ProductId         uint                     `json:"productId"`
 	StoreName         string                   `json:"storeName"`
 	Image             string                   `json:"image"`
 	CartNum           int64                    `json:"cartNum"`

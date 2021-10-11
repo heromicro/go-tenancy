@@ -29,7 +29,7 @@ func SaveConfigValue(values map[string]interface{}, configKey string, tenancyId 
 			configValue.Value = val
 			g.TENANCY_DB.Save(configValue)
 		} else {
-			g.TENANCY_DB.Create(&model.SysConfigValue{ConfigKey: key, Value: val, SysTenancyID: tenancyId})
+			g.TENANCY_DB.Create(&model.SysConfigValue{ConfigKey: key, Value: val, SysTenancyId: tenancyId})
 		}
 	}
 	return nil

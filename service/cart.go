@@ -15,10 +15,10 @@ import (
 func CreateCart(req request.CreateCart) (model.Cart, error) {
 	var cart model.Cart
 	err := g.TENANCY_DB.Model(&model.Cart{}).
-		Where("patient_id = ?", req.PatientID).
-		Where("sys_user_id = ?", req.SysUserID).
-		Where("sys_tenancy_id = ?", req.SysTenancyID).
-		Where("product_id = ?", req.ProductID).
+		Where("patient_id = ?", req.PatientId).
+		Where("c_user_id = ?", req.CUserId).
+		Where("sys_tenancy_id = ?", req.SysTenancyId).
+		Where("product_id = ?", req.ProductId).
 		Where("is_pay = ?", g.StatusFalse).
 		Where("is_fail = ?", g.StatusFalse).
 		Where("is_new = ?", g.StatusFalse).
@@ -33,7 +33,7 @@ func CreateCart(req request.CreateCart) (model.Cart, error) {
 			IsNew:             req.IsNew,
 			IsFail:            g.StatusFalse,
 		}
-		cart = model.Cart{BaseCart: baseCart, SysUserID: req.SysUserID, SysTenancyID: req.SysTenancyID, ProductID: req.ProductID, PatientID: req.PatientID}
+		cart = model.Cart{BaseCart: baseCart, CUserId: req.CUserId, SysTenancyId: req.SysTenancyId, ProductId: req.ProductId, PatientId: req.PatientId}
 		err = g.TENANCY_DB.Model(&model.Cart{}).Create(&cart).Error
 		if err != nil {
 			return cart, err
@@ -55,7 +55,7 @@ func CreateCart(req request.CreateCart) (model.Cart, error) {
 func ChangeCartNum(cartNum int64, id, userId, tenancyId uint) error {
 	return g.TENANCY_DB.Model(&model.Cart{}).
 		Where("id = ?", id).
-		Where("sys_user_id = ?", userId).
+		Where("c_user_id = ?", userId).
 		Where("sys_tenancy_id = ?", tenancyId).
 		Update("cart_num", cartNum).Error
 }
@@ -70,7 +70,7 @@ func ChangeIsPayByIds(tx *gorm.DB, ids []uint) error {
 // DeleteCart
 func DeleteCart(ids []uint, userId, tenancyId uint) error {
 	return g.TENANCY_DB.Model(&model.Cart{}).
-		Where("sys_user_id = ?", userId).
+		Where("c_user_id = ?", userId).
 		Where("sys_tenancy_id = ?", tenancyId).
 		Where("id in ?", ids).
 		Delete(&model.Cart{}).Error
@@ -80,7 +80,7 @@ func DeleteCart(ids []uint, userId, tenancyId uint) error {
 func GetProductCount(userId, tenancyId uint) (int64, error) {
 	var count int64
 	err := g.TENANCY_DB.Model(&model.Cart{}).
-		Where("sys_user_id = ?", userId).
+		Where("c_user_id = ?", userId).
 		Where("sys_tenancy_id = ?", tenancyId).
 		Count(&count).Error
 	if err != nil {
@@ -102,7 +102,7 @@ func GetCartList(tenancyId, userId, patientId uint, cartIds []uint) ([]response.
 	if len(cartProducts) > 0 {
 		for _, cartProduct := range cartProducts {
 			if cartProduct.IsFail == g.StatusFalse {
-				tenancyIds = append(tenancyIds, cartProduct.SysTenancyID)
+				tenancyIds = append(tenancyIds, cartProduct.SysTenancyId)
 			} else {
 				fails = append(fails, cartProduct)
 			}
@@ -120,7 +120,7 @@ func GetCartList(tenancyId, userId, patientId uint, cartIds []uint) ([]response.
 	if len(cartList) > 0 {
 		for i := 0; i < len(cartList); i++ {
 			for _, cartProduct := range cartProducts {
-				if cartProduct.SysTenancyID == cartList[i].SysTenancyID && cartProduct.IsFail == g.StatusFalse {
+				if cartProduct.SysTenancyId == cartList[i].SysTenancyId && cartProduct.IsFail == g.StatusFalse {
 					cartList[i].Products = append(cartList[i].Products, cartProduct)
 				}
 			}

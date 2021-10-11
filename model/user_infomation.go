@@ -14,7 +14,7 @@ type UserVisit struct {
 	TypeID  int    `gorm:"index:type;column:type_id;type:int;not null;default:0" json:"typeId"` // 商品ID
 	Content string `gorm:"column:content;type:varchar(255)" json:"content"`                     // 备注描述
 
-	CUserID uint `json:"cUserId" form:"cUserId" gorm:"column:c_user_id;comment:关联标记"`
+	CUserId uint `json:"cUserId" form:"cUserId" gorm:"column:c_user_id;comment:关联标记"`
 }
 
 // UserBill 用户账单表
@@ -30,7 +30,7 @@ type UserBill struct {
 	Mark     string  `gorm:"column:mark;type:varchar(512);not null" json:"mark"`                             // 备注
 	Status   int     `gorm:"column:status;type:tinyint(1);not null;default:2" json:"status"`                 // 1 = 待确定 2 = 有效 3 = 无效
 
-	CUserID uint `json:"cUserId" form:"cUserId" gorm:"column:c_user_id;comment:关联标记"`
+	CUserId uint `json:"cUserId" form:"cUserId" gorm:"column:c_user_id;comment:关联标记"`
 	LinkID  uint `gorm:"index:type;column:link_id;type:varchar(32);not null;default:0" json:"linkId"` // 关联id
 }
 
@@ -53,7 +53,7 @@ type UserExtract struct {
 	StatusTime   time.Time `gorm:"column:status_time;type:timestamp;not null;default:CURRENT_TIMESTAMP" json:"statusTime"` // 无效时间
 	Status       int       `gorm:"column:status;type:tinyint;default:2" json:"status"`                                     // 1 审核中 2 已提现 3 未通过
 
-	CUserID uint `json:"cUserId" form:"cUserId" gorm:"column:c_user_id;comment:关联标记"`
+	CUserId uint `json:"cUserId" form:"cUserId" gorm:"column:c_user_id;comment:关联标记"`
 }
 
 // UserReceipt 发票
@@ -71,7 +71,7 @@ type UserReceipt struct {
 	Tel              string `json:"tel" form:"tel" gorm:"column:tel;comment:企业电话"`
 	IsDefault        int    `json:"isDefault" form:"isDefault" gorm:"type:tinyint(1);column:is_default;comment:是否默认"`
 
-	CUserID uint `json:"cUserId" form:"cUserId" gorm:"column:c_user_id;comment:关联标记"`
+	CUserId uint `json:"cUserId" form:"cUserId" gorm:"column:c_user_id;comment:关联标记"`
 }
 
 // UserRecharge 用户充值表
@@ -85,8 +85,8 @@ type UserRecharge struct {
 	PayTime      time.Time `gorm:"column:pay_time;type:timestamp" json:"payTime"`                                   // 充值支付时间
 	RefundPrice  float64   `gorm:"column:refund_price;type:decimal(10,2) unsigned;default:0.00" json:"refundPrice"` // 退款金额
 
-	SysUserID uint   `json:"sysUserId" form:"sysUserId" gorm:"column:sys_user_id;comment:关联标记"`
-	OrderID   string `gorm:"unique;column:order_id;type:varchar(32);not null" json:"orderId"` // 订单号
+	CUserId uint   `json:"sysUserId" form:"sysUserId" gorm:"column:sys_user_id;comment:关联标记"`
+	OrderId string `gorm:"unique;column:order_id;type:varchar(32);not null" json:"orderId"` // 订单号
 }
 
 // UserRelation 用户记录表,关注店铺和商品
@@ -96,7 +96,7 @@ type UserRelation struct {
 	Type   int  `gorm:"uniqueIndex:type_index;column:type;type:tinyint;not null;default:0" json:"type"`    // 关联类型(1= 普通商品、10 = 店铺、12=购买过)
 	TypeID uint `gorm:"uniqueIndex:type_id_index;column:type_id;type:int unsigned;not null" json:"typeId"` // 类型的 id
 
-	CUserID uint `json:"cUserId" form:"cUserId" gorm:"column:c_user_id;comment:关联标记"`
+	CUserId uint `json:"cUserId" form:"cUserId" gorm:"column:c_user_id;comment:关联标记"`
 }
 
 // UserAddress 用户收货地址
@@ -121,5 +121,5 @@ type UserAddress struct {
 	HospitalNO   string `json:"hospitalNo" form:"hospitalNo" gorm:"type:varchar(20);column:hospital_no;comment:住院号"`
 	Disease      string `json:"disease" form:"disease" gorm:"type:varchar(150);column:disease;comment:病种"`
 
-	CUserID uint `json:"cUserId" form:"cUserId" gorm:"column:c_user_id;comment:关联标记"`
+	CUserId uint `json:"cUserId" form:"cUserId" gorm:"column:c_user_id;comment:关联标记"`
 }

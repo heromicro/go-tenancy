@@ -53,7 +53,7 @@ func CreateProductCategory(productCategory model.ProductCategory, tenancyId uint
 		return productCategory, errors.New("名称已被注冊")
 	}
 
-	productCategory.SysTenancyID = tenancyId
+	productCategory.SysTenancyId = tenancyId
 	err = g.TENANCY_DB.Create(&productCategory).Error
 	return productCategory, err
 }

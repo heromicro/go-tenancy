@@ -9,7 +9,7 @@ type ShippingTemplate struct {
 	g.TENANCY_MODEL
 	BaseShippingTemplate
 
-	SysTenancyID uint `gorm:"index:sys_tenancy_id;column:sys_tenancy_id;type:int;not null" json:"sysTenancyId"`
+	SysTenancyId uint `gorm:"index:sys_tenancy_id;column:sys_tenancy_id;type:int;not null" json:"sysTenancyId"`
 }
 
 type BaseShippingTemplate struct {

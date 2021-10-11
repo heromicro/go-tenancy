@@ -40,7 +40,7 @@ func getRefundOrderSearch(info request.RefundOrderPageInfo, ctx *gin.Context, db
 	}
 
 	if info.Date != "" {
-		db = db.Scopes(scope.FilterDate(info.Date,"created_at", "refund_orders"))
+		db = db.Scopes(scope.FilterDate(info.Date, "created_at", "refund_orders"))
 	}
 
 	if info.IsTrader != "" {
@@ -53,7 +53,7 @@ func getRefundOrderSearch(info request.RefundOrderPageInfo, ctx *gin.Context, db
 	}
 
 	if info.SysUserId > 0 {
-		db.Where("orders.sys_user_id = ?", info.SysUserId)
+		db.Where("orders.c_user_id = ?", info.SysUserId)
 	}
 
 	if info.PatientId > 0 {
@@ -85,7 +85,7 @@ func GetRefundOrderInfoList(info request.RefundOrderPageInfo, ctx *gin.Context) 
 		Select("refund_orders.*,sys_tenancies.name as tenancy_name,sys_tenancies.is_trader as is_trader,c_users.nick_name as user_nick_name,orders.order_sn as order_sn,orders.activity_type as activity_type").
 		Joins("left join orders on refund_orders.order_id = orders.id").
 		Joins("left join sys_tenancies on refund_orders.sys_tenancy_id = sys_tenancies.id").
-		Joins("left join c_users on refund_orders.sys_user_id = c_users.id")
+		Joins("left join c_users on refund_orders.c_user_id = c_users.id")
 
 	if info.Status != "" {
 		db = db.Where("refund_orders.status = ?", info.Status)
@@ -124,7 +124,7 @@ func GetRefundOrderInfoList(info request.RefundOrderPageInfo, ctx *gin.Context) 
 
 		for i := 0; i < len(refundOrderList); i++ {
 			for _, refundProduct := range refundProducts {
-				if refundOrderList[i].ID == refundProduct.RefundOrderID {
+				if refundOrderList[i].ID == refundProduct.RefundOrderId {
 					refundOrderList[i].RefundProduct = append(refundOrderList[i].RefundProduct, refundProduct)
 				}
 			}
@@ -319,14 +319,14 @@ func GetRefundPriceByOrderIds(ids []uint) (float64, error) {
 
 // checkRefundPrice 检查退款金额
 func checkRefundPrice(refundOrder model.RefundOrder) (float64, error) {
-	order, err := GetOrderById(refundOrder.OrderID)
+	order, err := GetOrderById(refundOrder.OrderId)
 	if errors.Is(err, gorm.ErrRecordNotFound) {
 		return 0, fmt.Errorf("当前订单不存在")
 	} else if err != nil {
 		return 0, err
 	}
 	// 已退款金额
-	refundPrice, err := GetRefundPriceByOrderIds([]uint{refundOrder.OrderID})
+	refundPrice, err := GetRefundPriceByOrderIds([]uint{refundOrder.OrderId})
 	if err != nil {
 		g.TENANCY_LOG.Error("检查退款金额", zap.String("GetRefundPriceByOrderIds()", err.Error()))
 		return 0, fmt.Errorf("get refund order price %w", err)
@@ -386,7 +386,7 @@ func refuseRefundOrder(refundOrder model.RefundOrder, failMessage string) error 
 	status := refundOrder.Status
 
 	// 其他退款订单
-	refundOrderIds, err := GetOtherRefundOrderIds(refundOrder.OrderID, refundOrder.ID)
+	refundOrderIds, err := GetOtherRefundOrderIds(refundOrder.OrderId, refundOrder.ID)
 	if err != nil {
 		return err
 	}
@@ -413,7 +413,7 @@ func refuseRefundOrder(refundOrder model.RefundOrder, failMessage string) error 
 			// 判断如果还有其他退款单，商品状态变为退款中
 			if len(refundOrderIds) > 0 {
 				var count int64
-				err := g.TENANCY_DB.Model(&model.RefundProduct{}).Where("refund_order_id in ?", refundOrderIds).Where("order_product_id = ?", refundProduct.ProductID).Count(&count).Error
+				err := g.TENANCY_DB.Model(&model.RefundProduct{}).Where("refund_order_id in ?", refundOrderIds).Where("order_product_id = ?", refundProduct.ProductId).Count(&count).Error
 				if err != nil {
 					return fmt.Errorf("get check refund product %w", err)
 				}
@@ -488,11 +488,11 @@ func agreeRefundOrder(refundOrder model.RefundOrder, refundAgreeMsg string) erro
 				return err
 			}
 			// 修改商品库存和销量
-			if err = IncStock(tx, refundProduct.ProductID, refundProduct.ProductNum); err != nil {
+			if err = IncStock(tx, refundProduct.ProductId, refundProduct.ProductNum); err != nil {
 				return err
 			}
 			// 修改商品规格库存和销量
-			if err = IncSkuStock(tx, refundProduct.ProductID, refundProduct.Unique, refundProduct.ProductNum); err != nil {
+			if err = IncSkuStock(tx, refundProduct.ProductId, refundProduct.Unique, refundProduct.ProductNum); err != nil {
 				return err
 			}
 		}
@@ -502,7 +502,7 @@ func agreeRefundOrder(refundOrder model.RefundOrder, refundAgreeMsg string) erro
 		if refundOrder.RefundType == model.RefundTypeTK { // 只退款，直接原路退款给用户
 			// 获取订单支付类型，获取订单号
 			// 生成支付平台退款单
-			order, err := GetOrderById(refundOrder.OrderID)
+			order, err := GetOrderById(refundOrder.OrderId)
 			if err != nil {
 				return err
 			}
@@ -545,10 +545,10 @@ func CreateRefundOrder(reqId request.GetById, req request.CreateRefundOrder, ord
 	var returnOrderId uint
 	err := g.TENANCY_DB.Transaction(func(tx *gorm.DB) error {
 		refundOrder := model.RefundOrder{
-			OrderID:      reqId.Id,
-			PatientID:    reqId.PatientId,
-			SysUserID:    reqId.UserId,
-			SysTenancyID: reqId.TenancyId,
+			OrderId:      reqId.Id,
+			PatientId:    reqId.PatientId,
+			CUserId:      reqId.UserId,
+			SysTenancyId: reqId.TenancyId,
 			BaseRefundOrder: model.BaseRefundOrder{
 				RefundOrderSn: g.CreateOrderSn("R"),
 				Mark:          req.Mark,
@@ -577,8 +577,8 @@ func CreateRefundOrder(reqId request.GetById, req request.CreateRefundOrder, ord
 		var refundProducts []model.RefundProduct
 		for _, orderProduct := range orderProducts {
 			refundProduct := model.RefundProduct{
-				RefundOrderID:  refundOrder.ID,
-				OrderProductID: orderProduct.ProductID,
+				RefundOrderId:  refundOrder.ID,
+				OrderProductId: orderProduct.ProductId,
 				RefundNum:      orderProduct.ProductNum,
 			}
 			refundProducts = append(refundProducts, refundProduct)
@@ -637,7 +637,7 @@ func AutoAgreeRefundOrders(refundOrders []model.RefundOrder) {
 // addRefundOrderStatus 添加退款单记录
 func addRefundOrderStatus(db *gorm.DB, id uint, cahngeType, changeMessage string) error {
 	status := model.RefundStatus{
-		RefundOrderID: id,
+		RefundOrderId: id,
 		ChangeType:    cahngeType,
 		ChangeMessage: changeMessage,
 		ChangeTime:    time.Now(),

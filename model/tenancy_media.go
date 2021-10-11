@@ -11,5 +11,5 @@ type TenancyMedia struct {
 	Tag  string `json:"tag" gorm:"comment:文件标签"` // 文件标签
 	Key  string `json:"key" gorm:"comment:编号"`   // 编号
 
-	SysTenancyID uint `gorm:"index:sys_tenancy_id;column:sys_tenancy_id;type:int;not null" json:"sysTenancyId"` // 商户 id
+	SysTenancyId uint `gorm:"index:sys_tenancy_id;column:sys_tenancy_id;type:int;not null" json:"sysTenancyId"` // 商户 id
 }

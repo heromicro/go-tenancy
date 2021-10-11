@@ -43,7 +43,7 @@ func CreateUserLabel(ctx *gin.Context) {
 		response.FailWithMessage(errs.Error(), ctx)
 		return
 	}
-	label.SysTenancyID = multi.GetTenancyId(ctx)
+	label.SysTenancyId = multi.GetTenancyId(ctx)
 	if returnUserLabel, err := service.CreateUserLabel(label); err != nil {
 		g.TENANCY_LOG.Error("创建失败!", zap.Any("err", err))
 		response.FailWithMessage("添加失败:"+err.Error(), ctx)
@@ -64,7 +64,7 @@ func UpdateUserLabel(ctx *gin.Context) {
 		response.FailWithMessage(errs.Error(), ctx)
 		return
 	}
-	label.SysTenancyID = multi.GetTenancyId(ctx)
+	label.SysTenancyId = multi.GetTenancyId(ctx)
 	if returnUserLabel, err := service.UpdateUserLabel(label, req.Id); err != nil {
 		g.TENANCY_LOG.Error("更新失败!", zap.Any("err", err))
 		response.FailWithMessage("更新失败:"+err.Error(), ctx)

@@ -36,14 +36,14 @@ func PayTest(req request.CreateCart) ([]byte, error) {
 		OrderType: 1,
 		Remark:    "remark",
 	}
-	index := fmt.Sprintf("%s%d_%d_%d", PayTestKey, req.SysTenancyID, req.SysUserID, req.PatientID)
+	index := fmt.Sprintf("%s%d_%d_%d", PayTestKey, req.SysTenancyId, req.CUserId, req.PatientId)
 	qrcode, err := cache.GetCacheBytes(index)
 	if err != nil || qrcode == nil {
-		tenancy, err := GetTenancyByID(req.SysTenancyID)
+		tenancy, err := GetTenancyByID(req.SysTenancyId)
 		if err != nil {
 			return nil, err
 		}
-		qrcode, _, err = CreateOrder(res, req.SysTenancyID, req.SysUserID, req.PatientID, tenancy.Name)
+		qrcode, _, err = CreateOrder(res, req.SysTenancyId, req.CUserId, req.PatientId, tenancy.Name)
 		if err != nil {
 			return nil, err
 		}

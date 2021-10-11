@@ -4,5 +4,5 @@ import "github.com/snowlyg/go-tenancy/model"
 
 type UserLabelWithUserId struct {
 	model.UserLabel
-	SysUserID uint `json:"sysUserId"`
+	SysUserId uint `json:"sysUserId"`
 }

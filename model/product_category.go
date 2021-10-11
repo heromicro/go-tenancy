@@ -6,7 +6,7 @@ type ProductCategory struct {
 	g.TENANCY_MODEL
 	BaseProductCategory
 
-	SysTenancyID uint `gorm:"index:sys_tenancy_id;column:sys_tenancy_id;type:int unsigned;not null" json:"sysTenancyId"` // 商户 id
+	SysTenancyId uint `gorm:"index:sys_tenancy_id;column:sys_tenancy_id;type:int unsigned;not null" json:"sysTenancyId"` // 商户 id
 }
 
 type BaseProductCategory struct {

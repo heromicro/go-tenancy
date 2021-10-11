@@ -16,5 +16,5 @@ type Patient struct {
 	HospitalNO string `json:"hospitalNo" form:"hospitalNo" gorm:"uniqueIndex:hospital_no;type:varchar(20);column:hospital_no;comment:住院号" binding:"required"`
 	Disease    string `json:"disease" form:"disease" gorm:"type:varchar(150);column:disease;comment:病种" binding:"required"`
 
-	SysTenancyID uint `json:"sysTenancyId" form:"sysTenancyId" gorm:"column:sys_tenancy_id;comment:关联标记"`
+	SysTenancyId uint `json:"sysTenancyId" form:"sysTenancyId" gorm:"column:sys_tenancy_id;comment:关联标记"`
 }

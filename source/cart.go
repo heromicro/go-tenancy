@@ -12,10 +12,10 @@ var Cart = new(cart)
 type cart struct{}
 
 var carts = []model.Cart{
-	{SysUserID: 3, SysTenancyID: 1, BaseCart: model.BaseCart{ProductType: model.GeneralSale, ProductAttrUnique: "167a5a36ded1", CartNum: 1, Source: 0, SourceID: 0, IsPay: g.StatusTrue, IsNew: g.StatusFalse, IsFail: g.StatusFalse}, ProductID: 7},
-	{SysUserID: 3, SysTenancyID: 1, BaseCart: model.BaseCart{ProductType: model.GeneralSale, ProductAttrUnique: "167a5a36ded2", CartNum: 1, Source: 0, SourceID: 0, IsPay: g.StatusTrue, IsNew: g.StatusFalse, IsFail: g.StatusFalse}, ProductID: 7},
-	{SysUserID: 3, SysTenancyID: 1, BaseCart: model.BaseCart{ProductType: model.GeneralSale, ProductAttrUnique: "167a5a36ded3", CartNum: 1, Source: 0, SourceID: 0, IsPay: g.StatusTrue, IsNew: g.StatusFalse, IsFail: g.StatusFalse}, ProductID: 7},
-	{SysUserID: 3, SysTenancyID: 1, BaseCart: model.BaseCart{ProductType: model.GeneralSale, ProductAttrUnique: "167a5a36ded4", CartNum: 4, Source: 0, SourceID: 0, IsPay: g.StatusTrue, IsNew: g.StatusFalse, IsFail: g.StatusFalse}, ProductID: 7},
+	{CUserId: 3, SysTenancyId: 1, BaseCart: model.BaseCart{ProductType: model.GeneralSale, ProductAttrUnique: "167a5a36ded1", CartNum: 1, Source: 0, SourceID: 0, IsPay: g.StatusTrue, IsNew: g.StatusFalse, IsFail: g.StatusFalse}, ProductId: 7},
+	{CUserId: 3, SysTenancyId: 1, BaseCart: model.BaseCart{ProductType: model.GeneralSale, ProductAttrUnique: "167a5a36ded2", CartNum: 1, Source: 0, SourceID: 0, IsPay: g.StatusTrue, IsNew: g.StatusFalse, IsFail: g.StatusFalse}, ProductId: 7},
+	{CUserId: 3, SysTenancyId: 1, BaseCart: model.BaseCart{ProductType: model.GeneralSale, ProductAttrUnique: "167a5a36ded3", CartNum: 1, Source: 0, SourceID: 0, IsPay: g.StatusTrue, IsNew: g.StatusFalse, IsFail: g.StatusFalse}, ProductId: 7},
+	{CUserId: 3, SysTenancyId: 1, BaseCart: model.BaseCart{ProductType: model.GeneralSale, ProductAttrUnique: "167a5a36ded4", CartNum: 4, Source: 0, SourceID: 0, IsPay: g.StatusTrue, IsNew: g.StatusFalse, IsFail: g.StatusFalse}, ProductId: 7},
 }
 
 //@description: carts 表数据初始化

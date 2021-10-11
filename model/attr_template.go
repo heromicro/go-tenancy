@@ -11,5 +11,5 @@ type AttrTemplate struct {
 	TemplateName  string         `gorm:"column:template_name;type:varchar(32);not null" json:"templateName" binding:"required"` // 规格名称
 	TemplateValue datatypes.JSON `gorm:"column:template_value;type:json;not null" json:"templateValue" binding:"required"`      // 规格值
 
-	SysTenancyID uint `gorm:"index:sys_tenancy_id;column:sys_tenancy_id;type:int;not null" json:"sysTenancyId"` // 商户 id
+	SysTenancyId uint `gorm:"index:sys_tenancy_id;column:sys_tenancy_id;type:int;not null" json:"sysTenancyId"` // 商户 id
 }

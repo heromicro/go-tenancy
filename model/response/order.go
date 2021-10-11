@@ -12,10 +12,10 @@ type OrderList struct {
 	GroupOrderSn     string         `json:"groupOrderSn" form:"groupOrderSn"`
 	TenancyName      string         `json:"tenancyName" form:"tenancyName"`
 	IsTrader         int            `json:"isTrader" form:"isTrader"`
-	SysUserID        uint           `json:"sysUserId" form:"sysUserId"`
-	SysTenancyID     uint           `json:"sysTenancyId"`
-	GroupOrderID     int            `json:"groupOrderId"`
-	ReconciliationID uint8          `json:"reconciliationId"`
+	SysUserId        uint           `json:"sysUserId" form:"sysUserId"`
+	SysTenancyId     uint           `json:"sysTenancyId"`
+	GroupOrderId     int            `json:"groupOrderId"`
+	ReconciliationId uint8          `json:"reconciliationId"`
 	OrderProduct     []OrderProduct `gorm:"-" json:"orderProduct"`
 }
 
@@ -23,8 +23,8 @@ type OrderProduct struct {
 	ID       uint           `json:"id"`
 	CartInfo datatypes.JSON `json:"cartInfo"`
 	model.BaseOrderProduct
-	OrderID   uint `json:"orderID"`
-	ProductID uint `json:"productId"` // 商品ID
+	OrderId   uint `json:"orderID"`
+	ProductId uint `json:"productId"` // 商品ID
 }
 
 type OrderCondition struct {
@@ -37,11 +37,11 @@ type OrderCondition struct {
 type OrderDetail struct {
 	TenancyResponse
 	model.BaseOrder
-	SysUserID        uint           `json:"sysUserId" form:"sysUserId"`
-	SysTenancyID     uint           `json:"sysTenancyId"`
+	SysUserId        uint           `json:"sysUserId" form:"sysUserId"`
+	SysTenancyId     uint           `json:"sysTenancyId"`
 	PatientId        uint           `json:"patientId"`
-	GroupOrderID     int            `json:"groupOrderId"`
-	ReconciliationID uint8          `json:"reconciliationId"`
+	GroupOrderId     int            `json:"groupOrderId"`
+	ReconciliationId uint8          `json:"reconciliationId"`
 	UserNickName     string         `json:"userNickName" form:"userNickName"`
 	OrderProduct     []OrderProduct `gorm:"-" json:"orderProduct"`
 }

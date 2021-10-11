@@ -129,7 +129,7 @@ func CreateProduct(req request.CreateProduct, tenancyId uint) (uint, error) {
 		BaseProduct: req.BaseProduct,
 		SliderImage: strings.Join(req.SliderImages, ","),
 	}
-	product.SysTenancyID = tenancyId
+	product.SysTenancyId = tenancyId
 	product.ProductCategoryID = req.CateId
 	product.IsHot = g.StatusFalse
 	product.IsBenefit = g.StatusFalse
@@ -293,7 +293,7 @@ func SetProductAttrValue(tx *gorm.DB, productId uint, productType int32, reqAttr
 		attrValue.BaseProductAttrValue.Sku = attrValue.Value0
 		attrValue.BaseProductAttrValue.Unique = unique
 		productAttrValue := model.ProductAttrValue{
-			ProductID:            productId,
+			ProductId:            productId,
 			BaseProductAttrValue: attrValue.BaseProductAttrValue,
 			Detail:               attrValue.Detail.String(),
 			Type:                 productType,
@@ -317,7 +317,7 @@ func SetProductAttrValue(tx *gorm.DB, productId uint, productType int32, reqAttr
 			continue
 		}
 		productAttr := model.ProductAttr{
-			ProductID:  productId,
+			ProductId:  productId,
 			AttrName:   attr.Value,
 			AttrValues: attr.Detail.String(),
 			Type:       productType,
@@ -349,7 +349,7 @@ func SetProductContent(tx *gorm.DB, productId, tenancyId uint, productType int32
 	err := g.TENANCY_DB.Model(&model.ProductContent{}).Where("product_id = ?", productId).First(&conModel).Error
 
 	if errors.Is(err, gorm.ErrRecordNotFound) {
-		con := model.ProductContent{Content: content, ProductID: productId, Type: productType}
+		con := model.ProductContent{Content: content, ProductId: productId, Type: productType}
 		if err := tx.Model(&model.ProductContent{}).Create(&con).Error; err != nil {
 			return err
 		}
@@ -409,7 +409,7 @@ func SetProductCategory(tx *gorm.DB, id, tenancyId uint, reqIds []uint) error {
 	if len(addIds) > 0 {
 		var cates []model.ProductProductCate
 		for _, addId := range addIds {
-			cates = append(cates, model.ProductProductCate{ProductID: id, ProductCategoryID: addId, SysTenancyID: tenancyId})
+			cates = append(cates, model.ProductProductCate{ProductId: id, ProductCategoryID: addId, SysTenancyId: tenancyId})
 		}
 		if err = tx.Model(&model.ProductProductCate{}).Create(&cates).Error; err != nil {
 			return fmt.Errorf("create product_product_categorys %w", err)
@@ -449,7 +449,7 @@ func GetCartProducts(sysTenancyID, sysUserID, patientId uint, cartIds []uint) ([
 	db := g.TENANCY_DB.Model(&model.Product{}).Where("products.is_show = ?", g.StatusTrue).Where("products.status = ?", model.SuccessProductStatus).Select("products.id as product_id,products.store_name,products.image,products.spec_type,products.price,carts.id,carts.cart_num,carts.sys_tenancy_id as sys_tenancy_id,carts.product_attr_unique,carts.is_fail").
 		Joins("left join carts on products.id = carts.product_id")
 	db = CheckTenancyId(db, sysTenancyID, "carts.")
-	db.Where("carts.sys_user_id = ?", sysUserID).
+	db.Where("carts.c_user_id = ?", sysUserID).
 		Where("carts.patient_id = ?", patientId).
 		Where("carts.is_pay = ?", g.StatusFalse).
 		Where("carts.deleted_at is null")
@@ -467,9 +467,9 @@ func GetCartProducts(sysTenancyID, sysUserID, patientId uint, cartIds []uint) ([
 	uniques := []string{}
 	for _, cartProduct := range cartProducts {
 		if cartProduct.SpecType == model.SingleSpec {
-			productIds = append(productIds, cartProduct.ProductID)
+			productIds = append(productIds, cartProduct.ProductId)
 		} else if cartProduct.SpecType == model.DoubleSpec {
-			productIds = append(productIds, cartProduct.ProductID)
+			productIds = append(productIds, cartProduct.ProductId)
 		}
 
 		uniques = append(uniques, cartProduct.ProductAttrUnique)
@@ -483,7 +483,7 @@ func GetCartProducts(sysTenancyID, sysUserID, patientId uint, cartIds []uint) ([
 	if len(attrValues) > 0 {
 		for _, attrValue := range attrValues {
 			for i := 0; i < len(cartProducts); i++ {
-				if cartProducts[i].ProductID == attrValue.ProductID && cartProducts[i].ProductAttrUnique == attrValue.Unique {
+				if cartProducts[i].ProductId == attrValue.ProductId && cartProducts[i].ProductAttrUnique == attrValue.Unique {
 					productAttrValue := request.ProductAttrValue{BaseProductAttrValue: attrValue.BaseProductAttrValue, Value0: attrValue.BaseProductAttrValue.Sku}
 					if attrValue.Detail != "" {
 						err := json.Unmarshal([]byte(attrValue.Detail), &productAttrValue.Detail)
@@ -712,7 +712,7 @@ func GetProductInfoList(info request.ProductPageInfo, tenancyId uint, isTenancy,
 	err = db.Limit(limit).Offset(offset).Find(&productList).Error
 
 	for i := 0; i < len(productList); i++ {
-		productCates, err := getProductCatesByProductId(productList[i].ID, productList[i].SysTenancyID)
+		productCates, err := getProductCatesByProductId(productList[i].ID, productList[i].SysTenancyId)
 		if err != nil {
 			continue
 		}

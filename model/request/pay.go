@@ -4,7 +4,7 @@ type PayOrder struct {
 	OrderId   uint   `json:"orderId" form:"orderId"`
 	TenancyId uint   `json:"tenancyId" form:"tenancyId"`
 	UserId    uint   `json:"userId" form:"userId"`
-	PatientID uint   `json:"patientId" form:"patientId"`
+	PatientId uint   `json:"patientId" form:"patientId"`
 	OrderType int    `json:"orderType" form:"orderType"`
 	Expire    int64  `json:"expire" form:"expire"`
 	OpenId    string `json:"openId" form:"openId"`

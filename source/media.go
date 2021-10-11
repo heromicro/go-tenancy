@@ -12,8 +12,8 @@ var TenancyMedia = new(media)
 type media struct{}
 
 var medias = []model.TenancyMedia{
-	{Name: "杜蕾斯", Tag: "杜蕾斯", Url: "http://qmplusimg.henrongyi.top/head.png", Key: "001", SysTenancyID: 0},
-	{Name: "杜蕾斯1", Tag: "杜蕾斯1", Url: "http://qmplusimg.henrongyi.top/head.png", Key: "0011", SysTenancyID: 1},
+	{Name: "杜蕾斯", Tag: "杜蕾斯", Url: "http://qmplusimg.henrongyi.top/head.png", Key: "001", SysTenancyId: 0},
+	{Name: "杜蕾斯1", Tag: "杜蕾斯1", Url: "http://qmplusimg.henrongyi.top/head.png", Key: "0011", SysTenancyId: 1},
 }
 
 func (m *media) Init() error {

@@ -11,7 +11,7 @@ import (
 
 // CreateShippingTemplate
 func CreateShippingTemplate(shippingTem model.ShippingTemplate, tenancyId uint) (uint, error) {
-	shippingTem.SysTenancyID = tenancyId
+	shippingTem.SysTenancyId = tenancyId
 	err := g.TENANCY_DB.Create(&shippingTem).Error
 	return shippingTem.ID, err
 }

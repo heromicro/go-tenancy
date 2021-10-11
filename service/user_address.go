@@ -25,7 +25,7 @@ func CreateAddress(m request.CreateAddress, user_id uint) (model.UserAddress, er
 	address.BedNum = m.BedNum
 	address.HospitalNO = m.HospitalNO
 	address.Disease = m.Disease
-	address.CUserID = user_id
+	address.CUserId = user_id
 	err := g.TENANCY_DB.Create(&address).Error
 	return address, err
 }

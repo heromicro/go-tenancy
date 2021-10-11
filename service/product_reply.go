@@ -88,7 +88,7 @@ func AddReply(id uint, content string) error {
 	return nil
 }
 func AddFictiReply(req request.AddFictiReply) (uint, error) {
-	reply := model.ProductReply{BaseProductReply: req.BaseProductReply, ProductID: req.ProductID.Id}
+	reply := model.ProductReply{BaseProductReply: req.BaseProductReply, ProductId: req.ProductId.Id}
 	reply.Pics = strings.Join(req.Pic, ",")
 	err := g.TENANCY_DB.Model(&model.ProductReply{}).Create(&reply).Error
 	if err != nil {
@@ -109,7 +109,7 @@ func GetProductReplyInfoList(info request.ProductReplyPageInfo, tenancyId uint, 
 	}
 
 	if info.Date != "" {
-		db = db.Scopes(scope.FilterDate(info.Date,"created_at", ""))
+		db = db.Scopes(scope.FilterDate(info.Date, "created_at", ""))
 	}
 	if info.IsReply > 0 {
 		db = db.Where("is_reply = ?", info.IsReply)
@@ -142,7 +142,7 @@ func GetProductReplyInfoList(info request.ProductReplyPageInfo, tenancyId uint, 
 	products := []response.ProductForReply{}
 	if len(productReplyList) > 0 {
 		for _, productReply := range productReplyList {
-			productIds = append(productIds, productReply.ProductID)
+			productIds = append(productIds, productReply.ProductId)
 		}
 		if len(productIds) > 0 {
 			products, err = GetProductForReplysByIds(productIds, tenancyId)
@@ -154,7 +154,7 @@ func GetProductReplyInfoList(info request.ProductReplyPageInfo, tenancyId uint, 
 		for i := 0; i < len(productReplyList); i++ {
 			if len(products) > 0 {
 				for _, product := range products {
-					if productReplyList[i].ProductID == product.ID {
+					if productReplyList[i].ProductId == product.ID {
 						productReplyList[i].StoreName = product.StoreName
 						productReplyList[i].Image = product.Image
 					}

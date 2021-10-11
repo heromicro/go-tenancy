@@ -7,5 +7,5 @@ type AttrTemplate struct {
 	TemplateName  string         `json:"templateName"`  // 规格名称
 	TemplateValue datatypes.JSON `json:"templateValue"` // 规格值
 
-	SysTenancyID int `json:"sysTenancyId"` // 商户 id
+	SysTenancyId int `json:"sysTenancyId"` // 商户 id
 }

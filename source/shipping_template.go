@@ -16,10 +16,10 @@ var shippingTemplates = []model.ShippingTemplate{
 	// 103	邮费	1	0	1	66	0	0	2020-07-13 15:04:28
 	// 104	邮费	1	0	1	66	0	0	2020-07-13 15:10:30
 	// 105	包邮	0	1	1	65	0	0	2020-07-13 17:30:51
-	{BaseShippingTemplate: model.BaseShippingTemplate{Name: "陕西包邮新疆不配送其它1元", Type: 2, Appoint: 1, Undelivery: 1, IsDefault: 2, Sort: 9}, SysTenancyID: 1},
-	{BaseShippingTemplate: model.BaseShippingTemplate{Name: "邮费", Type: 1, Appoint: 2, Undelivery: 1, IsDefault: 2, Sort: 0}, SysTenancyID: 1},
-	{BaseShippingTemplate: model.BaseShippingTemplate{Name: "邮费", Type: 1, Appoint: 2, Undelivery: 1, IsDefault: 2, Sort: 0}, SysTenancyID: 1},
-	{BaseShippingTemplate: model.BaseShippingTemplate{Name: "包邮", Type: 2, Appoint: 1, Undelivery: 1, IsDefault: 2, Sort: 0}, SysTenancyID: 1},
+	{BaseShippingTemplate: model.BaseShippingTemplate{Name: "陕西包邮新疆不配送其它1元", Type: 2, Appoint: 1, Undelivery: 1, IsDefault: 2, Sort: 9}, SysTenancyId: 1},
+	{BaseShippingTemplate: model.BaseShippingTemplate{Name: "邮费", Type: 1, Appoint: 2, Undelivery: 1, IsDefault: 2, Sort: 0}, SysTenancyId: 1},
+	{BaseShippingTemplate: model.BaseShippingTemplate{Name: "邮费", Type: 1, Appoint: 2, Undelivery: 1, IsDefault: 2, Sort: 0}, SysTenancyId: 1},
+	{BaseShippingTemplate: model.BaseShippingTemplate{Name: "包邮", Type: 2, Appoint: 1, Undelivery: 1, IsDefault: 2, Sort: 0}, SysTenancyId: 1},
 }
 
 func (m *shippingTemplate) Init() error {

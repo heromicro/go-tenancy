@@ -12,13 +12,13 @@ var ProductProductCate = new(productProductCate)
 type productProductCate struct{}
 
 var productProductCates = []model.ProductProductCate{
-	{ProductID: 1, ProductCategoryID: 174, SysTenancyID: 1},
-	{ProductID: 2, ProductCategoryID: 174, SysTenancyID: 1},
-	{ProductID: 3, ProductCategoryID: 174, SysTenancyID: 1},
-	{ProductID: 4, ProductCategoryID: 174, SysTenancyID: 1},
-	{ProductID: 5, ProductCategoryID: 174, SysTenancyID: 1},
-	{ProductID: 6, ProductCategoryID: 174, SysTenancyID: 1},
-	{ProductID: 7, ProductCategoryID: 174, SysTenancyID: 1},
+	{ProductId: 1, ProductCategoryID: 174, SysTenancyId: 1},
+	{ProductId: 2, ProductCategoryID: 174, SysTenancyId: 1},
+	{ProductId: 3, ProductCategoryID: 174, SysTenancyId: 1},
+	{ProductId: 4, ProductCategoryID: 174, SysTenancyId: 1},
+	{ProductId: 5, ProductCategoryID: 174, SysTenancyId: 1},
+	{ProductId: 6, ProductCategoryID: 174, SysTenancyId: 1},
+	{ProductId: 7, ProductCategoryID: 174, SysTenancyId: 1},
 }
 
 func (m *productProductCate) Init() error {

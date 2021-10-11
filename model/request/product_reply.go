@@ -17,10 +17,10 @@ type ProductReply struct {
 
 type AddFictiReply struct {
 	model.BaseProductReply
-	ProductID ProductID `json:"productId"  form:"productId"`
+	ProductId ProductId `json:"productId"  form:"productId"`
 	Pic       []string  `json:"pic"  form:"pic"`
 }
-type ProductID struct {
+type ProductId struct {
 	Id  uint   `json:"id"  form:"id"`
 	Src string `json:"src"  form:"src"`
 }

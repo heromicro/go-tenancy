@@ -14,8 +14,8 @@ type userLabel struct{}
 var userLabels = []model.UserLabel{
 	{LabelName: "123", Type: model.UserLabelTypeSD},
 	{LabelName: "456", Type: model.UserLabelTypeZD},
-	{LabelName: "789", Type: model.UserLabelTypeSD, SysTenancyID: 1},
-	{LabelName: "567", Type: model.UserLabelTypeZD, SysTenancyID: 1},
+	{LabelName: "789", Type: model.UserLabelTypeSD, SysTenancyId: 1},
+	{LabelName: "567", Type: model.UserLabelTypeZD, SysTenancyId: 1},
 }
 
 func (m *userLabel) Init() error {

@@ -12,7 +12,7 @@ var Patient = new(patient)
 type patient struct{}
 
 var patients = []model.Patient{
-	{Name: "八两金", Phone: "13845687419", Sex: model.Female, Age: 32, LocName: "泌尿科一区", BedNum: "15", HospitalNO: "88956655", Disease: "不孕不育", SysTenancyID: 1},
+	{Name: "八两金", Phone: "13845687419", Sex: model.Female, Age: 32, LocName: "泌尿科一区", BedNum: "15", HospitalNO: "88956655", Disease: "不孕不育", SysTenancyId: 1},
 }
 
 func (m *patient) Init() error {

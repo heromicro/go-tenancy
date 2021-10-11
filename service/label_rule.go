@@ -15,7 +15,7 @@ import (
 func CreateAutoLabel(labelRule request.LabelRule) (request.LabelRule, error) {
 	var label model.UserLabel
 	err := g.TENANCY_DB.Model(&model.UserLabel{}).Where("label_name = ?", labelRule.LabelName).
-		Where("sys_tenancy_id = ?", labelRule.SysTenancyID).
+		Where("sys_tenancy_id = ?", labelRule.SysTenancyId).
 		Where("type = ?", model.UserLabelTypeZD).
 		First(&label).Error
 	if !errors.Is(err, gorm.ErrRecordNotFound) {
@@ -23,11 +23,11 @@ func CreateAutoLabel(labelRule request.LabelRule) (request.LabelRule, error) {
 	}
 
 	err = g.TENANCY_DB.Transaction(func(tx *gorm.DB) error {
-		label := model.UserLabel{LabelName: labelRule.LabelName, Type: model.UserLabelTypeZD, SysTenancyID: labelRule.SysTenancyID}
+		label := model.UserLabel{LabelName: labelRule.LabelName, Type: model.UserLabelTypeZD, SysTenancyId: labelRule.SysTenancyId}
 		if err := tx.Model(&model.UserLabel{}).Create(&label).Error; err != nil {
 			return err
 		}
-		ru := model.LabelRule{Max: labelRule.Max, Min: labelRule.Min, Type: labelRule.Type, UserLabelID: label.ID, SysTenancyID: labelRule.SysTenancyID}
+		ru := model.LabelRule{Max: labelRule.Max, Min: labelRule.Min, Type: labelRule.Type, UserLabelID: label.ID, SysTenancyId: labelRule.SysTenancyId}
 		if err := tx.Model(&model.LabelRule{}).Create(&ru).Error; err != nil {
 			return err
 		}
@@ -58,13 +58,13 @@ func GetLabelRuleById(id uint, tenancyId uint) (response.LabelRule, error) {
 
 // UpdateAutoLabel
 func UpdateAutoLabel(labelRule request.LabelRule, id uint) error {
-	rule, err := GetLabelRuleById(id, labelRule.SysTenancyID)
+	rule, err := GetLabelRuleById(id, labelRule.SysTenancyId)
 	if err != nil {
 		return err
 	}
 	var label model.UserLabel
 	err = g.TENANCY_DB.Model(&model.UserLabel{}).Where("label_name = ?", labelRule.LabelName).
-		Where("sys_tenancy_id = ?", labelRule.SysTenancyID).
+		Where("sys_tenancy_id = ?", labelRule.SysTenancyId).
 		Where("type = ?", model.UserLabelTypeZD).
 		Not("id = ?", rule.UserLabelID).
 		First(&label).Error

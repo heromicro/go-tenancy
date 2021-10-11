@@ -128,7 +128,7 @@ func UploadFile(header *multipart.FileHeader, noSave string, tenancyId uint) (mo
 		media.Name = header.Filename
 		media.Tag = s[len(s)-1]
 		media.Key = key
-		media.SysTenancyID = tenancyId
+		media.SysTenancyId = tenancyId
 		return Upload(media)
 	}
 	return media, nil

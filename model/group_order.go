@@ -28,6 +28,6 @@ type GroupOrder struct {
 	IsRemind int       `gorm:"column:is_remind;type:tinyint unsigned;not null;default:2" json:"isRemind"`   // 是否提醒
 	IsCancel int       `gorm:"column:is_cancel;type:tinyint unsigned;not null;default:2" json:"isCancel"`   //取消订单
 
-	PatientID uint `json:"patientId" form:"patientId" gorm:"column:patient_id;comment:患者"`
-	SysUserID uint `json:"sysUserId" form:"sysUserId" gorm:"column:sys_user_id;comment:关联标记"`
+	PatientId uint `json:"patientId" form:"patientId" gorm:"column:patient_id;comment:患者"`
+	CUserId   uint `json:"cUserId" form:"cUserId" gorm:"column:c_user_id;comment:关联标记"`
 }

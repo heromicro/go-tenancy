@@ -119,7 +119,7 @@ func CreateTenancy(req request.CreateTenancy) (uint, string, string, error) {
 		if defaultPwd == "" {
 			defaultPwd = "123456"
 		}
-		user := model.TUser{Username: req.Username, Password: utils.MD5V([]byte(defaultPwd)), AuthorityId: source.TenancyAuthorityId, Status: g.StatusTrue, IsShow: g.StatusFalse, SysTenancyID: req.SysTenancy.ID, NickName: req.Name}
+		user := model.TUser{Username: req.Username, Password: utils.MD5V([]byte(defaultPwd)), AuthorityId: source.TenancyAuthorityId, Status: g.StatusTrue, IsShow: g.StatusFalse, SysTenancyId: req.SysTenancy.ID, NickName: req.Name}
 		err = tx.Create(&user).Error
 		if err != nil {
 			return err
@@ -346,7 +346,7 @@ func LoginDevice(loginDevice request.LoginDevice) (*response.LoginResponse, erro
 		return nil, fmt.Errorf("商户已被冻结")
 	}
 
-	loginDevice.Patient.SysTenancyID = tenancy.ID
+	loginDevice.Patient.SysTenancyId = tenancy.ID
 	patient, err := FindOrCreatePatient(loginDevice.Patient)
 	if err != nil {
 		return nil, err

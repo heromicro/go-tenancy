@@ -68,7 +68,7 @@ type BaseProduct struct {
 
 	OldID        uint `gorm:"column:old_id;type:int;default:0" json:"oldId"`
 	TempID       uint `gorm:"column:temp_id;type:int;not null;default:0" json:"tempId"`                         // 运费模板ID
-	SysTenancyID uint `gorm:"index:sys_tenancy_id;column:sys_tenancy_id;type:int;not null" json:"sysTenancyId"` // 商户 id
+	SysTenancyId uint `gorm:"index:sys_tenancy_id;column:sys_tenancy_id;type:int;not null" json:"sysTenancyId"` // 商户 id
 	SysBrandID   uint `gorm:"column:sys_brand_id;type:int" json:"sysBrandId"`                                   // 品牌 id
 
 	ProductCategoryID uint `gorm:"index:product_category_id;column:product_category_id;type:int;not null" json:"productCategoryId"` // 平台分类
@@ -78,10 +78,10 @@ type BaseProduct struct {
 type ProductReply struct {
 	g.TENANCY_MODEL
 	BaseProductReply
-	SysUserID      uint   `gorm:"index:sys_user_id;column:sys_user_id;type:int;not null" json:"sysUserId"`                // 用户ID
-	SysTenancyID   uint   `gorm:"index:sys_tenancy_id;column:sys_tenancy_id;type:int;not null" json:"sysTenancyId"`       // 商户 id
-	ProductID      uint   `gorm:"index:product_id;column:product_id;type:int;not null" json:"productId"`                  // 商品id  // 商品id
-	OrderProductID uint   `gorm:"index:order_product_id;column:order_product_id;type:int;not null" json:"orderProductId"` // 订单商品ID
+	SysUserId      uint   `gorm:"index:sys_user_id;column:sys_user_id;type:int;not null" json:"sysUserId"`                // 用户ID
+	SysTenancyId   uint   `gorm:"index:sys_tenancy_id;column:sys_tenancy_id;type:int;not null" json:"sysTenancyId"`       // 商户 id
+	ProductId      uint   `gorm:"index:product_id;column:product_id;type:int;not null" json:"productId"`                  // 商品id  // 商品id
+	OrderProductId uint   `gorm:"index:order_product_id;column:order_product_id;type:int;not null" json:"orderProductId"` // 订单商品ID
 	Unique         string `gorm:"index:order_product_id;column:unique;type:char(12)" json:"unique"`                       // 商品 sku
 	ProductType    int32  `gorm:"column:product_type;type:tinyint;not null;default:1" json:"productType"`                 // 1=普通商品
 }
@@ -103,9 +103,9 @@ type BaseProductReply struct {
 
 // ProductCate 商品商户分类关联表
 type ProductProductCate struct {
-	ProductID         uint `gorm:"column:product_id;type:int" json:"productId"`
+	ProductId         uint `gorm:"column:product_id;type:int" json:"productId"`
 	ProductCategoryID uint `gorm:"index:product_category_id;column:product_category_id;type:int;not null" json:"productCategoryId"` // 分类id
-	SysTenancyID      uint `gorm:"index:sys_tenancy_id;column:sys_tenancy_id;type:int;not null" json:"sysTenancyId"`                // 商户 id
+	SysTenancyId      uint `gorm:"index:sys_tenancy_id;column:sys_tenancy_id;type:int;not null" json:"sysTenancyId"`                // 商户 id
 }
 
 // ProductContent 商品详情表
@@ -113,7 +113,7 @@ type ProductContent struct {
 	Content string `gorm:"column:content;type:longtext;not null" json:"content"`       // 商品详情
 	Type    int32  `gorm:"column:type;type:tinyint(1);not null;default:1" json:"type"` // 商品类型 1=普通
 
-	ProductID uint `gorm:"product_contents:product_id;column:product_id;type:int;not null" json:"productId"` // 商品id
+	ProductId uint `gorm:"product_contents:product_id;column:product_id;type:int;not null" json:"productId"` // 商品id
 }
 
 // ProductAttrValue 商品属性值表
@@ -123,7 +123,7 @@ type ProductAttrValue struct {
 	Detail string `gorm:"column:detail;type:varchar(1000);not null;default:''" json:"detail"`
 	BaseProductAttrValue
 	Type      int32 `gorm:"column:type;type:tinyint(1);default:1" json:"type"`                     // 活动类型 1=商品
-	ProductID uint  `gorm:"index:product_id;column:product_id;type:int;not null" json:"productId"` // 商品id
+	ProductId uint  `gorm:"index:product_id;column:product_id;type:int;not null" json:"productId"` // 商品id
 }
 
 // ProductAttr 商品属性值表
@@ -132,7 +132,7 @@ type ProductAttr struct {
 	AttrName   string `gorm:"column:attr_name;type:varchar(32);not null" json:"attrName"`            // 属性名
 	AttrValues string `gorm:"column:attr_values;type:varchar(2000);not null" json:"attrValues"`      // 属性值
 	Type       int32  `gorm:"column:type;type:tinyint(1);default:1" json:"type"`                     // 活动类型 1=商品
-	ProductID  uint   `gorm:"index:product_id;column:product_id;type:int;not null" json:"productId"` // 商品id
+	ProductId  uint   `gorm:"index:product_id;column:product_id;type:int;not null" json:"productId"` // 商品id
 }
 
 type BaseProductAttrValue struct {

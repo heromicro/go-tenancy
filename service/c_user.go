@@ -260,7 +260,7 @@ func SetUserLabel(id, tenancyId uint, reqlabelIds []uint) error {
 	if len(addIds) > 0 {
 		labels := []model.UserUserLabel{}
 		for _, addId := range addIds {
-			labels = append(labels, model.UserUserLabel{UserLabelID: addId, CUserID: id, SysTenancyID: tenancyId})
+			labels = append(labels, model.UserUserLabel{UserLabelID: addId, CUserId: id, SysTenancyId: tenancyId})
 		}
 		if err = g.TENANCY_DB.Model(&model.UserUserLabel{}).Create(&labels).Error; err != nil {
 			return fmt.Errorf("create user_user_labels %w", err)
@@ -420,7 +420,7 @@ func getCuserLabels(userList []response.GeneralUser, tenancyId uint) ([]response
 	for i := 0; i < len(userList); i++ {
 		userList[i].Label = []string{}
 		for _, userLabel := range userLabels {
-			if userLabel.SysUserID == userList[i].Uid {
+			if userLabel.SysUserId == userList[i].Uid {
 				userList[i].Label = append(userList[i].Label, userLabel.LabelName)
 			}
 		}

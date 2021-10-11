@@ -17,5 +17,5 @@ type LabelRule struct {
 	UserNum uint    `gorm:"column:user_num;type:int unsigned;not null;default:0" json:"userNum"`    // 用户数
 
 	UserLabelID  uint `gorm:"column:user_label_id;" json:"userLabelId"`
-	SysTenancyID uint `gorm:"index:sys_tenancy_id;column:sys_tenancy_id;type:int;not null" json:"sysTenancyId"` // 商户 id
+	SysTenancyId uint `gorm:"index:sys_tenancy_id;column:sys_tenancy_id;type:int;not null" json:"sysTenancyId"` // 商户 id
 }

@@ -17,7 +17,7 @@ func CreateAutoLabel(ctx *gin.Context) {
 		response.FailWithMessage(errs.Error(), ctx)
 		return
 	}
-	label.SysTenancyID = multi.GetTenancyId(ctx)
+	label.SysTenancyId = multi.GetTenancyId(ctx)
 	if returnUserLabel, err := service.CreateAutoLabel(label); err != nil {
 		g.TENANCY_LOG.Error("创建失败!", zap.Any("err", err))
 		response.FailWithMessage("创建失败:"+err.Error(), ctx)
@@ -38,7 +38,7 @@ func UpdateAutoLabel(ctx *gin.Context) {
 		response.FailWithMessage(errs.Error(), ctx)
 		return
 	}
-	label.SysTenancyID = multi.GetTenancyId(ctx)
+	label.SysTenancyId = multi.GetTenancyId(ctx)
 	if err := service.UpdateAutoLabel(label, req.Id); err != nil {
 		g.TENANCY_LOG.Error("更新失败!", zap.Any("err", err))
 		response.FailWithMessage("更新失败:"+err.Error(), ctx)

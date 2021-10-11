@@ -18,5 +18,5 @@ type TUser struct {
 
 	Authority    SysAuthority `json:"authority" gorm:"foreignKey:AuthorityId;references:AuthorityId;comment:用户角色"`
 	AuthorityId  string       `json:"authorityId" gorm:"not null;comment:用户角色ID"`
-	SysTenancyID uint         `json:"sysTenancyId" form:"sysTenancyId" gorm:"column:sys_tenancy_id;comment:关联标记"`
+	SysTenancyId uint         `json:"sysTenancyId" form:"sysTenancyId" gorm:"column:sys_tenancy_id;comment:关联标记"`
 }

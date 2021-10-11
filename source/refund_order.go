@@ -14,15 +14,15 @@ var RefundOrder = new(refundOrder)
 type refundOrder struct{}
 
 var refundOrders = []model.RefundOrder{
-	{BaseRefundOrder: model.BaseRefundOrder{RefundOrderSn: g.CreateOrderSn("R"), RefundType: 1, RefundMessage: "收货地址填错了", RefundPrice: 89.00, RefundNum: 1, Status: model.RefundStatusAudit, StatusTime: time.Now(), IsCancel: g.StatusFalse, IsSystemDel: g.StatusFalse}, OrderID: 1, SysUserID: 3, SysTenancyID: 1},
+	{BaseRefundOrder: model.BaseRefundOrder{RefundOrderSn: g.CreateOrderSn("R"), RefundType: 1, RefundMessage: "收货地址填错了", RefundPrice: 89.00, RefundNum: 1, Status: model.RefundStatusAudit, StatusTime: time.Now(), IsCancel: g.StatusFalse, IsSystemDel: g.StatusFalse}, OrderId: 1, CUserId: 3, SysTenancyId: 1},
 }
 
 var refundProducts = []model.RefundProduct{
-	{RefundOrderID: 1, OrderProductID: 1, RefundNum: 1},
+	{RefundOrderId: 1, OrderProductId: 1, RefundNum: 1},
 }
 
 var refundStatus = []model.RefundStatus{
-	{RefundOrderID: 1, ChangeType: "create", ChangeMessage: "创建退款单", ChangeTime: time.Now()},
+	{RefundOrderId: 1, ChangeType: "create", ChangeMessage: "创建退款单", ChangeTime: time.Now()},
 }
 
 //@description: refundOrders 表数据初始化

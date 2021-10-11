@@ -13,7 +13,7 @@ import (
 func CreateAttrTemplate(req request.AttrTemplate, tenancyId uint) (model.AttrTemplate, error) {
 	attrTemplate := model.AttrTemplate{
 		TemplateName: req.TemplateName,
-		SysTenancyID: tenancyId,
+		SysTenancyId: tenancyId,
 	}
 	value, err := json.Marshal(&req.TemplateValue)
 	if err != nil {

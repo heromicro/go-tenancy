@@ -25,7 +25,7 @@ import (
 
 func PayOrder(req request.PayOrder) (response.PayOrder, error) {
 	// 清除测试缓存
-	defer DeleteTestCache(req.TenancyId, req.UserId, req.PatientID)
+	defer DeleteTestCache(req.TenancyId, req.UserId, req.PatientId)
 	var res response.PayOrder
 	autoCloseTime := param.GetOrderAutoCloseTime()
 	if time.Until(time.Unix(req.Expire, 0)).Minutes() > float64(autoCloseTime) {

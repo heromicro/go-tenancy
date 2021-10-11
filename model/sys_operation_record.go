@@ -24,5 +24,5 @@ type BaseOperationRecord struct {
 	Body         string        `json:"body" form:"body" gorm:"type:longtext;column:body;comment:请求Body"`
 	Resp         string        `json:"resp" form:"resp" gorm:"type:longtext;column:resp;comment:响应Body"`
 	UserID       uint          `json:"userId" form:"userId" gorm:"column:user_id;comment:用户id"`
-	SysTenancyID uint          `json:"sysTenancyId" form:"sysTenancyId" gorm:"column:sys_tenancy_id;comment:商户id"`
+	SysTenancyId uint          `json:"sysTenancyId" form:"sysTenancyId" gorm:"column:sys_tenancy_id;comment:商户id"`
 }

@@ -77,7 +77,7 @@ func RegisterClient(req request.Register, authorityType int, tenancyId uint) (ui
 		return 0, errors.New("用户名已注册")
 	}
 	// 否则 附加uuid 密码md5简单加密 注册
-	user := model.TUser{Username: req.Username, Password: utils.MD5V([]byte(req.Password)), AuthorityId: req.AuthorityId[0], Status: req.Status, IsShow: g.StatusTrue, NickName: req.NickName, Phone: req.Phone, SysTenancyID: tenancyId}
+	user := model.TUser{Username: req.Username, Password: utils.MD5V([]byte(req.Password)), AuthorityId: req.AuthorityId[0], Status: req.Status, IsShow: g.StatusTrue, NickName: req.NickName, Phone: req.Phone, SysTenancyId: tenancyId}
 	err = g.TENANCY_DB.Transaction(func(tx *gorm.DB) error {
 		err := tx.Create(&user).Error
 		if err != nil {

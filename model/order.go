@@ -45,11 +45,11 @@ type Order struct {
 
 	BaseOrder
 
-	PatientID        uint `json:"patientId" form:"patientId" gorm:"column:patient_id;comment:患者"`
-	SysUserID        uint `json:"sysUserId" form:"sysUserId" gorm:"column:sys_user_id;comment:关联标记"`
-	SysTenancyID     uint `gorm:"index:sys_tenancy_id;column:sys_tenancy_id;type:int;not null" json:"sysTenancyId"` // 商户 id
-	GroupOrderID     uint `gorm:"column:group_order_id;type:int" json:"groupOrderId"`
-	ReconciliationID uint `gorm:"column:reconciliation_id;type:tinyint unsigned;not null;default:0" json:"reconciliationId"` // 对账id
+	PatientId        uint `json:"patientId" form:"patientId" gorm:"column:patient_id;comment:患者"`
+	CUserId          uint `json:"cUserId" form:"cUserId" gorm:"column:c_user_id;comment:关联标记"`
+	SysTenancyId     uint `gorm:"index:sys_tenancy_id;column:sys_tenancy_id;type:int;not null" json:"sysTenancyId"` // 商户 id
+	GroupOrderId     uint `gorm:"column:group_order_id;type:int" json:"groupOrderId"`
+	ReconciliationId uint `gorm:"column:reconciliation_id;type:tinyint unsigned;not null;default:0" json:"reconciliationId"` // 对账id
 }
 
 type BaseOrder struct {
@@ -88,7 +88,7 @@ type OrderStatus struct {
 	ChangeMessage string    `gorm:"column:change_message;type:varchar(256);not null" json:"changeMessage"`                  // 操作备注
 	ChangeTime    time.Time `gorm:"column:change_time;type:timestamp;not null;default:CURRENT_TIMESTAMP" json:"changeTime"` // 操作时间
 
-	OrderID uint `gorm:"index:order_id;column:order_id;type:int unsigned;not null" json:"orderId"` // 订单id
+	OrderId uint `gorm:"index:order_id;column:order_id;type:int unsigned;not null" json:"orderId"` // 订单id
 }
 
 // OrderReceipt 订单发票信息
@@ -106,9 +106,9 @@ type OrderReceipt struct {
 	StatusTime   time.Time `gorm:"column:status_time;type:datetime;not null" json:"statusTime"`         // 状态变更时间
 	MerMark      string    `gorm:"column:mer_mark;type:varchar(255)" json:"merMark"`                    // 备注
 
-	OrderID      string `gorm:"column:order_id;type:varchar(255);not null;default:0" json:"orderId"`              // 订单ID
-	SysUserID    uint   `json:"sysUserId" form:"sysUserId" gorm:"column:sys_user_id;comment:关联标记"`                // 关联 c_users
-	SysTenancyID uint   `gorm:"index:sys_tenancy_id;column:sys_tenancy_id;type:int;not null" json:"sysTenancyId"` // 商户 id
+	OrderId      string `gorm:"column:order_id;type:varchar(255);not null;default:0" json:"orderId"` // 订单ID
+	CUserId      uint   `json:"cUserId" form:"cUserId" gorm:"column:c_user_id;comment:关联标记"`
+	SysTenancyId uint   `gorm:"index:sys_tenancy_id;column:sys_tenancy_id;type:int;not null" json:"sysTenancyId"` // 商户 id
 }
 
 // OrderProduct 订单购物详情表
@@ -117,11 +117,11 @@ type OrderProduct struct {
 
 	BaseOrderProduct
 
-	CartInfo  string `gorm:"column:cart_info;type:text;not null" json:"cartInfo"`                                      // 购买东西的详细信息
-	OrderID   uint   `gorm:"index:oid;column:order_id;type:int unsigned;not null" json:"orderId"`                      // 订单id
-	SysUserID uint   `json:"sysUserId" form:"sysUserId" gorm:"column:sys_user_id;comment:关联标记"`                        // 关联 c_users
-	CartID    uint   `gorm:"column:cart_id;type:int unsigned;not null;default:0" json:"cartId"`                        // 购物车id
-	ProductID uint   `gorm:"index:product_id;column:product_id;type:int unsigned;not null;default:0" json:"productId"` // 商品ID
+	CartInfo  string `gorm:"column:cart_info;type:text;not null" json:"cartInfo"`                 // 购买东西的详细信息
+	OrderId   uint   `gorm:"index:oid;column:order_id;type:int unsigned;not null" json:"orderId"` // 订单id
+	CUserId   uint   `json:"cUserId" form:"cUserId" gorm:"column:c_user_id;comment:关联标记"`
+	CartId    uint   `gorm:"column:cart_id;type:int unsigned;not null;default:0" json:"cartId"`                        // 购物车id
+	ProductId uint   `gorm:"index:product_id;column:product_id;type:int unsigned;not null;default:0" json:"productId"` // 商品ID
 }
 
 type BaseOrderProduct struct {

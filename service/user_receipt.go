@@ -19,7 +19,7 @@ func CreateReceipt(m request.CreateReceipt, user_id uint) (model.UserReceipt, er
 	receipt.Address = m.Address
 	receipt.Tel = m.Tel
 	receipt.IsDefault = m.IsDefault
-	receipt.CUserID = user_id
+	receipt.CUserId = user_id
 	err := g.TENANCY_DB.Create(&receipt).Error
 	return receipt, err
 }

@@ -17,6 +17,6 @@ type UserMerchant struct {
 	LastTime     time.Time `gorm:"column:last_time;type:timestamp;not null;default:CURRENT_TIMESTAMP" json:"lastTime"` // 最后一次访问时间
 	Status       int       `gorm:"column:status;type:tinyint unsigned;default:1" json:"status"`                        // 状态
 
-	CUserID      uint `json:"cUserId" form:"cUserId" gorm:"column:c_user_id;comment:关联标记"`
-	SysTenancyID uint `gorm:"index:sys_tenancy_id;column:sys_tenancy_id;type:int;not null" json:"sysTenancyId"` // 商户 id
+	CUserId      uint `json:"cUserId" form:"cUserId" gorm:"column:c_user_id;comment:关联标记"`
+	SysTenancyId uint `gorm:"index:sys_tenancy_id;column:sys_tenancy_id;type:int;not null" json:"sysTenancyId"` // 商户 id
 }
