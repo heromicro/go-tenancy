@@ -78,7 +78,7 @@ type BaseProduct struct {
 type ProductReply struct {
 	g.TENANCY_MODEL
 	BaseProductReply
-	SysUserId      uint   `gorm:"index:sys_user_id;column:sys_user_id;type:int;not null" json:"sysUserId"`                // 用户ID
+	CUserId        uint   `json:"cUserId" form:"cUserId" gorm:"column:c_user_id;comment:关联标记"`                            // 用户ID
 	SysTenancyId   uint   `gorm:"index:sys_tenancy_id;column:sys_tenancy_id;type:int;not null" json:"sysTenancyId"`       // 商户 id
 	ProductId      uint   `gorm:"index:product_id;column:product_id;type:int;not null" json:"productId"`                  // 商品id  // 商品id
 	OrderProductId uint   `gorm:"index:order_product_id;column:order_product_id;type:int;not null" json:"orderProductId"` // 订单商品ID

@@ -183,6 +183,7 @@ func InitDB(conf request.InitDB) error {
 		source.Config,
 		source.SysConfigCategory,
 		source.SysConfigValue,
+		source.FinancialRecord,
 	)
 	if err != nil {
 		refreshConfig()
@@ -254,6 +255,7 @@ func MysqlTables(db *gorm.DB) error {
 		model.UserVisit{},
 		model.Mqtt{},
 		model.MqttRecord{},
+		model.FinancialRecord{},
 	)
 	if err != nil {
 		g.TENANCY_LOG.Error("register table failed", zap.Any("err", err))

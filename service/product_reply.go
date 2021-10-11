@@ -105,7 +105,7 @@ func GetProductReplyInfoList(info request.ProductReplyPageInfo, tenancyId uint, 
 	offset := info.PageSize * (info.Page - 1)
 	db := g.TENANCY_DB.Model(&model.ProductReply{})
 	if isAdmin {
-		db = db.Where("order_product_id = ?", 0).Where("sys_user_id = ?", 0).Where("sys_tenancy_id =?", 0)
+		db = db.Where("order_product_id = ?", 0).Where("c_user_id = ?", 0).Where("sys_tenancy_id =?", 0)
 	}
 
 	if info.Date != "" {
@@ -119,7 +119,7 @@ func GetProductReplyInfoList(info request.ProductReplyPageInfo, tenancyId uint, 
 		if err != nil {
 			return productReplyList, total, err
 		}
-		db = db.Where("sys_user_id in ?", userIds)
+		db = db.Where("c_user_id in ?", userIds)
 	}
 	if info.Keyword != "" {
 		productIds, err := GetProductIdsByKeyword(info.Keyword, tenancyId)

@@ -229,9 +229,21 @@ var baseApis = []model.SysApi{
 	{Path: "/v1/admin/order/getOrderById/:id", Description: "订单详情", ApiGroup: "order", Method: "GET"},
 	//退款订单
 	{Path: "/v1/admin/refundOrder/getRefundOrderList", Description: "退款订单列表", ApiGroup: "refundOrder", Method: "POST"},
-	
+
 	//控制台
-	{Path: "/v1/admin/statistics/main", Description: "控制台列表", ApiGroup: "statistics", Method: "GET"},
+	{Path: "/v1/admin/statistics/main", Description: "运营数据", ApiGroup: "statistics", Method: "GET"},
+	{Path: "/v1/admin/statistics/order", Description: "当日订单金额", ApiGroup: "statistics", Method: "GET"},
+	{Path: "/v1/admin/statistics/orderNum", Description: "订单数量统计", ApiGroup: "statistics", Method: "GET"},
+	{Path: "/v1/admin/statistics/orderUser", Description: "支付人数统计", ApiGroup: "statistics", Method: "GET"},
+	{Path: "/v1/admin/statistics/merchantStock", Description: "商品销量排行", ApiGroup: "statistics", Method: "GET"},
+	{Path: "/v1/admin/statistics/merchantVisit", Description: "商户访客量排行", ApiGroup: "statistics", Method: "GET"},
+	{Path: "/v1/admin/statistics/merchantRate", Description: "商户销售额占比", ApiGroup: "statistics", Method: "GET"},
+	{Path: "/v1/admin/statistics/userData", Description: "用户数据", ApiGroup: "statistics", Method: "GET"},
+	{Path: "/v1/admin/statistics/user", Description: "成交用户统计", ApiGroup: "statistics", Method: "GET"},
+	{Path: "/v1/admin/statistics/userRate", Description: "成交用户占比", ApiGroup: "statistics", Method: "GET"},
+
+	//财务
+	{Path: "/v1/admin/financialRecord/getFinancialRecordList", Description: "财务-资金流水", ApiGroup: "financialRecord", Method: "GET"},
 
 	// other
 	{Path: "/v1/admin/test/emailTest", Description: "发送测试邮件", ApiGroup: "email", Method: "POST"},
@@ -383,6 +395,15 @@ var baseApis = []model.SysApi{
 	{Path: "/v1/merchant/express/getExpressByCode/:code", Description: "物流信息", ApiGroup: "expressClient", Method: "GET"},
 	// 操作记录
 	{Path: "/v1/merchant/sysOperationRecord/getSysOperationRecordList", Description: "操作记录列表", ApiGroup: "sysOperationRecordClient", Method: "POST"},
+
+	//控制台
+	{Path: "/v1/merchant/statistics/main", Description: "主要数据", ApiGroup: "statisticsClient", Method: "GET"},
+	{Path: "/v1/merchant/statistics/order", Description: "支付订单", ApiGroup: "statisticsClient", Method: "GET"},
+	{Path: "/v1/merchant/statistics/user", Description: "成交用户", ApiGroup: "statisticsClient", Method: "GET"},
+	{Path: "/v1/merchant/statistics/userRate", Description: "成交用户占比", ApiGroup: "statisticsClient", Method: "GET"},
+	{Path: "/v1/merchant/statistics/product", Description: "商品支付排行", ApiGroup: "statisticsClient", Method: "GET"},
+	{Path: "/v1/merchant/statistics/productVisit", Description: "商品访客排行", ApiGroup: "statisticsClient", Method: "GET"},
+	{Path: "/v1/merchant/statistics/productCart", Description: "商品加购排行", ApiGroup: "statisticsClient", Method: "GET"},
 
 	//TODO:: 用户权限
 	// 我的地址

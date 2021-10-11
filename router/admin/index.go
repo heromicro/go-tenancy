@@ -407,3 +407,12 @@ func InitStatisticsRouter(Router *gin.RouterGroup) {
 		StatisticsRouter.GET("/userRate", admin.GetStatisticsUserRate)
 	}
 }
+
+// 财务
+func InitFinancialRecordRouter(Router *gin.RouterGroup) {
+	FinancialRecordRouter := Router.Group("/financialRecord")
+	{
+		// 资金流水
+		FinancialRecordRouter.GET("/getFinancialRecordList", admin.GetFinancialRecordList)
+	}
+}

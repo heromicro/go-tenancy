@@ -85,34 +85,35 @@ func Routers(app *gin.Engine) {
 		// 管理员
 		AdminGroup := V1Group.Group(g.TENANCY_CONFIG.System.AdminPreix, middleware.IsAdmin(), middleware.CasbinHandler(), middleware.OperationRecord())
 		{
-			admin.InitApiRouter(AdminGroup)            // 注册功能api路由
-			admin.InitUserRouter(AdminGroup)           // 注册用户路由
-			admin.InitCUserRouter(AdminGroup)          // 注册c用户路由
-			admin.InitTenancyRouter(AdminGroup)        // 注册商户路由
-			admin.InitMiniRouter(AdminGroup)           // 注册小程序路由
-			admin.InitBrandRouter(AdminGroup)          // 注册品牌路由
-			admin.InitBrandCategoryRouter(AdminGroup)  // 注册品牌分类路由
-			admin.InitConfigCategoryRouter(AdminGroup) // 注册系统配置分类路由
-			admin.InitConfigRouter(AdminGroup)         // 注册系统配置路由
-			admin.InitConfigValueRouter(AdminGroup)    // 注册系统配置值路由
-			admin.InitMenuRouter(AdminGroup)           // 注册menu路由
-			admin.InitTestouter(AdminGroup)            // 邮件相关路由
-			admin.InitSystemRouter(AdminGroup)         // system相关路由
-			admin.InitCasbinRouter(AdminGroup)         // 权限相关路由
-			admin.InitAuthorityRouter(AdminGroup)      // 注册角色路由
-			admin.InitMediaRouter(AdminGroup)          // 媒体库路由
-			admin.InitCategoryRouter(AdminGroup)       // 商品分类路由
-			admin.InitProductRouter(AdminGroup)        // 商品路由
-			admin.InitProductReplyRouter(AdminGroup)   // 商品评价路由
-			admin.InitOrderRouter(AdminGroup)          // 订单路由
-			admin.InitRefundOrderRouter(AdminGroup)    // 退款订单路由
-			admin.InitExpressRouter(AdminGroup)        // 物流公司路由
-			admin.InitMqttRouter(AdminGroup)           // MQTT路由
-			admin.InitJobRouter(AdminGroup)            // 定时任务管理路由
-			admin.InitUserGroupRouter(AdminGroup)      // 用户分组路由
-			admin.InitUserLabelRouter(AdminGroup)      // 用户标签路由
-			admin.InitPatientRouter(AdminGroup)        // 床旁患者路由
-			admin.InitStatisticsRouter(AdminGroup)     // 控制大盘路由
+			admin.InitApiRouter(AdminGroup)             // 注册功能api路由
+			admin.InitUserRouter(AdminGroup)            // 注册用户路由
+			admin.InitCUserRouter(AdminGroup)           // 注册c用户路由
+			admin.InitTenancyRouter(AdminGroup)         // 注册商户路由
+			admin.InitMiniRouter(AdminGroup)            // 注册小程序路由
+			admin.InitBrandRouter(AdminGroup)           // 注册品牌路由
+			admin.InitBrandCategoryRouter(AdminGroup)   // 注册品牌分类路由
+			admin.InitConfigCategoryRouter(AdminGroup)  // 注册系统配置分类路由
+			admin.InitConfigRouter(AdminGroup)          // 注册系统配置路由
+			admin.InitConfigValueRouter(AdminGroup)     // 注册系统配置值路由
+			admin.InitMenuRouter(AdminGroup)            // 注册menu路由
+			admin.InitTestouter(AdminGroup)             // 邮件相关路由
+			admin.InitSystemRouter(AdminGroup)          // system相关路由
+			admin.InitCasbinRouter(AdminGroup)          // 权限相关路由
+			admin.InitAuthorityRouter(AdminGroup)       // 注册角色路由
+			admin.InitMediaRouter(AdminGroup)           // 媒体库路由
+			admin.InitCategoryRouter(AdminGroup)        // 商品分类路由
+			admin.InitProductRouter(AdminGroup)         // 商品路由
+			admin.InitProductReplyRouter(AdminGroup)    // 商品评价路由
+			admin.InitOrderRouter(AdminGroup)           // 订单路由
+			admin.InitRefundOrderRouter(AdminGroup)     // 退款订单路由
+			admin.InitExpressRouter(AdminGroup)         // 物流公司路由
+			admin.InitMqttRouter(AdminGroup)            // MQTT路由
+			admin.InitJobRouter(AdminGroup)             // 定时任务管理路由
+			admin.InitUserGroupRouter(AdminGroup)       // 用户分组路由
+			admin.InitUserLabelRouter(AdminGroup)       // 用户标签路由
+			admin.InitPatientRouter(AdminGroup)         // 床旁患者路由
+			admin.InitStatisticsRouter(AdminGroup)      // 控制大盘路由
+			admin.InitFinancialRecordRouter(AdminGroup) // 财务路由
 		}
 
 		AdminLogGroup := V1Group.Group(g.TENANCY_CONFIG.System.AdminPreix, middleware.IsAdmin(), middleware.CasbinHandler())

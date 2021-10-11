@@ -16,9 +16,9 @@ type SetRegionCode struct {
 
 type TenancyPageInfo struct {
 	PageInfo
-	Date    string `json:"date"`
-	Status  string `json:"status"`
-	Keyword string `json:"keyword"`
+	Date    string `json:"date" form:"date"`
+	Status  string `json:"status" form:"status"`
+	Keyword string `json:"keyword" form:"keyword"`
 }
 
 type UpdateClientTenancy struct {
