@@ -9,7 +9,6 @@ import (
 	"github.com/snowlyg/go-tenancy/g"
 	"github.com/snowlyg/go-tenancy/model"
 	"github.com/snowlyg/go-tenancy/model/request"
-	"github.com/snowlyg/go-tenancy/service/scope"
 	"gorm.io/gorm"
 )
 
@@ -100,24 +99,21 @@ func DeleteExpress(id uint) error {
 	return g.TENANCY_DB.Where("id = ?", id).Delete(&model.Express{}).Error
 }
 
-// GettFinancialRecordInfoList
-func GettFinancialRecordInfoList(info request.FinancialRecordPageInfo) ([]model.FinancialRecord, int64, error) {
-	financialRecord := []model.FinancialRecord{}
+// GetExpressInfoList
+func GetExpressInfoList(info request.ExpressPageInfo) ([]model.Express, int64, error) {
+	expressList := []model.Express{}
 	limit := info.PageSize
 	offset := info.PageSize * (info.Page - 1)
+	db := g.TENANCY_DB.Model(&model.Express{})
+	if info.Name != "" {
+		db = db.Where(g.TENANCY_DB.Where("name like ?", info.Name+"%").Or("code like ?", info.Name+"%"))
+	}
 	var total int64
-	db := g.TENANCY_DB.Model(&model.FinancialRecord{})
-	if info.Keyword != "" {
-		db = db.Where(g.TENANCY_DB.Where("order_sn like ?", info.Keyword+"%").Or("user_info like ?", info.Keyword+"%"))
-	}
-	if info.Date != "" {
-		db = db.Scopes(scope.FilterDate(info.Date, "created_at", ""))
-	}
 	err := db.Count(&total).Error
 	if err != nil {
-		return financialRecord, total, err
+		return expressList, total, err
 	}
 	db = OrderBy(db, info.OrderBy, info.SortBy)
-	err = db.Limit(limit).Offset(offset).Find(&financialRecord).Error
-	return financialRecord, total, err
+	err = db.Limit(limit).Offset(offset).Find(&expressList).Error
+	return expressList, total, err
 }

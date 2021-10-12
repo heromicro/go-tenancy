@@ -11,8 +11,8 @@ const (
 // FinancialRecord 商户财务流水
 type FinancialRecord struct {
 	g.TENANCY_MODEL
-	RecordSn string `gorm:"column:record_sn;type:varchar(32);not null" json:"recordSn"` // 流水号
-	OrderSn  string `gorm:"column:order_sn;type:varchar(32);not null" json:"orderSn"`   // 订单编号
+	RecordSn string `gorm:"column:record_sn;type:varchar(36);not null" json:"recordSn"` // 流水号
+	OrderSn  string `gorm:"column:order_sn;type:varchar(36);not null" json:"orderSn"`   // 订单编号
 	UserInfo string `gorm:"column:user_info;type:varchar(32);not null" json:"userInfo"` // 用户名
 
 	FinancialType string  `gorm:"index:financial_type;column:financial_type;type:varchar(32);not null" json:"financialType"` // 流水类型

@@ -105,6 +105,7 @@ func GetProductReplyInfoList(info request.ProductReplyPageInfo, tenancyId uint, 
 	offset := info.PageSize * (info.Page - 1)
 	db := g.TENANCY_DB.Model(&model.ProductReply{})
 	if isAdmin {
+		// 管理員评论，
 		db = db.Where("order_product_id = ?", 0).Where("c_user_id = ?", 0).Where("sys_tenancy_id =?", 0)
 	}
 

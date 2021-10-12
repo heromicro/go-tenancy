@@ -221,8 +221,6 @@ func GetOrderDetailById(id uint, funcs ...func(*gorm.DB) *gorm.DB) (response.Ord
 		Select("orders.*,c_users.nick_name as user_nick_name").
 		Joins("left join c_users on orders.c_user_id = c_users.id").
 		Joins(fmt.Sprintf("left join sys_authorities on sys_authorities.authority_id = c_users.authority_id and sys_authorities.authority_type = %d", multi.GeneralAuthority))
-
-	// db = CheckTenancyIdAndUserId(db, req, "orders.")
 	db = db.Scopes(funcs...)
 
 	err := db.Where("orders.id = ?", id).First(&order).Error
@@ -230,8 +228,8 @@ func GetOrderDetailById(id uint, funcs ...func(*gorm.DB) *gorm.DB) (response.Ord
 		return order, err
 	}
 
-	if order.SysUserId > 0 {
-		cuser, err := GetGeneralDetail(order.SysUserId)
+	if order.CUserId > 0 {
+		cuser, err := GetGeneralDetail(order.CUserId)
 		if err != nil {
 			return order, err
 		}
@@ -323,7 +321,7 @@ func DeliveryOrder(id uint, delivery request.DeliveryOrder, ctx *gin.Context) er
 	}
 
 	orderStatus := model.OrderStatus{
-		ChangeType:    fmt.Sprintf("delivery_%d", delivery.DeliveryType),
+		ChangeType:    model.OrderChangeType(fmt.Sprintf("delivery_%d", delivery.DeliveryType)),
 		ChangeMessage: changeMessage,
 		ChangeTime:    time.Now(),
 		OrderId:       id,
@@ -636,13 +634,15 @@ func UpdateOrderByIds(db *gorm.DB, ids []uint, data map[string]interface{}) erro
 }
 
 // GetNoPayOrdersByOrderSn 根据订单号获取未支付订单
-func GetNoPayOrdersByOrderSn(orderSn string) ([]model.Order, error) {
-	orders := []model.Order{}
+func GetNoPayOrdersByOrderSn(orderSn string) ([]response.OrderDetail, error) {
+	orders := []response.OrderDetail{}
 	err := g.TENANCY_DB.Model(&model.Order{}).
-		Where("order_sn = ?", orderSn).
-		Where("is_system_del = ?", g.StatusFalse).
-		Where("is_cancel = ?", g.StatusFalse).
-		Where("status = ?", model.OrderStatusNoPay).
+		Select("orders.*,c_users.nick_name as user_nick_name").
+		Joins("left join c_users on orders.c_user_id = c_users.id").
+		Where("orders.order_sn = ?", orderSn).
+		Where("orders.is_system_del = ?", g.StatusFalse).
+		Where("orders.is_cancel = ?", g.StatusFalse).
+		Where("orders.status = ?", model.OrderStatusNoPay).
 		Find(&orders).Error
 	if err != nil {
 		return nil, err
@@ -939,7 +939,10 @@ func CreateOrderStatus(db *gorm.DB, orderStatus *model.OrderStatus) error {
 }
 
 // ChangeOrderStatusByOrderId 修改订单状态
-func ChangeOrderStatusByOrderId(orderId uint, changeData map[string]interface{}, changeType, changeMessage string) error {
+func ChangeOrderStatusByOrderId(orderId uint, changeData map[string]interface{}, changeType model.OrderChangeType, changeMessage string, financials ...*model.FinancialRecord) error {
+	if changeMessage == "" {
+		changeMessage = changeType.ToMessage()
+	}
 	orderProducts, err := GetOrderProductsByOrderIds([]uint{orderId})
 	if err != nil {
 		return err
@@ -955,6 +958,7 @@ func ChangeOrderStatusByOrderId(orderId uint, changeData map[string]interface{},
 			return err
 		}
 
+		// 用户没有付款的商品才回退库存，已经付款的商品部回退库存
 		if changeType == "cancel" {
 			// 退回库存
 			for _, cartProduct := range orderProducts {
@@ -964,6 +968,13 @@ func ChangeOrderStatusByOrderId(orderId uint, changeData map[string]interface{},
 				if err = IncSkuStock(tx, cartProduct.ProductId, cartProduct.Unique, cartProduct.ProductNum); err != nil {
 					return err
 				}
+			}
+		}
+
+		// TODO:: 添加交易记录
+		if len(financials) == 1 {
+			if err = CreateFinancialRecord(tx, financials[0]); err != nil {
+				return err
 			}
 		}
 
@@ -978,7 +989,7 @@ func ChangeOrderStatusByOrderId(orderId uint, changeData map[string]interface{},
 // CancelOrder 用户取消订单
 func CancelOrder(req request.GetById) error {
 	changeData := map[string]interface{}{"is_cancel": g.StatusTrue}
-	err := ChangeOrderStatusByOrderId(req.Id, changeData, "cancel", "取消订单")
+	err := ChangeOrderStatusByOrderId(req.Id, changeData, model.ChangeTypeCancel, "")
 	if err != nil {
 		return err
 	}
@@ -1000,7 +1011,7 @@ func DeleteOrder(req request.GetById) error {
 }
 
 // ChangeOrderPayNotifyByOrderSn 修改支付状态
-func ChangeOrderPayNotifyByOrderSn(changeData map[string]interface{}, orderSn, changeType, changeMessage string) (model.Payload, error) {
+func ChangeOrderPayNotifyByOrderSn(changeData map[string]interface{}, orderSn string, changeType model.OrderChangeType) (model.Payload, error) {
 	var palyload model.Payload
 	orders, err := GetNoPayOrdersByOrderSn(orderSn)
 	if err != nil {
@@ -1009,7 +1020,18 @@ func ChangeOrderPayNotifyByOrderSn(changeData map[string]interface{}, orderSn, c
 	if len(orders) != 1 {
 		return palyload, fmt.Errorf("%s 订单号重复生产 %d 个订单", orderSn, len(orders))
 	}
-	err = ChangeOrderStatusByOrderId(orders[0].ID, changeData, changeType, changeMessage)
+	financialRecord := &model.FinancialRecord{
+		RecordSn:      g.CreateOrderSn("RC"),
+		OrderSn:       orders[0].OrderSn,
+		UserInfo:      orders[0].UserNickName,
+		FinancialType: "order",
+		FinancialPm:   model.InFinancialPm,
+		Number:        orders[0].PayPrice,
+		SysTenancyId:  orders[0].SysTenancyId,
+		CUserId:       orders[0].CUserId,
+		OrderId:       orders[0].ID,
+	}
+	err = ChangeOrderStatusByOrderId(orders[0].ID, changeData, changeType, "", financialRecord)
 	if err != nil {
 		return palyload, err
 	}
@@ -1061,7 +1083,6 @@ func AutoTakeOrders(orderIds []uint) error {
 		if err != nil {
 			return err
 		}
-
 		err = tx.Model(&model.OrderStatus{}).Create(&orderStatues).Error
 		if err != nil {
 			return fmt.Errorf("生成订单操作记录 %w", err)

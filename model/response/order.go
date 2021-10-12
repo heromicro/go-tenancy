@@ -37,7 +37,7 @@ type OrderCondition struct {
 type OrderDetail struct {
 	TenancyResponse
 	model.BaseOrder
-	SysUserId        uint           `json:"sysUserId" form:"sysUserId"`
+	CUserId          uint           `json:"cUserId" form:"cUserId"`
 	SysTenancyId     uint           `json:"sysTenancyId"`
 	PatientId        uint           `json:"patientId"`
 	GroupOrderId     int            `json:"groupOrderId"`

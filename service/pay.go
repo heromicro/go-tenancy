@@ -382,12 +382,12 @@ func NotifyAliPay(ctx *gin.Context) error {
 
 		// 部分退款
 		if tradeStatus == "TRADE_SUCCESS" {
-			err := ChangeReturnOrderStatusByReturnOrderSn(model.PayTypeAlipay, model.RefundStatusEnd, outBizNo, "refund_success", "退款成功")
+			err := ChangeReturnOrderStatusByReturnOrderSn(model.PayTypeAlipay, model.RefundStatusEnd, outBizNo, model.RefundChangeTypeSuccess)
 			if err != nil {
 				g.TENANCY_LOG.Error("退款异步通知: 支付宝支付异步通知回调错误", zap.String(orderSn, err.Error()))
 			}
 		} else if tradeStatus == "TRADE_CLOSED" { // 全部退款
-			err := ChangeReturnOrderStatusByOrderSn(model.PayTypeAlipay, model.RefundStatusEnd, orderSn, "refund_success", "退款成功")
+			err := ChangeReturnOrderStatusByOrderSn(model.PayTypeAlipay, model.RefundStatusEnd, orderSn, model.RefundChangeTypeSuccess)
 			if err != nil {
 				g.TENANCY_LOG.Error("退款异步通知: 支付宝支付异步通知回调错误", zap.String(orderSn, err.Error()))
 			}
@@ -403,7 +403,7 @@ func NotifyAliPay(ctx *gin.Context) error {
 			"pay_time": time.Now(),
 			"paid":     g.StatusTrue,
 		}
-		payload, err := ChangeOrderPayNotifyByOrderSn(changeData, orderSn, "pay_success", "订单支付成功")
+		payload, err := ChangeOrderPayNotifyByOrderSn(changeData, orderSn, model.ChangeTypePaySuccess)
 		if err != nil {
 			g.TENANCY_LOG.Error("支付异步通知: 支付宝支付异步通知回调错误", zap.String(orderSn, err.Error()))
 		}
@@ -512,7 +512,7 @@ func wechatPayNotifyForPay(result *wechat.V3DecryptResult) error {
 		"pay_time": time.Now(),
 		"paid":     g.StatusTrue,
 	}
-	payload, err := ChangeOrderPayNotifyByOrderSn(changeData, result.OutTradeNo, "pay_success", "订单支付成功")
+	payload, err := ChangeOrderPayNotifyByOrderSn(changeData, result.OutTradeNo, model.ChangeTypePaySuccess)
 	if err != nil {
 		g.TENANCY_LOG.Error("支付异步回调: 微信支付异支付异步通知回调错误", zap.String(result.OutTradeNo, err.Error()))
 	}
@@ -544,7 +544,7 @@ func wechatPayNotifyForRefund(result *wechat.V3DecryptRefundResult) error {
 		return fmt.Errorf("退款异步回调返回状态错误")
 	}
 
-	err := ChangeReturnOrderStatusByReturnOrderSn(model.PayTypeWx, model.RefundStatusEnd, result.OutRefundNo, "refund_success", "退款成功")
+	err := ChangeReturnOrderStatusByReturnOrderSn(model.PayTypeWx, model.RefundStatusEnd, result.OutRefundNo, model.RefundChangeTypeSuccess)
 	if err != nil {
 		g.TENANCY_LOG.Error("退款异步回调: 微信支付异支付异步通知回调错误", zap.String(result.OutTradeNo, err.Error()))
 	}

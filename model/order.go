@@ -80,13 +80,38 @@ type BaseOrder struct {
 	IsSystemDel    int       `gorm:"column:is_system_del;type:tinyint(1);default:2" json:"isSystemDel"`                               // 商户删除
 }
 
+type OrderChangeType string
+
+// 操作类型
+const (
+	ChangeTypeUnknown    OrderChangeType = "unknown_type"
+	ChangeTypeCreate     OrderChangeType = "create"
+	ChangeTypeCancel     OrderChangeType = "cancel"
+	ChangeTypePaySuccess OrderChangeType = "pay_success"
+)
+
+func (oct OrderChangeType) ToMessage() string {
+	switch oct {
+	case ChangeTypeUnknown:
+		return "未知操作"
+	case ChangeTypeCreate:
+		return "下单成功"
+	case ChangeTypeCancel:
+		return "取消订单"
+	case ChangeTypePaySuccess:
+		return "支付成功"
+	default:
+		return "未知操作"
+	}
+}
+
 // OrderStatus 订单操作记录表
 type OrderStatus struct {
 	g.TENANCY_MODEL
 
-	ChangeType    string    `gorm:"index:change_type;column:change_type;type:varchar(32);not null" json:"changeType"`       // 操作类型
-	ChangeMessage string    `gorm:"column:change_message;type:varchar(256);not null" json:"changeMessage"`                  // 操作备注
-	ChangeTime    time.Time `gorm:"column:change_time;type:timestamp;not null;default:CURRENT_TIMESTAMP" json:"changeTime"` // 操作时间
+	ChangeType    OrderChangeType `gorm:"index:change_type;column:change_type;type:varchar(32);not null" json:"changeType"`       // 操作类型
+	ChangeMessage string          `gorm:"column:change_message;type:varchar(256);not null" json:"changeMessage"`                  // 操作备注
+	ChangeTime    time.Time       `gorm:"column:change_time;type:timestamp;not null;default:CURRENT_TIMESTAMP" json:"changeTime"` // 操作时间
 
 	OrderId uint `gorm:"index:order_id;column:order_id;type:int unsigned;not null" json:"orderId"` // 订单id
 }

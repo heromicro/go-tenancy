@@ -20,6 +20,7 @@ var node *snowflake.Node
 // CreateOrderSn 生成订单号 orderType+20060102150405+随机数
 // 订单组 G+20060102150405+随机数
 // 退款单 R+20060102150405+随机数
+// 资金流水 RC+20060102150405+随机数
 func CreateOrderSn(orderType interface{}) string {
 	id := fmt.Sprintf("%d", getNodeId().Generate().Int64())
 	now := time.Now().Format("20060102150405")

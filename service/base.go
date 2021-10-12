@@ -4,7 +4,6 @@ import (
 	"fmt"
 
 	"github.com/gin-gonic/gin"
-	"github.com/snowlyg/go-tenancy/model/request"
 	"github.com/snowlyg/multi"
 	"gorm.io/gorm"
 )
@@ -59,27 +58,6 @@ func CheckTenancyId(db *gorm.DB, tenancyId uint, perfix string) *gorm.DB {
 		return db
 	}
 	return db.Where(perfix+"sys_tenancy_id", tenancyId)
-}
-
-func CheckUserId(db *gorm.DB, userId uint, perfix string) *gorm.DB {
-	if userId == 0 {
-		return db
-	}
-	return db.Where(perfix+"sys_user_id", userId)
-}
-
-// CheckTenancyIdAndUserId
-func CheckTenancyIdAndUserId(db *gorm.DB, req request.GetById, perfix string) *gorm.DB {
-	if req.TenancyId > 0 {
-		db = db.Where(perfix+"sys_tenancy_id", req.TenancyId)
-	}
-	if req.UserId > 0 {
-		db = db.Where(perfix+"sys_user_id", req.UserId)
-	}
-	if req.PatientId > 0 {
-		db = db.Where(perfix+"patient_id", req.PatientId)
-	}
-	return db
 }
 
 //OrderBy 排序

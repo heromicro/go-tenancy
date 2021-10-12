@@ -144,7 +144,7 @@ func TestDeviceRefundOrderProcess(t *testing.T) {
 		"pay_time": time.Now(),
 		"paid":     g.StatusTrue,
 	}
-	_, err := service.ChangeOrderPayNotifyByOrderSn(changeData, orderSn, "pay_success", "订单支付成功")
+	_, err := service.ChangeOrderPayNotifyByOrderSn(changeData, orderSn, model.ChangeTypePaySuccess)
 	if err != nil {
 		t.Errorf("%s 订单支付失败%v", orderSn, err.Error())
 	}

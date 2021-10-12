@@ -183,10 +183,10 @@ var baseApis = []model.SysApi{
 	{Path: "/v1/admin/product/getProductById/:id", Description: "商品详情", ApiGroup: "product", Method: "GET"},
 	{Path: "/v1/admin/product/updateProduct/:id", Description: "编辑商品", ApiGroup: "product", Method: "PUT"},
 	// 商品评论
-	{Path: "/v1/admin/product/replyMap", Description: "虚拟评论表单", ApiGroup: "productReply", Method: "GET"},
-	{Path: "/v1/admin/product/reply", Description: "添加虚拟评论", ApiGroup: "productReply", Method: "POST"},
-	{Path: "/v1/admin/product/deleteProductReply/:id", Description: "删除评论", ApiGroup: "productReply", Method: "DELETE"},
-	{Path: "/v1/admin/product/getProductReplyList", Description: "商品评论列表", ApiGroup: "productReply", Method: "POST"},
+	{Path: "/v1/admin/productReply/replyMap", Description: "虚拟评论表单", ApiGroup: "productReply", Method: "GET"},
+	{Path: "/v1/admin/productReply/reply", Description: "添加虚拟评论", ApiGroup: "productReply", Method: "POST"},
+	{Path: "/v1/admin/productReply/deleteProductReply/:id", Description: "删除评论", ApiGroup: "productReply", Method: "DELETE"},
+	{Path: "/v1/admin/productReply/getProductReplyList", Description: "商品评论列表", ApiGroup: "productReply", Method: "POST"},
 
 	//品牌分类
 	{Path: "/v1/admin/category/getCreateBrandCategoryMap", Description: "品牌分类添加表单", ApiGroup: "brandCategory", Method: "POST"},

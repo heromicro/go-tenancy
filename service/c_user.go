@@ -330,11 +330,11 @@ func GetGeneralInfoList(info request.UserPageInfo, ctx *gin.Context) ([]response
 
 	db := g.TENANCY_DB.Model(&model.CUser{})
 	if multi.IsTenancy(ctx) {
-		db = db.Select("c_user.sex,c_user.nick_name,c_user.avatar_url,c_user.user_type,c_user.id as uid,c_user.username,c_user.authority_id,c_user.created_at,c_user.updated_at,sys_authorities.authority_name,sys_authorities.authority_type,c_user.authority_id,user_groups.group_name,user_merchants.first_pay_time,user_merchants.last_pay_time").
-			Joins("left join user_merchants on user_merchants.c_user_id = c_user.id").
+		db = db.Select("c_user.sex,c_user.nick_name,c_user.avatar_url,c_user.user_type,c_users.id as uid,c_user.username,c_user.authority_id,c_user.created_at,c_user.updated_at,sys_authorities.authority_name,sys_authorities.authority_type,c_user.authority_id,user_groups.group_name,user_merchants.first_pay_time,user_merchants.last_pay_time").
+			Joins("left join user_merchants on user_merchants.c_user_id = c_users.id").
 			Where("user_merchants.sys_tenancy_id = ?", tenancyId)
 	} else {
-		db = db.Select("c_user.id as uid,c_user.username,c_user.authority_id,c_user.created_at,c_user.updated_at, c_user.*,sys_authorities.authority_name,sys_authorities.authority_type,c_user.authority_id,user_groups.group_name")
+		db = db.Select("c_users.id as uid,c_user.username,c_user.authority_id,c_user.created_at,c_user.updated_at, c_user.*,sys_authorities.authority_name,sys_authorities.authority_type,c_user.authority_id,user_groups.group_name")
 	}
 	db = db.Joins("left join sys_authorities on sys_authorities.authority_id = c_user.authority_id").
 		Joins("left join user_groups on c_user.group_id = user_groups.id").
