@@ -101,9 +101,15 @@ func UpdateApi(ctx *gin.Context) {
 	}
 }
 
-// GetAllApis 获取所有的Api 不分页
+// GetAllApis 获取所有的Api不分页
 func GetAllApis(ctx *gin.Context) {
-	if apis, err := service.GetAllApis(); err != nil {
+	var req request.AuthorityType
+	if err := ctx.ShouldBind(&req); err != nil {
+		g.TENANCY_LOG.Error("参数校验不通过", zap.Any("err", err))
+		response.FailWithMessage("参数校验不通过", ctx)
+		return
+	}
+	if apis, err := service.GetAllApis(req); err != nil {
 		g.TENANCY_LOG.Error("获取失败!", zap.Any("err", err))
 		response.FailWithMessage("获取失败:"+err.Error(), ctx)
 	} else {

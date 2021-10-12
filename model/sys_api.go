@@ -6,8 +6,9 @@ import (
 
 type SysApi struct {
 	g.TENANCY_MODEL
-	Path        string `json:"path" gorm:"comment:api路径" binding:"required"`
-	Description string `json:"description" gorm:"comment:api中文描述" binding:"required"`
-	ApiGroup    string `json:"apiGroup" gorm:"comment:api组" binding:"required"`
-	Method      string `json:"method" gorm:"default:POST;comment:方法" binding:"required"`
+	Path          string `json:"path" gorm:"comment:api路径" binding:"required"`
+	Description   string `json:"description" gorm:"comment:api中文描述" binding:"required"`
+	ApiGroup      string `json:"apiGroup" gorm:"comment:api组" binding:"required"`
+	Method        string `json:"method" gorm:"default:POST;comment:方法" binding:"required"`
+	AuthorityType int    `json:"authorityType" gorm:"comment:角色类型"`
 }

@@ -72,9 +72,9 @@ func GetAPIInfoList(pageInfo request.SearchApiParams) ([]model.SysApi, int64, er
 }
 
 // GetAllApis 获取所有的api
-func GetAllApis() ([]model.SysApi, error) {
+func GetAllApis(authorityType request.AuthorityType) ([]model.SysApi, error) {
 	apis := []model.SysApi{}
-	err := g.TENANCY_DB.Find(&apis).Error
+	err := g.TENANCY_DB.Where("authority_type = ?", authorityType.AuthorityType).Find(&apis).Error
 	return apis, err
 }
 
