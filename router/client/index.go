@@ -228,14 +228,6 @@ func InitCUserRouter(Router *gin.RouterGroup) {
 	}
 }
 
-// 患者管理
-func InitPatientRouter(Router *gin.RouterGroup) {
-	PatientRouter := Router.Group("/patient")
-	{
-		PatientRouter.POST("/getPatientList", client.GetPatientList)
-	}
-}
-
 // 控制面板接口
 func InitStatisticsRouter(Router *gin.RouterGroup) {
 	StatisticsRouter := Router.Group("/statistics")

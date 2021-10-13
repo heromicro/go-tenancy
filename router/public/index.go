@@ -20,15 +20,6 @@ func InitPayRouter(Router *gin.RouterGroup) {
 	}
 }
 
-// 数据库初始化检测
-func InitInitRouter(Router *gin.RouterGroup) {
-	ApiRouter := Router.Group("/init")
-	{
-		ApiRouter.POST("/initdb", public.InitDB)  // 初始化
-		ApiRouter.GET("/checkdb", public.CheckDB) // 检测初始化
-	}
-}
-
 // 登录授权验证码
 func InitPublicRouter(Router *gin.RouterGroup) {
 	BaseRouter := Router.Group("/public")

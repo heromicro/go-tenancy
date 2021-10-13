@@ -413,48 +413,31 @@ func GetStatisticsOrderUser() (response.StaticOrderNum, error) {
 	if err != nil {
 		return staticOrderNum, err
 	}
-	orderPatientNum, err := service.GetOrderPatientNum(scope.FilterToday("pay_time", ""))
-	if err != nil {
-		return staticOrderNum, err
-	}
-	staticOrderNum.OrderNum = orderUserNum + orderPatientNum
+
+	staticOrderNum.OrderNum = orderUserNum
 
 	yesterdayOrderUserNum, err := service.GetOrderUserNum(scope.FilterYesterday("pay_time", ""), scope.FilterBase("paid", "=", "", g.StatusTrue))
 	if err != nil {
 		return staticOrderNum, err
 	}
-	yesterdayOrderPatientNum, err := service.GetOrderPatientNum(scope.FilterYesterday("pay_time", ""))
-	if err != nil {
-		return staticOrderNum, err
-	}
 
-	staticOrderNum.OrderRate = getRateInt(staticOrderNum.OrderNum, yesterdayOrderUserNum+yesterdayOrderPatientNum)
+	staticOrderNum.OrderRate = getRateInt(staticOrderNum.OrderNum, yesterdayOrderUserNum)
 
 	monthOrderUserNum, err := service.GetOrderUserNum(scope.FilterMonth("pay_time", ""), scope.FilterBase("paid", "=", "", g.StatusTrue))
 	if err != nil {
 		return staticOrderNum, err
 	}
-	monthOrderPatientNum, err := service.GetOrderPatientNum(scope.FilterMonth("pay_time", ""))
-	if err != nil {
-		return staticOrderNum, err
-	}
-	staticOrderNum.MonthOrderNum = monthOrderUserNum + monthOrderPatientNum
+
+	staticOrderNum.MonthOrderNum = monthOrderUserNum
 
 	yesterdayMonthOrderUserNum, err := service.GetOrderUserNum(scope.FilterYesterday("pay_time", ""))
 	if err != nil {
 		return staticOrderNum, err
 	}
-	yesterdayMonthOrderPatientNum, err := service.GetOrderPatientNum(scope.FilterYesterday("pay_time", ""))
-	if err != nil {
-		return staticOrderNum, err
-	}
-	staticOrderNum.MonthRate = getRateInt(staticOrderNum.MonthOrderNum, yesterdayMonthOrderUserNum+yesterdayMonthOrderPatientNum)
+
+	staticOrderNum.MonthRate = getRateInt(staticOrderNum.MonthOrderNum, yesterdayMonthOrderUserNum)
 
 	todayOrderUserNumGroup, err := service.GetOrderUserNumGroup(scope.FilterMonth("pay_time", ""))
-	if err != nil {
-		return staticOrderNum, err
-	}
-	todayOrderPatientNumGroup, err := service.GetOrderPatientNumGroup(scope.FilterMonth("pay_time", ""))
 	if err != nil {
 		return staticOrderNum, err
 	}
@@ -467,14 +450,6 @@ func GetStatisticsOrderUser() (response.StaticOrderNum, error) {
 			for _, todayOrderUserNum := range todayOrderUserNumGroup {
 				if todayOrderUserNum.Time == timeStr {
 					order.Total += todayOrderUserNum.Count
-				}
-			}
-		}
-
-		if len(todayOrderPatientNumGroup) > 0 {
-			for _, todayOrderPatientNum := range todayOrderPatientNumGroup {
-				if todayOrderPatientNum.Time == timeStr {
-					order.Total += todayOrderPatientNum.Count
 				}
 			}
 		}

@@ -174,8 +174,7 @@ var menus = []model.SysBaseMenu{
 	{TENANCY_MODEL: g.TENANCY_MODEL{ID: 1028}, Pid: 1027, Path: "1027/", Icon: "", MenuName: "标签管理", Route: "/merchant/user/_label", Params: "[]", Sort: 0, Hidden: 2, IsTenancy: 1, IsMenu: 1},
 	{TENANCY_MODEL: g.TENANCY_MODEL{ID: 1029}, Pid: 1028, Path: "1028/", Icon: "", MenuName: "手动标签", Route: "/merchant/user/label", Params: "[]", Sort: 0, Hidden: 2, IsTenancy: 1, IsMenu: 1},
 	{TENANCY_MODEL: g.TENANCY_MODEL{ID: 1030}, Pid: 1028, Path: "1028/", Icon: "", MenuName: "自动标签", Route: "/merchant/user/maticlabel", Params: "[]", Sort: 0, Hidden: 1, IsTenancy: 1, IsMenu: 1},
-	{TENANCY_MODEL: g.TENANCY_MODEL{ID: 1031}, Pid: 0, Path: "/", Icon: "user-solid", MenuName: "患者", Route: "/merchant/patient", Params: "", Sort: 0, Hidden: 2, IsTenancy: 1, IsMenu: 1},
-	{TENANCY_MODEL: g.TENANCY_MODEL{ID: 1032}, Pid: 1031, Path: "/1032/", Icon: "", MenuName: "患者列表", Route: "/merchant/patient/list", Params: "", Sort: 0, Hidden: 2, IsTenancy: 1, IsMenu: 1},
+
 	{TENANCY_MODEL: g.TENANCY_MODEL{ID: 1095}, Pid: 1051, Path: "/719/1051/", Icon: "", MenuName: "活动商品", Route: "/marketing/assist/goods_list", Params: "[]", Sort: 0, Hidden: 1, IsTenancy: 2, IsMenu: 1},
 	{TENANCY_MODEL: g.TENANCY_MODEL{ID: 1096}, Pid: 1051, Path: "/719/1051/", Icon: "", MenuName: "助力活动", Route: "/marketing/assist/list", Params: "[]", Sort: 0, Hidden: 2, IsTenancy: 1, IsMenu: 1},
 	{TENANCY_MODEL: g.TENANCY_MODEL{ID: 1099}, Pid: 106, Path: "106/", Icon: "", MenuName: "助力", Route: "/merchant/assist", Params: "[]", Sort: 0, Hidden: 1, IsTenancy: 1, IsMenu: 1},

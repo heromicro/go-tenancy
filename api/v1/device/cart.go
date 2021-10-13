@@ -11,7 +11,7 @@ import (
 )
 
 func GetCartList(ctx *gin.Context) {
-	if list, fails, total, err := service.GetCartList(multi.GetTenancyId(ctx), 0, multi.GetUserId(ctx), nil); err != nil {
+	if list, fails, total, err := service.GetCartList(multi.GetTenancyId(ctx), multi.GetUserId(ctx), nil); err != nil {
 		g.TENANCY_LOG.Error("获取失败!", zap.Any("err", err))
 		response.FailWithMessage("获取失败:"+err.Error(), ctx)
 	} else {
@@ -52,7 +52,7 @@ func GetProductCount(ctx *gin.Context) {
 func CreateCart(ctx *gin.Context) {
 	var cart request.CreateCart
 	cart.SysTenancyId = multi.GetTenancyId(ctx)
-	cart.PatientId = multi.GetUserId(ctx)
+	cart.CUserId = multi.GetUserId(ctx)
 	if errs := ctx.ShouldBindJSON(&cart); errs != nil {
 		response.FailWithMessage(errs.Error(), ctx)
 		return

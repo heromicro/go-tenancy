@@ -18,7 +18,7 @@ func GetOrderList(ctx *gin.Context) {
 		response.FailWithMessage(errs.Error(), ctx)
 		return
 	}
-	pageInfo.PatientId = multi.GetUserId(ctx)
+	pageInfo.CUserId = multi.GetUserId(ctx)
 	pageInfo.SysTenancyId = multi.GetTenancyId(ctx)
 	if ginH, err := service.GetOrderInfoList(pageInfo, ctx); err != nil {
 		g.TENANCY_LOG.Error("获取失败!", zap.Any("err", err))
@@ -35,7 +35,7 @@ func CheckOrder(ctx *gin.Context) {
 		response.FailWithMessage(errs.Error(), ctx)
 		return
 	}
-	if order, err := service.CheckOrder(req.Ids, multi.GetTenancyId(ctx), 0, multi.GetUserId(ctx)); err != nil {
+	if order, err := service.CheckOrder(req.Ids, multi.GetTenancyId(ctx), multi.GetUserId(ctx)); err != nil {
 		g.TENANCY_LOG.Error("获取失败!", zap.Any("err", err))
 		response.FailWithMessage("获取失败:"+err.Error(), ctx)
 	} else {
@@ -51,7 +51,7 @@ func GetOrderById(ctx *gin.Context) {
 		return
 	}
 	req.TenancyId = multi.GetTenancyId(ctx)
-	req.PatientId = multi.GetUserId(ctx)
+	req.UserId = multi.GetUserId(ctx)
 	if order, err := service.GetOrderDetailById(req.Id); err != nil {
 		g.TENANCY_LOG.Error("获取失败!", zap.Any("err", err))
 		response.FailWithMessage("获取失败:"+err.Error(), ctx)
@@ -67,7 +67,7 @@ func CreateOrder(ctx *gin.Context) {
 		response.FailWithMessage(errs.Error(), ctx)
 		return
 	}
-	if qrcode, orderId, err := service.CreateOrder(req, multi.GetTenancyId(ctx), 0, multi.GetUserId(ctx), multi.GetTenancyName(ctx)); err != nil {
+	if qrcode, orderId, err := service.CreateOrder(req, multi.GetTenancyId(ctx), multi.GetUserId(ctx), multi.GetTenancyName(ctx)); err != nil {
 		g.TENANCY_LOG.Error("获取失败!", zap.Any("err", err))
 		response.FailWithMessage("获取失败:"+err.Error(), ctx)
 	} else {
@@ -84,7 +84,7 @@ func PayOrder(ctx *gin.Context) {
 	}
 
 	req.TenancyId = multi.GetTenancyId(ctx)
-	req.PatientId = multi.GetUserId(ctx)
+	req.UserId = multi.GetUserId(ctx)
 
 	if qrcode, err := logic.PayOrder(req); err != nil {
 		g.TENANCY_LOG.Error("结算订单失败!", zap.Any("err", err))
@@ -103,7 +103,7 @@ func CancelOrder(ctx *gin.Context) {
 		return
 	}
 	req.TenancyId = multi.GetTenancyId(ctx)
-	req.PatientId = multi.GetUserId(ctx)
+	req.UserId = multi.GetUserId(ctx)
 	if err := logic.CancelOrder(req); err != nil {
 		g.TENANCY_LOG.Error("操作失败!", zap.Any("err", err))
 		response.FailWithMessage("操作失败:"+err.Error(), ctx)
@@ -127,7 +127,7 @@ func CheckRefundOrder(ctx *gin.Context) {
 		response.FailWithMessage("参数校验不通过", ctx)
 		return
 	}
-	req.PatientId = multi.GetUserId(ctx)
+	req.UserId = multi.GetUserId(ctx)
 	req.TenancyId = multi.GetTenancyId(ctx)
 	if refundOrder, err := logic.CheckRefundOrder(req, idsReq.Ids); err != nil {
 		g.TENANCY_LOG.Error("操作失败!", zap.Any("err", err))
@@ -150,7 +150,7 @@ func RefundOrder(ctx *gin.Context) {
 		response.FailWithMessage("参数校验不通过", ctx)
 		return
 	}
-	req.PatientId = multi.GetUserId(ctx)
+	req.UserId = multi.GetUserId(ctx)
 	req.TenancyId = multi.GetTenancyId(ctx)
 	if id, err := logic.CreateRefundOrder(req, createRefundOrder); err != nil {
 		g.TENANCY_LOG.Error("操作失败!", zap.Any("err", err))

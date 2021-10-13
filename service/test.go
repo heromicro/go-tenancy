@@ -13,8 +13,8 @@ import (
 const PayTestKey = "PAY_TEST_KEY:"
 
 // DeleteTestCache 清除测试缓存
-func DeleteTestCache(tenancyId, userId, patientId uint) {
-	index := fmt.Sprintf("%s%d_%d_%d", PayTestKey, tenancyId, userId, patientId)
+func DeleteTestCache(tenancyId, userId uint) {
+	index := fmt.Sprintf("%s%d_%d_%d", PayTestKey, tenancyId, userId)
 	cache.DeleteCache(index)
 }
 
@@ -36,14 +36,14 @@ func PayTest(req request.CreateCart) ([]byte, error) {
 		OrderType: 1,
 		Remark:    "remark",
 	}
-	index := fmt.Sprintf("%s%d_%d_%d", PayTestKey, req.SysTenancyId, req.CUserId, req.PatientId)
+	index := fmt.Sprintf("%s%d_%d_%d", PayTestKey, req.SysTenancyId, req.CUserId)
 	qrcode, err := cache.GetCacheBytes(index)
 	if err != nil || qrcode == nil {
 		tenancy, err := GetTenancyByID(req.SysTenancyId)
 		if err != nil {
 			return nil, err
 		}
-		qrcode, _, err = CreateOrder(res, req.SysTenancyId, req.CUserId, req.PatientId, tenancy.Name)
+		qrcode, _, err = CreateOrder(res, req.SysTenancyId, req.CUserId, tenancy.Name)
 		if err != nil {
 			return nil, err
 		}

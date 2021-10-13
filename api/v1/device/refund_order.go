@@ -17,7 +17,7 @@ func GetRefundOrderList(ctx *gin.Context) {
 		response.FailWithMessage(errs.Error(), ctx)
 		return
 	}
-	pageInfo.PatientId = multi.GetUserId(ctx)
+	pageInfo.CUserId = multi.GetUserId(ctx)
 	pageInfo.SysTenancyId = multi.GetTenancyId(ctx)
 	if list, stat, total, err := service.GetRefundOrderInfoList(pageInfo, ctx); err != nil {
 		g.TENANCY_LOG.Error("获取失败!", zap.Any("err", err))

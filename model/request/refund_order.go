@@ -8,8 +8,7 @@ type RefundOrderPageInfo struct {
 	RefundOrderSn string `json:"refundOrderSn" form:"refundOrderSn"`
 	Status        string `json:"status" form:"status"`
 	SysTenancyId  uint   `json:"sysTenancyId" form:"sysTenancyId"`
-	SysUserId     uint   `json:"sysUserId" form:"sysUserId"`
-	PatientId     uint   `json:"patientId" form:"patientId"`
+	CUserId       uint   `json:"cUserId" form:"cUserId"`
 }
 
 type OrderAudit struct {

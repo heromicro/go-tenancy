@@ -12,7 +12,9 @@ import (
 	"github.com/snowlyg/go-tenancy/model"
 	"github.com/snowlyg/go-tenancy/model/request"
 	"github.com/snowlyg/go-tenancy/model/response"
+	"github.com/snowlyg/go-tenancy/source"
 	"github.com/snowlyg/multi"
+	"go.uber.org/zap"
 	"gorm.io/gorm"
 )
 
@@ -270,6 +272,7 @@ func SetUserLabel(id, tenancyId uint, reqlabelIds []uint) error {
 	return nil
 }
 
+// GetGeneralDetail 获取用户详情
 func GetGeneralDetail(id uint) (response.GeneralUserDetail, error) {
 	var user response.GeneralUserDetail
 	generalAuthorityIds, err := GetUserAuthorityIds(multi.GeneralAuthority)
@@ -602,4 +605,50 @@ func GetLikeStore(scopes ...func(*gorm.DB) *gorm.DB) (int64, error) {
 		return count, err
 	}
 	return count, nil
+}
+
+// CreateCUserFromDevice 医院设备用户登录
+// - 生成 c_users 和 user_merchants 表数据
+func CreateCUserFromDevice(loginDevice request.LoginDevice, tenancyId uint) (uint, error) {
+	var cUserId uint
+	cuser := model.CUser{
+		BaseGeneralInfo: model.BaseGeneralInfo{
+			RealName:  loginDevice.Name,
+			Phone:     loginDevice.Phone,
+			Age:       loginDevice.Age,
+			Sex:       loginDevice.Sex,
+			LastTime:  time.Now(),
+			LoginType: model.LoginTypeDevice,
+		},
+		SysTenancyId: tenancyId,
+		AuthorityId:  source.DeviceAuthorityId,
+	}
+	userMerchant := model.UserMerchant{
+		LastTime: time.Now(),
+		Status:   g.StatusTrue,
+		//  医院相关字段
+		LocName:      loginDevice.LocName,
+		BedNum:       loginDevice.BedNum,
+		HospitalNO:   loginDevice.HospitalNO,
+		Disease:      loginDevice.Disease,
+		SysTenancyId: tenancyId,
+	}
+	err := g.TENANCY_DB.Transaction(func(tx *gorm.DB) error {
+		err := tx.Model(&model.CUser{}).Create(&cuser).Error
+		if err != nil {
+			return err
+		}
+		userMerchant.CUserId = cuser.ID
+		err = tx.Model(&model.UserMerchant{}).Create(&userMerchant).Error
+		if err != nil {
+			return err
+		}
+		cUserId = cuser.ID
+		return nil
+	})
+	if err != nil {
+		g.TENANCY_LOG.Error("医院设备用户登录失败", zap.String("CreateCUserFromDevice()", err.Error()))
+		return 0, err
+	}
+	return cUserId, nil
 }

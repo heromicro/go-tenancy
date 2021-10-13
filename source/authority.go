@@ -13,8 +13,8 @@ var (
 	Authority          = new(authority)
 	AdminAuthorityId   = "999"
 	TenancyAuthorityId = "998"
-	GeneralAuthorityId = "997"
-	DeviceAuthorityId  = "996"
+	LiteAuthorityId    = "997" // 小程序用户
+	DeviceAuthorityId  = "996" // 床旁设备用户
 )
 
 type authority struct{}
@@ -22,8 +22,8 @@ type authority struct{}
 var authorities = []model.SysAuthority{
 	{AuthorityId: AdminAuthorityId, AuthorityType: multi.AdminAuthority, AuthorityName: "超级管理员", ParentId: "0", DefaultRouter: "dashboard"},
 	{AuthorityId: TenancyAuthorityId, AuthorityType: multi.TenancyAuthority, AuthorityName: "商户管理员", ParentId: "0", DefaultRouter: "dashboard"},
-	{AuthorityId: GeneralAuthorityId, AuthorityType: multi.GeneralAuthority, AuthorityName: "C端用户", ParentId: "0", DefaultRouter: "dashboard"},
-	{AuthorityId: DeviceAuthorityId, AuthorityType: model.DeviceAuthority, AuthorityName: "设备用户", ParentId: "0", DefaultRouter: "dashboard"},
+	{AuthorityId: LiteAuthorityId, AuthorityType: multi.GeneralAuthority, AuthorityName: "C端用户", ParentId: "0", DefaultRouter: "dashboard"},
+	{AuthorityId: DeviceAuthorityId, AuthorityType: multi.GeneralAuthority, AuthorityName: "设备用户", ParentId: "0", DefaultRouter: "dashboard"},
 	{AuthorityId: "8881", AuthorityName: "普通用户子角色", ParentId: AdminAuthorityId, AuthorityType: multi.AdminAuthority, DefaultRouter: "dashboard"},
 	{AuthorityId: "9528", AuthorityType: multi.GeneralAuthority, AuthorityName: "测试角色", ParentId: "0", DefaultRouter: "dashboard"},
 }

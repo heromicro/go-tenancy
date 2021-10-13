@@ -7,8 +7,7 @@ import (
 type OrderPageInfo struct {
 	PageInfo
 	SysTenancyId uint   `json:"sysTenancyId" form:"sysTenancyId"`
-	SysUserId    uint   `json:"sysUserId" form:"sysUserId"`
-	PatientId    uint   `json:"patientId" form:"patientId"`
+	CUserId      uint   `json:"cUserId" form:"cUserId"`
 	Date         string `json:"date" form:"date"`
 	IsTrader     string `json:"isTrader" form:"isTrader"`
 	Keywords     string `json:"keywords" form:"keywords"`

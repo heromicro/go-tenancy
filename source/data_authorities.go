@@ -18,9 +18,9 @@ type DataAuthority struct {
 
 var infos = []DataAuthority{
 	{AdminAuthorityId, AdminAuthorityId},
-	{AdminAuthorityId, GeneralAuthorityId},
+	{AdminAuthorityId, LiteAuthorityId},
 	{AdminAuthorityId, TenancyAuthorityId},
-	{TenancyAuthorityId, GeneralAuthorityId},
+	{TenancyAuthorityId, LiteAuthorityId},
 	{TenancyAuthorityId, TenancyAuthorityId},
 }
 

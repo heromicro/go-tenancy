@@ -85,7 +85,7 @@ func Clean(ctx *gin.Context) {
 	response.OkWithMessage("TOKEN清空", ctx)
 }
 
-// LoginDevice
+// LoginDevice 床旁用户登录
 func LoginDevice(ctx *gin.Context) {
 	var loginDevice request.LoginDevice
 	if errs := ctx.ShouldBindJSON(&loginDevice); errs != nil {

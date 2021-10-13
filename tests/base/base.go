@@ -120,7 +120,7 @@ func DeviceWithLoginTester(t *testing.T) *httpexpect.Expect {
 	obj.Keys().ContainsOnly("status", "data", "message")
 	obj.Value("status").Number().Equal(http.StatusOK)
 	obj.Value("message").String().Equal("登录成功")
-	obj.Value("data").Object().Value("user").NotNull()
+	// obj.Value("data").Object().Value("user").NotNull()
 	obj.Value("data").Object().Value("AccessToken").NotNull()
 
 	token := obj.Value("data").Object().Value("AccessToken").String().Raw()

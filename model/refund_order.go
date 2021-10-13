@@ -27,7 +27,6 @@ type RefundOrder struct {
 	g.TENANCY_MODEL
 	BaseRefundOrder
 	ReconciliationId uint `gorm:"column:reconciliation_id;type:int unsigned;default:0" json:"reconciliationId"` // 对账id
-	PatientId        uint `json:"patientId" form:"patientId" gorm:"column:patient_id;comment:患者"`
 	OrderId          uint `gorm:"index:oid;column:order_id;type:int unsigned;not null" json:"orderId"` // 订单id
 	CUserId          uint `json:"cUserId" form:"cUserId" gorm:"column:c_user_id;comment:关联标记"`
 	SysTenancyId     uint `gorm:"index:sys_tenancy_id;column:sys_tenancy_id;type:int;not null" json:"sysTenancyId"` // 商户 id

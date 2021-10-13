@@ -71,11 +71,10 @@ func Routers(app *gin.Engine) {
 	PublicGroup := app.Group("/v1")
 	{
 		public.InitPublicRouter(PublicGroup) // 注册基础功能路由 不做鉴权
-		public.InitInitRouter(PublicGroup)   // 自动初始化相关
 		public.InitPayRouter(PublicGroup)    // 自动初始化相关
 	}
 
-	V1Group := app.Group("/v1", middleware.NeedInit(), middleware.Auth())
+	V1Group := app.Group("/v1", middleware.Auth())
 	{
 		Auth := V1Group.Group("/auth")
 		{
@@ -111,7 +110,6 @@ func Routers(app *gin.Engine) {
 			admin.InitJobRouter(AdminGroup)             // 定时任务管理路由
 			admin.InitUserGroupRouter(AdminGroup)       // 用户分组路由
 			admin.InitUserLabelRouter(AdminGroup)       // 用户标签路由
-			admin.InitPatientRouter(AdminGroup)         // 床旁患者路由
 			admin.InitStatisticsRouter(AdminGroup)      // 控制大盘路由
 			admin.InitFinancialRecordRouter(AdminGroup) // 财务路由
 		}
@@ -141,7 +139,6 @@ func Routers(app *gin.Engine) {
 			client.InitExpressRouter(ClientGroup)          // 物流公司路由
 			client.InitUserLabelRouter(ClientGroup)        // 用户标签路由
 			client.InitCUserRouter(ClientGroup)            // 用户管理路由
-			client.InitPatientRouter(ClientGroup)          // 患者管理路由
 			client.InitStatisticsRouter(ClientGroup)       // 大盘路由
 		}
 		ClientLogGroup := V1Group.Group(g.TENANCY_CONFIG.System.ClientPreix, middleware.IsTenancy(), middleware.CasbinHandler())
@@ -154,7 +151,7 @@ func Routers(app *gin.Engine) {
 		// 	user.InitDeviceRouter(GeneralGroup)
 		// }
 
-		DeviceGroup := V1Group.Group("/device", middleware.IsDevice(), middleware.CheckTenancy(), middleware.OperationRecord())
+		DeviceGroup := V1Group.Group("/device", middleware.IsGeneral(), middleware.CheckTenancy(), middleware.OperationRecord())
 		{
 			device.InitDeviceRouter(DeviceGroup)
 		}

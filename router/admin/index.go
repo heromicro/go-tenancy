@@ -383,14 +383,6 @@ func InitUserLabelRouter(Router *gin.RouterGroup) {
 	}
 }
 
-// 患者管理
-func InitPatientRouter(Router *gin.RouterGroup) {
-	PatientRouter := Router.Group("/patient")
-	{
-		PatientRouter.GET("/getPatientSelect/:tenancy_id", admin.GetPatientSelect)
-	}
-}
-
 // 控制面板接口
 func InitStatisticsRouter(Router *gin.RouterGroup) {
 	StatisticsRouter := Router.Group("/statistics")

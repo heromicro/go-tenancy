@@ -15,7 +15,6 @@ import (
 func CreateCart(req request.CreateCart) (model.Cart, error) {
 	var cart model.Cart
 	err := g.TENANCY_DB.Model(&model.Cart{}).
-		Where("patient_id = ?", req.PatientId).
 		Where("c_user_id = ?", req.CUserId).
 		Where("sys_tenancy_id = ?", req.SysTenancyId).
 		Where("product_id = ?", req.ProductId).
@@ -33,7 +32,7 @@ func CreateCart(req request.CreateCart) (model.Cart, error) {
 			IsNew:             req.IsNew,
 			IsFail:            g.StatusFalse,
 		}
-		cart = model.Cart{BaseCart: baseCart, CUserId: req.CUserId, SysTenancyId: req.SysTenancyId, ProductId: req.ProductId, PatientId: req.PatientId}
+		cart = model.Cart{BaseCart: baseCart, CUserId: req.CUserId, SysTenancyId: req.SysTenancyId, ProductId: req.ProductId}
 		err = g.TENANCY_DB.Model(&model.Cart{}).Create(&cart).Error
 		if err != nil {
 			return cart, err
@@ -90,11 +89,11 @@ func GetProductCount(userId, tenancyId uint) (int64, error) {
 }
 
 // GetCartList
-func GetCartList(tenancyId, userId, patientId uint, cartIds []uint) ([]response.CartList, []response.CartProduct, int64, error) {
+func GetCartList(tenancyId, userId uint, cartIds []uint) ([]response.CartList, []response.CartProduct, int64, error) {
 	cartList := []response.CartList{}
 	fails := []response.CartProduct{}
 	var count int64
-	cartProducts, err := GetCartProducts(tenancyId, userId, patientId, cartIds)
+	cartProducts, err := GetCartProducts(tenancyId, userId, cartIds)
 	if err != nil {
 		return cartList, fails, count, fmt.Errorf("get cart %w", err)
 	}

@@ -77,7 +77,7 @@ func GetUserOrderList(ctx *gin.Context) {
 		response.FailWithMessage(errs.Error(), ctx)
 		return
 	}
-	pageInfo.SysUserId = req.Id
+	pageInfo.CUserId = req.Id
 	if ginH, err := service.GetOrderInfoList(pageInfo, ctx); err != nil {
 		g.TENANCY_LOG.Error("获取失败!", zap.Any("err", err))
 		response.FailWithMessage("获取失败:"+err.Error(), ctx)

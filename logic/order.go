@@ -29,7 +29,7 @@ func PayOrder(req request.GetById) (string, error) {
 	if order.Status > model.OrderStatusNoPay {
 		return "", fmt.Errorf("订单已经支付，请勿重复支付")
 	}
-	qrcode, err := service.GetQrCode(req.Id, req.TenancyId, req.PatientId, order.OrderType)
+	qrcode, err := service.GetQrCode(req.Id, req.TenancyId, order.OrderType)
 	if err != nil {
 		return "", err
 	}

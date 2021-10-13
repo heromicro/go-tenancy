@@ -5,8 +5,6 @@ import (
 	"github.com/snowlyg/go-tenancy/g"
 )
 
-const DeviceAuthority = 4 //设备用户
-
 type SysTenancy struct {
 	g.TENANCY_MODEL
 	BaseTenancy

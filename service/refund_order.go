@@ -52,12 +52,8 @@ func getRefundOrderSearch(info request.RefundOrderPageInfo, ctx *gin.Context, db
 		db = db.Where("orders.order_sn like ?", info.OrderSn+"%")
 	}
 
-	if info.SysUserId > 0 {
-		db.Where("orders.c_user_id = ?", info.SysUserId)
-	}
-
-	if info.PatientId > 0 {
-		db.Where("orders.patient_id = ?", info.PatientId)
+	if info.CUserId > 0 {
+		db.Where("orders.c_user_id = ?", info.CUserId)
 	}
 
 	if info.RefundOrderSn != "" {
@@ -546,7 +542,6 @@ func CreateRefundOrder(reqId request.GetById, req request.CreateRefundOrder, ord
 	err := g.TENANCY_DB.Transaction(func(tx *gorm.DB) error {
 		refundOrder := model.RefundOrder{
 			OrderId:      reqId.Id,
-			PatientId:    reqId.PatientId,
 			CUserId:      reqId.UserId,
 			SysTenancyId: reqId.TenancyId,
 			BaseRefundOrder: model.BaseRefundOrder{

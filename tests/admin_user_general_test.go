@@ -312,16 +312,3 @@ func TestCuserUserSelect(t *testing.T) {
 	url := fmt.Sprintf("v1/admin/cuser/getGeneralSelect/%d", tenancyId)
 	base.Get(adminAuth, url, nil, http.StatusOK, "获取成功")
 }
-
-func TestAdminPatientSelect(t *testing.T) {
-	adminAuth := base.BaseWithLoginTester(t)
-	defer base.BaseLogOut(adminAuth)
-	tenancyId, _, _ := base.CreateTenancy(adminAuth, "bafvetyy_cuser_select", http.StatusOK, "创建成功")
-	if tenancyId == 0 {
-		t.Fatal("创建失败")
-	}
-	defer base.DeleteTenancy(adminAuth, tenancyId)
-
-	url := fmt.Sprintf("v1/admin/patient/getPatientSelect/%d", tenancyId)
-	base.Get(adminAuth, url, nil, http.StatusOK, "获取成功")
-}

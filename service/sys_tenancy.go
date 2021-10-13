@@ -336,49 +336,6 @@ func SetCopyProductNum(req request.SetCopyProductNum, id uint) error {
 	return err
 }
 
-func LoginDevice(loginDevice request.LoginDevice) (*response.LoginResponse, error) {
-
-	tenancy, err := GetTenancyByUUID(loginDevice.UUID)
-	if err != nil {
-		return nil, fmt.Errorf("find tenancy %w", err)
-	}
-	if tenancy.Status == g.StatusFalse {
-		return nil, fmt.Errorf("商户已被冻结")
-	}
-
-	loginDevice.Patient.SysTenancyId = tenancy.ID
-	patient, err := FindOrCreatePatient(loginDevice.Patient)
-	if err != nil {
-		return nil, err
-	}
-
-	claims := &multi.CustomClaims{
-		ID:            strconv.FormatUint(uint64(patient.ID), 10), // 患者 id
-		Username:      loginDevice.HospitalNO,
-		TenancyId:     tenancy.ID,
-		TenancyName:   tenancy.Name,
-		AuthorityId:   source.DeviceAuthorityId,
-		AuthorityType: model.DeviceAuthority,
-		LoginType:     multi.LoginTypeDevice,
-		AuthType:      multi.AuthPwd,
-		CreationDate:  time.Now().Local().Unix(),
-		ExpiresIn:     multi.RedisSessionTimeoutWeb.Milliseconds(),
-	}
-	token, _, err := multi.AuthDriver.GenerateToken(claims)
-	if err != nil {
-		return nil, err
-	}
-	user := map[string]interface{}{
-		"tenancy": tenancy,
-		"patient": patient,
-	}
-	loginResponse := &response.LoginResponse{
-		User:  user,
-		Token: token,
-	}
-	return loginResponse, nil
-}
-
 // GetTenancyNum 获取商户数量
 func GetTenancyNum(scopes ...func(*gorm.DB) *gorm.DB) (int64, error) {
 	var userNum int64
@@ -407,4 +364,44 @@ func GetTenancyOrderPayPriceGroup(scopes ...func(*gorm.DB) *gorm.DB) ([]*respons
 		return nil, err
 	}
 	return rateData, nil
+}
+
+func LoginDevice(loginDevice request.LoginDevice) (*response.LoginResponse, error) {
+	tenancy, err := GetTenancyByUUID(loginDevice.UUID)
+	if err != nil {
+		return nil, fmt.Errorf("find tenancy %w", err)
+	}
+	if tenancy.Status == g.StatusFalse {
+		return nil, fmt.Errorf("商户已被冻结")
+	}
+	cuserId, err := CreateCUserFromDevice(loginDevice, tenancy.ID)
+	if err != nil {
+		return nil, err
+	}
+
+	claims := &multi.CustomClaims{
+		ID:            strconv.FormatUint(uint64(cuserId), 10), // 患者 id
+		Username:      loginDevice.HospitalNO,
+		TenancyId:     tenancy.ID,
+		TenancyName:   tenancy.Name,
+		AuthorityId:   source.DeviceAuthorityId,
+		AuthorityType: multi.GeneralAuthority,
+		LoginType:     multi.LoginTypeDevice,
+		AuthType:      multi.AuthPwd,
+		CreationDate:  time.Now().Local().Unix(),
+		ExpiresIn:     multi.RedisSessionTimeoutWeb.Milliseconds(),
+	}
+	token, _, err := multi.AuthDriver.GenerateToken(claims)
+	if err != nil {
+		return nil, err
+	}
+	// user := map[string]interface{}{
+	// 	"tenancy": tenancy,
+	// 	"patient": patient,
+	// }
+	loginResponse := &response.LoginResponse{
+		User:  nil,
+		Token: token,
+	}
+	return loginResponse, nil
 }

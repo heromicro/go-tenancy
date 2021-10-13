@@ -45,7 +45,6 @@ type Order struct {
 
 	BaseOrder
 
-	PatientId        uint `json:"patientId" form:"patientId" gorm:"column:patient_id;comment:患者"`
 	CUserId          uint `json:"cUserId" form:"cUserId" gorm:"column:c_user_id;comment:关联标记"`
 	SysTenancyId     uint `gorm:"index:sys_tenancy_id;column:sys_tenancy_id;type:int;not null" json:"sysTenancyId"` // 商户 id
 	GroupOrderId     uint `gorm:"column:group_order_id;type:int" json:"groupOrderId"`

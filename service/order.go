@@ -236,15 +236,6 @@ func GetOrderDetailById(id uint, funcs ...func(*gorm.DB) *gorm.DB) (response.Ord
 		order.UserNickName = cuser.NickName
 	}
 
-	// 如果不是小程序用户，显示床旁名称
-	if order.PatientId > 0 && order.UserNickName == "" {
-		patient, err := GetPatientById(order.PatientId)
-		if err != nil {
-			return order, err
-		}
-		order.UserNickName = patient.Name
-	}
-
 	orderProducts, err := GetOrderProductsByOrderIds([]uint{order.ID})
 	if err != nil {
 		return order, err
@@ -470,12 +461,8 @@ func getOrderSearch(info request.OrderPageInfo, ctx *gin.Context, db *gorm.DB) (
 		}
 	}
 
-	if info.SysUserId > 0 {
-		db.Where("orders.c_user_id = ?", info.SysUserId)
-	}
-
-	if info.PatientId > 0 {
-		db.Where("orders.patient_id = ?", info.PatientId)
+	if info.CUserId > 0 {
+		db.Where("orders.c_user_id = ?", info.CUserId)
 	}
 
 	if info.Date != "" {
@@ -651,14 +638,14 @@ func GetNoPayOrdersByOrderSn(orderSn string) ([]response.OrderDetail, error) {
 }
 
 // CheckOrder 结算订单
-func CheckOrder(cartIds []uint, tenancyId, userId, patientId uint) (response.CheckOrder, error) {
-	return GetOrderInfoByCartId(tenancyId, userId, patientId, cartIds)
+func CheckOrder(cartIds []uint, tenancyId, userId uint) (response.CheckOrder, error) {
+	return GetOrderInfoByCartId(tenancyId, userId, cartIds)
 }
 
 // GetOrderInfoByCartId 根据购物车获取订单信息
-func GetOrderInfoByCartId(tenancyId, userId, patientId uint, cartIds []uint) (response.CheckOrder, error) {
+func GetOrderInfoByCartId(tenancyId, userId uint, cartIds []uint) (response.CheckOrder, error) {
 	var res response.CheckOrder
-	list, fails, _, err := GetCartList(tenancyId, userId, patientId, cartIds)
+	list, fails, _, err := GetCartList(tenancyId, userId, cartIds)
 	if err != nil {
 		return res, fmt.Errorf("获取购物车信息 %w", err)
 	}
@@ -698,21 +685,13 @@ func GetOrderInfoByCartId(tenancyId, userId, patientId uint, cartIds []uint) (re
 // - 生成订单组
 // - 生成订单
 // - 二维码需要 data:image/png;base64,
-func CreateOrder(req request.CreateOrder, tenancyId, userId, patientId uint, tenancyName string) ([]byte, uint, error) {
+func CreateOrder(req request.CreateOrder, tenancyId, userId uint, tenancyName string) ([]byte, uint, error) {
 	var png []byte
 
 	var order model.Order
-	// 床旁用户登录，userId 为患者id
-	patient, err := GetPatientById(patientId)
-	if err != nil {
-		if errors.Is(err, gorm.ErrRecordNotFound) {
-			return nil, 0, fmt.Errorf("患者不存在")
-		} else {
-			return nil, 0, fmt.Errorf("患者数据错误")
-		}
-	}
-	userAddress := fmt.Sprintf("%s-%s-%s床", tenancyName, patient.LocName, patient.BedNum)
-	orderInfo, err := GetOrderInfoByCartId(tenancyId, userId, patientId, req.CartIds)
+
+	// userAddress := fmt.Sprintf("%s-%s-%s床", tenancyName, patient.LocName, patient.BedNum)
+	orderInfo, err := GetOrderInfoByCartId(tenancyId, userId, req.CartIds)
 	if err != nil {
 		return nil, 0, err
 	}
@@ -731,16 +710,15 @@ func CreateOrder(req request.CreateOrder, tenancyId, userId, patientId uint, ten
 
 	groupOrder := model.GroupOrder{
 		GroupOrderSn: g.CreateOrderSn("G"),
-		RealName:     patient.Name,
-		UserPhone:    patient.Phone,
-		UserAddress:  userAddress,
+		// RealName:     patient.Name,
+		// UserPhone:    patient.Phone,
+		// UserAddress:  userAddress,
 		TotalNum:     orderInfo.TotalNum,
 		TotalPrice:   totalPrice,
 		PayPrice:     orderPrice,
 		TotalPostage: postagePrice,
 		PayPostage:   postagePrice,
 		Paid:         g.StatusFalse,
-		PatientId:    patientId,
 		CUserId:      userId,
 		Cost:         orderCost,
 	}
@@ -753,10 +731,10 @@ func CreateOrder(req request.CreateOrder, tenancyId, userId, patientId uint, ten
 		// 订单
 		order = model.Order{
 			BaseOrder: model.BaseOrder{
-				OrderSn:      g.CreateOrderSn(req.OrderType),
-				RealName:     patient.Name,
-				UserPhone:    patient.Phone,
-				UserAddress:  userAddress,
+				OrderSn: g.CreateOrderSn(req.OrderType),
+				// RealName:     patient.Name,
+				// UserPhone:    patient.Phone,
+				// UserAddress:  userAddress,
 				OrderType:    req.OrderType,
 				Remark:       req.Remark,
 				TotalNum:     orderInfo.TotalNum,
@@ -767,7 +745,7 @@ func CreateOrder(req request.CreateOrder, tenancyId, userId, patientId uint, ten
 				Paid:         g.StatusFalse,
 				Cost:         orderCost,
 			},
-			PatientId:    patientId,
+
 			CUserId:      userId,
 			SysTenancyId: tenancyId,
 			GroupOrderId: groupOrder.ID,
@@ -838,7 +816,7 @@ func CreateOrder(req request.CreateOrder, tenancyId, userId, patientId uint, ten
 			return fmt.Errorf("生成订单-修改购物车属性错误 %w", err)
 		}
 		// 生成二维码
-		png, err = GetQrCode(order.ID, tenancyId, patientId, order.OrderType)
+		png, err = GetQrCode(order.ID, tenancyId, order.OrderType)
 		if err != nil {
 			return err
 		}
@@ -852,7 +830,7 @@ func CreateOrder(req request.CreateOrder, tenancyId, userId, patientId uint, ten
 }
 
 // GetQrCode 生成支付二维码
-func GetQrCode(orderId, tenancyId, patientId uint, orderType int) ([]byte, error) {
+func GetQrCode(orderId, tenancyId uint, orderType int) ([]byte, error) {
 	seitURL, err := param.GetSeitURL()
 	if err != nil {
 		return nil, err
@@ -861,7 +839,7 @@ func GetQrCode(orderId, tenancyId, patientId uint, orderType int) ([]byte, error
 	// 生成支付地址二维码
 	// 订单自动过期时间
 	autoCloseTime := param.GetOrderAutoCloseTime()
-	payUrl := fmt.Sprintf("%s/v1/pay/payOrder?orderId=%d&tenancyId=%d&patientId=%d&orderType=%d&expire=%d", seitURL, orderId, tenancyId, patientId, orderType, time.Now().Add(time.Duration(autoCloseTime)*time.Minute).Unix())
+	payUrl := fmt.Sprintf("%s/v1/pay/payOrder?orderId=%d&tenancyId=%d&orderType=%d&expire=%d", seitURL, orderId, tenancyId, orderType, time.Now().Add(time.Duration(autoCloseTime)*time.Minute).Unix())
 	if g.TENANCY_CONFIG.System.Level == "debug" {
 		g.TENANCY_LOG.Info("支付二维码", zap.String("url", payUrl))
 	}
@@ -1148,20 +1126,6 @@ func GetOrderUserNum(scopes ...func(*gorm.DB) *gorm.DB) (int64, error) {
 	return count, nil
 }
 
-// GetOrderPatientNum 获取订单床旁用户数量
-func GetOrderPatientNum(scopes ...func(*gorm.DB) *gorm.DB) (int64, error) {
-	var count int64
-	db := g.TENANCY_DB.Model(&model.Order{}).Where("paid =?", g.StatusTrue)
-	if len(scopes) > 0 {
-		db = db.Scopes(scopes...)
-	}
-	err := db.Where("patient_id > ? and c_user_id= ? ", 0, 0).Group("patient_id").Count(&count).Error
-	if err != nil && !errors.Is(err, gorm.ErrRecordNotFound) {
-		return 0, err
-	}
-	return count, nil
-}
-
 // GetOrderGroup 获取订单数量按时间分组集合
 func GetOrderGroup(scopes ...func(*gorm.DB) *gorm.DB) ([]response.ClientStaticOrder, error) {
 	var res []response.ClientStaticOrder
@@ -1200,20 +1164,6 @@ func GetOrderUserNumGroup(scopes ...func(*gorm.DB) *gorm.DB) ([]request.Result, 
 		db = db.Scopes(scopes...)
 	}
 	err := db.Where("c_user_id > ?", 0).Group("time").Find(&res).Error
-	if err != nil && !errors.Is(err, gorm.ErrRecordNotFound) {
-		return nil, err
-	}
-	return res, nil
-}
-
-// GetOrderPatientNumGroup 获取床旁订单数量按时间分组集合
-func GetOrderPatientNumGroup(scopes ...func(*gorm.DB) *gorm.DB) ([]request.Result, error) {
-	var res []request.Result
-	db := g.TENANCY_DB.Model(&model.Order{}).Select("count(DISTINCT patient_id) as total , from_unixtime(unix_timestamp(pay_time),'%H:%i') as time").Where("paid =?", g.StatusTrue)
-	if len(scopes) > 0 {
-		db = db.Scopes(scopes...)
-	}
-	err := db.Where("patient_id > ? and c_user_id= ? ", 0, 0).Group("time").Find(&res).Error
 	if err != nil && !errors.Is(err, gorm.ErrRecordNotFound) {
 		return nil, err
 	}

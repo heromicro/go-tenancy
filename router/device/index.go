@@ -46,10 +46,4 @@ func InitDeviceRouter(Router *gin.RouterGroup) {
 		RefundOrderRouter.POST("/getRefundOrderList", device.GetRefundOrderList)
 		RefundOrderRouter.GET("/getRefundOrderById/:id", device.GetRefundOrderById)
 	}
-	// 患者管理
-	PatientRouter := Router.Group("/patient")
-	{
-		PatientRouter.GET("/getPatientDetail", device.GetPatientDetail)
-		PatientRouter.GET("/getPatientList", device.GetPatientList)
-	}
 }

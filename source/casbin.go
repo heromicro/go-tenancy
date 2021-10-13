@@ -69,8 +69,6 @@ var carbines = []gormadapter.CasbinRule{
 	{Ptype: "p", V0: AdminAuthorityId, V1: "/v1/admin/user/setUserInfo/:user_id", V2: "PUT"},
 	{Ptype: "p", V0: AdminAuthorityId, V1: "/v1/admin/user/deleteUser", V2: "DELETE"},
 
-	// 患者管理
-	{Ptype: "p", V0: AdminAuthorityId, V1: "/v1/admin/patient/getPatientSelect/:tenancy_id", V2: "GET"},
 	// 用户管理
 	{Ptype: "p", V0: AdminAuthorityId, V1: "/v1/admin/cuser/getGeneralSelect/:tenancy_id", V2: "GET"},
 	{Ptype: "p", V0: AdminAuthorityId, V1: "/v1/admin/cuser/getGeneralList", V2: "POST"},
@@ -383,28 +381,26 @@ var carbines = []gormadapter.CasbinRule{
 	{Ptype: "p", V0: TenancyAuthorityId, V1: "/v1/merchant/user/getAdminList", V2: "POST"},
 	{Ptype: "p", V0: TenancyAuthorityId, V1: "/v1/merchant/user/setUserInfo/:user_id", V2: "PUT"},
 	{Ptype: "p", V0: TenancyAuthorityId, V1: "/v1/merchant/user/deleteUser", V2: "DELETE"},
-	// 患者管理
-	{Ptype: "p", V0: TenancyAuthorityId, V1: "/v1/merchant/patient/getPatientList", V2: "POST"},
 
 	// 物流信息
 	{Ptype: "p", V0: TenancyAuthorityId, V1: "/v1/merchant/express/getExpressByCode/:code", V2: "GET"},
 
 	// TODO:普通用户权限
-	{Ptype: "p", V0: GeneralAuthorityId, V1: "/v1/auth/logout", V2: "GET"},
-	{Ptype: "p", V0: GeneralAuthorityId, V1: "/v1/auth/clean", V2: "GET"},
+	{Ptype: "p", V0: LiteAuthorityId, V1: "/v1/auth/logout", V2: "GET"},
+	{Ptype: "p", V0: LiteAuthorityId, V1: "/v1/auth/clean", V2: "GET"},
 
 	// 我的地址
-	{Ptype: "p", V0: GeneralAuthorityId, V1: "/v1/user/address/getAddressList", V2: "POST"},
-	{Ptype: "p", V0: GeneralAuthorityId, V1: "/v1/user/address/createAddress", V2: "POST"},
-	{Ptype: "p", V0: GeneralAuthorityId, V1: "/v1/user/address/getAddressById/:id", V2: "GET"},
-	{Ptype: "p", V0: GeneralAuthorityId, V1: "/v1/user/address/updateAddress/:id", V2: "PUT"},
-	{Ptype: "p", V0: GeneralAuthorityId, V1: "/v1/user/address/deleteAddress/:id", V2: "DELETE"},
+	{Ptype: "p", V0: LiteAuthorityId, V1: "/v1/user/address/getAddressList", V2: "POST"},
+	{Ptype: "p", V0: LiteAuthorityId, V1: "/v1/user/address/createAddress", V2: "POST"},
+	{Ptype: "p", V0: LiteAuthorityId, V1: "/v1/user/address/getAddressById/:id", V2: "GET"},
+	{Ptype: "p", V0: LiteAuthorityId, V1: "/v1/user/address/updateAddress/:id", V2: "PUT"},
+	{Ptype: "p", V0: LiteAuthorityId, V1: "/v1/user/address/deleteAddress/:id", V2: "DELETE"},
 	// 我的发票
-	{Ptype: "p", V0: GeneralAuthorityId, V1: "/v1/user/receipt/getReceiptList", V2: "POST"},
-	{Ptype: "p", V0: GeneralAuthorityId, V1: "/v1/user/receipt/createReceipt", V2: "POST"},
-	{Ptype: "p", V0: GeneralAuthorityId, V1: "/v1/user/receipt/getReceiptById/:id", V2: "GET"},
-	{Ptype: "p", V0: GeneralAuthorityId, V1: "/v1/user/receipt/updateReceipt/:id", V2: "PUT"},
-	{Ptype: "p", V0: GeneralAuthorityId, V1: "/v1/user/receipt/deleteReceipt/:id", V2: "DELETE"},
+	{Ptype: "p", V0: LiteAuthorityId, V1: "/v1/user/receipt/getReceiptList", V2: "POST"},
+	{Ptype: "p", V0: LiteAuthorityId, V1: "/v1/user/receipt/createReceipt", V2: "POST"},
+	{Ptype: "p", V0: LiteAuthorityId, V1: "/v1/user/receipt/getReceiptById/:id", V2: "GET"},
+	{Ptype: "p", V0: LiteAuthorityId, V1: "/v1/user/receipt/updateReceipt/:id", V2: "PUT"},
+	{Ptype: "p", V0: LiteAuthorityId, V1: "/v1/user/receipt/deleteReceipt/:id", V2: "DELETE"},
 }
 
 //Init casbin_rule 表数据初始化

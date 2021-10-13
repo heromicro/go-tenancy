@@ -444,13 +444,12 @@ func GetProductIdsByKeyword(keyword string, tenancyId uint) ([]uint, error) {
 }
 
 // GetCartProducts
-func GetCartProducts(sysTenancyID, sysUserID, patientId uint, cartIds []uint) ([]response.CartProduct, error) {
+func GetCartProducts(sysTenancyId, cUserId uint, cartIds []uint) ([]response.CartProduct, error) {
 	cartProducts := []response.CartProduct{}
 	db := g.TENANCY_DB.Model(&model.Product{}).Where("products.is_show = ?", g.StatusTrue).Where("products.status = ?", model.SuccessProductStatus).Select("products.id as product_id,products.store_name,products.image,products.spec_type,products.price,carts.id,carts.cart_num,carts.sys_tenancy_id as sys_tenancy_id,carts.product_attr_unique,carts.is_fail").
 		Joins("left join carts on products.id = carts.product_id")
-	db = CheckTenancyId(db, sysTenancyID, "carts.")
-	db.Where("carts.c_user_id = ?", sysUserID).
-		Where("carts.patient_id = ?", patientId).
+	db = CheckTenancyId(db, sysTenancyId, "carts.")
+	db.Where("carts.c_user_id = ?", cUserId).
 		Where("carts.is_pay = ?", g.StatusFalse).
 		Where("carts.deleted_at is null")
 

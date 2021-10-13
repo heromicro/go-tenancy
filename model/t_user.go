@@ -17,6 +17,6 @@ type TUser struct {
 	HeaderImg string `json:"headerImg" gorm:"default:http://qmplusimg.henrongyi.top/head.png;comment:用户头像"`
 
 	Authority    SysAuthority `json:"authority" gorm:"foreignKey:AuthorityId;references:AuthorityId;comment:用户角色"`
-	AuthorityId  string       `json:"authorityId" gorm:"not null;comment:用户角色ID"`
+	AuthorityId  string       `json:"authorityId" gorm:"not null;type:varchar(90)"`
 	SysTenancyId uint         `json:"sysTenancyId" form:"sysTenancyId" gorm:"column:sys_tenancy_id;comment:关联标记"`
 }

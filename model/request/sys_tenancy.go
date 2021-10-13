@@ -36,6 +36,13 @@ type SetCopyProductNum struct {
 }
 
 type LoginDevice struct {
-	UUID string `json:"uuid" binding:"required"`
-	model.Patient
+	UUID       string `json:"uuid" binding:"required"`
+	Phone      string `json:"phone" form:"phone" binding:"required"`
+	Name       string `json:"name" form:"name" binding:"required"`
+	Sex        int    `json:"sex" form:"sex"`
+	Age        int    `json:"age" form:"age"`
+	LocName    string `json:"locName" form:"locName"  binding:"required"`
+	BedNum     string `json:"bedNum" form:"bedNum" binding:"required"`
+	HospitalNO string `json:"hospitalNo" form:"hospitalNo" binding:"required"`
+	Disease    string `json:"disease" form:"disease"  binding:"required"`
 }

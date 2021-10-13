@@ -22,7 +22,6 @@ type GetByTenancyId struct {
 type GetById struct {
 	Id        uint `json:"id" uri:"id" form:"id" binding:"required"`
 	TenancyId uint `json:"tenancy_id" uri:"tenancy_id" form:"tenancy_id"`
-	PatientId uint `json:"patient_id" uri:"patient_id" form:"patient_id"`
 	UserId    uint `json:"user_id" uri:"user_id" form:"user_id"`
 }
 

@@ -36,8 +36,6 @@ var baseApis = []model.SysApi{
 	{Path: "/v1/admin/user/setUserInfo/:user_id", AuthorityType: multi.AdminAuthority, Description: "设置用户信息", ApiGroup: "user", Method: "PUT"},
 	{Path: "/v1/admin/user/deleteUser", AuthorityType: multi.AdminAuthority, Description: "删除用户", ApiGroup: "user", Method: "DELETE"},
 
-	// 患者管理
-	{Path: "/v1/admin/patient/getPatientSelect/:tenancy_id", AuthorityType: multi.AdminAuthority, Description: "患者下拉选项", ApiGroup: "patient", Method: "GET"},
 	// 用户管理
 	{Path: "/v1/admin/cuser/getGeneralSelect/:tenancy_id", AuthorityType: multi.AdminAuthority, Description: "c用户下拉选项", ApiGroup: "cuser", Method: "GET"},
 	{Path: "/v1/admin/cuser/getGeneralList", AuthorityType: multi.AdminAuthority, Description: "c用户列表", ApiGroup: "cuser", Method: "POST"},
@@ -166,7 +164,7 @@ var baseApis = []model.SysApi{
 	{Path: "/v1/admin/productCategory/getCreateProductCategoryMap", AuthorityType: multi.AdminAuthority, Description: "商品分类添加表单", ApiGroup: "productCategory", Method: "GET"},
 	{Path: "/v1/admin/productCategory/getUpdateProductCategoryMap/:id", AuthorityType: multi.AdminAuthority, Description: "商品分类编辑表单", ApiGroup: "productCategory", Method: "GET"},
 	{Path: "/v1/admin/productCategory/getProductCategorySelect", AuthorityType: multi.AdminAuthority, Description: "商品分类选项", ApiGroup: "productCategory", Method: "GET"},
-	{Path: "/v1/admin/productCategory/getProductCategoryList", AuthorityType: multi.AdminAuthority, Description: "商品分类列表", ApiGroup: "productCategory", Method: "POST"},
+	{Path: "/v1/admin/productCategory/getProductCategoryList", AuthorityType: multi.AdminAuthority, Description: "商品分类列表", ApiGroup: "productCategory", Method: "GET"},
 	{Path: "/v1/admin/productCategory/createProductCategory", AuthorityType: multi.AdminAuthority, Description: "添加商品分类", ApiGroup: "productCategory", Method: "POST"},
 	{Path: "/v1/admin/productCategory/getProductCategoryById/:id", AuthorityType: multi.AdminAuthority, Description: "根据id商品分类", ApiGroup: "productCategory", Method: "GET"},
 	{Path: "/v1/admin/productCategory/changeProductCategoryStatus", AuthorityType: multi.AdminAuthority, Description: "修改商品分类状态", ApiGroup: "productCategory", Method: "POST"},
@@ -389,8 +387,6 @@ var baseApis = []model.SysApi{
 	{Path: "/v1/merchant/cuser/getOrderList/:id", AuthorityType: multi.TenancyAuthority, Description: "消费列表", ApiGroup: "cuserClient", Method: "POST"},
 	{Path: "/v1/merchant/cuser/setUserLabel/:id", AuthorityType: multi.TenancyAuthority, Description: "设置用户标签", ApiGroup: "cuserClient", Method: "POST"},
 	{Path: "/v1/merchant/cuser/setUserLabelMap/:id", AuthorityType: multi.TenancyAuthority, Description: "设置用户标签表单", ApiGroup: "cuserClient", Method: "GET"},
-	// 患者管理
-	{Path: "/v1/merchant/patient/getPatientList", AuthorityType: multi.TenancyAuthority, Description: "患者列表", ApiGroup: "patient", Method: "POST"},
 
 	//物流信息
 	{Path: "/v1/merchant/express/getExpressByCode/:code", AuthorityType: multi.TenancyAuthority, Description: "物流信息", ApiGroup: "expressClient", Method: "GET"},
