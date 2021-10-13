@@ -1,6 +1,5 @@
 # dirs
 log/
-cmd/
 tmp/
 old/
 uploads/
@@ -16,7 +15,6 @@ latest_log
 main
 tests/resource/favicon.ico
 .air.conf
-migration/main.go
 
 
 

@@ -607,10 +607,27 @@ func GetLikeStore(scopes ...func(*gorm.DB) *gorm.DB) (int64, error) {
 	return count, nil
 }
 
+// FindUserMerchantByHospitalNO 查询医院用户
+func FindUserMerchantByHospitalNO(hospitalNO string, tenancyId uint) (model.UserMerchant, error) {
+	var userMerchant model.UserMerchant
+	err := g.TENANCY_DB.Model(&model.UserMerchant{}).Where("hospital_no = ?", hospitalNO).Where("sys_tenancy_id = ?", tenancyId).First(&userMerchant).Error
+	if err != nil {
+		g.TENANCY_LOG.Error("查询医院用户失败", zap.String("FindUserMerchantByHospitalNO()", err.Error()))
+		return userMerchant, err
+	}
+	return userMerchant, nil
+}
+
 // CreateCUserFromDevice 医院设备用户登录
 // - 生成 c_users 和 user_merchants 表数据
 func CreateCUserFromDevice(loginDevice request.LoginDevice, tenancyId uint) (uint, error) {
 	var cUserId uint
+
+	// 用户存在直接返回设备用户
+	if userMerchant, err := FindUserMerchantByHospitalNO(loginDevice.HospitalNO, tenancyId); !errors.Is(err, gorm.ErrRecordNotFound) {
+		return userMerchant.CUserId, nil
+	}
+
 	cuser := model.CUser{
 		BaseGeneralInfo: model.BaseGeneralInfo{
 			RealName:  loginDevice.Name,

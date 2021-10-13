@@ -36,6 +36,10 @@ const (
 	LoginTypeDevice     // 床旁设备用户
 )
 
+// BaseGeneralInfo
+// - C端用户如果是小程序登录，根据UnionId判断用户唯一性
+// - 如果是床旁设备登录，根据 SysTenancyId 商户医院id和 UserMerchant 表的 HospitalNO 住院号判断用户唯一性
+// - 小程序端和用户端用户根据手机号码关联数据
 type BaseGeneralInfo struct {
 	Email     string   `json:"email" gorm:"default:'';comment:员工邮箱"`
 	Phone     string   `json:"phone" gorm:"type:char(15);default:'';comment:手机号"`
@@ -45,7 +49,7 @@ type BaseGeneralInfo struct {
 	Age       int      `json:"age" form:"age" gorm:"column:age;comment:年龄"`
 	Subscribe int      `json:"subscribe" form:"subscribe" gorm:"column:subscribe;comment:是否订阅"`
 	OpenId    string   `json:"openId" form:"openId" gorm:"type:varchar(30);column:open_id;comment:openid"`
-	UnionId   string   `json:"unionId" form:"unionId" gorm:"unique;type:varchar(30);column:union_id;comment:unionId"`
+	UnionId   string   `json:"unionId" form:"unionId" gorm:"type:varchar(30);column:union_id;comment:unionId"`
 	Country   string   `json:"country" form:"country" gorm:"type:varchar(32);column:country;comment:国家"`
 	Province  string   `json:"province" form:"province" gorm:"type:varchar(32);column:province;comment:省份"`
 	City      string   `json:"city" form:"city" gorm:"type:varchar(32);column:city;comment:城市"`

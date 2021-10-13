@@ -62,9 +62,7 @@ GO TEST
 ```
 
 迁移数据库，填充数据
-```go
- go test -v -run ^TestInitDB$ github.com/snowlyg/go-tenancy/tests
-```
+- 见 [迁移脚本](https://github.com/snowlyg/go-tenancy/tree/master/cmd/main.go)
 
 使用 vscode 执行测试
 - 用 vscode 打开项目 =》 终端 =》 运行任务 =》 选择对应任务执行

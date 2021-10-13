@@ -75,11 +75,11 @@ func TestMain(m *testing.M) {
 	cache.DeleteCache(g.TENANCY_CONFIG.Mysql.Dbname + ":id")
 	cache.DeleteCache(g.TENANCY_CONFIG.Mysql.Dbname + ":uuid")
 
-	// err = migration.DorpDB(g.TENANCY_DB, uuid)
-	// if err != nil {
-	// 	fmt.Printf("初始化商户错误： %v\n", err)
-	// 	return
-	// }
+	err = migration.DorpDB(g.TENANCY_DB, uuid)
+	if err != nil {
+		fmt.Printf("初始化商户错误： %v\n", err)
+		return
+	}
 
 	db, _ := g.TENANCY_DB.DB()
 	db.Close()
