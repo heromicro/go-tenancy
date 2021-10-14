@@ -310,9 +310,11 @@ func GetGeneralSelect(tenancyId uint) ([]response.SelectOption, error) {
 	}
 	var userSelects []response.SelectOption
 	err := g.TENANCY_DB.Model(&model.CUser{}).
-		Select("c_users.id as id,c_users.nick_name as name").
-		Where("status = ?", g.StatusTrue).
-		Where("is_show = ?", g.StatusTrue).
+		Select("c_users.id as id,c_users.real_name as name").
+		Joins("left join user_merchants on user_merchants.c_user_id = c_users.id").
+		Where("c_users.status = ?", g.StatusTrue).
+		Where("c_users.is_show = ?", g.StatusTrue).
+		Where("user_merchants.sys_tenancy_id = ?", tenancyId).
 		Find(&userSelects).Error
 	selects = append(selects, userSelects...)
 	return selects, err
@@ -333,15 +335,15 @@ func GetGeneralInfoList(info request.UserPageInfo, ctx *gin.Context) ([]response
 
 	db := g.TENANCY_DB.Model(&model.CUser{})
 	if multi.IsTenancy(ctx) {
-		db = db.Select("c_user.sex,c_user.nick_name,c_user.avatar_url,c_user.user_type,c_users.id as uid,c_user.username,c_user.authority_id,c_user.created_at,c_user.updated_at,sys_authorities.authority_name,sys_authorities.authority_type,c_user.authority_id,user_groups.group_name,user_merchants.first_pay_time,user_merchants.last_pay_time").
+		db = db.Select("c_users.sex,c_users.nick_name,c_users.avatar_url,c_users.user_type,c_users.id as uid,c_users.username,c_users.authority_id,c_users.created_at,c_users.updated_at,sys_authorities.authority_name,sys_authorities.authority_type,c_users.authority_id,user_groups.group_name,user_merchants.first_pay_time,user_merchants.last_pay_time").
 			Joins("left join user_merchants on user_merchants.c_user_id = c_users.id").
 			Where("user_merchants.sys_tenancy_id = ?", tenancyId)
 	} else {
-		db = db.Select("c_users.id as uid,c_user.username,c_user.authority_id,c_user.created_at,c_user.updated_at, c_user.*,sys_authorities.authority_name,sys_authorities.authority_type,c_user.authority_id,user_groups.group_name")
+		db = db.Select("c_users.id as uid,c_users.username,c_users.authority_id,c_users.created_at,c_users.updated_at, c_users.*,sys_authorities.authority_name,sys_authorities.authority_type,c_users.authority_id,user_groups.group_name")
 	}
-	db = db.Joins("left join sys_authorities on sys_authorities.authority_id = c_user.authority_id").
-		Joins("left join user_groups on c_user.group_id = user_groups.id").
-		Where("c_user.authority_id IN (?)", generalAuthorityIds)
+	db = db.Joins("left join sys_authorities on sys_authorities.authority_id = c_users.authority_id").
+		Joins("left join user_groups on c_users.group_id = user_groups.id").
+		Where("c_users.authority_id IN (?)", generalAuthorityIds)
 
 	if info.UserTimeType != "" && info.UserTime != "" {
 		userTimes := strings.Split(info.UserTime, "-")
@@ -625,6 +627,9 @@ func CreateCUserFromDevice(loginDevice request.LoginDevice, tenancyId uint) (uin
 
 	// 用户存在直接返回设备用户
 	if userMerchant, err := FindUserMerchantByHospitalNO(loginDevice.HospitalNO, tenancyId); !errors.Is(err, gorm.ErrRecordNotFound) {
+		if userMerchant.CUserId == 0 {
+			return userMerchant.CUserId, err
+		}
 		return userMerchant.CUserId, nil
 	}
 

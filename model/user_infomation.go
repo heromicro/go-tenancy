@@ -18,12 +18,12 @@ type UserUserLabel struct {
 type UserMerchant struct {
 	g.TENANCY_MODEL
 
-	FirstPayTime time.Time `gorm:"column:first_pay_time;type:timestamp" json:"firstPayTime"`                           // 首次消费时间
-	LastPayTime  time.Time `gorm:"column:last_pay_time;type:timestamp" json:"lastPayTime"`                             // 最后一次消费时间
-	PayCount     int       `gorm:"column:pay_count;type:int unsigned;not null;default:0" json:"payCount"`              // 消费次数
-	PayPrice     float64   `gorm:"column:pay_price;type:decimal(10,2) unsigned;not null;default:0.00" json:"payPrice"` // 消费金额
-	LastTime     time.Time `gorm:"column:last_time;type:timestamp;not null;default:CURRENT_TIMESTAMP" json:"lastTime"` // 最后一次访问时间
-	Status       int       `gorm:"column:status;type:tinyint unsigned;default:1" json:"status"`                        // 状态
+	FirstPayTime *time.Time `gorm:"column:first_pay_time;type:timestamp" json:"firstPayTime"`                           // 首次消费时间
+	LastPayTime  *time.Time `gorm:"column:last_pay_time;type:timestamp" json:"lastPayTime"`                             // 最后一次消费时间
+	PayCount     int        `gorm:"column:pay_count;type:int unsigned;not null;default:0" json:"payCount"`              // 消费次数
+	PayPrice     float64    `gorm:"column:pay_price;type:decimal(10,2) unsigned;not null;default:0.00" json:"payPrice"` // 消费金额
+	LastTime     time.Time  `gorm:"column:last_time;type:timestamp;not null;default:CURRENT_TIMESTAMP" json:"lastTime"` // 最后一次访问时间
+	Status       int        `gorm:"column:status;type:tinyint unsigned;default:1" json:"status"`                        // 状态
 
 	//  医院相关字段
 	LocName    string `json:"locName" form:"locName" gorm:"type:varchar(50);column:loc_name;comment:科室名称"`
@@ -109,12 +109,12 @@ type UserReceipt struct {
 type UserRecharge struct {
 	g.TENANCY_MODEL
 
-	Price        float64   `gorm:"column:price;type:decimal(8,2) unsigned;not null;default:0.00" json:"price"`      // 充值金额
-	GivePrice    float64   `gorm:"column:give_price;type:decimal(8,2);not null;default:0.00" json:"givePrice"`      // 购买赠送金额
-	RechargeType string    `gorm:"column:recharge_type;type:varchar(32);not null" json:"rechargeType"`              // 充值类型
-	Paid         int       `gorm:"column:paid;type:tinyint unsigned;not null;default:0" json:"paid"`                // 是否充值
-	PayTime      time.Time `gorm:"column:pay_time;type:timestamp" json:"payTime"`                                   // 充值支付时间
-	RefundPrice  float64   `gorm:"column:refund_price;type:decimal(10,2) unsigned;default:0.00" json:"refundPrice"` // 退款金额
+	Price        float64    `gorm:"column:price;type:decimal(8,2) unsigned;not null;default:0.00" json:"price"`      // 充值金额
+	GivePrice    float64    `gorm:"column:give_price;type:decimal(8,2);not null;default:0.00" json:"givePrice"`      // 购买赠送金额
+	RechargeType string     `gorm:"column:recharge_type;type:varchar(32);not null" json:"rechargeType"`              // 充值类型
+	Paid         int        `gorm:"column:paid;type:tinyint unsigned;not null;default:0" json:"paid"`                // 是否充值
+	PayTime      *time.Time `gorm:"column:pay_time;type:timestamp" json:"payTime"`                                   // 充值支付时间
+	RefundPrice  float64    `gorm:"column:refund_price;type:decimal(10,2) unsigned;default:0.00" json:"refundPrice"` // 退款金额
 
 	CUserId uint   `json:"sysUserId" form:"sysUserId" gorm:"column:sys_user_id;comment:关联标记"`
 	OrderId string `gorm:"unique;column:order_id;type:varchar(32);not null" json:"orderId"` // 订单号

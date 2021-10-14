@@ -2,6 +2,11 @@
 migration
 基于 https://github.com/go-gormigrate/gormigrate 实现
 用于数据库迁移使用，每次使用都需要修改 GormMysql() 方法内的数据库连接信息。
+
+迁移  go run .\cmd\main.go migrate -d=xxx:xxx@tcp(127.0.0.1:3306)/ -db=dbname
+回退  go run .\cmd\main.go rollback -d=xxx:xxx@tcp(127.0.0.1:3306)/ -db=dbname
+回退到某处迁移  go run .\cmd\main.go rollback -d=xxx:xxx@tcp(127.0.0.1:3306)/ -db=dbname -t=migration-id
+填充数据 go run .\cmd\main.go seed -d=xxx:xxx@tcp(127.0.0.1:3306)/ -db=dbname
 */
 
 package main

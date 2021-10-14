@@ -381,7 +381,7 @@ func LoginDevice(loginDevice request.LoginDevice) (*response.LoginResponse, erro
 
 	claims := &multi.CustomClaims{
 		ID:            strconv.FormatUint(uint64(cuserId), 10), // 患者 id
-		Username:      loginDevice.HospitalNO,
+		Username:      loginDevice.HospitalNO,                  // 用户名使用住院号
 		TenancyId:     tenancy.ID,
 		TenancyName:   tenancy.Name,
 		AuthorityId:   source.DeviceAuthorityId,
@@ -400,7 +400,7 @@ func LoginDevice(loginDevice request.LoginDevice) (*response.LoginResponse, erro
 	// 	"patient": patient,
 	// }
 	loginResponse := &response.LoginResponse{
-		User:  nil,
+		User:  loginDevice.HospitalNO,
 		Token: token,
 	}
 	return loginResponse, nil

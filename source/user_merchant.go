@@ -13,8 +13,9 @@ var UserMerchant = new(userMerchant)
 
 type userMerchant struct{}
 
+var now = time.Now()
 var userMerchants = []model.UserMerchant{
-	{CUserId: 7, SysTenancyId: 1, FirstPayTime: time.Now(), LastPayTime: time.Now(), PayCount: 3, PayPrice: 534.00, LastTime: time.Now(), Status: g.StatusTrue},
+	{CUserId: 7, SysTenancyId: 1, FirstPayTime: &now, LastPayTime: &now, PayCount: 3, PayPrice: 534.00, LastTime: now, Status: g.StatusTrue},
 }
 
 var userTenancyUserLabels = []model.UserUserLabel{

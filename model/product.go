@@ -94,7 +94,7 @@ type BaseProductReply struct {
 	Comment              string    `gorm:"column:comment;type:varchar(512);not null" json:"comment"`                    // 评论内容
 	Pics                 string    `gorm:"column:pics;type:text;not null" json:"pics"`                                  // 评论图片
 	MerchantReplyContent string    `gorm:"column:merchant_reply_content;type:varchar(300)" json:"merchantReplyContent"` // 管理员回复内容
-	MerchantReplyTime    time.Time `gorm:"column:merchant_reply_time;type:timestamp" json:"merchantReplyTime"`          // 管理员回复时间
+	MerchantReplyTime    time.Time `gorm:"column:merchant_reply_time;type:timestamp;not nul" json:"merchantReplyTime"`  // 管理员回复时间
 	IsReply              int       `gorm:"column:is_reply;type:tinyint(1);not null;default:1" json:"isReply"`           // 2未回复1已回复
 	IsVirtual            int       `gorm:"column:is_virtual;type:tinyint(1);not null;default:1" json:"isVirtual"`       // 2不是虚拟评价1是虚拟评价
 	Nickname             string    `gorm:"column:nickname;type:varchar(64);not null" json:"nickname"`                   // 用户名称

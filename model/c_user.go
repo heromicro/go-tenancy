@@ -60,7 +60,7 @@ type BaseGeneralInfo struct {
 
 	Mark      string    `gorm:"column:mark;type:varchar(255);not null;default:''" json:"mark"`                      // 用户备注
 	Address   string    `gorm:"column:address;type:varchar(128)" json:"address"`                                    // 地址
-	LastTime  time.Time `gorm:"column:last_time;type:timestamp" json:"lastTime"`                                    // 最后一次登录时间
+	LastTime  time.Time `gorm:"column:last_time;type:timestamp;not null" json:"lastTime"`                           // 最后一次登录时间
 	LastIP    string    `gorm:"column:last_ip;type:varchar(16);not null" json:"lastIp"`                             // 最后一次登录ip
 	NowMoney  float64   `gorm:"column:now_money;type:decimal(8,2) unsigned;not null;default:0.00" json:"nowMoney"`  // 用户余额
 	LoginType int       `gorm:"column:login_type;type:varchar(32);not null" json:"loginType"`                       // 用户登录类型
